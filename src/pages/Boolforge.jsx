@@ -100,21 +100,22 @@ const Boolforge = ({ simplifiedExpression = null, variables = [] }) => {
     });
 
     let result = false;
+    const connectedInputs = inputs.filter(v => v !== undefined);
     switch (gate.type) {
       case 'AND':
-        result = inputs.length === 2 && inputs[0] && inputs[1];
+        result = connectedInputs.length > 0 && connectedInputs.every(Boolean);
         break;
       case 'OR':
-        result = inputs.length === 2 && (inputs[0] || inputs[1]);
+        result = connectedInputs.some(Boolean);
         break;
       case 'NOT':
         result = !inputs[0];
         break;
       case 'NAND':
-        result = !(inputs.length === 2 && inputs[0] && inputs[1]);
+        result = !(connectedInputs.length > 0 && connectedInputs.every(Boolean));
         break;
       case 'NOR':
-        result = !(inputs.length === 2 && (inputs[0] || inputs[1]));
+        result = !connectedInputs.some(Boolean);
         break;
       case 'XOR':
         result = inputs.length === 2 && (inputs[0] !== inputs[1]);
@@ -169,14 +170,15 @@ const Boolforge = ({ simplifiedExpression = null, variables = [] }) => {
           let toY;
 
           if (toGate.inputs === 1) {
-            // Single input - centered
             toY = toGate.y + 50;
           } else if (toGate.inputs === 2) {
-            // Two inputs - top and bottom
             toY = toGate.y + (wire.toIndex === 0 ? 35 : 65);
           } else {
-            // Default to center
-            toY = toGate.y + 50;
+            // Spread N inputs evenly across gate height (20px top margin, 80px height)
+            const n = toGate.inputs;
+            const gateTop = toGate.y + 15;
+            const gateBottom = toGate.y + 85;
+            toY = gateTop + (wire.toIndex / (n - 1)) * (gateBottom - gateTop);
           }
 
           const isActive = evaluateGate(fromGate, memo);
@@ -532,17 +534,18 @@ const Boolforge = ({ simplifiedExpression = null, variables = [] }) => {
       }
     });
 
+    const connectedInputs2 = inputs.filter(v => v !== undefined);
     switch (gate.type) {
       case 'AND':
-        return inputs.length === 2 && inputs[0] && inputs[1];
+        return connectedInputs2.length > 0 && connectedInputs2.every(Boolean);
       case 'OR':
-        return inputs.length === 2 && (inputs[0] || inputs[1]);
+        return connectedInputs2.some(Boolean);
       case 'NOT':
         return !inputs[0];
       case 'NAND':
-        return !(inputs.length === 2 && inputs[0] && inputs[1]);
+        return !(connectedInputs2.length > 0 && connectedInputs2.every(Boolean));
       case 'NOR':
-        return !(inputs.length === 2 && (inputs[0] || inputs[1]));
+        return !connectedInputs2.some(Boolean);
       case 'XOR':
         return inputs.length === 2 && (inputs[0] !== inputs[1]);
       case 'XNOR':
@@ -809,20 +812,20 @@ const Boolforge = ({ simplifiedExpression = null, variables = [] }) => {
                 />
               )}
 
-              {gate.inputs === 2 && (
-                <>
+              {gate.inputs >= 2 && Array.from({ length: gate.inputs }).map((_, idx) => {
+                const n = gate.inputs;
+                const topPct = n === 2
+                  ? (idx === 0 ? 35 : 65)
+                  : 15 + (idx / (n - 1)) * 70;
+                return (
                   <div
+                    key={idx}
                     className={`connection-point input-point ${connectingFrom ? 'active' : ''}`}
-                    style={{ top: '35%' }}
-                    onClick={() => completeConnection(gate, 0)}
+                    style={{ top: `${topPct}%` }}
+                    onClick={() => completeConnection(gate, idx)}
                   />
-                  <div
-                    className={`connection-point input-point ${connectingFrom ? 'active' : ''}`}
-                    style={{ top: '65%' }}
-                    onClick={() => completeConnection(gate, 1)}
-                  />
-                </>
-              )}
+                );
+              })}
 
               {gate.inputs === 1 && (
                 <>

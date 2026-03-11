@@ -6,8 +6,17 @@ export const parseExpressionToCircuit = (expression, variables) => {
 
     // Remove "F = " prefix
     let expr = expression.replace(/^F\s*=\s*/, '').trim();
-    // Normalize explicit AND operators to a single symbol and remove spaces
+    // Normalize explicit AND operators and remove spaces
     expr = expr.replace(/[•.*]/g, '•').replace(/\s+/g, '');
+
+    // ── Scan which variables appear complemented in the expression ──────────────
+    const complementedVars = new Set();
+    for (let i = 0; i < expr.length; i++) {
+        // A variable letter followed immediately by '
+        if (/[A-Za-z]/.test(expr[i]) && expr[i + 1] === "'") {
+            complementedVars.add(expr[i]);
+        }
+    }
 
     // Helper: split at top-level by a separator (ignoring parentheses)
     const splitTopLevel = (str, sep) => {
@@ -32,16 +41,16 @@ export const parseExpressionToCircuit = (expression, variables) => {
     let gateId = 0;
     let wireId = 0;
 
-    // Calculate layout parameters
-    const inputSpacing = 140;
-    const termSpacing = 150;
-    const inputStartY = 100;
-    const termStartY = 100;
+    // Layout constants
+    const inputSpacing = 120;
+    const termSpacing = 160;
+    const inputStartY = 80;
+    const termStartY = 80;
 
-    // Create input gates for each variable
+    // ── Create INPUT gates for each variable ────────────────────────────────────
     const inputGates = {};
     variables.forEach((variable, index) => {
-        const inputGate = {
+        const g = {
             id: gateId++,
             type: 'INPUT',
             label: variable,
@@ -51,47 +60,60 @@ export const parseExpressionToCircuit = (expression, variables) => {
             hasOutput: true,
             inputValues: [false]
         };
-        gates.push(inputGate);
-        inputGates[variable] = inputGate.id;
+        gates.push(g);
+        inputGates[variable] = g.id;
     });
 
-    // Create NOT gates for inverted variables (A', B', etc.)
+    // ── Create NOT gates ONLY for variables that appear complemented ────────────
     const notGates = {};
     variables.forEach((variable, index) => {
-        const notGate = {
+        if (!complementedVars.has(variable)) return; // skip if not needed
+        const g = {
             id: gateId++,
             type: 'NOT',
             label: `${variable}'`,
-            x: 250,
+            x: 240,
             y: inputStartY + index * inputSpacing,
             inputs: 1,
             hasOutput: true,
             inputValues: []
         };
-        gates.push(notGate);
-        notGates[variable] = notGate.id;
-
-        // Connect input to NOT gate
-        wires.push({
-            id: wireId++,
-            fromId: inputGates[variable],
-            toId: notGate.id,
-            toIndex: 0
-        });
+        gates.push(g);
+        notGates[variable] = g.id;
+        wires.push({ id: wireId++, fromId: inputGates[variable], toId: g.id, toIndex: 0 });
     });
 
-    // Process each term
-    const termGates = [];
+    // ── X offset for AND/OR gates: further right if there are NOT gates ─────────
+    const hasNotGates = complementedVars.size > 0;
+    const andX = hasNotGates ? 430 : 270;
+    const orX = hasNotGates ? 620 : 460;
 
-    // Parse factors within a product term
+    // ── Helper: resolve a literal token to a gate id ────────────────────────────
+    const resolveToken = (token, fallbackY) => {
+        if (token === '1' || token === '0') {
+            const g = {
+                id: gateId++, type: 'INPUT', label: token,
+                x: andX, y: fallbackY, inputs: 0, hasOutput: true,
+                inputValues: [token === '1']
+            };
+            gates.push(g);
+            return g.id;
+        }
+        const variable = token.replace("'", "");
+        const isInverted = token.endsWith("'");
+        return isInverted ? notGates[variable] : inputGates[variable];
+    };
+
+    // ── Parse a product term; returns gate id of the term's output ──────────────
     const parseProduct = (term, termIndex) => {
-        const factors = [];
+        const termY = termStartY + termIndex * termSpacing;
+        const factors = []; // each: { type:'literal'|'gate', token?, id? }
+
         for (let i = 0; i < term.length; i++) {
             const ch = term[i];
             if (ch === '(') {
-                // Parse inner parenthesized expression (may have trailing ')
-                let j = i + 1;
-                let depth = 1;
+                // parenthesised sub-expression
+                let j = i + 1, depth = 1;
                 while (j < term.length && depth > 0) {
                     if (term[j] === '(') depth++;
                     else if (term[j] === ')') depth--;
@@ -99,32 +121,24 @@ export const parseExpressionToCircuit = (expression, variables) => {
                 }
                 const inner = term.slice(i + 1, j - 1);
                 const hasNot = j < term.length && term[j] === "'";
-                // Build sub-expression gate (OR of inner terms or product)
-                const subGateId = buildSubExpression(inner, termIndex);
-                let sourceId = subGateId;
+                let subId = buildSubExpression(inner, termIndex);
                 if (hasNot) {
-                    const notGate = {
-                        id: gateId++,
-                        type: 'NOT',
-                        label: `(${inner})'`,
-                        x: 550,
-                        y: termStartY + termIndex * termSpacing,
-                        inputs: 1,
-                        hasOutput: true,
-                        inputValues: []
+                    const ng = {
+                        id: gateId++, type: 'NOT', label: `(${inner})'`,
+                        x: andX - 80, y: termY, inputs: 1, hasOutput: true, inputValues: []
                     };
-                    gates.push(notGate);
-                    wires.push({ id: wireId++, fromId: subGateId, toId: notGate.id, toIndex: 0 });
-                    sourceId = notGate.id;
+                    gates.push(ng);
+                    wires.push({ id: wireId++, fromId: subId, toId: ng.id, toIndex: 0 });
+                    subId = ng.id;
                     i = j; // consumed ')'
                 } else {
-                    i = j - 1; // consumed ')'
+                    i = j - 1;
                 }
-                factors.push({ type: 'gate', id: sourceId });
+                factors.push({ type: 'gate', id: subId });
             } else if (ch === '•') {
-                // explicit AND separator, skip
+                // explicit AND separator — skip
             } else {
-                // Variable or constant possibly with apostrophe
+                // variable or constant, possibly followed by '
                 let token = ch;
                 if (i + 1 < term.length && term[i + 1] === "'") {
                     token += "'";
@@ -135,292 +149,125 @@ export const parseExpressionToCircuit = (expression, variables) => {
         }
 
         if (factors.length === 0) return null;
+
+        // Single factor — no AND gate needed
         if (factors.length === 1) {
             const f = factors[0];
             if (f.type === 'gate') return f.id;
-            const variable = f.token.replace("'", "");
-            const isInverted = f.token.includes("'");
-            if (variable === '1' || variable === '0') {
-                const constGate = {
-                    id: gateId++,
-                    type: 'INPUT',
-                    label: variable,
-                    x: 450,
-                    y: termStartY + termIndex * termSpacing,
-                    inputs: 0,
-                    hasOutput: true,
-                    inputValues: [variable === '1']
-                };
-                gates.push(constGate);
-                return constGate.id;
-            }
-            return isInverted ? notGates[variable] : inputGates[variable];
+            return resolveToken(f.token, termY);
         }
 
-        // Build AND chain for multiple factors
-        const andGateBase = {
+        // Multiple factors — build a SINGLE multi-input AND gate
+        const andGate = {
             id: gateId++,
             type: 'AND',
             label: `AND${termIndex}`,
-            x: 450,
-            y: termStartY + termIndex * termSpacing,
-            inputs: 2,
+            x: andX,
+            y: termY,
+            inputs: factors.length,   // ← multi-input
             hasOutput: true,
             inputValues: []
         };
-        gates.push(andGateBase);
+        gates.push(andGate);
 
-        const getSourceId = (factor) => {
-            if (factor.type === 'gate') return factor.id;
-            const variable = factor.token.replace("'", "");
-            const isInverted = factor.token.includes("'");
-            if (variable === '1' || variable === '0') {
-                const constGate = {
-                    id: gateId++,
-                    type: 'INPUT',
-                    label: variable,
-                    x: 450,
-                    y: termStartY + termIndex * termSpacing,
-                    inputs: 0,
-                    hasOutput: true,
-                    inputValues: [variable === '1']
-                };
-                gates.push(constGate);
-                return constGate.id;
-            }
-            return isInverted ? notGates[variable] : inputGates[variable];
-        };
-
-        const firstTwo = factors.slice(0, 2);
-        firstTwo.forEach((f, idx) => {
-            wires.push({
-                id: wireId++,
-                fromId: getSourceId(f),
-                toId: andGateBase.id,
-                toIndex: idx
-            });
+        factors.forEach((f, idx) => {
+            const srcId = f.type === 'gate' ? f.id : resolveToken(f.token, termY);
+            wires.push({ id: wireId++, fromId: srcId, toId: andGate.id, toIndex: idx });
         });
 
-        let currentAndGate = andGateBase;
-        for (let idx = 2; idx < factors.length; idx++) {
-            const nextAndGate = {
-                id: gateId++,
-                type: 'AND',
-                label: `AND${termIndex}_${idx}`,
-                x: 450 + (idx - 1) * 150,
-                y: termStartY + termIndex * termSpacing,
-                inputs: 2,
-                hasOutput: true,
-                inputValues: []
-            };
-            gates.push(nextAndGate);
-            wires.push({ id: wireId++, fromId: currentAndGate.id, toId: nextAndGate.id, toIndex: 0 });
-            wires.push({ id: wireId++, fromId: getSourceId(factors[idx]), toId: nextAndGate.id, toIndex: 1 });
-            currentAndGate = nextAndGate;
-        }
-        return currentAndGate.id;
+        return andGate.id;
     };
 
-    // Build sub-expression for parentheses (returns gate id)
+    // ── Build sub-expression inside parentheses (OR of product terms) ────────────
     const buildSubExpression = (inner, termIndex) => {
+        const termY = termStartY + termIndex * termSpacing;
         const innerTerms = splitTopLevel(inner, '+');
-        const innerTermGateIds = innerTerms.map(t => parseProduct(t, termIndex)).filter(Boolean);
-        if (innerTermGateIds.length === 0) return null;
-        if (innerTermGateIds.length === 1) return innerTermGateIds[0];
-        // Chain OR gates
-        let currentOrGate = {
-            id: gateId++,
-            type: 'OR',
-            label: `OR${termIndex}_0`,
-            x: 650,
-            y: termStartY + termIndex * termSpacing,
-            inputs: 2,
-            hasOutput: true,
-            inputValues: []
+        const ids = innerTerms.map(t => parseProduct(t, termIndex)).filter(Boolean);
+        if (ids.length === 0) return null;
+        if (ids.length === 1) return ids[0];
+
+        // Single multi-input OR gate
+        const orGate = {
+            id: gateId++, type: 'OR', label: `OR${termIndex}_sub`,
+            x: andX + 120, y: termY,
+            inputs: ids.length, hasOutput: true, inputValues: []
         };
-        gates.push(currentOrGate);
-        wires.push({ id: wireId++, fromId: innerTermGateIds[0], toId: currentOrGate.id, toIndex: 0 });
-        wires.push({ id: wireId++, fromId: innerTermGateIds[1], toId: currentOrGate.id, toIndex: 1 });
-        for (let i = 2; i < innerTermGateIds.length; i++) {
-            const nextOrGate = {
-                id: gateId++,
-                type: 'OR',
-                label: `OR${termIndex}_${i - 1}`,
-                x: 650 + (i - 1) * 150,
-                y: termStartY + termIndex * termSpacing,
-                inputs: 2,
-                hasOutput: true,
-                inputValues: []
-            };
-            gates.push(nextOrGate);
-            wires.push({ id: wireId++, fromId: currentOrGate.id, toId: nextOrGate.id, toIndex: 0 });
-            wires.push({ id: wireId++, fromId: innerTermGateIds[i], toId: nextOrGate.id, toIndex: 1 });
-            currentOrGate = nextOrGate;
-        }
-        return currentOrGate.id;
+        gates.push(orGate);
+        ids.forEach((srcId, idx) => {
+            wires.push({ id: wireId++, fromId: srcId, toId: orGate.id, toIndex: idx });
+        });
+        return orGate.id;
     };
 
+    // ── Parse all top-level SOP terms ───────────────────────────────────────────
     const terms = splitTopLevel(expr, '+');
+    const termGateIds = [];
 
     terms.forEach((term, termIndex) => {
         if (term === '1') {
-            // Constant 1 - create a special input
-            const constGate = {
-                id: gateId++,
-                type: 'INPUT',
-                label: '1',
-                x: 450,
-                y: termStartY + termIndex * termSpacing,
-                inputs: 0,
-                hasOutput: true,
-                inputValues: [true]
+            const g = {
+                id: gateId++, type: 'INPUT', label: '1',
+                x: andX, y: termStartY + termIndex * termSpacing,
+                inputs: 0, hasOutput: true, inputValues: [true]
             };
-            gates.push(constGate);
-            termGates.push(constGate.id);
+            gates.push(g);
+            termGateIds.push(g.id);
             return;
         }
         if (term === '0') {
-            const constGate = {
-                id: gateId++,
-                type: 'INPUT',
-                label: '0',
-                x: 450,
-                y: termStartY + termIndex * termSpacing,
-                inputs: 0,
-                hasOutput: true,
-                inputValues: [false]
+            const g = {
+                id: gateId++, type: 'INPUT', label: '0',
+                x: andX, y: termStartY + termIndex * termSpacing,
+                inputs: 0, hasOutput: true, inputValues: [false]
             };
-            gates.push(constGate);
-            termGates.push(constGate.id);
+            gates.push(g);
+            termGateIds.push(g.id);
             return;
         }
-
-        const gateIdForTerm = parseProduct(term, termIndex);
-        if (gateIdForTerm !== null && gateIdForTerm !== undefined) {
-            termGates.push(gateIdForTerm);
-        }
+        const id = parseProduct(term, termIndex);
+        if (id !== null && id !== undefined) termGateIds.push(id);
     });
 
-    // Create OR gate to combine all terms (if more than one term)
+    if (termGateIds.length === 0) return { gates, wires };
+
+    // ── Combine terms with a final OR gate (if >1 term) ────────────────────────
     let outputSourceId;
 
-    if (termGates.length === 0) {
-        return { gates, wires };
-    } else if (termGates.length === 1) {
-        // Single term - connect directly to output
-        outputSourceId = termGates[0];
+    if (termGateIds.length === 1) {
+        outputSourceId = termGateIds[0];
     } else {
-        // Multiple terms - need OR gates
-        if (termGates.length === 2) {
-            // Two terms - single OR gate
-            const orGate = {
-                id: gateId++,
-                type: 'OR',
-                label: 'OR',
-                x: 650,
-                y: inputStartY + ((termGates.length - 1) * termSpacing) / 2,
-                inputs: 2,
-                hasOutput: true,
-                inputValues: []
-            };
-            gates.push(orGate);
-
-            // Connect terms to OR gate
-            termGates.forEach((termGateId, idx) => {
-                wires.push({
-                    id: wireId++,
-                    fromId: termGateId,
-                    toId: orGate.id,
-                    toIndex: idx
-                });
-            });
-
-            outputSourceId = orGate.id;
-        } else {
-            // More than 2 terms - chain OR gates
-            let currentOrGate = {
-                id: gateId++,
-                type: 'OR',
-                label: 'OR0',
-                x: 650,
-                y: termStartY,
-                inputs: 2,
-                hasOutput: true,
-                inputValues: []
-            };
-            gates.push(currentOrGate);
-
-            // Connect first two terms
-            wires.push({
-                id: wireId++,
-                fromId: termGates[0],
-                toId: currentOrGate.id,
-                toIndex: 0
-            });
-            wires.push({
-                id: wireId++,
-                fromId: termGates[1],
-                toId: currentOrGate.id,
-                toIndex: 1
-            });
-
-            // Chain additional OR gates
-            for (let i = 2; i < termGates.length; i++) {
-                const nextOrGate = {
-                    id: gateId++,
-                    type: 'OR',
-                    label: `OR${i - 1}`,
-                    x: 650 + (i - 1) * 150,
-                    y: termStartY + i * 60,
-                    inputs: 2,
-                    hasOutput: true,
-                    inputValues: []
-                };
-                gates.push(nextOrGate);
-
-                // Connect previous OR to new OR input 0
-                wires.push({
-                    id: wireId++,
-                    fromId: currentOrGate.id,
-                    toId: nextOrGate.id,
-                    toIndex: 0
-                });
-
-                // Connect term to new OR input 1
-                wires.push({
-                    id: wireId++,
-                    fromId: termGates[i],
-                    toId: nextOrGate.id,
-                    toIndex: 1
-                });
-
-                currentOrGate = nextOrGate;
-            }
-
-            outputSourceId = currentOrGate.id;
-        }
+        // Single multi-input OR gate for all top-level terms
+        const centerY = termStartY + ((termGateIds.length - 1) * termSpacing) / 2;
+        const finalOrGate = {
+            id: gateId++,
+            type: 'OR',
+            label: 'OR',
+            x: orX,
+            y: centerY,
+            inputs: termGateIds.length,   // ← multi-input
+            hasOutput: true,
+            inputValues: []
+        };
+        gates.push(finalOrGate);
+        termGateIds.forEach((srcId, idx) => {
+            wires.push({ id: wireId++, fromId: srcId, toId: finalOrGate.id, toIndex: idx });
+        });
+        outputSourceId = finalOrGate.id;
     }
 
-    // Create output gate
+    // ── Output gate ─────────────────────────────────────────────────────────────
     const outputGate = {
         id: gateId++,
         type: 'OUTPUT',
         label: 'Z',
-        x: 850,
-        y: inputStartY + ((termGates.length - 1) * termSpacing) / 2,
+        x: orX + 200,
+        y: termStartY + ((termGateIds.length - 1) * termSpacing) / 2,
         inputs: 1,
         hasOutput: false,
         inputValues: []
     };
     gates.push(outputGate);
-
-    // Connect to output
-    wires.push({
-        id: wireId++,
-        fromId: outputSourceId,
-        toId: outputGate.id,
-        toIndex: 0
-    });
+    wires.push({ id: wireId++, fromId: outputSourceId, toId: outputGate.id, toIndex: 0 });
 
     return {
         gates,
