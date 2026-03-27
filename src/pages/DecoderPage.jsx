@@ -1,9 +1,18 @@
 import React, { useState, useMemo } from "react";
-import ToolLayout from "../components/ToolLayout";
-import ExplanationBlock from "../components/ExplanationBlock";
-import CircuitModal from "../components/CircuitModal";
 
-// ─── Decoder Logic ───────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════
+   DECODER PAGE — Upgraded with:
+   • Animated Minterm Explorer (click any output row to highlight)
+   • Live 7-Segment Display with BCD input
+   • Step-by-step "How to write D equation" builder
+   • Enable pin visual explanation
+   • Decoder as Function Generator interactive demo
+   • Expanded quiz with hints & streaks
+   • Floating tips panel
+   • Cascading decoder concept explainer
+   ═══════════════════════════════════════════════════════════════════ */
+
+// ─── Decoder Logic ─────────────────────────────────────────────────────────────
 const DECODER_TYPES = {
   "1to2": {
     label: "1-to-2 Decoder",
@@ -11,6 +20,7 @@ const DECODER_TYPES = {
     enableInput: true,
     outputs: ["D0", "D1"],
     description: "1-bit input + Enable → 2 output lines",
+    analogy: "Like a light switch that routes power to one of two lamps",
     decode: (code, en) => {
       if (!en) return { D0: 0, D1: 0, active: -1 };
       const i = code[0];
@@ -20,14 +30,20 @@ const DECODER_TYPES = {
       {
         out: "D0",
         eq: "D0 = E · A'",
+        color: "#34d399",
         explanation:
-          "Address 0 → binary '0'. A=0 means complement it → A'. Think: flip 0-bits.",
+          "D0 fires when Enable=1 AND A=0. Since D0 is address 0 (binary 0), we complement A to get A'=1 when A=0. Rule: complement any bit that is 0 in the target address.",
+        trick:
+          "Address 0 = '0' in binary → complement A to make it a 1 condition.",
       },
       {
         out: "D1",
         eq: "D1 = E · A",
+        color: "#60a5fa",
         explanation:
-          "Address 1 → binary '1'. A=1 means use directly. Think: keep 1-bits as-is.",
+          "D1 fires when Enable=1 AND A=1. Since address 1 has bit A=1, we use A directly (no complement). Rule: keep any bit that is 1 in the target address.",
+        trick:
+          "Address 1 = '1' in binary → use A directly, it's already 1 when we need it.",
       },
     ],
     truthRows: [
@@ -36,6 +52,10 @@ const DECODER_TYPES = {
       ["1", "1", "0", "1"],
     ],
     truthHeaders: ["E", "A", "D0", "D1"],
+    minterms: [
+      { idx: 0, binary: "0", desc: "m0: A'" },
+      { idx: 1, binary: "1", desc: "m1: A" },
+    ],
   },
   "2to4": {
     label: "2-to-4 Decoder",
@@ -43,6 +63,8 @@ const DECODER_TYPES = {
     enableInput: true,
     outputs: ["D0", "D1", "D2", "D3"],
     description: "2-bit binary code + Enable → 4 output lines",
+    analogy:
+      "Like a building directory that routes a visitor to one of 4 floors",
     decode: (code, en) => {
       if (!en) return { D0: 0, D1: 0, D2: 0, D3: 0, active: -1 };
       const i = (code[0] << 1) | code[1];
@@ -58,26 +80,35 @@ const DECODER_TYPES = {
       {
         out: "D0",
         eq: "D0 = E · A1' · A0'",
+        color: "#34d399",
         explanation:
-          "Address 00 → both bits are 0 → complement both. D0 fires ONLY when A1=0 AND A0=0.",
+          "Address 00 → both bits are 0 → complement both. D0 fires ONLY when A1=0 AND A0=0. The equation is the minterm m0.",
+        trick: "Address 00: both 0s → both complemented. A1'·A0'",
       },
       {
         out: "D1",
         eq: "D1 = E · A1' · A0",
+        color: "#60a5fa",
         explanation:
-          "Address 01 → A1=0 complement, A0=1 keep. D1 fires ONLY when A1=0 AND A0=1.",
+          "Address 01 → A1=0 (complement it), A0=1 (keep it). D1 fires when A1=0 AND A0=1. Minterm m1.",
+        trick: "Address 01: first bit 0 → A1', second bit 1 → A0. A1'·A0",
       },
       {
         out: "D2",
         eq: "D2 = E · A1 · A0'",
+        color: "#a78bfa",
         explanation:
-          "Address 10 → A1=1 keep, A0=0 complement. D2 fires ONLY when A1=1 AND A0=0.",
+          "Address 10 → A1=1 (keep it), A0=0 (complement it). D2 fires when A1=1 AND A0=0. Minterm m2.",
+        trick: "Address 10: first bit 1 → A1, second bit 0 → A0'. A1·A0'",
       },
       {
         out: "D3",
         eq: "D3 = E · A1 · A0",
+        color: "#fbbf24",
         explanation:
-          "Address 11 → both bits are 1 → keep both direct. D3 fires ONLY when A1=1 AND A0=1.",
+          "Address 11 → both bits are 1 → keep both direct. D3 fires when A1=1 AND A0=1. Minterm m3.",
+        trick:
+          "Address 11: both 1s → both direct. No complements needed! A1·A0",
       },
     ],
     truthRows: [
@@ -88,6 +119,12 @@ const DECODER_TYPES = {
       ["1", "1", "1", "0", "0", "0", "1"],
     ],
     truthHeaders: ["E", "A1", "A0", "D0", "D1", "D2", "D3"],
+    minterms: [
+      { idx: 0, binary: "00", desc: "m0: A1'A0'" },
+      { idx: 1, binary: "01", desc: "m1: A1'A0" },
+      { idx: 2, binary: "10", desc: "m2: A1A0'" },
+      { idx: 3, binary: "11", desc: "m3: A1A0" },
+    ],
   },
   "3to8": {
     label: "3-to-8 Decoder",
@@ -95,6 +132,8 @@ const DECODER_TYPES = {
     enableInput: true,
     outputs: ["D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7"],
     description: "3-bit binary code + Enable → 8 output lines",
+    analogy:
+      "Like a memory chip select: each output enables exactly one memory chip",
     decode: (code, en) => {
       if (!en) {
         const o = {};
@@ -112,43 +151,60 @@ const DECODER_TYPES = {
       {
         out: "D0",
         eq: "D0 = E·A2'·A1'·A0'",
-        explanation: "000 → all 0 → all complemented. Minterm m0.",
+        color: "#34d399",
+        explanation:
+          "000 → all 0 → all complemented. Minterm m0. Three inputs, all complemented.",
+        trick: "All zeros → all complemented. The easiest to remember!",
       },
       {
         out: "D1",
         eq: "D1 = E·A2'·A1'·A0",
+        color: "#4ade80",
         explanation: "001 → A0=1 direct, A2 & A1 complemented. Minterm m1.",
+        trick: "Only the last bit is 1 → only A0 is direct.",
       },
       {
         out: "D2",
         eq: "D2 = E·A2'·A1·A0'",
+        color: "#60a5fa",
         explanation: "010 → A1=1 direct, A2 & A0 complemented. Minterm m2.",
+        trick: "Middle bit is 1 → A1 is direct, others complemented.",
       },
       {
         out: "D3",
         eq: "D3 = E·A2'·A1·A0",
+        color: "#93c5fd",
         explanation: "011 → A1 & A0 direct, only A2 complemented. Minterm m3.",
+        trick: "Two last bits are 1 → A1 and A0 direct, A2' still complements.",
       },
       {
         out: "D4",
         eq: "D4 = E·A2·A1'·A0'",
+        color: "#fbbf24",
         explanation: "100 → A2=1 direct, A1 & A0 complemented. Minterm m4.",
+        trick: "First bit is 1 → A2 direct, others complemented.",
       },
       {
         out: "D5",
         eq: "D5 = E·A2·A1'·A0",
+        color: "#f97316",
         explanation: "101 → A2 & A0 direct, A1 complemented. Minterm m5.",
+        trick: "Bits 2 and 0 are 1 → A2 and A0 direct.",
       },
       {
         out: "D6",
         eq: "D6 = E·A2·A1·A0'",
+        color: "#a78bfa",
         explanation: "110 → A2 & A1 direct, A0 complemented. Minterm m6.",
+        trick: "First two bits are 1 → A2·A1 direct, A0' complement.",
       },
       {
         out: "D7",
         eq: "D7 = E·A2·A1·A0",
+        color: "#f472b6",
         explanation:
-          "111 → all 1 → all direct. No complements at all. Minterm m7.",
+          "111 → all 1 → all direct. No complements at all! Minterm m7.",
+        trick: "All ones → no complements. The other easy one!",
       },
     ],
     truthRows: Array.from({ length: 8 }, (_, i) => {
@@ -173,6 +229,11 @@ const DECODER_TYPES = {
       "D6",
       "D7",
     ],
+    minterms: Array.from({ length: 8 }, (_, i) => ({
+      idx: i,
+      binary: i.toString(2).padStart(3, "0"),
+      desc: `m${i}`,
+    })),
   },
   BCD7seg: {
     label: "BCD-to-7-Segment",
@@ -180,6 +241,8 @@ const DECODER_TYPES = {
     enableInput: false,
     outputs: ["a", "b", "c", "d", "e", "f", "g"],
     description: "4-bit BCD → 7 segment display signals",
+    analogy:
+      "Like translating a number to a specific set of lit-up bars on a display",
     decode: (code) => {
       const table = [
         [1, 1, 1, 1, 1, 1, 0],
@@ -210,46 +273,61 @@ const DECODER_TYPES = {
     },
     booleanEqs: [
       {
-        out: "a",
+        out: "a — top bar",
         eq: "a = A + C + B'D' + BD",
+        color: "#f97316",
         explanation:
-          "Segment a (top bar) is OFF only for digits 1 and 4. Complex OR expression covers remaining 8 digits.",
+          "Segment a (top bar) is OFF only for digits 1 and 4. The complex OR expression covers all remaining 8 digits.",
+        trick: "OFF for 1,4. All other digits need the top bar.",
       },
       {
-        out: "b",
+        out: "b — top-right",
         eq: "b = B' + CD + C'D'",
+        color: "#fbbf24",
         explanation:
           "Segment b (top-right) is OFF only for digits 5 and 6. Note how B' alone covers half the cases.",
+        trick: "OFF for 5,6. B'=1 handles digits 0,1,2,3 at once.",
       },
       {
-        out: "c",
+        out: "c — bottom-right",
         eq: "c = B + C' + D",
+        color: "#34d399",
         explanation:
-          "Segment c (bottom-right) is OFF ONLY for digit 2. Simplest 7-seg equation!",
+          "Segment c (bottom-right) is OFF ONLY for digit 2. Simplest 7-seg equation with just 3 terms!",
+        trick: "OFF only for digit 2 — simplest equation in the whole decoder!",
       },
       {
-        out: "d",
+        out: "d — bottom bar",
         eq: "d = A + B'C' + C'D' + BC'D + CD'",
+        color: "#60a5fa",
         explanation:
           "Segment d (bottom bar) is the most complex — ON for 0,2,3,5,6,8. Four product terms needed.",
+        trick: "d is the hardest. ON for many digits, needs 4 AND terms.",
       },
       {
-        out: "e",
+        out: "e — bottom-left",
         eq: "e = B'D' + CD'",
+        color: "#a78bfa",
         explanation:
-          "Segment e (bottom-left) is ON only for 0,2,6,8. Just two product terms covers it.",
+          "Segment e (bottom-left) is ON only for 0,2,6,8. Just two product terms cover it.",
+        trick: "D'=0 means the digit is even AND needs the left side.",
       },
       {
-        out: "f",
+        out: "f — top-left",
         eq: "f = A + BC' + BD' + C'D'",
+        color: "#f472b6",
         explanation:
           "Segment f (top-left) is ON for 0,4,5,6,7,8,9 — OFF only for 1,2,3.",
+        trick: "ON for most digits. OFF for 1,2,3 — the 'plain' numbers.",
       },
       {
-        out: "g",
+        out: "g — middle bar",
         eq: "g = A + BC' + BC + C'D",
+        color: "#c084fc",
         explanation:
           "Segment g (middle bar) is OFF only for 0 and 1. ON for all other digits (2–9).",
+        trick:
+          "g is the middle bar. OFF only for 0 (no middle) and 1 (just sticks).",
       },
     ],
     truthRows: [
@@ -265,590 +343,76 @@ const DECODER_TYPES = {
       ["1", "0", "0", "1", "1", "1", "1", "1", "0", "1", "1"],
     ],
     truthHeaders: ["A", "B", "C", "D", "a", "b", "c", "d", "e", "f", "g"],
+    minterms: [],
   },
 };
 
-// ─── 7-Segment SVG ──────────────────────────────────────────────────────────
-const SevenSegDisplay = ({ segs }) => {
-  const on = "#00ff88",
-    off = "rgba(0,255,136,0.07)";
-  const s = (n) => (segs[n] ? on : off);
-  return (
-    <svg
-      viewBox="0 0 60 100"
-      width="90"
-      height="150"
-      style={{ filter: "drop-shadow(0 0 8px rgba(0,255,136,0.5))" }}
-    >
-      <rect x="8" y="4" width="44" height="8" rx="3" fill={s("a")} />
-      <rect x="50" y="8" width="8" height="40" rx="3" fill={s("b")} />
-      <rect x="50" y="52" width="8" height="40" rx="3" fill={s("c")} />
-      <rect x="8" y="88" width="44" height="8" rx="3" fill={s("d")} />
-      <rect x="2" y="52" width="8" height="40" rx="3" fill={s("e")} />
-      <rect x="2" y="8" width="8" height="40" rx="3" fill={s("f")} />
-      <rect x="8" y="46" width="44" height="8" rx="3" fill={s("g")} />
-      <text
-        x="30"
-        y="108"
-        textAnchor="middle"
-        fill="#4b5563"
-        fontSize="8"
-        fontFamily="monospace"
-      >
-        {["a", "b", "c", "d", "e", "f", "g"].filter((k) => segs[k]).join("") ||
-          "—"}
-      </text>
-    </svg>
-  );
-};
+// ─── Tips ──────────────────────────────────────────────────────────────────────
+const TIPS = [
+  {
+    icon: "📐",
+    title: "The Minterm Rule",
+    text: "Each decoder output Dᵢ is exactly minterm mᵢ. Write the binary for i, then: bit=1 → use input directly, bit=0 → complement it. AND them all.",
+  },
+  {
+    icon: "🔌",
+    title: "Enable Pin is Power",
+    text: "E=0 kills ALL outputs. E=1 lets them work. In memory systems, this is how chips are selected — only one chip has E=1 at a time.",
+  },
+  {
+    icon: "🧩",
+    title: "Decoder as Function Generator",
+    text: "Any Boolean function can be built from a decoder! Just OR the outputs for rows where your function = 1. No AND gates needed!",
+  },
+  {
+    icon: "📦",
+    title: "Cascading Decoders",
+    text: "A 2×4 decoder with cascading can become 4×16! Connect your high address bits to a 2×4 decoder, each output enables one of four 2×4 decoders.",
+  },
+  {
+    icon: "🔢",
+    title: "Count the Gates",
+    text: "An n-to-2ⁿ decoder needs exactly 2ⁿ AND gates (one per output), n NOT gates (one per input), and 1 enable connection per AND gate.",
+  },
+  {
+    icon: "⚡",
+    title: "Output Is Exclusive",
+    text: "Exactly ONE decoder output is HIGH at any time (when E=1). This is called 'one-hot encoding' — guaranteed mutual exclusion.",
+  },
+  {
+    icon: "🏥",
+    title: "Real World: Memory Chips",
+    text: "A 20-bit CPU address uses bits [19:18] → 2-to-4 decoder → 4 chip-select lines. Each selects a different 256KB memory region.",
+  },
+  {
+    icon: "🎯",
+    title: "Exam Trick",
+    text: "To find which output is active: convert address to decimal. D(decimal) is HIGH. Example: A1=1,A0=1 → 11₂ = 3 → D3 is HIGH.",
+  },
+];
 
-// ─── Live 2-to-4 SVG Circuit ─────────────────────────────────────────────────
-const Decoder2to4SVG = ({ A1, A0, E, activeOut }) => {
-  const w = (v) => (v ? "#00ff88" : "#1e3a2f");
-  const glow = (v) => (v ? { filter: "drop-shadow(0 0 3px #00ff88)" } : {});
-  const nA1 = E && !A1 ? 1 : 0,
-    nA0 = E && !A0 ? 1 : 0;
-  const dActive = (i) => (E && activeOut === i ? 1 : 0);
-
-  // AND gate path helper
-  const AndGate = ({ cx, cy, active }) => (
-    <g style={glow(active)}>
-      <path
-        d={`M${cx - 18} ${cy - 16} L${cx} ${cy - 16} Q${cx + 18} ${cy - 16} ${cx + 18} ${cy} Q${cx + 18} ${cy + 16} ${cx} ${cy + 16} L${cx - 18} ${cy + 16} Z`}
-        fill="rgba(20,30,50,0.95)"
-        stroke={w(active)}
-        strokeWidth={active ? 2 : 1.5}
-      />
-      <text
-        x={cx}
-        y={cy + 4}
-        textAnchor="middle"
-        fill={active ? "#00ff88" : "#4b5563"}
-        fontSize="8"
-        fontFamily="monospace"
-      >
-        AND
-      </text>
-    </g>
-  );
-  const NotGate = ({ cx, cy, active }) => (
-    <g>
-      <path
-        d={`M${cx - 14} ${cy - 10} L${cx - 14} ${cy + 10} L${cx + 8} ${cy} Z`}
-        fill="rgba(20,30,50,0.9)"
-        stroke={w(active)}
-        strokeWidth="1.5"
-      />
-      <circle
-        cx={cx + 11}
-        cy={cy}
-        r="3"
-        fill="none"
-        stroke={w(active)}
-        strokeWidth="1.5"
-      />
-    </g>
-  );
-
-  return (
-    <svg
-      viewBox="0 0 580 280"
-      width="100%"
-      style={{
-        maxWidth: "580px",
-        fontFamily: "monospace",
-        fontSize: "11px",
-        display: "block",
-      }}
-    >
-      <rect
-        width="580"
-        height="280"
-        rx="10"
-        fill="rgba(8,12,22,0.97)"
-        stroke="rgba(99,102,241,0.25)"
-        strokeWidth="1.5"
-      />
-
-      {/* Input circles */}
-      {[
-        ["E", 40, 50, E, "#fbbf24"],
-        ["A1", 40, 110, A1, "#00d4ff"],
-        ["A0", 40, 170, A0, "#00d4ff"],
-      ].map(([l, x, y, v, c]) => (
-        <g key={l}>
-          <circle
-            cx={x}
-            cy={y}
-            r="16"
-            fill={v ? `${c}22` : "rgba(30,40,60,0.8)"}
-            stroke={v ? c : "#334155"}
-            strokeWidth="1.5"
-            style={glow(v)}
-          />
-          <text
-            x={x}
-            y={y + 4}
-            textAnchor="middle"
-            fill={v ? c : "#6b7280"}
-            fontSize="11"
-            fontWeight="bold"
-          >
-            {l}
-          </text>
-        </g>
-      ))}
-
-      {/* NOT gates */}
-      <NotGate cx={128} cy={110} active={nA1} />
-      <NotGate cx={128} cy={170} active={nA0} />
-
-      {/* Wire: inputs → NOT gates */}
-      <line x1="56" y1="110" x2="114" y2="110" stroke={w(A1)} strokeWidth="2" />
-      <line x1="56" y1="170" x2="114" y2="170" stroke={w(A0)} strokeWidth="2" />
-
-      {/* Distribution nodes on A1, A0 lines */}
-      <circle cx="75" cy="110" r="3" fill={w(A1)} />
-      <circle cx="75" cy="170" r="3" fill={w(A0)} />
-
-      {/* AND gates at x=230, y=50,110,170,230 */}
-      {[0, 1, 2, 3].map((i) => (
-        <AndGate key={i} cx={240} cy={50 + i * 65} active={dActive(i)} />
-      ))}
-
-      {/* Output labels */}
-      {["D0", "D1", "D2", "D3"].map((lbl, i) => {
-        const cy = 50 + i * 65,
-          act = dActive(i);
-        return (
-          <g key={lbl} style={glow(act)}>
-            <rect
-              x="275"
-              y={cy - 14}
-              width="52"
-              height="28"
-              rx="6"
-              fill={act ? "rgba(0,255,136,0.15)" : "rgba(15,25,45,0.8)"}
-              stroke={w(act)}
-              strokeWidth={act ? 2 : 1}
-            />
-            <text
-              x="301"
-              y={cy + 4}
-              textAnchor="middle"
-              fill={act ? "#00ff88" : "#6b7280"}
-              fontSize="11"
-              fontWeight={act ? "bold" : "normal"}
-            >
-              {lbl}
-            </text>
-            <line
-              x1="258"
-              y1={cy}
-              x2="275"
-              y2={cy}
-              stroke={w(act)}
-              strokeWidth={act ? 2.5 : 1.5}
-            />
-            <text
-              x="335"
-              y={cy + 4}
-              fill={act ? "#fbbf24" : "#374151"}
-              fontSize="9"
-            >
-              =m{i}
-            </text>
-          </g>
-        );
-      })}
-
-      {/* ── Wire routing ── */}
-      {/* E → all AND gates (vertical bus at x=55) */}
-      <line x1="55" y1="50" x2="55" y2="245" stroke={w(E)} strokeWidth="1.5" />
-      {[0, 1, 2, 3].map((i) => {
-        const cy = 50 + i * 65;
-        return (
-          <line
-            key={i}
-            x1="55"
-            y1={cy}
-            x2="222"
-            y2={cy - 12}
-            stroke={w(E)}
-            strokeWidth="1.5"
-          />
-        );
-      })}
-      {/* D0: A1'·A0' */}
-      <line
-        x1="139"
-        y1="110"
-        x2="155"
-        y2="110"
-        stroke={w(nA1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="155"
-        y1="110"
-        x2="155"
-        y2="42"
-        stroke={w(nA1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="155"
-        y1="42"
-        x2="222"
-        y2="42"
-        stroke={w(nA1 ? nA0 : 0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="139"
-        y1="170"
-        x2="160"
-        y2="170"
-        stroke={w(nA0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="160"
-        y1="170"
-        x2="160"
-        y2="56"
-        stroke={w(nA0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="160"
-        y1="56"
-        x2="222"
-        y2="52"
-        stroke={w(nA0)}
-        strokeWidth="1.5"
-      />
-      {/* D1: A1'·A0 */}
-      <line
-        x1="150"
-        y1="110"
-        x2="150"
-        y2="105"
-        stroke={w(nA1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="150"
-        y1="105"
-        x2="222"
-        y2="105"
-        stroke={w(nA1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="75"
-        y1="170"
-        x2="75"
-        y2="117"
-        stroke={w(A0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="75"
-        y1="117"
-        x2="222"
-        y2="117"
-        stroke={w(A0)}
-        strokeWidth="1.5"
-      />
-      {/* D2: A1·A0' */}
-      <line
-        x1="75"
-        y1="110"
-        x2="75"
-        y2="167"
-        stroke={w(A1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="75"
-        y1="167"
-        x2="222"
-        y2="167"
-        stroke={w(A1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="158"
-        y1="170"
-        x2="158"
-        y2="178"
-        stroke={w(nA0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="158"
-        y1="178"
-        x2="222"
-        y2="178"
-        stroke={w(nA0)}
-        strokeWidth="1.5"
-      />
-      {/* D3: A1·A0 */}
-      <line
-        x1="72"
-        y1="110"
-        x2="72"
-        y2="230"
-        stroke={w(A1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="72"
-        y1="230"
-        x2="222"
-        y2="230"
-        stroke={w(A1)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="70"
-        y1="170"
-        x2="70"
-        y2="242"
-        stroke={w(A0)}
-        strokeWidth="1.5"
-      />
-      <line
-        x1="70"
-        y1="242"
-        x2="222"
-        y2="242"
-        stroke={w(A0)}
-        strokeWidth="1.5"
-      />
-
-      <text x="290" y="268" textAnchor="middle" fill="#374151" fontSize="9">
-        2-to-4 Decoder — Live Gate-Level Circuit
-      </text>
-    </svg>
-  );
-};
-
-// ─── 3-to-8 Block Diagram SVG ─────────────────────────────────────────────────
-const Decoder3to8SVG = ({ A2, A1, A0, E, activeOut }) => {
-  const glow = (v) => (v ? { filter: "drop-shadow(0 0 4px #00ff88)" } : {});
-
-  return (
-    <svg
-      viewBox="0 0 560 360"
-      width="100%"
-      style={{
-        maxWidth: "560px",
-        fontFamily: "monospace",
-        fontSize: "11px",
-        display: "block",
-      }}
-    >
-      <rect
-        width="560"
-        height="360"
-        rx="10"
-        fill="rgba(8,12,22,0.97)"
-        stroke="rgba(99,102,241,0.25)"
-        strokeWidth="1.5"
-      />
-
-      {/* Decoder box */}
-      <rect
-        x="170"
-        y="28"
-        width="150"
-        height="300"
-        rx="8"
-        fill="rgba(15,22,40,0.95)"
-        stroke="rgba(99,102,241,0.5)"
-        strokeWidth="2"
-      />
-      <text
-        x="245"
-        y="50"
-        textAnchor="middle"
-        fill="#60a5fa"
-        fontSize="13"
-        fontWeight="bold"
-      >
-        3-to-8
-      </text>
-      <text x="245" y="65" textAnchor="middle" fill="#60a5fa" fontSize="11">
-        DECODER
-      </text>
-      <line
-        x1="170"
-        y1="74"
-        x2="320"
-        y2="74"
-        stroke="rgba(99,102,241,0.3)"
-        strokeWidth="1"
-      />
-
-      {/* Input buses */}
-      {[
-        ["E", 40, 95, E, "#fbbf24"],
-        ["A2", 40, 145, A2, "#00d4ff"],
-        ["A1", 40, 195, A1, "#00d4ff"],
-        ["A0", 40, 245, A0, "#00d4ff"],
-      ].map(([lbl, x, y, v, c]) => (
-        <g key={lbl}>
-          <circle
-            cx={x}
-            cy={y}
-            r="16"
-            fill={v ? `${c}20` : "rgba(20,30,50,0.8)"}
-            stroke={v ? c : "#334155"}
-            strokeWidth="1.5"
-            style={{ filter: v ? `drop-shadow(0 0 4px ${c})` : "none" }}
-          />
-          <text
-            x={x}
-            y={y + 4}
-            textAnchor="middle"
-            fill={v ? c : "#6b7280"}
-            fontWeight="bold"
-            fontSize="11"
-          >
-            {lbl}
-          </text>
-          <line
-            x1={x + 16}
-            y1={y}
-            x2="170"
-            y2={y}
-            stroke={v ? c : "#1e3a5f"}
-            strokeWidth="2"
-          />
-          <text
-            x="110"
-            y={y - 5}
-            textAnchor="middle"
-            fill="#374151"
-            fontSize="8"
-          >
-            {lbl}
-          </text>
-        </g>
-      ))}
-
-      {/* Output lines */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const cy = 90 + i * 30;
-        const act = E && activeOut === i;
-        const binStr = i.toString(2).padStart(3, "0");
-        return (
-          <g key={i}>
-            <text
-              x="245"
-              y={cy + 4}
-              textAnchor="middle"
-              fill={act ? "#00ff88" : "#374151"}
-              fontSize="9"
-              fontWeight={act ? "bold" : "normal"}
-            >
-              m{i}
-            </text>
-            <line
-              x1="320"
-              y1={cy}
-              x2="390"
-              y2={cy}
-              stroke={act ? "#00ff88" : "#1a2840"}
-              strokeWidth={act ? 3 : 1.5}
-              style={glow(act)}
-            />
-            <rect
-              x="390"
-              y={cy - 13}
-              width="54"
-              height="26"
-              rx="6"
-              fill={act ? "rgba(0,255,136,0.2)" : "rgba(10,16,30,0.9)"}
-              stroke={act ? "#00ff88" : "#1e3a5f"}
-              strokeWidth={act ? 2 : 1}
-            />
-            <text
-              x="417"
-              y={cy + 4}
-              textAnchor="middle"
-              fill={act ? "#00ff88" : "#4b5563"}
-              fontSize="11"
-              fontWeight={act ? "bold" : "normal"}
-            >
-              D{i}
-            </text>
-            <text
-              x="452"
-              y={cy + 4}
-              fill={act ? "#fbbf24" : "#2d3748"}
-              fontSize="8"
-            >
-              ={binStr}
-            </text>
-            {act && (
-              <circle
-                cx="325"
-                cy={cy}
-                r="5"
-                fill="#00ff88"
-                style={{ filter: "drop-shadow(0 0 5px #00ff88)" }}
-              />
-            )}
-          </g>
-        );
-      })}
-
-      {/* Status bar */}
-      <rect
-        x="8"
-        y="338"
-        width="544"
-        height="16"
-        rx="4"
-        fill="rgba(15,22,40,0.6)"
-      />
-      <text
-        x="280"
-        y="350"
-        textAnchor="middle"
-        fill={E ? "#9ca3af" : "#6b7280"}
-        fontSize="9"
-      >
-        {E
-          ? `Active: D${activeOut} | Code: ${[A2, A1, A0].join("")}₂ = ${activeOut}₁₀ | Minterm: ${["A2", "A1", "A0"].map((v, i) => ([A2, A1, A0][i] ? v : v + "'")).join("·")}`
-          : "⚠ DISABLED — E=0, all outputs LOW"}
-      </text>
-    </svg>
-  );
-};
-
-// ─── Quiz Component ───────────────────────────────────────────────────────────
+// ─── Quiz ──────────────────────────────────────────────────────────────────────
 const QUIZ = [
   {
     q: "2-to-4 decoder: A1=1, A0=0, E=1. Which output is HIGH?",
     opts: ["D0", "D1", "D2", "D3"],
     ans: 2,
-    exp: "Binary 10 = decimal 2 → D2 HIGH. MSB = A1, LSB = A0. Always convert binary to decimal!",
+    exp: "Binary 10 = decimal 2 → D2 HIGH. Just convert A1A0 from binary to decimal to find which D is active!",
+    hint: "Convert the binary number A1A0 = 10 to decimal.",
   },
   {
     q: "3-to-8 decoder. Boolean equation for D5?",
     opts: ["E·A2'·A1·A0", "E·A2·A1'·A0", "E·A2·A1·A0'", "E·A2'·A1·A0'"],
     ans: 1,
-    exp: "5 = 101₂ → A2=1(direct)·A1=0(complement→A1')·A0=1(direct). Match bits!",
+    exp: "5 = 101₂ → A2=1 (direct), A1=0 (complement→A1'), A0=1 (direct). Match each bit: 1=direct, 0=complemented.",
+    hint: "Write 5 in binary: 101. Then: bit=1 means direct, bit=0 means complemented.",
   },
   {
     q: "How many AND gates in a 3-to-8 decoder?",
     opts: ["3", "6", "8", "16"],
     ans: 2,
-    exp: "2³=8 outputs → 8 AND gates. One AND gate per decoder output. Always 2ⁿ.",
+    exp: "2³ = 8 outputs → 8 AND gates. One AND gate per decoder output. Formula: always 2ⁿ AND gates.",
+    hint: "Formula: 2^(number of input bits). Here n=3.",
   },
   {
     q: "Enable E=0. What happens to ALL outputs?",
@@ -859,36 +423,717 @@ const QUIZ = [
       "Output is undefined",
     ],
     ans: 2,
-    exp: "E=0 disables the entire chip. All outputs go LOW regardless of address inputs. E acts as a master chip-select.",
+    exp: "E=0 disables the entire decoder chip. All outputs go LOW regardless of address inputs. E acts as a master chip-select or on/off switch.",
+    hint: "E=0 means the chip is disabled. Think of it as cutting power.",
   },
   {
-    q: "You want to implement F = A'B' + A'B + AB (any function of A,B). You use:",
+    q: "You want to implement F = A'B' + AB using a decoder. You use:",
     opts: [
-      "Only AND gates",
+      "8 AND gates",
       "A 2-to-4 decoder + OR gate",
       "Only NOT gates",
-      "A multiplexer",
+      "A 4-to-1 MUX",
     ],
     ans: 1,
-    exp: "Decoder outputs ARE minterms. Just OR the outputs for rows where F=1. No AND gates needed at all!",
+    exp: "Decoder outputs ARE minterms! F = m0 + m3 (where inputs are 00 and 11). Just OR D0 and D3. No extra AND gates needed at all!",
+    hint: "Which minterms (rows) make F=1? Those are rows 00 and 11.",
   },
   {
-    q: "BCD 1001 input to 7-seg decoder. Which segment is OFF?",
+    q: "BCD input 1001 to 7-segment decoder. Which segment is OFF?",
     opts: ["a (top)", "b (top-right)", "e (bottom-left)", "g (middle)"],
     ans: 2,
-    exp: "Digit 9 has a,b,c,d,f,g ON. Segment e (bottom-left) is OFF. Check the truth table for digit 9 row!",
+    exp: "1001₂ = digit 9. Digit 9 shows a,b,c,d,f,g ON. Segment e (bottom-left) is OFF for 9.",
+    hint: "1001₂ = 9 in decimal. Look up digit 9 in your memory — which bars does it NOT light?",
   },
 ];
-const QuizBlock = () => {
+
+// ─── 7-Segment Display SVG ─────────────────────────────────────────────────────
+const SevenSeg = ({ segs, digit }) => {
+  const on = "#00ff88",
+    off = "rgba(0,255,136,0.06)";
+  const s = (n) => (segs[n] ? on : off);
+  const segNames = ["a", "b", "c", "d", "e", "f", "g"];
+  const activeSegs = segNames.filter((k) => segs[k]);
+  return (
+    <div style={{ textAlign: "center" }}>
+      <svg
+        viewBox="0 0 70 120"
+        width="90"
+        height="130"
+        style={{ filter: "drop-shadow(0 0 10px rgba(0,255,136,0.25))" }}
+      >
+        {/* a - top */}
+        <rect x="10" y="4" width="50" height="9" rx="4" fill={s("a")} />
+        {/* b - top-right */}
+        <rect x="58" y="8" width="9" height="48" rx="4" fill={s("b")} />
+        {/* c - bottom-right */}
+        <rect x="58" y="62" width="9" height="48" rx="4" fill={s("c")} />
+        {/* d - bottom */}
+        <rect x="10" y="107" width="50" height="9" rx="4" fill={s("d")} />
+        {/* e - bottom-left */}
+        <rect x="3" y="62" width="9" height="48" rx="4" fill={s("e")} />
+        {/* f - top-left */}
+        <rect x="3" y="8" width="9" height="48" rx="4" fill={s("f")} />
+        {/* g - middle */}
+        <rect x="10" y="54" width="50" height="9" rx="4" fill={s("g")} />
+      </svg>
+      {digit >= 0 && (
+        <div
+          style={{
+            color: "#00ff88",
+            fontFamily: "monospace",
+            fontWeight: "700",
+            fontSize: "1.3rem",
+            marginTop: "4px",
+          }}
+        >
+          {digit}
+        </div>
+      )}
+      <div
+        style={{
+          color: "#4b5563",
+          fontFamily: "monospace",
+          fontSize: "0.68rem",
+          marginTop: "4px",
+        }}
+      >
+        {activeSegs.length > 0 ? activeSegs.join("") : "—"}
+      </div>
+    </div>
+  );
+};
+
+// ─── Minterm Visual Builder ────────────────────────────────────────────────────
+const MintermBuilder = () => {
+  const [numBits, setNumBits] = useState(2);
+  const [selectedMinterm, setSelectedMinterm] = useState(0);
+  const numOutputs = Math.pow(2, numBits);
+  const inputs = Array.from(
+    { length: numBits },
+    (_, i) => `A${numBits - 1 - i}`,
+  );
+  const binary = selectedMinterm.toString(2).padStart(numBits, "0");
+
+  const equation =
+    "E · " +
+    inputs
+      .map((inp, i) => {
+        const bit = (selectedMinterm >> (numBits - 1 - i)) & 1;
+        return bit ? inp : inp + "'";
+      })
+      .join(" · ");
+
+  return (
+    <div
+      style={{
+        background: "rgba(8,14,30,0.9)",
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(99,102,241,0.3)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: "16px",
+          marginBottom: "20px",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <label
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+              display: "block",
+              marginBottom: "6px",
+            }}
+          >
+            Number of Input Bits
+          </label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {[1, 2, 3, 4].map((n) => (
+              <button
+                key={n}
+                onClick={() => {
+                  setNumBits(n);
+                  setSelectedMinterm(0);
+                }}
+                style={{
+                  padding: "7px 14px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${numBits === n ? "#6366f1" : "rgba(99,102,241,0.25)"}`,
+                  background:
+                    numBits === n ? "rgba(99,102,241,0.25)" : "transparent",
+                  color: numBits === n ? "#a5b4fc" : "#6b7280",
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "18px" }}>
+        <label
+          style={{
+            color: "#9ca3af",
+            fontSize: "0.8rem",
+            display: "block",
+            marginBottom: "10px",
+          }}
+        >
+          Select Output (click to select which minterm to build):
+        </label>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {Array.from({ length: numOutputs }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedMinterm(i)}
+              style={{
+                padding: "9px 14px",
+                borderRadius: "9px",
+                border: `2px solid ${selectedMinterm === i ? "#fbbf24" : "rgba(99,102,241,0.2)"}`,
+                background:
+                  selectedMinterm === i
+                    ? "rgba(251,191,36,0.15)"
+                    : "rgba(12,18,35,0.6)",
+                color: selectedMinterm === i ? "#fbbf24" : "#6b7280",
+                cursor: "pointer",
+                fontFamily: "monospace",
+                fontWeight: selectedMinterm === i ? "700" : "400",
+                transition: "all 0.2s",
+              }}
+            >
+              D{i}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "14px",
+          marginBottom: "18px",
+        }}
+      >
+        <div
+          style={{
+            padding: "16px",
+            background: "rgba(12,18,35,0.8)",
+            borderRadius: "10px",
+            border: "1px solid rgba(99,102,241,0.2)",
+          }}
+        >
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.75rem",
+              marginBottom: "8px",
+            }}
+          >
+            ADDRESS IN BINARY
+          </div>
+          <div
+            style={{
+              fontFamily: "monospace",
+              fontSize: "1.3rem",
+              color: "#60a5fa",
+              fontWeight: "700",
+              letterSpacing: "6px",
+            }}
+          >
+            {binary}₂
+          </div>
+          <div
+            style={{ color: "#4b5563", fontSize: "0.78rem", marginTop: "4px" }}
+          >
+            = {selectedMinterm}₁₀
+          </div>
+        </div>
+        <div
+          style={{
+            padding: "16px",
+            background: "rgba(12,18,35,0.8)",
+            borderRadius: "10px",
+            border: "1px solid rgba(251,191,36,0.3)",
+          }}
+        >
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.75rem",
+              marginBottom: "8px",
+            }}
+          >
+            RULE
+          </div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {inputs.map((inp, i) => {
+              const bit = (selectedMinterm >> (numBits - 1 - i)) & 1;
+              return (
+                <div
+                  key={inp}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "3px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: "0.85rem",
+                      color: bit ? "#4ade80" : "#f87171",
+                    }}
+                  >
+                    {bit === 1 ? inp : inp + "'"}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.65rem",
+                      color: bit ? "#4ade80" : "#f87171",
+                    }}
+                  >
+                    {bit === 1 ? "DIRECT" : "COMPLEMENT"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: "rgba(251,191,36,0.07)",
+          border: "1px solid rgba(251,191,36,0.3)",
+          borderRadius: "10px",
+          padding: "16px",
+        }}
+      >
+        <div
+          style={{ color: "#9ca3af", fontSize: "0.75rem", marginBottom: "6px" }}
+        >
+          RESULTING BOOLEAN EQUATION
+        </div>
+        <code
+          style={{ color: "#fbbf24", fontSize: "1.05rem", fontWeight: "700" }}
+        >
+          D{selectedMinterm} = {equation}
+        </code>
+        <p
+          style={{
+            color: "#9ca3af",
+            fontSize: "0.82rem",
+            marginTop: "10px",
+            lineHeight: "1.6",
+            marginBottom: 0,
+          }}
+        >
+          🔑 <strong style={{ color: "#e2e8f0" }}>Pattern:</strong> Bit=1 in
+          address → use input directly. Bit=0 → complement it. AND everything
+          together with E.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ─── Function Generator Demo ───────────────────────────────────────────────────
+const FunctionGeneratorDemo = () => {
+  const [funcRows, setFuncRows] = useState([false, false, false, false]);
+  const toggleRow = (i) =>
+    setFuncRows((prev) => {
+      const n = [...prev];
+      n[i] = !n[i];
+      return n;
+    });
+  const inputs = ["A1", "A0"];
+  const selected = funcRows.map((on, i) => (on ? i : -1)).filter((i) => i >= 0);
+  const equation =
+    selected.length === 0
+      ? "F = 0"
+      : "F = " + selected.map((i) => `D${i}`).join(" + ");
+  const mintermEq =
+    selected.length === 0
+      ? "F = 0"
+      : "F = " +
+        selected
+          .map((i) => {
+            const a1 = (i >> 1) & 1,
+              a0 = i & 1;
+            return `(${a1 ? "A1" : "A1'"}·${a0 ? "A0" : "A0'"})`;
+          })
+          .join(" + ");
+
+  return (
+    <div
+      style={{
+        background: "rgba(8,14,30,0.9)",
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(0,255,136,0.25)",
+      }}
+    >
+      <h4
+        style={{ color: "#86efac", marginBottom: "8px", fontSize: "0.95rem" }}
+      >
+        🧩 Decoder as Function Generator
+      </h4>
+      <p
+        style={{
+          color: "#9ca3af",
+          fontSize: "0.83rem",
+          lineHeight: "1.6",
+          marginBottom: "18px",
+        }}
+      >
+        Check the rows where your Boolean function = 1. The decoder + OR gate
+        implements ANY function of A1,A0 instantly — no K-mapping needed!
+      </p>
+      <div style={{ overflowX: "auto", marginBottom: "18px" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontFamily: "monospace",
+            fontSize: "0.85rem",
+          }}
+        >
+          <thead>
+            <tr>
+              {["Row", "A1", "A0", "Decoder Output", "F = ?"].map((h, i) => (
+                <th
+                  key={i}
+                  style={{
+                    padding: "9px 14px",
+                    background: "rgba(15,23,42,0.9)",
+                    color: i < 3 ? "#60a5fa" : i === 3 ? "#fbbf24" : "#00ff88",
+                    textAlign: "center",
+                    borderBottom: "1px solid rgba(99,102,241,0.3)",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[0, 1, 2, 3].map((i) => {
+              const a1 = (i >> 1) & 1,
+                a0 = i & 1;
+              return (
+                <tr
+                  key={i}
+                  style={{
+                    background: funcRows[i]
+                      ? "rgba(0,255,136,0.07)"
+                      : "transparent",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => toggleRow(i)}
+                >
+                  <td
+                    style={{
+                      padding: "9px 14px",
+                      textAlign: "center",
+                      color: "#9ca3af",
+                      borderBottom: "1px solid rgba(30,40,60,0.4)",
+                    }}
+                  >
+                    {i}
+                  </td>
+                  <td
+                    style={{
+                      padding: "9px 14px",
+                      textAlign: "center",
+                      color: a1 ? "#60a5fa" : "#374151",
+                      borderBottom: "1px solid rgba(30,40,60,0.4)",
+                    }}
+                  >
+                    {a1}
+                  </td>
+                  <td
+                    style={{
+                      padding: "9px 14px",
+                      textAlign: "center",
+                      color: a0 ? "#60a5fa" : "#374151",
+                      borderBottom: "1px solid rgba(30,40,60,0.4)",
+                    }}
+                  >
+                    {a0}
+                  </td>
+                  <td
+                    style={{
+                      padding: "9px 14px",
+                      textAlign: "center",
+                      color: "#fbbf24",
+                      borderBottom: "1px solid rgba(30,40,60,0.4)",
+                      fontWeight: "600",
+                    }}
+                  >
+                    D{i}
+                  </td>
+                  <td
+                    style={{
+                      padding: "9px 14px",
+                      textAlign: "center",
+                      borderBottom: "1px solid rgba(30,40,60,0.4)",
+                    }}
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleRow(i);
+                      }}
+                      style={{
+                        width: "32px",
+                        height: "20px",
+                        borderRadius: "5px",
+                        background: funcRows[i]
+                          ? "#00ff88"
+                          : "rgba(99,102,241,0.15)",
+                        border: `1.5px solid ${funcRows[i] ? "#00ff88" : "rgba(99,102,241,0.3)"}`,
+                        color: funcRows[i] ? "#0a0f1a" : "#4b5563",
+                        cursor: "pointer",
+                        fontFamily: "monospace",
+                        fontWeight: "800",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      {funcRows[i] ? "1" : "0"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}
+      >
+        <div
+          style={{
+            padding: "14px",
+            background: "rgba(0,255,136,0.06)",
+            border: "1px solid rgba(0,255,136,0.25)",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            style={{
+              color: "#86efac",
+              fontSize: "0.75rem",
+              fontWeight: "700",
+              marginBottom: "6px",
+            }}
+          >
+            USING DECODER OUTPUTS
+          </div>
+          <code style={{ color: "#00ff88", fontSize: "0.9rem" }}>
+            {equation}
+          </code>
+        </div>
+        <div
+          style={{
+            padding: "14px",
+            background: "rgba(99,102,241,0.06)",
+            border: "1px solid rgba(99,102,241,0.25)",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            style={{
+              color: "#a5b4fc",
+              fontSize: "0.75rem",
+              fontWeight: "700",
+              marginBottom: "6px",
+            }}
+          >
+            EQUIVALENT MINTERM SOP
+          </div>
+          <code
+            style={{ color: "#a5b4fc", fontSize: "0.85rem", lineHeight: "1.5" }}
+          >
+            {mintermEq}
+          </code>
+        </div>
+      </div>
+      {selected.length > 0 && (
+        <div
+          style={{
+            marginTop: "12px",
+            padding: "10px 14px",
+            background: "rgba(251,191,36,0.06)",
+            borderRadius: "8px",
+            color: "#fbbf24",
+            fontSize: "0.82rem",
+          }}
+        >
+          ✨ OR gate connects D{selected.join(", D")} outputs → implements your
+          function without any AND gates!
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Floating Tips ─────────────────────────────────────────────────────────────
+const TipsPanel = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [tipIdx, setTipIdx] = useState(0);
+  const tip = TIPS[tipIdx];
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          width: "52px",
+          height: "52px",
+          borderRadius: "50%",
+          background: isOpen ? "rgba(251,191,36,0.3)" : "rgba(99,102,241,0.85)",
+          border: `2px solid ${isOpen ? "#fbbf24" : "#6366f1"}`,
+          color: isOpen ? "#fbbf24" : "#e2e8f0",
+          fontSize: "1.4rem",
+          cursor: "pointer",
+          zIndex: 999,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          transition: "all 0.2s",
+        }}
+      >
+        {isOpen ? "✕" : "💡"}
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "88px",
+            right: "24px",
+            width: "320px",
+            background: "rgba(8,14,30,0.97)",
+            border: "1px solid rgba(99,102,241,0.4)",
+            borderRadius: "16px",
+            padding: "20px",
+            zIndex: 998,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+          }}
+        >
+          <div
+            style={{
+              color: "#a5b4fc",
+              fontSize: "0.75rem",
+              fontWeight: "700",
+              marginBottom: "14px",
+              letterSpacing: "0.08em",
+            }}
+          >
+            💡 TIPS & TRICKS
+          </div>
+          <div style={{ fontSize: "1.5rem", marginBottom: "8px" }}>
+            {tip.icon}
+          </div>
+          <div
+            style={{
+              color: "#fbbf24",
+              fontWeight: "700",
+              marginBottom: "8px",
+              fontSize: "0.9rem",
+            }}
+          >
+            {tip.title}
+          </div>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.83rem",
+              lineHeight: "1.65",
+              margin: "0 0 16px",
+            }}
+          >
+            {tip.text}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ color: "#4b5563", fontSize: "0.75rem" }}>
+              {tipIdx + 1}/{TIPS.length}
+            </span>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={() =>
+                  setTipIdx((tipIdx - 1 + TIPS.length) % TIPS.length)
+                }
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  background: "rgba(99,102,241,0.15)",
+                  border: "1px solid rgba(99,102,241,0.3)",
+                  color: "#a5b4fc",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                }}
+              >
+                ←
+              </button>
+              <button
+                onClick={() => setTipIdx((tipIdx + 1) % TIPS.length)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  background: "rgba(99,102,241,0.15)",
+                  border: "1px solid rgba(99,102,241,0.3)",
+                  color: "#a5b4fc",
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                }}
+              >
+                →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+// ─── Quiz ──────────────────────────────────────────────────────────────────────
+const Quiz = () => {
   const [qi, setQi] = useState(0);
   const [sel, setSel] = useState(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
   const q = QUIZ[qi];
   const choose = (i) => {
     if (sel !== null) return;
     setSel(i);
-    if (i === q.ans) setScore((s) => s + 1);
+    if (i === q.ans) {
+      const ns = streak + 1;
+      setScore((s) => s + 1);
+      setStreak(ns);
+      if (ns > bestStreak) setBestStreak(ns);
+    } else setStreak(0);
   };
   const next = () => {
     if (qi + 1 >= QUIZ.length) {
@@ -897,85 +1142,162 @@ const QuizBlock = () => {
     }
     setQi(qi + 1);
     setSel(null);
+    setShowHint(false);
   };
   const restart = () => {
     setQi(0);
     setSel(null);
     setScore(0);
     setDone(false);
+    setStreak(0);
+    setShowHint(false);
   };
+
   if (done)
     return (
-      <div style={{ textAlign: "center", padding: "30px" }}>
-        <div style={{ fontSize: "3rem", marginBottom: "12px" }}>
+      <div style={{ textAlign: "center", padding: "40px 20px" }}>
+        <div style={{ fontSize: "3.5rem", marginBottom: "12px" }}>
           {score >= 5 ? "🏆" : score >= 3 ? "🎯" : "📚"}
         </div>
-        <h3 style={{ color: "#00ff88", marginBottom: "8px" }}>
+        <h3 style={{ color: "#fbbf24", marginBottom: "8px" }}>
           Quiz Complete!
         </h3>
         <p style={{ color: "#9ca3af", marginBottom: "4px" }}>
           Score:{" "}
-          <strong style={{ color: "#fbbf24" }}>
+          <strong style={{ color: "#00ff88", fontSize: "1.2rem" }}>
             {score}/{QUIZ.length}
           </strong>
         </p>
-        <p style={{ color: "#9ca3af", marginBottom: "20px" }}>
-          {score >= 5
-            ? "Outstanding mastery!"
-            : score >= 3
-              ? "Good — review missed ones."
-              : "Keep at it — the pattern-trick will click!"}
+        <p style={{ color: "#9ca3af", marginBottom: "4px" }}>
+          Best Streak:{" "}
+          <strong style={{ color: "#f97316" }}>🔥 {bestStreak}</strong>
         </p>
-        <button className="kmap-btn kmap-btn-primary" onClick={restart}>
+        <p
+          style={{ color: "#9ca3af", marginBottom: "24px", fontSize: "0.9rem" }}
+        >
+          {score >= 5
+            ? "Excellent! You understand minterm logic and enable pins cold."
+            : score >= 3
+              ? "Good — practice the binary→decimal conversion for fast output identification."
+              : "Review the minterm rule: binary 0 → complement, binary 1 → direct."}
+        </p>
+        <button
+          onClick={restart}
+          style={{
+            padding: "12px 28px",
+            borderRadius: "10px",
+            background: "rgba(99,102,241,0.25)",
+            border: "1.5px solid rgba(99,102,241,0.6)",
+            color: "#a5b4fc",
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
+        >
           ↺ Try Again
         </button>
       </div>
     );
+
   return (
     <div>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginBottom: "14px",
+          marginBottom: "16px",
+          alignItems: "center",
         }}
       >
-        <span style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
-          Question {qi + 1}/{QUIZ.length}
-        </span>
-        <span style={{ color: "#fbbf24", fontSize: "0.85rem" }}>
-          Score: {score}
-        </span>
+        <div style={{ display: "flex", gap: "4px" }}>
+          {QUIZ.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: "28px",
+                height: "5px",
+                borderRadius: "3px",
+                background:
+                  i < qi
+                    ? "#00ff88"
+                    : i === qi
+                      ? "#6366f1"
+                      : "rgba(99,102,241,0.2)",
+              }}
+            />
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+          {streak >= 2 && (
+            <span style={{ color: "#f97316", fontSize: "0.82rem" }}>
+              🔥 {streak} streak!
+            </span>
+          )}
+          <span style={{ color: "#00ff88", fontSize: "0.85rem" }}>
+            Score: {score}
+          </span>
+        </div>
       </div>
       <p
         style={{
           color: "#e2e8f0",
           fontWeight: "600",
-          marginBottom: "14px",
-          lineHeight: "1.6",
+          marginBottom: "18px",
+          lineHeight: "1.65",
         }}
       >
         {q.q}
       </p>
+      {!showHint && sel === null && (
+        <button
+          onClick={() => setShowHint(true)}
+          style={{
+            marginBottom: "12px",
+            padding: "6px 14px",
+            borderRadius: "7px",
+            background: "rgba(251,191,36,0.1)",
+            border: "1px solid rgba(251,191,36,0.3)",
+            color: "#fbbf24",
+            cursor: "pointer",
+            fontSize: "0.8rem",
+          }}
+        >
+          💡 Show Hint
+        </button>
+      )}
+      {showHint && (
+        <div
+          style={{
+            marginBottom: "14px",
+            padding: "10px 14px",
+            background: "rgba(251,191,36,0.07)",
+            border: "1px solid rgba(251,191,36,0.3)",
+            borderRadius: "8px",
+            color: "#fbbf24",
+            fontSize: "0.83rem",
+          }}
+        >
+          🔍 {q.hint}
+        </div>
+      )}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "8px",
-          marginBottom: "14px",
+          gap: "9px",
+          marginBottom: "16px",
         }}
       >
         {q.opts.map((opt, i) => {
-          let bg = "rgba(15,23,42,0.6)",
-            border = "rgba(148,163,184,0.2)",
+          let border = "rgba(148,163,184,0.2)",
+            bg = "rgba(15,23,42,0.6)",
             color = "#9ca3af";
           if (sel !== null) {
             if (i === q.ans) {
-              bg = "rgba(0,255,136,0.12)";
+              bg = "rgba(0,255,136,0.1)";
               border = "#00ff88";
               color = "#00ff88";
-            } else if (i === sel && sel !== q.ans) {
-              bg = "rgba(239,68,68,0.12)";
+            } else if (i === sel) {
+              bg = "rgba(239,68,68,0.1)";
               border = "#ef4444";
               color = "#ef4444";
             }
@@ -985,8 +1307,8 @@ const QuizBlock = () => {
               key={i}
               onClick={() => choose(i)}
               style={{
-                padding: "10px 14px",
-                borderRadius: "8px",
+                padding: "11px 16px",
+                borderRadius: "9px",
                 border: `1.5px solid ${border}`,
                 background: bg,
                 color,
@@ -994,9 +1316,13 @@ const QuizBlock = () => {
                 cursor: sel !== null ? "default" : "pointer",
                 textAlign: "left",
                 transition: "all 0.2s",
+                fontSize: "0.9rem",
               }}
             >
-              {String.fromCharCode(65 + i)}. {opt}
+              <span style={{ marginRight: "10px", opacity: 0.7 }}>
+                {String.fromCharCode(65 + i)}.
+              </span>
+              {opt}
             </button>
           );
         })}
@@ -1004,788 +1330,380 @@ const QuizBlock = () => {
       {sel !== null && (
         <div
           style={{
-            padding: "12px",
-            background: "rgba(99,102,241,0.1)",
+            padding: "14px",
+            background: "rgba(99,102,241,0.08)",
             border: "1px solid rgba(99,102,241,0.3)",
-            borderRadius: "8px",
-            marginBottom: "14px",
+            borderRadius: "10px",
+            marginBottom: "16px",
           }}
         >
-          <p style={{ color: "#c4b5fd", margin: 0, fontSize: "0.9rem" }}>
-            💡 {q.exp}
+          <p
+            style={{
+              color: "#c4b5fd",
+              margin: 0,
+              fontSize: "0.88rem",
+              lineHeight: "1.65",
+            }}
+          >
+            {sel === q.ans ? "✅ " : "❌ "}
+            {q.exp}
           </p>
         </div>
       )}
       {sel !== null && (
-        <button className="kmap-btn kmap-btn-primary" onClick={next}>
-          {qi + 1 < QUIZ.length ? "Next →" : "See Results"}
+        <button
+          onClick={next}
+          style={{
+            padding: "11px 24px",
+            borderRadius: "9px",
+            background: "rgba(99,102,241,0.25)",
+            border: "1.5px solid rgba(99,102,241,0.6)",
+            color: "#a5b4fc",
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
+        >
+          {qi + 1 < QUIZ.length ? "Next Question →" : "See Results"}
         </button>
       )}
     </div>
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-const DecoderPage = () => {
-  const [selectedType, setSelectedType] = useState("2to4");
-  const [codeVals, setCodeVals] = useState([0, 0, 0, 0]);
-  const [enable, setEnable] = useState(1);
-  const [openCircuit, setOpenCircuit] = useState(null);
-  const [expandedEq, setExpandedEq] = useState(null);
-  const [highlightRow, setHighlightRow] = useState(null);
-  const [bcdAuto, setBcdAuto] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [bcdStep, setBcdStep] = useState(0);
-
+// ─── Main Simulator ────────────────────────────────────────────────────────────
+const DecoderSimulator = ({ selectedType, inputVals, setInputVals }) => {
   const config = DECODER_TYPES[selectedType];
-  const toggleBit = (idx) => {
-    const n = [...codeVals];
+  const [expandedEq, setExpandedEq] = useState(null);
+  const [enable, setEnable] = useState(true);
+
+  const toggleCode = (idx) => {
+    const n = [...inputVals];
     n[idx] = n[idx] ? 0 : 1;
-    setCodeVals(n);
+    setInputVals(n);
   };
-  const resetInputs = () => {
-    setCodeVals([0, 0, 0, 0]);
-    setEnable(1);
+  const reset = () => {
+    setInputVals(Array(4).fill(0));
   };
 
-  const activeCode = codeVals.slice(0, config.codeInputs.length);
+  const codeVals = config.codeInputs.map((_, i) => inputVals[i] ?? 0);
   const result = useMemo(
-    () =>
-      selectedType === "BCD7seg"
-        ? config.decode(activeCode)
-        : config.decode(activeCode, enable),
-    [config, activeCode, enable, selectedType],
+    () => config.decode(codeVals, enable),
+    [config, codeVals, enable],
   );
-  const outputEntries = config.outputs.map((name) => ({
+
+  const is7seg = selectedType === "BCD7seg";
+  const outputKeys = config.outputs;
+  const outputEntries = outputKeys.map((name) => ({
     name,
     val: result[name] ?? 0,
   }));
-  const codeDecimal = activeCode.reduce(
-    (a, b, i) => a | (b << (activeCode.length - 1 - i)),
+
+  const binaryValue = codeVals.reduce(
+    (acc, bit, i) => acc + (bit << (config.codeInputs.length - 1 - i)),
     0,
   );
 
-  React.useEffect(() => {
-    if (!bcdAuto || selectedType !== "BCD7seg") return;
-    const t = setInterval(() => {
-      setBcdStep((s) => {
-        const next = (s + 1) % 10;
-        setCodeVals([3, 2, 1, 0].map((b) => (next >> b) & 1));
-        return next;
-      });
-    }, 900);
-    return () => clearInterval(t);
-  }, [bcdAuto, selectedType]);
-
-  // 2x4 live circuit state
-  const liveA1 = codeVals[0],
-    liveA0 = codeVals[1];
-  const live2to4Active = enable ? (liveA1 << 1) | liveA0 : -1;
-  const live3to8Active = enable
-    ? (codeVals[0] << 2) | (codeVals[1] << 1) | codeVals[2]
-    : -1;
-
-  const circuitConfigs = {
-    "2to4": {
-      expression: "F = A'B'",
-      variables: ["A", "B"],
-      label: "2-to-4 Decoder (D0 minterm)",
-    },
-    "3to8": {
-      expression: "F = A'B'C'",
-      variables: ["A", "B", "C"],
-      label: "3-to-8 Decoder (D0 minterm)",
-    },
-  };
-
   return (
-    <ToolLayout
-      title="Decoders"
-      subtitle="Convert binary codes into exactly one activated output line"
-    >
-      {/* ═══════════════════ SECTION 1: CONCEPT ═══════════════════ */}
-      <ExplanationBlock title="What is a Decoder?">
-        <p className="explanation-intro">
-          A <strong>decoder</strong> is a combinational logic circuit that
-          converts an n-bit binary input code into exactly <em>one</em> of 2ⁿ
-          output lines. Think of it as a <strong>postal sorting machine</strong>
-          : the ZIP code (binary input) routes the letter (HIGH signal) to
-          exactly one mailbox (one output line) while all others stay LOW.
-        </p>
-        <div className="info-card">
-          <h4>The Three Golden Rules of Every Decoder</h4>
-          <ul>
-            <li>
-              📌 <strong>One-Hot Output:</strong> Exactly ONE output is HIGH at
-              a time (when enabled)
-            </li>
-            <li>
-              🔑 <strong>Enable Pin (E):</strong> When E=0, ALL outputs go LOW —
-              acts as a chip-select / master OFF switch
-            </li>
-            <li>
-              🧮 <strong>Minterm Generator:</strong> Output Dᵢ equals minterm mᵢ
-              of the input variables
-            </li>
-          </ul>
-        </div>
-        <div className="example-box">
-          <h4>
-            🎯 The Pattern-Matching Trick — Write Any Decoder Equation Instantly
-          </h4>
-          <p>
-            For output Dᵢ, convert <strong>i to binary</strong>, then read each
-            bit position:
-          </p>
-          <ul>
-            <li>
-              Bit = <strong>1</strong> → use the variable{" "}
-              <strong>directly (no complement)</strong>
-            </li>
-            <li>
-              Bit = <strong>0</strong> → use the variable{" "}
-              <strong>complemented (add ')</strong>
-            </li>
-            <li>AND everything together with Enable E</li>
-          </ul>
-          <p
-            style={{
-              marginTop: "12px",
-              padding: "10px",
-              background: "rgba(0,0,0,0.3)",
-              borderRadius: "6px",
-              fontFamily: "monospace",
-            }}
-          >
-            <strong style={{ color: "#fbbf24" }}>
-              Example — D5 in a 3-to-8 decoder:
-            </strong>
-            <br />5 in binary = <strong>101</strong>
-            <br />
-            A2=<strong style={{ color: "#00ff88" }}>1</strong> → A2 (direct)
-            &nbsp;&nbsp; A1=<strong style={{ color: "#ef4444" }}>0</strong> →
-            A1' (complement) &nbsp;&nbsp; A0=
-            <strong style={{ color: "#00ff88" }}>1</strong> → A0 (direct)
-            <br />
-            <strong style={{ color: "#00ff88" }}>
-              ∴ D5 = E · A2 · A1' · A0 ✅
-            </strong>
-          </p>
-        </div>
-        <div className="key-insight">
-          <h4>🧠 Why Decoders Are Power Tools for Logic Design</h4>
-          <p>
-            Since D0=m0, D1=m1, …, D7=m7 — every output IS already a minterm.
-            This means <strong>any Boolean function</strong> of n variables can
-            be implemented by connecting a single n-to-2ⁿ decoder plus one OR
-            gate per output function. No AND gates required. A 3-to-8 decoder +
-            OR gates = <em>universal function generator for 3 variables</em>.
-          </p>
-        </div>
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 2: INTERNAL CIRCUIT + LIVE SVG ═══════════════════ */}
-      <ExplanationBlock title="How the Circuit Works — The Trick to Learn It Forever">
-        <p className="explanation-intro">
-          Every binary decoder is built from just{" "}
-          <strong>two layers of logic</strong>. Once you understand these two
-          layers, you can draw any decoder from memory.
-        </p>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3,1fr)",
-            gap: "12px",
-            margin: "18px 0",
-          }}
-        >
-          {[
-            {
-              n: "1",
-              icon: "🔀",
-              title: "NOT Layer",
-              color: "#60a5fa",
-              text: "Each input variable A, B, C… passes through a NOT gate. This gives both A and A' for every input. n inputs → 2n signals total available.",
-            },
-            {
-              n: "2",
-              icon: "🔧",
-              title: "AND Layer",
-              color: "#fbbf24",
-              text: "One AND gate per output. Each AND gate picks the true OR complemented form of every variable based on the address bit pattern. Plus Enable.",
-            },
-            {
-              n: "3",
-              icon: "💡",
-              title: "One-Hot Output",
-              color: "#00ff88",
-              text: "Since every AND gate has a unique bit-pattern, only one can fire at a time. The active one is guaranteed unique — that's the one-hot property.",
-            },
-          ].map(({ n, icon, title, color, text }) => (
-            <div
-              key={n}
-              style={{
-                background: "rgba(12,18,35,0.8)",
-                border: `1px solid ${color}30`,
-                borderRadius: "10px",
-                padding: "16px",
-              }}
-            >
-              <div style={{ fontSize: "1.5rem", marginBottom: "6px" }}>
-                {icon}
-              </div>
-              <div
-                style={{
-                  color,
-                  fontWeight: "700",
-                  fontSize: "0.75rem",
-                  marginBottom: "3px",
-                }}
-              >
-                STEP {n}
-              </div>
-              <div
-                style={{
-                  color: "#e2e8f0",
-                  fontWeight: "600",
-                  marginBottom: "8px",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {title}
-              </div>
-              <div
-                style={{
-                  color: "#9ca3af",
-                  fontSize: "0.82rem",
-                  lineHeight: "1.6",
-                }}
-              >
-                {text}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── LIVE 2-to-4 Circuit ── */}
-        <div
-          style={{
-            background: "rgba(8,14,28,0.9)",
-            border: "1px solid rgba(99,102,241,0.35)",
-            borderRadius: "12px",
-            padding: "20px",
-            marginTop: "16px",
-          }}
-        >
+    <div>
+      {/* Input section */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        <div>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
               marginBottom: "12px",
-              flexWrap: "wrap",
-              gap: "8px",
             }}
           >
-            <h4 style={{ color: "#a5b4fc", margin: 0 }}>
-              🔬 2-to-4 Decoder — Live Gate-Level Circuit
+            <h4 style={{ color: "#60a5fa", margin: 0, fontSize: "0.9rem" }}>
+              📥 Address Inputs
             </h4>
-            <span style={{ color: "#6b7280", fontSize: "0.8rem" }}>
-              Toggle inputs to see signal flow
-            </span>
+            <button
+              onClick={reset}
+              style={{
+                padding: "5px 12px",
+                borderRadius: "7px",
+                border: "1px solid rgba(148,163,184,0.2)",
+                background: "transparent",
+                color: "#6b7280",
+                cursor: "pointer",
+                fontSize: "0.78rem",
+              }}
+            >
+              Reset
+            </button>
           </div>
-          <p
-            style={{
-              color: "#6b7280",
-              fontSize: "0.82rem",
-              marginBottom: "14px",
-            }}
-          >
-            🟢 Green wire = HIGH (1) &nbsp;|&nbsp; 🔵 Dark wire = LOW (0)
-            &nbsp;|&nbsp; Green AND gate = active output
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              marginBottom: "16px",
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              ["E", enable, "#fbbf24", () => setEnable((e) => (e ? 0 : 1))],
-              ["A1", codeVals[0], "#00d4ff", () => toggleBit(0)],
-              ["A0", codeVals[1], "#00d4ff", () => toggleBit(1)],
-            ].map(([lbl, v, c, fn]) => (
-              <button
-                key={lbl}
-                onClick={fn}
+
+          {config.enableInput && (
+            <button
+              onClick={() => setEnable(!enable)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "9px",
+                border: `2px solid ${enable ? "#fbbf24" : "rgba(239,68,68,0.5)"}`,
+                background: enable
+                  ? "rgba(251,191,36,0.1)"
+                  : "rgba(239,68,68,0.08)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                marginBottom: "10px",
+                transition: "all 0.2s",
+              }}
+            >
+              <span
                 style={{
-                  padding: "7px 16px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
+                  color: enable ? "#fbbf24" : "#f87171",
                   fontFamily: "monospace",
                   fontWeight: "700",
-                  fontSize: "0.9rem",
-                  border: `2px solid ${v ? c : "rgba(148,163,184,0.25)"}`,
-                  background: v ? `${c}20` : "rgba(20,30,50,0.6)",
-                  color: v ? c : "#6b7280",
-                  transition: "all 0.2s",
                 }}
               >
-                {lbl}={v}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                setCodeVals([0, 0, 0, 0]);
-                setEnable(1);
-              }}
-              style={{
-                padding: "7px 14px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontFamily: "monospace",
-                fontSize: "0.8rem",
-                background: "rgba(30,40,60,0.5)",
-                border: "1px solid rgba(148,163,184,0.15)",
-                color: "#6b7280",
-              }}
-            >
-              ↺ Reset
-            </button>
-          </div>
-          <div style={{ overflowX: "auto" }}>
-            <Decoder2to4SVG
-              A1={liveA1}
-              A0={liveA0}
-              E={enable}
-              activeOut={live2to4Active}
-            />
-          </div>
-          <div
-            style={{
-              marginTop: "12px",
-              padding: "10px 14px",
-              background: "rgba(0,0,0,0.4)",
-              borderRadius: "8px",
-              fontFamily: "monospace",
-              fontSize: "0.85rem",
-            }}
-          >
-            <span style={{ color: "#9ca3af" }}>
-              State: E={enable}, A1={liveA1}, A0={liveA0} →{" "}
-            </span>
-            <span
-              style={{
-                color: enable ? "#00ff88" : "#ef4444",
-                fontWeight: "600",
-              }}
-            >
-              {enable
-                ? `D${live2to4Active} HIGH (address ${live2to4Active})  m${live2to4Active}=${[liveA1, liveA0].map((b, i) => (b ? ["A1", "A0"][i] : ["A1", "A0"][i] + "'")).join("·")}`
-                : "ALL OUTPUTS LOW (E disabled)"}
-            </span>
-          </div>
-        </div>
-
-        {/* ── LIVE 3-to-8 Block ── */}
-        <div
-          style={{
-            background: "rgba(8,14,28,0.9)",
-            border: "1px solid rgba(99,102,241,0.35)",
-            borderRadius: "12px",
-            padding: "20px",
-            marginTop: "20px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "12px",
-              flexWrap: "wrap",
-              gap: "8px",
-            }}
-          >
-            <h4 style={{ color: "#a5b4fc", margin: 0 }}>
-              🔬 3-to-8 Decoder — Block-Level Diagram
-            </h4>
-            <span style={{ color: "#6b7280", fontSize: "0.8rem" }}>
-              8 internal AND gates shown as minterm labels
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              marginBottom: "16px",
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              ["E", enable, "#fbbf24", () => setEnable((e) => (e ? 0 : 1))],
-              ["A2", codeVals[0], "#00d4ff", () => toggleBit(0)],
-              ["A1", codeVals[1], "#00d4ff", () => toggleBit(1)],
-              ["A0", codeVals[2], "#00d4ff", () => toggleBit(2)],
-            ].map(([lbl, v, c, fn]) => (
-              <button
-                key={lbl}
-                onClick={fn}
-                style={{
-                  padding: "7px 16px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  fontFamily: "monospace",
-                  fontWeight: "700",
-                  fontSize: "0.9rem",
-                  border: `2px solid ${v ? c : "rgba(148,163,184,0.25)"}`,
-                  background: v ? `${c}20` : "rgba(20,30,50,0.6)",
-                  color: v ? c : "#6b7280",
-                  transition: "all 0.2s",
-                }}
+                E (Enable)
+              </span>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                {lbl}={v}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                setCodeVals([0, 0, 0, 0]);
-                setEnable(1);
-              }}
-              style={{
-                padding: "7px 14px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontFamily: "monospace",
-                fontSize: "0.8rem",
-                background: "rgba(30,40,60,0.5)",
-                border: "1px solid rgba(148,163,184,0.15)",
-                color: "#6b7280",
-              }}
-            >
-              ↺ Reset
-            </button>
-          </div>
-          <div style={{ overflowX: "auto" }}>
-            <Decoder3to8SVG
-              A2={codeVals[0]}
-              A1={codeVals[1]}
-              A0={codeVals[2]}
-              E={enable}
-              activeOut={live3to8Active}
-            />
-          </div>
-        </div>
-
-        {/* Cascading trick */}
-        <div className="example-box" style={{ marginTop: "20px" }}>
-          <h4>
-            🔗 The Cascading Trick — Build a 3-to-8 from Two 2-to-4 Decoders
-          </h4>
-          <p>
-            You don't need to buy an 8-output chip! Combine two 4-output chips:
-          </p>
-          <ul>
-            <li>
-              <strong>A2 (MSB)</strong> → Enable of Decoder #2 (active-high).
-              Through a NOT gate → Enable of Decoder #1
-            </li>
-            <li>
-              <strong>A2=0:</strong> Decoder #1 enabled → handles D0–D3 using
-              A1, A0
-            </li>
-            <li>
-              <strong>A2=1:</strong> Decoder #2 enabled → handles D4–D7 using
-              A1, A0
-            </li>
-            <li>
-              Scalable: four 2-to-4 can make one 4-to-16 using 2 MSBs as enable
-              logic!
-            </li>
-          </ul>
-        </div>
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 3: FULL SIMULATOR ═══════════════════ */}
-      <ExplanationBlock title="Interactive Decoder Simulator">
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginBottom: "20px",
-          }}
-        >
-          {Object.entries(DECODER_TYPES).map(([key, cfg]) => (
-            <button
-              key={key}
-              className={`kmap-btn ${selectedType === key ? "kmap-btn-primary" : "kmap-btn-secondary"}`}
-              onClick={() => {
-                setSelectedType(key);
-                resetInputs();
-              }}
-            >
-              {cfg.label}
-            </button>
-          ))}
-        </div>
-        <p className="explanation-intro" style={{ marginBottom: "16px" }}>
-          <strong>{config.label}</strong> — {config.description}.
-          {selectedType === "BCD7seg" && (
-            <button
-              className="kmap-btn kmap-btn-secondary"
-              style={{
-                marginLeft: "10px",
-                padding: "4px 12px",
-                fontSize: "0.8rem",
-              }}
-              onClick={() => setBcdAuto((a) => !a)}
-            >
-              {bcdAuto ? "⏸ Stop" : "▶ Auto-cycle 0–9"}
+                {!enable && (
+                  <span style={{ color: "#f87171", fontSize: "0.72rem" }}>
+                    ⚠ DISABLED
+                  </span>
+                )}
+                <span
+                  style={{
+                    width: "28px",
+                    height: "16px",
+                    borderRadius: "4px",
+                    background: enable ? "#fbbf24" : "rgba(239,68,68,0.3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "monospace",
+                    fontSize: "0.78rem",
+                    color: enable ? "#0a0f1a" : "#9ca3af",
+                    fontWeight: "800",
+                  }}
+                >
+                  {enable ? "1" : "0"}
+                </span>
+              </div>
             </button>
           )}
-        </p>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "24px",
-          }}
-        >
-          <div>
-            <h4 style={{ color: "#93c5fd", marginBottom: "12px" }}>
-              Code Inputs
-              {selectedType !== "BCD7seg" && (
-                <span
-                  style={{
-                    color: "#9ca3af",
-                    fontSize: "0.8rem",
-                    marginLeft: "6px",
-                  }}
-                >
-                  (= decimal {codeDecimal})
-                </span>
-              )}
-            </h4>
-            {config.enableInput && (
-              <button
-                onClick={() => setEnable((e) => (e ? 0 : 1))}
-                style={{
-                  marginBottom: "10px",
-                  padding: "10px 16px",
-                  borderRadius: "8px",
-                  width: "100%",
-                  cursor: "pointer",
-                  border: `2px solid ${enable ? "#fbbf24" : "rgba(148,163,184,0.3)"}`,
-                  background: enable
-                    ? "rgba(251,191,36,0.15)"
-                    : "rgba(15,23,42,0.6)",
-                  color: enable ? "#fbbf24" : "#9ca3af",
-                  fontFamily: "monospace",
-                  fontWeight: "600",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span>Enable (E) — chip select</span>
-                <span
-                  style={{
-                    width: "22px",
-                    height: "22px",
-                    borderRadius: "50%",
-                    background: enable ? "#fbbf24" : "#334155",
-                    boxShadow: enable ? "0 0 8px #fbbf24" : "none",
-                    display: "inline-block",
-                  }}
-                />
-              </button>
-            )}
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-            >
-              {config.codeInputs.map((label, idx) => (
-                <button
-                  key={label}
-                  onClick={() => toggleBit(idx)}
-                  style={{
-                    padding: "10px 16px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    border: `2px solid ${codeVals[idx] ? "#00d4ff" : "rgba(148,163,184,0.3)"}`,
-                    background: codeVals[idx]
-                      ? "rgba(0,212,255,0.15)"
-                      : "rgba(15,23,42,0.6)",
-                    color: codeVals[idx] ? "#00d4ff" : "#9ca3af",
-                    fontFamily: "monospace",
-                    fontWeight: "600",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span>
-                    {label} &nbsp;
-                    <span style={{ color: "#4b5563", fontSize: "0.8rem" }}>
-                      2<sup>{config.codeInputs.length - 1 - idx}</sup> place
-                    </span>
-                  </span>
-                  <span
-                    style={{
-                      width: "22px",
-                      height: "22px",
-                      borderRadius: "50%",
-                      background: codeVals[idx] ? "#00d4ff" : "#334155",
-                      boxShadow: codeVals[idx] ? "0 0 8px #00d4ff" : "none",
-                      display: "inline-block",
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
+
+          {config.codeInputs.map((name, idx) => (
             <button
-              className="kmap-btn kmap-btn-secondary"
-              style={{ marginTop: "12px", width: "100%" }}
-              onClick={resetInputs}
-            >
-              ↺ Reset All
-            </button>
-            <div
+              key={name}
+              onClick={() => toggleCode(idx)}
               style={{
-                marginTop: "12px",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "rgba(0,212,255,0.05)",
-                border: "1px solid rgba(0,212,255,0.2)",
-                fontFamily: "monospace",
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "9px",
+                border: `2px solid ${codeVals[idx] ? "#60a5fa" : "rgba(99,102,241,0.2)"}`,
+                background: codeVals[idx]
+                  ? "rgba(96,165,250,0.1)"
+                  : "rgba(12,18,35,0.7)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                marginBottom: "8px",
+                transition: "all 0.2s",
               }}
             >
-              <p style={{ color: "#00d4ff", margin: 0, fontWeight: "600" }}>
-                Code: <strong>{activeCode.join("")}</strong>₂
-                {selectedType !== "BCD7seg" && (
-                  <span style={{ color: "#9ca3af" }}> = {codeDecimal}₁₀</span>
-                )}
-              </p>
-              {config.enableInput && (
-                <p
-                  style={{
-                    color: enable ? "#fbbf24" : "#6b7280",
-                    margin: "4px 0 0",
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  Enable: {enable ? "✅ ON" : "❌ OFF — all outputs LOW"}
-                </p>
-              )}
-            </div>
-          </div>
-          <div>
-            <h4 style={{ color: "#fbbf24", marginBottom: "12px" }}>
-              {selectedType === "BCD7seg"
-                ? "Segment Outputs"
-                : "Decoded Outputs"}
-            </h4>
-            {selectedType === "BCD7seg" && (
-              <div
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "20px",
-                  marginBottom: "16px",
-                  padding: "12px",
-                  background: "rgba(10,16,30,0.6)",
-                  borderRadius: "10px",
-                  border: "1px solid rgba(0,255,136,0.15)",
+                  color: codeVals[idx] ? "#60a5fa" : "#6b7280",
+                  fontFamily: "monospace",
+                  fontWeight: "700",
                 }}
               >
-                <SevenSegDisplay segs={result} />
-                <div>
-                  {result.active >= 0 ? (
-                    <>
-                      <p
-                        style={{
-                          color: "#00ff88",
-                          fontWeight: "700",
-                          fontSize: "1.6rem",
-                          margin: 0,
-                          fontFamily: "monospace",
-                          textShadow: "0 0 20px #00ff88",
-                        }}
-                      >
-                        "{result.active}"
-                      </p>
-                      <p
-                        style={{
-                          color: "#9ca3af",
-                          margin: "4px 0 0",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        BCD: {activeCode.join("")}₂
-                      </p>
-                      <p
-                        style={{
-                          color: "#6b7280",
-                          margin: "4px 0 0",
-                          fontSize: "0.8rem",
-                        }}
-                      >
-                        ON segments:{" "}
-                        {["a", "b", "c", "d", "e", "f", "g"]
-                          .filter((k) => result[k])
-                          .join(" ") || "none"}
-                      </p>
-                    </>
-                  ) : (
-                    <p
-                      style={{ color: "#ef4444", fontWeight: "600", margin: 0 }}
-                    >
-                      Invalid BCD (≥10)
-                    </p>
-                  )}
+                {name}
+              </span>
+              <span
+                style={{
+                  width: "28px",
+                  height: "16px",
+                  borderRadius: "4px",
+                  background: codeVals[idx]
+                    ? "#60a5fa"
+                    : "rgba(99,102,241,0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "monospace",
+                  fontSize: "0.78rem",
+                  color: codeVals[idx] ? "#0a0f1a" : "#4b5563",
+                  fontWeight: "800",
+                  transition: "all 0.2s",
+                }}
+              >
+                {codeVals[idx]}
+              </span>
+            </button>
+          ))}
+
+          <div
+            style={{
+              padding: "12px 14px",
+              background: "rgba(8,14,30,0.8)",
+              border: "1px solid rgba(99,102,241,0.2)",
+              borderRadius: "9px",
+              marginTop: "8px",
+            }}
+          >
+            {enable && result.active >= 0 ? (
+              <>
+                <div
+                  style={{
+                    color: "#86efac",
+                    fontSize: "0.75rem",
+                    fontWeight: "700",
+                    marginBottom: "4px",
+                  }}
+                >
+                  DECODING
                 </div>
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    color: "#00ff88",
+                    fontSize: "1.05rem",
+                    fontWeight: "700",
+                  }}
+                >
+                  {codeVals.join("")}₂ = {binaryValue}₁₀ →{" "}
+                  {is7seg ? `digit ${binaryValue}` : `D${result.active}`}
+                </div>
+              </>
+            ) : !enable ? (
+              <div style={{ color: "#f87171", fontSize: "0.85rem" }}>
+                ⚠️ Chip disabled (E=0) — all outputs LOW
+              </div>
+            ) : (
+              <div
+                style={{
+                  color: "#4b5563",
+                  fontSize: "0.85rem",
+                  fontStyle: "italic",
+                }}
+              >
+                {is7seg ? "BCD > 9 = invalid input" : "No input selected"}
               </div>
             )}
+          </div>
+        </div>
+
+        <div>
+          <h4
+            style={{
+              color: "#fbbf24",
+              marginBottom: "12px",
+              fontSize: "0.9rem",
+            }}
+          >
+            📤 Outputs {is7seg ? "— 7 Segment" : ""}
+          </h4>
+          {is7seg ? (
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+              style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}
+            >
+              <SevenSeg segs={result} digit={enable ? result.active : -1} />
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+              >
+                {outputEntries.map(({ name, val }) => (
+                  <div
+                    key={name}
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#4b5563",
+                        fontFamily: "monospace",
+                        fontSize: "0.8rem",
+                        width: "16px",
+                      }}
+                    >
+                      {name}
+                    </span>
+                    <div
+                      style={{
+                        width: "20px",
+                        height: "12px",
+                        borderRadius: "3px",
+                        background: val ? "#00ff88" : "rgba(99,102,241,0.15)",
+                        border: `1px solid ${val ? "#00ff88" : "rgba(99,102,241,0.2)"}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "monospace",
+                        fontSize: "0.7rem",
+                        color: val ? "#0a0f1a" : "#374151",
+                        fontWeight: "800",
+                      }}
+                    >
+                      {val}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "7px" }}
             >
               {outputEntries.map(({ name, val }) => (
                 <div
                   key={name}
                   style={{
-                    padding: "7px 14px",
-                    borderRadius: "7px",
-                    transition: "all 0.2s",
+                    padding: "9px 14px",
+                    borderRadius: "9px",
                     border: `2px solid ${val ? "#00ff88" : "rgba(148,163,184,0.12)"}`,
                     background: val
-                      ? "rgba(0,255,136,0.09)"
-                      : "rgba(10,16,30,0.5)",
+                      ? "rgba(0,255,136,0.08)"
+                      : "rgba(12,18,35,0.7)",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    transition: "all 0.2s",
+                    boxShadow: val ? "0 0 8px rgba(0,255,136,0.2)" : "none",
                   }}
                 >
                   <span
                     style={{
+                      color: val ? "#00ff88" : "#6b7280",
                       fontFamily: "monospace",
-                      fontWeight: "600",
-                      color: "#e2e8f0",
-                      fontSize: "0.9rem",
+                      fontWeight: "700",
                     }}
                   >
                     {name}
                   </span>
                   <span
                     style={{
+                      width: "28px",
+                      height: "16px",
+                      borderRadius: "4px",
+                      background: val ? "#00ff88" : "rgba(99,102,241,0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       fontFamily: "monospace",
-                      fontSize: "1.2rem",
-                      fontWeight: "700",
-                      color: val ? "#00ff88" : "#374151",
-                      textShadow: val ? "0 0 10px #00ff88" : "none",
+                      fontSize: "0.78rem",
+                      color: val ? "#0a0f1a" : "#4b5563",
+                      fontWeight: "800",
+                      transition: "all 0.2s",
                     }}
                   >
                     {val}
@@ -1793,161 +1711,83 @@ const DecoderPage = () => {
                 </div>
               ))}
             </div>
-            {selectedType !== "BCD7seg" && result.active >= 0 && (
-              <div
-                style={{
-                  marginTop: "12px",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  background: "rgba(0,255,136,0.06)",
-                  border: "1px solid rgba(0,255,136,0.3)",
-                }}
-              >
-                <p style={{ color: "#00ff88", fontWeight: "600", margin: 0 }}>
-                  ✅ D{result.active} = HIGH
-                </p>
-                <p
-                  style={{
-                    color: "#9ca3af",
-                    margin: "4px 0 0",
-                    fontFamily: "monospace",
-                    fontSize: "0.82rem",
-                  }}
-                >
-                  m{result.active} ={" "}
-                  {activeCode
-                    .map((b, i) =>
-                      b ? config.codeInputs[i] : config.codeInputs[i] + "'",
-                    )
-                    .join("·")}
-                </p>
-              </div>
-            )}
-          </div>
+          )}
         </div>
-      </ExplanationBlock>
+      </div>
 
-      {/* ═══════════════════ SECTION 4: BOOLEAN EQS (expandable) ═══════════════════ */}
-      <ExplanationBlock title={`Boolean Equations — ${config.label}`}>
-        <p className="explanation-intro">
-          Click any equation to reveal <strong>why</strong> it is written that
-          way using the bit-pattern trick.
-        </p>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "12px",
-          }}
+      {/* Truth Table */}
+      <div style={{ marginBottom: "20px" }}>
+        <h4
+          style={{ color: "#93c5fd", marginBottom: "12px", fontSize: "0.9rem" }}
         >
-          {config.booleanEqs.map(({ out, eq, explanation }, i) => (
-            <div key={out}>
-              <button
-                onClick={() => setExpandedEq(expandedEq === i ? null : i)}
-                style={{
-                  width: "100%",
-                  padding: "11px 16px",
-                  background:
-                    expandedEq === i
-                      ? "rgba(99,102,241,0.16)"
-                      : "rgba(99,102,241,0.05)",
-                  border: `1px solid ${expandedEq === i ? "rgba(99,102,241,0.55)" : "rgba(99,102,241,0.22)"}`,
-                  borderRadius: expandedEq === i ? "8px 8px 0 0" : "8px",
-                  fontFamily: "monospace",
-                  fontSize: "0.93rem",
-                  color: "#c4b5fd",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.2s",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span>
-                  <strong style={{ color: "#a5b4fc" }}>{out}:</strong> {eq}
-                </span>
-                <span
-                  style={{
-                    color: "#6b7280",
-                    fontSize: "0.8rem",
-                    marginLeft: "8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {expandedEq === i ? "▲" : "▼ explain"}
-                </span>
-              </button>
-              {expandedEq === i && (
-                <div
-                  style={{
-                    padding: "12px 16px",
-                    background: "rgba(99,102,241,0.04)",
-                    border: "1px solid rgba(99,102,241,0.15)",
-                    borderTop: "none",
-                    borderRadius: "0 0 8px 8px",
-                  }}
-                >
-                  <p
+          📊 Truth Table
+        </h4>
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+            }}
+          >
+            <thead>
+              <tr>
+                {config.truthHeaders.map((h, i) => (
+                  <th
+                    key={i}
                     style={{
-                      color: "#9ca3af",
-                      margin: 0,
-                      fontSize: "0.88rem",
-                      lineHeight: "1.6",
+                      padding: "8px 10px",
+                      background: "rgba(15,23,42,0.9)",
+                      color:
+                        h === "E"
+                          ? "#fbbf24"
+                          : config.codeInputs.includes(h)
+                            ? "#60a5fa"
+                            : "#34d399",
+                      textAlign: "center",
+                      borderBottom: "1px solid rgba(99,102,241,0.3)",
+                      fontSize: "0.78rem",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    💡 {explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 5: TRUTH TABLE ═══════════════════ */}
-      <ExplanationBlock title={`Truth Table — ${config.label}`}>
-        <p className="explanation-intro" style={{ marginBottom: "10px" }}>
-          Hover any row to highlight. The currently decoded row lights up
-          automatically.
-        </p>
-        <div className="binary-table-container">
-          <table className="binary-table">
-            <thead className="binary-table-header">
-              <tr>
-                {config.truthHeaders.map((h) => (
-                  <th key={h}>{h}</th>
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {config.truthRows.map((row, ri) => {
                 const isActive =
-                  selectedType !== "BCD7seg"
-                    ? enable && result.active === ri
-                    : result.active === ri;
+                  enable && result.active === ri - (config.enableInput ? 1 : 0);
                 return (
                   <tr
                     key={ri}
-                    className="binary-table-row"
-                    onMouseEnter={() => setHighlightRow(ri)}
-                    onMouseLeave={() => setHighlightRow(null)}
                     style={{
                       background: isActive
                         ? "rgba(0,255,136,0.07)"
-                        : highlightRow === ri
-                          ? "rgba(99,102,241,0.07)"
-                          : "transparent",
-                      cursor: "default",
-                      transition: "background 0.15s",
+                        : "transparent",
                     }}
                   >
                     {row.map((cell, ci) => (
                       <td
                         key={ci}
-                        className={`binary-table-cell ${cell === "1" ? "binary-table-cell-primary" : ""}`}
-                        style={{ fontWeight: isActive ? "700" : "normal" }}
+                        style={{
+                          padding: "6px 10px",
+                          textAlign: "center",
+                          color:
+                            cell === "1"
+                              ? config.codeInputs.length +
+                                  (config.enableInput ? 1 : 0) >
+                                ci
+                                ? "#60a5fa"
+                                : "#00ff88"
+                              : cell === "0"
+                                ? "#374151"
+                                : "#4b5563",
+                          borderBottom: "1px solid rgba(30,40,60,0.4)",
+                          fontWeight: isActive && cell === "1" ? "700" : "400",
+                        }}
                       >
                         {cell}
                       </td>
@@ -1958,315 +1798,975 @@ const DecoderPage = () => {
             </tbody>
           </table>
         </div>
-      </ExplanationBlock>
+      </div>
 
-      {/* ═══════════════════ SECTION 6: IMPLEMENTING FUNCTIONS ═══════════════════ */}
-      <ExplanationBlock title="Implementing Boolean Functions with a Decoder">
-        <p className="explanation-intro">
-          Since every decoder output IS a minterm, OR the right outputs together
-          to get any function.
-        </p>
-        <div className="example-box">
-          <h4>
-            Full Adder — 1 decoder + 2 OR gates (all logic functions at once!)
-          </h4>
-          <p>Inputs: A, B, Cin using a 3-to-8 decoder:</p>
-          <ul>
-            <li>
-              <strong>Sum S</strong> = Σm(1,2,4,7) → D1 + D2 + D4 + D7
-            </li>
-            <li>
-              <strong>Carry Cout</strong> = Σm(3,5,6,7) → D3 + D5 + D6 + D7
-            </li>
-            <li>
-              Both functions simultaneously from one chip — ultra efficient!
-            </li>
-          </ul>
-        </div>
-        <div className="example-box">
-          <h4>Common 2-variable functions from a 2-to-4 decoder</h4>
-          <ul>
-            <li>
-              <strong>AND(A,B):</strong> F = D3
-            </li>
-            <li>
-              <strong>OR(A,B):</strong> F = D1 + D2 + D3
-            </li>
-            <li>
-              <strong>XOR(A,B):</strong> F = D1 + D2
-            </li>
-            <li>
-              <strong>XNOR(A,B):</strong> F = D0 + D3
-            </li>
-            <li>
-              <strong>NAND(A,B):</strong> F = D0 + D1 + D2
-            </li>
-          </ul>
-        </div>
-        <div className="key-insight">
-          <h4>🧠 The Design Rule</h4>
-          <p>
-            Pick decoder size n = number of input variables. List minterms where
-            F=1. OR those decoder outputs. Done — any function with minimal
-            gates.
-          </p>
-        </div>
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 7: QUIZ ═══════════════════ */}
-      <ExplanationBlock title="🧪 Knowledge Check — Test Yourself">
-        <p className="explanation-intro" style={{ marginBottom: "20px" }}>
-          6 questions covering all key concepts. Each answer is explained.
-        </p>
-        <QuizBlock />
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 8: APPLICATIONS ═══════════════════ */}
-      <ExplanationBlock title="Real-World Applications">
-        <div className="comparison-grid">
-          {[
-            {
-              icon: "🧠",
-              title: "Memory Address Decoding",
-              items: [
-                "CPU n-bit address → decoder inputs",
-                "Each output selects one memory chip",
-                "Only that chip drives the data bus",
-                "Cascading covers huge address spaces",
-              ],
-            },
-            {
-              icon: "📟",
-              title: "7-Segment Display (74LS47)",
-              items: [
-                "BCD from counter register",
-                "Decoder drives each LED segment",
-                "Used in clocks, meters, scoreboards",
-                "Single IC implementation",
-              ],
-            },
-            {
-              icon: "🔀",
-              title: "DEMUX (Demultiplexer)",
-              items: [
-                "Enable pin = data input line",
-                "Address selects destination output",
-                "Reconstructs TDM multiplexed signals",
-                "Same physical IC as decoder!",
-              ],
-            },
-            {
-              icon: "⚙️",
-              title: "CPU Instruction Decoder",
-              items: [
-                "Opcode bits → decoder inputs",
-                "Each output activates one micro-op",
-                "Drives ALU, register file controls",
-                "Core of hardwired control units",
-              ],
-            },
-          ].map(({ icon, title, items }) => (
-            <div key={title} className="comparison-card">
-              <h5>
-                {icon} {title}
-              </h5>
-              <ul>
-                {items.map((it) => (
-                  <li key={it}>{it}</li>
-                ))}
-              </ul>
+      {/* Equations */}
+      <div>
+        <h4
+          style={{ color: "#a5b4fc", marginBottom: "14px", fontSize: "0.9rem" }}
+        >
+          📐 Boolean Equations — Click to Expand
+        </h4>
+        <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+          {config.booleanEqs.map((eq, i) => (
+            <div
+              key={i}
+              onClick={() => setExpandedEq(expandedEq === i ? null : i)}
+              style={{
+                background: "rgba(12,18,35,0.8)",
+                border: `1.5px solid ${expandedEq === i ? eq.color + "55" : "rgba(99,102,241,0.18)"}`,
+                borderRadius: "10px",
+                padding: "13px 16px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <code
+                  style={{
+                    color: eq.color,
+                    fontFamily: "monospace",
+                    fontSize: "0.92rem",
+                    fontWeight: "700",
+                  }}
+                >
+                  {eq.eq}
+                </code>
+                <span style={{ color: "#6b7280", fontSize: "0.73rem" }}>
+                  {expandedEq === i ? "▲ less" : "▼ explain"}
+                </span>
+              </div>
+              {expandedEq === i && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    borderTop: "1px solid rgba(99,102,241,0.12)",
+                    paddingTop: "12px",
+                  }}
+                >
+                  <p
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: "0.86rem",
+                      lineHeight: "1.7",
+                      margin: "0 0 12px",
+                    }}
+                  >
+                    {eq.explanation}
+                  </p>
+                  <div
+                    style={{
+                      padding: "10px 14px",
+                      background: `${eq.color}12`,
+                      border: `1px solid ${eq.color}35`,
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: eq.color,
+                        fontSize: "0.78rem",
+                        fontWeight: "700",
+                      }}
+                    >
+                      🎯 MEMORY TRICK:{" "}
+                    </span>
+                    <span style={{ color: "#e2e8f0", fontSize: "0.82rem" }}>
+                      {eq.trick}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
-      </ExplanationBlock>
-
-      {/* ═══════════════════ SECTION 9: CIRCUIT BUTTONS ═══════════════════ */}
-      <ExplanationBlock title="Visualize in Circuit Forge">
-        <p className="explanation-intro" style={{ marginBottom: "8px" }}>
-          Open the Circuit Forge with the decoder's Boolean expression
-          pre-loaded. Experiment with connecting outputs to OR gates to
-          implement your own functions.
-        </p>
-        <div className="example-box" style={{ marginBottom: "20px" }}>
-          <h4>ℹ️ What the Circuit Forge shows:</h4>
-          <ul>
-            <li>
-              <strong>2×4 Decoder button:</strong> Shows the D0 output — a
-              2-input AND gate computing A'B'. This is minterm m0.
-            </li>
-            <li>
-              <strong>3×8 Decoder button:</strong> Shows the D0 output — a
-              3-input AND gate computing A'B'C'. This is minterm m0.
-            </li>
-            <li>
-              Each decoder output Dᵢ is exactly one AND gate with the complement
-              pattern for minterm mᵢ. Duplicate the pattern with different
-              complements for D1, D2, etc.
-            </li>
-          </ul>
-        </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-            gap: "14px",
-          }}
-        >
-          <button
-            className="kmap-btn kmap-btn-primary"
-            style={{
-              padding: "16px 18px",
-              fontSize: "0.95rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-            onClick={() => setOpenCircuit("2to4")}
-          >
-            🔌 Visualize 2×4 Decoder (D0 = A'B')
-          </button>
-          <button
-            className="kmap-btn kmap-btn-primary"
-            style={{
-              padding: "16px 18px",
-              fontSize: "0.95rem",
-              background: "linear-gradient(135deg,#6366f1,#4f46e5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-            onClick={() => setOpenCircuit("3to8")}
-          >
-            🔌 Visualize 3×8 Decoder (D0 = A'B'C')
-          </button>
-        </div>
-      </ExplanationBlock>
-
-      {openCircuit && circuitConfigs[openCircuit] && (
-        <CircuitModal
-          open={true}
-          onClose={() => setOpenCircuit(null)}
-          expression={circuitConfigs[openCircuit].expression}
-          variables={circuitConfigs[openCircuit].variables}
-        />
-      )}
-
-      <style jsx>{`
-        .comparison-card h5 {
-          color: #93c5fd;
-          margin-bottom: 10px;
-          font-size: 0.95rem;
-        }
-        .comparison-card ul {
-          color: #9ca3af;
-          padding-left: 18px;
-          margin: 0;
-        }
-        .comparison-card li {
-          margin-bottom: 6px;
-          line-height: 1.5;
-        }
-        .info-card {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid rgba(148, 163, 184, 0.25);
-          border-radius: 12px;
-          padding: 20px;
-          margin-top: 16px;
-        }
-        .info-card h4 {
-          color: #93c5fd;
-          margin-bottom: 10px;
-        }
-        .info-card ul,
-        .info-card p {
-          color: #9ca3af;
-          padding-left: 18px;
-          margin: 0;
-        }
-        .info-card li {
-          margin-bottom: 6px;
-          line-height: 1.5;
-        }
-        .example-box {
-          background: rgba(251, 191, 36, 0.07);
-          border: 1px solid rgba(251, 191, 36, 0.3);
-          border-radius: 12px;
-          padding: 20px;
-          margin-top: 16px;
-        }
-        .example-box h4 {
-          color: #fbbf24;
-          margin-bottom: 10px;
-        }
-        .example-box ul,
-        .example-box p {
-          color: #9ca3af;
-          padding-left: 18px;
-          margin: 4px 0 0;
-        }
-        .example-box li {
-          margin-bottom: 6px;
-          line-height: 1.5;
-        }
-        .key-insight {
-          background: rgba(34, 197, 94, 0.08);
-          border: 1px solid rgba(34, 197, 94, 0.3);
-          border-radius: 12px;
-          padding: 20px;
-          margin-top: 16px;
-        }
-        .key-insight h4 {
-          color: #86efac;
-          margin-bottom: 10px;
-        }
-        .key-insight p {
-          color: #9ca3af;
-          margin: 0;
-          line-height: 1.6;
-        }
-        .comparison-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
-          margin-top: 16px;
-        }
-        .comparison-card {
-          background: rgba(15, 23, 42, 0.5);
-          border: 1px solid rgba(148, 163, 184, 0.2);
-          border-radius: 10px;
-          padding: 16px;
-        }
-        .binary-table-container {
-          overflow-x: auto;
-          margin-top: 12px;
-        }
-        .binary-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .binary-table-header th {
-          background: rgba(99, 102, 241, 0.2);
-          color: #93c5fd;
-          padding: 9px 12px;
-          text-align: center;
-          border: 1px solid rgba(148, 163, 184, 0.2);
-          font-family: monospace;
-        }
-        .binary-table-row td {
-          padding: 7px 12px;
-          text-align: center;
-          border: 1px solid rgba(148, 163, 184, 0.1);
-          color: #e2e8f0;
-          font-family: monospace;
-        }
-        .binary-table-cell-primary {
-          color: #00ff88 !important;
-          font-weight: 700;
-        }
-      `}</style>
-    </ToolLayout>
+      </div>
+    </div>
   );
 };
+
+// ─── Type Selector ─────────────────────────────────────────────────────────────
+const TypeSelector = ({ selectedType, onChange }) => (
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+      marginBottom: "22px",
+      flexWrap: "wrap",
+    }}
+  >
+    {Object.entries(DECODER_TYPES).map(([key, val]) => (
+      <button
+        key={key}
+        onClick={() => onChange(key)}
+        style={{
+          padding: "10px 18px",
+          borderRadius: "10px",
+          border: `2px solid ${selectedType === key ? "#6366f1" : "rgba(99,102,241,0.2)"}`,
+          background:
+            selectedType === key
+              ? "rgba(99,102,241,0.2)"
+              : "rgba(12,18,35,0.7)",
+          color: selectedType === key ? "#a5b4fc" : "#6b7280",
+          cursor: "pointer",
+          fontWeight: selectedType === key ? "700" : "400",
+          transition: "all 0.2s",
+          fontSize: "0.87rem",
+        }}
+      >
+        {val.label}
+      </button>
+    ))}
+  </div>
+);
+
+// ─── Section Block ─────────────────────────────────────────────────────────────
+const Section = ({ title, children, accent = "#6366f1" }) => (
+  <div
+    style={{
+      marginBottom: "32px",
+      background: "rgba(10,16,32,0.85)",
+      border: `1px solid ${accent}30`,
+      borderRadius: "16px",
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        padding: "16px 22px",
+        borderBottom: `1px solid ${accent}25`,
+        background: `${accent}0a`,
+      }}
+    >
+      <h3
+        style={{
+          color: "#e2e8f0",
+          margin: 0,
+          fontSize: "1.05rem",
+          fontWeight: "700",
+        }}
+      >
+        {title}
+      </h3>
+    </div>
+    <div style={{ padding: "22px" }}>{children}</div>
+  </div>
+);
+
+// ─── Cascading Decoder Explainer ───────────────────────────────────────────────
+const CascadingExplainer = () => {
+  const [chipSelect, setChipSelect] = useState(0);
+  const chips = [
+    "Chip A (0–3)",
+    "Chip B (4–7)",
+    "Chip C (8–11)",
+    "Chip D (12–15)",
+  ];
+  const [innerAddr, setInnerAddr] = useState(0);
+
+  return (
+    <div
+      style={{
+        background: "rgba(8,14,30,0.9)",
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(251,191,36,0.25)",
+      }}
+    >
+      <h4
+        style={{ color: "#fbbf24", marginBottom: "8px", fontSize: "0.95rem" }}
+      >
+        🔗 Cascading — Building a 4-to-16 from 2-to-4 Decoders
+      </h4>
+      <p
+        style={{
+          color: "#9ca3af",
+          fontSize: "0.83rem",
+          lineHeight: "1.6",
+          marginBottom: "18px",
+        }}
+      >
+        Connect high address bits to a top-level decoder. Each output enables
+        one of four child decoders, each handling 4 outputs.
+      </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          gap: "16px",
+          alignItems: "start",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.75rem",
+              marginBottom: "8px",
+            }}
+          >
+            Top-level select (A3,A2)
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {chips.map((c, i) => (
+              <button
+                key={i}
+                onClick={() => setChipSelect(i)}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${chipSelect === i ? "#fbbf24" : "rgba(99,102,241,0.2)"}`,
+                  background:
+                    chipSelect === i
+                      ? "rgba(251,191,36,0.15)"
+                      : "rgba(12,18,35,0.7)",
+                  color: chipSelect === i ? "#fbbf24" : "#6b7280",
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                  fontSize: "0.82rem",
+                  textAlign: "left",
+                }}
+              >
+                {i.toString(2).padStart(2, "0")}₂ → {c}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.75rem",
+              marginBottom: "8px",
+            }}
+          >
+            Inner address (A1,A0) — select within {chips[chipSelect]}
+          </div>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+            {[0, 1, 2, 3].map((i) => (
+              <button
+                key={i}
+                onClick={() => setInnerAddr(i)}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${innerAddr === i ? "#00ff88" : "rgba(99,102,241,0.2)"}`,
+                  background:
+                    innerAddr === i
+                      ? "rgba(0,255,136,0.12)"
+                      : "rgba(12,18,35,0.7)",
+                  color: innerAddr === i ? "#00ff88" : "#6b7280",
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {i.toString(2).padStart(2, "0")}₂
+              </button>
+            ))}
+          </div>
+          <div
+            style={{
+              padding: "14px",
+              background: "rgba(0,255,136,0.06)",
+              border: "1px solid rgba(0,255,136,0.3)",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              style={{
+                color: "#86efac",
+                fontSize: "0.75rem",
+                fontWeight: "700",
+                marginBottom: "6px",
+              }}
+            >
+              ACTIVE OUTPUT
+            </div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                color: "#00ff88",
+                fontSize: "1.1rem",
+                fontWeight: "700",
+              }}
+            >
+              D{chipSelect * 4 + innerAddr} = output #
+              {chipSelect * 4 + innerAddr}
+            </div>
+            <div
+              style={{
+                color: "#9ca3af",
+                fontSize: "0.78rem",
+                marginTop: "4px",
+              }}
+            >
+              4-bit address:{" "}
+              {(chipSelect * 4 + innerAddr).toString(2).padStart(4, "0")}₂ ={" "}
+              {chipSelect * 4 + innerAddr}₁₀
+            </div>
+            <div
+              style={{
+                color: "#60a5fa",
+                fontSize: "0.78rem",
+                marginTop: "4px",
+              }}
+            >
+              Top decoder selects {chips[chipSelect]} → inner decoder selects
+              output {innerAddr}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── BCD Digit Pad ─────────────────────────────────────────────────────────────
+const BCDDigitPad = () => {
+  const [digit, setDigit] = useState(0);
+  const bcd = digit.toString(2).padStart(4, "0");
+  const bits = bcd.split("").map(Number);
+  const result = DECODER_TYPES["BCD7seg"].decode(bits);
+
+  return (
+    <div
+      style={{
+        background: "rgba(8,14,30,0.9)",
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(0,255,136,0.25)",
+      }}
+    >
+      <h4
+        style={{ color: "#86efac", marginBottom: "14px", fontSize: "0.95rem" }}
+      >
+        🔢 BCD Digit Pad — Type a Number, See the Segments
+      </h4>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: "8px",
+          marginBottom: "20px",
+        }}
+      >
+        {[7, 8, 9, 4, 5, 6, 1, 2, 3, null, 0, null].map((n, i) =>
+          n !== null ? (
+            <button
+              key={i}
+              onClick={() => setDigit(n)}
+              style={{
+                padding: "14px",
+                borderRadius: "10px",
+                border: `2px solid ${digit === n ? "#00ff88" : "rgba(99,102,241,0.2)"}`,
+                background:
+                  digit === n ? "rgba(0,255,136,0.12)" : "rgba(12,18,35,0.7)",
+                color: digit === n ? "#00ff88" : "#9ca3af",
+                cursor: "pointer",
+                fontFamily: "monospace",
+                fontWeight: "700",
+                fontSize: "1.1rem",
+                transition: "all 0.2s",
+              }}
+            >
+              {n}
+            </button>
+          ) : (
+            <div key={i} />
+          ),
+        )}
+      </div>
+      <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+        <SevenSeg segs={result} digit={digit} />
+        <div>
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+              marginBottom: "8px",
+            }}
+          >
+            BCD Code:{" "}
+            <span
+              style={{
+                color: "#60a5fa",
+                fontFamily: "monospace",
+                fontWeight: "700",
+              }}
+            >
+              {bcd}₂
+            </span>
+          </div>
+          <div
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+              marginBottom: "8px",
+            }}
+          >
+            A B C D ={" "}
+            <span style={{ fontFamily: "monospace", color: "#fbbf24" }}>
+              {bits.join(" ")}
+            </span>
+          </div>
+          <div style={{ color: "#9ca3af", fontSize: "0.8rem" }}>
+            Active segments:{" "}
+            <span style={{ fontFamily: "monospace", color: "#00ff88" }}>
+              {["a", "b", "c", "d", "e", "f", "g"]
+                .filter((k) => result[k])
+                .join(", ")}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
+const DecoderPage = () => {
+  const [selectedType, setSelectedType] = useState("2to4");
+  const [inputVals, setInputVals] = useState(Array(4).fill(0));
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    setInputVals(Array(4).fill(0));
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: "'Segoe UI', system-ui, sans-serif",
+        background: "#080e1e",
+        minHeight: "100vh",
+        color: "#e2e8f0",
+        padding: "28px 20px 80px",
+      }}
+    >
+      <style>{`* { box-sizing: border-box; } ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: rgba(15,23,42,0.3); } ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 3px; } button:hover { filter: brightness(1.12); }`}</style>
+
+      {/* Header */}
+      <div style={{ maxWidth: "900px", margin: "0 auto 32px" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "6px 14px",
+            borderRadius: "20px",
+            background: "rgba(0,255,136,0.1)",
+            border: "1px solid rgba(0,255,136,0.3)",
+            marginBottom: "16px",
+          }}
+        >
+          <span
+            style={{
+              color: "#86efac",
+              fontSize: "0.78rem",
+              fontWeight: "700",
+              letterSpacing: "0.1em",
+            }}
+          >
+            DIGITAL LOGIC
+          </span>
+        </div>
+        <h1
+          style={{
+            fontSize: "2.2rem",
+            fontWeight: "800",
+            background: "linear-gradient(135deg, #86efac, #60a5fa, #a78bfa)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            margin: "0 0 12px",
+            lineHeight: 1.2,
+          }}
+        >
+          Decoders — Complete Guide
+        </h1>
+        <p
+          style={{
+            color: "#64748b",
+            fontSize: "1rem",
+            lineHeight: "1.6",
+            margin: 0,
+          }}
+        >
+          Interactive simulator • Minterm equation builder • 7-segment live demo
+          • Cascading decoder • Function generator • Quiz with hints
+        </p>
+      </div>
+
+      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+        {/* SECTION 1: Concept */}
+        <Section title="📖 What is a Decoder? — Core Concept" accent="#00ff88">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  color: "#9ca3af",
+                  lineHeight: "1.7",
+                  fontSize: "0.92rem",
+                  margin: "0 0 16px",
+                }}
+              >
+                A <strong style={{ color: "#e2e8f0" }}>decoder</strong> is a
+                combinational circuit that converts a binary code into one
+                active output line. Given an n-bit code, it activates exactly
+                one of 2ⁿ outputs.
+              </p>
+              <p
+                style={{
+                  color: "#9ca3af",
+                  lineHeight: "1.7",
+                  fontSize: "0.92rem",
+                  margin: 0,
+                }}
+              >
+                Think of it as a{" "}
+                <strong style={{ color: "#fbbf24" }}>building directory</strong>{" "}
+                — given a floor number (binary code), it rings the bell on
+                exactly that one floor.
+              </p>
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
+              {[
+                {
+                  icon: "🎯",
+                  label: "One-Hot Output",
+                  desc: "Exactly ONE output is HIGH at any time",
+                  color: "#00ff88",
+                },
+                {
+                  icon: "🔌",
+                  label: "Enable Pin",
+                  desc: "E=0 disables ALL outputs (chip-select)",
+                  color: "#fbbf24",
+                },
+                {
+                  icon: "🧩",
+                  label: "Minterm Machine",
+                  desc: "Each output = one AND gate minterm",
+                  color: "#60a5fa",
+                },
+                {
+                  icon: "📡",
+                  label: "Expansion",
+                  desc: "n bits → 2ⁿ output lines",
+                  color: "#a78bfa",
+                },
+              ].map(({ icon, label, desc, color }) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    alignItems: "center",
+                    padding: "10px 14px",
+                    background: "rgba(12,18,35,0.6)",
+                    borderRadius: "9px",
+                    border: `1px solid ${color}20`,
+                  }}
+                >
+                  <span style={{ fontSize: "1.2rem" }}>{icon}</span>
+                  <div>
+                    <div
+                      style={{ color, fontWeight: "700", fontSize: "0.82rem" }}
+                    >
+                      {label}
+                    </div>
+                    <div style={{ color: "#6b7280", fontSize: "0.78rem" }}>
+                      {desc}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "18px",
+              background: "rgba(0,255,136,0.05)",
+              border: "1px solid rgba(0,255,136,0.25)",
+              borderRadius: "12px",
+              marginBottom: "16px",
+            }}
+          >
+            <h4
+              style={{
+                color: "#86efac",
+                marginBottom: "12px",
+                fontSize: "0.9rem",
+              }}
+            >
+              🎯 The Minterm Rule — Write Any Decoder Equation Instantly
+            </h4>
+            <ol
+              style={{
+                color: "#9ca3af",
+                paddingLeft: "18px",
+                margin: 0,
+                lineHeight: "1.8",
+                fontSize: "0.88rem",
+              }}
+            >
+              <li>
+                Write the output index in binary (e.g., D5 → 5 ={" "}
+                <strong style={{ color: "#fbbf24" }}>101</strong>₂)
+              </li>
+              <li>
+                For each bit:{" "}
+                <strong style={{ color: "#00ff88" }}>
+                  bit=1 → use input directly
+                </strong>
+                ,{" "}
+                <strong style={{ color: "#f87171" }}>
+                  bit=0 → complement it
+                </strong>
+              </li>
+              <li>AND all terms together, including Enable (E)</li>
+            </ol>
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "12px",
+                background: "rgba(0,0,0,0.3)",
+                borderRadius: "8px",
+                fontFamily: "monospace",
+                fontSize: "0.87rem",
+              }}
+            >
+              <span style={{ color: "#fbbf24" }}>
+                Example — D5 in 3-to-8 decoder:
+              </span>
+              <br />
+              <span style={{ color: "#9ca3af" }}>5 = </span>
+              <span style={{ color: "#f97316" }}>1</span>
+              <span style={{ color: "#f87171" }}>0</span>
+              <span style={{ color: "#f97316" }}>1</span>
+              <span style={{ color: "#9ca3af" }}>
+                ₂ → A2=1 (keep) · A1=0 (complement) · A0=1 (keep)
+              </span>
+              <br />
+              <span style={{ color: "#00ff88", fontWeight: "700" }}>
+                ∴ D5 = E · A2 · A1' · A0 ✅
+              </span>
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "16px",
+              background: "rgba(99,102,241,0.05)",
+              border: "1px solid rgba(99,102,241,0.25)",
+              borderRadius: "12px",
+            }}
+          >
+            <h4
+              style={{
+                color: "#a5b4fc",
+                marginBottom: "8px",
+                fontSize: "0.88rem",
+              }}
+            >
+              🔌 The Enable Pin — Chip Select Superpower
+            </h4>
+            <p
+              style={{
+                color: "#9ca3af",
+                margin: 0,
+                fontSize: "0.87rem",
+                lineHeight: "1.65",
+              }}
+            >
+              <strong style={{ color: "#fbbf24" }}>E=1:</strong> Decoder works
+              normally. One output goes HIGH.
+              <br />
+              <strong style={{ color: "#f87171" }}>E=0:</strong> ALL outputs go
+              LOW, regardless of address. The chip is "asleep."
+              <br />
+              In memory systems, each chip has its own decoder-driven enable.
+              Only one chip is "awake" at any time — safe, no bus conflicts.
+            </p>
+          </div>
+        </Section>
+
+        {/* SECTION 2: Minterm Builder */}
+        <Section
+          title="🔬 Interactive Minterm Equation Builder"
+          accent="#6366f1"
+        >
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            Select any output and see its equation built step-by-step. Watch how
+            each bit in the binary address determines whether the input appears
+            direct or complemented.
+          </p>
+          <MintermBuilder />
+        </Section>
+
+        {/* SECTION 3: Simulator */}
+        <Section title="🎮 Interactive Decoder Simulator" accent="#60a5fa">
+          <TypeSelector
+            selectedType={selectedType}
+            onChange={handleTypeChange}
+          />
+          <div
+            style={{
+              color: "#6b7280",
+              fontSize: "0.8rem",
+              marginBottom: "14px",
+              padding: "8px 12px",
+              background: "rgba(251,191,36,0.05)",
+              border: "1px solid rgba(251,191,36,0.15)",
+              borderRadius: "8px",
+            }}
+          >
+            💡 <em>Analogy: {DECODER_TYPES[selectedType].analogy}</em>
+          </div>
+          <DecoderSimulator
+            key={selectedType}
+            selectedType={selectedType}
+            inputVals={inputVals}
+            setInputVals={setInputVals}
+          />
+        </Section>
+
+        {/* SECTION 4: 7-Seg Demo */}
+        <Section title="🔢 7-Segment Display — Live BCD Demo" accent="#00ff88">
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            A BCD-to-7-segment decoder converts a 4-bit BCD number to 7 segment
+            control signals. Click any digit below to see which segments light
+            up and what the BCD code is.
+          </p>
+          <BCDDigitPad />
+          <div
+            style={{
+              marginTop: "18px",
+              padding: "14px",
+              background: "rgba(251,191,36,0.06)",
+              border: "1px solid rgba(251,191,36,0.25)",
+              borderRadius: "10px",
+            }}
+          >
+            <h4
+              style={{
+                color: "#fbbf24",
+                marginBottom: "10px",
+                fontSize: "0.88rem",
+              }}
+            >
+              💡 7-Segment Label Reference
+            </h4>
+            <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+              {[
+                ["a", "top horizontal bar"],
+                ["b", "top-right vertical"],
+                ["c", "bottom-right vertical"],
+                ["d", "bottom horizontal bar"],
+                ["e", "bottom-left vertical"],
+                ["f", "top-left vertical"],
+                ["g", "middle horizontal bar"],
+              ].map(([seg, name]) => (
+                <div
+                  key={seg}
+                  style={{ display: "flex", gap: "6px", alignItems: "center" }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "monospace",
+                      color: "#00ff88",
+                      fontWeight: "700",
+                      width: "14px",
+                    }}
+                  >
+                    {seg}
+                  </span>
+                  <span style={{ color: "#6b7280", fontSize: "0.78rem" }}>
+                    {name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        {/* SECTION 5: Function Generator */}
+        <Section
+          title="🧩 Decoder as Function Generator — Zero Extra Gates!"
+          accent="#a78bfa"
+        >
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            This is one of the most powerful uses of decoders. Since each output
+            = one minterm, you can implement ANY Boolean function using a
+            decoder + a single OR gate. No K-map simplification needed for
+            implementation!
+          </p>
+          <FunctionGeneratorDemo />
+        </Section>
+
+        {/* SECTION 6: Cascading */}
+        <Section
+          title="🔗 Cascading Decoders — Building Larger Decoders"
+          accent="#fbbf24"
+        >
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            Need 16 outputs but only have 2-to-4 decoders? Cascade them! One
+            top-level decoder selects which of four child decoders is active
+            using the high address bits.
+          </p>
+          <CascadingExplainer />
+        </Section>
+
+        {/* SECTION 7: Real World */}
+        <Section title="🌍 Real-World Applications" accent="#34d399">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "14px",
+            }}
+          >
+            {[
+              {
+                icon: "🧠",
+                color: "#60a5fa",
+                title: "Memory Address Decoding",
+                items: [
+                  "CPU n-bit address → decoder inputs",
+                  "Each output selects one memory chip",
+                  "Only active chip drives the bus",
+                  "74LS138 is the classic chip",
+                ],
+              },
+              {
+                icon: "📟",
+                color: "#00ff88",
+                title: "7-Segment Display (74LS47)",
+                items: [
+                  "BCD from counter register",
+                  "Decoder drives each LED segment",
+                  "Used in clocks, meters, scoreboards",
+                  "Handles all 10 decimal digits",
+                ],
+              },
+              {
+                icon: "🔀",
+                color: "#a78bfa",
+                title: "DEMUX (Demultiplexer)",
+                items: [
+                  "Enable pin = data input line",
+                  "Address selects destination output",
+                  "Reconstructs TDM multiplexed signals",
+                  "Same IC as decoder!",
+                ],
+              },
+              {
+                icon: "⚙️",
+                color: "#f97316",
+                title: "CPU Instruction Decoder",
+                items: [
+                  "Opcode bits → decoder inputs",
+                  "Each output activates one micro-op",
+                  "Drives ALU and register controls",
+                  "Core of hardwired control units",
+                ],
+              },
+            ].map(({ icon, color, title, items }) => (
+              <div
+                key={title}
+                style={{
+                  background: "rgba(12,18,35,0.7)",
+                  border: `1px solid ${color}25`,
+                  borderRadius: "12px",
+                  padding: "18px",
+                }}
+              >
+                <div style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
+                  {icon}
+                </div>
+                <h5
+                  style={{
+                    color,
+                    marginBottom: "12px",
+                    fontSize: "0.88rem",
+                    fontWeight: "700",
+                  }}
+                >
+                  {title}
+                </h5>
+                <ul
+                  style={{
+                    color: "#6b7280",
+                    paddingLeft: "18px",
+                    margin: 0,
+                    lineHeight: "1.7",
+                    fontSize: "0.83rem",
+                  }}
+                >
+                  {items.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* SECTION 8: Quiz */}
+        <Section
+          title="🧪 Test Yourself — Quiz with Hints & Streaks"
+          accent="#6366f1"
+        >
+          <Quiz />
+        </Section>
+      </div>
+
+      <TipsPanel />
+    </div>
+  );
+};
+
 export default DecoderPage;
