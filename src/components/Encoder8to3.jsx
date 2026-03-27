@@ -6,7 +6,7 @@ export const Encoder8to3SVG = ({ inputVals, result }) => {
 
   return (
     <svg
-      viewBox="0 0 520 340"
+      viewBox="0 0 520 370"
       width="100%"
       style={{
         maxWidth: "520px",
@@ -17,7 +17,7 @@ export const Encoder8to3SVG = ({ inputVals, result }) => {
     >
       <rect
         width="520"
-        height="340"
+        height="370"
         rx="10"
         fill="rgba(8,12,22,0.97)"
         stroke="rgba(99,102,241,0.25)"
@@ -161,22 +161,22 @@ export const Encoder8to3SVG = ({ inputVals, result }) => {
         </g>
       ))}
 
-      {/* Active annotation */}
-      {result.active >= 0 && (
+      {/* Active annotation — positioned in the expanded lower area */}
+      {result.active >= 0 ? (
         <g>
           <rect
             x="6"
-            y="292"
-            width="160"
-            height="38"
+            y="316"
+            width="174"
+            height="42"
             rx="6"
             fill="rgba(0,255,136,0.08)"
             stroke="rgba(0,255,136,0.3)"
             strokeWidth="1"
           />
           <text
-            x="86"
-            y="308"
+            x="93"
+            y="333"
             textAnchor="middle"
             fill="#00ff88"
             fontSize="9"
@@ -185,13 +185,33 @@ export const Encoder8to3SVG = ({ inputVals, result }) => {
             Active: I{result.active} →{" "}
             {[result.A2 || 0, result.A1 || 0, result.A0 || 0].join("")}₂
           </text>
-          <text x="86" y="322" textAnchor="middle" fill="#9ca3af" fontSize="8">
+          <text x="93" y="348" textAnchor="middle" fill="#9ca3af" fontSize="8">
             Priority: highest active input wins
+          </text>
+        </g>
+      ) : (
+        <g>
+          <rect
+            x="6"
+            y="316"
+            width="174"
+            height="42"
+            rx="6"
+            fill="rgba(30,40,60,0.5)"
+            stroke="rgba(99,102,241,0.15)"
+            strokeWidth="1"
+          />
+          <text x="93" y="333" textAnchor="middle" fill="#6b7280" fontSize="9">
+            No inputs active
+          </text>
+          <text x="93" y="348" textAnchor="middle" fill="#4b5563" fontSize="8">
+            V=0 — outputs indeterminate
           </text>
         </g>
       )}
 
-      <text x="260" y="325" textAnchor="middle" fill="#374151" fontSize="9">
+      {/* Watermark — moved to bottom-right, away from annotation */}
+      <text x="514" y="362" textAnchor="end" fill="#374151" fontSize="9">
         8-to-3 Priority Encoder — Block Diagram
       </text>
     </svg>

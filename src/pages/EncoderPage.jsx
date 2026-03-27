@@ -772,7 +772,7 @@ const EncoderPage = () => {
                   transition: "all 0.2s",
                 }}
               >
-                {lbl}
+                {lbl}={diag8InputVals[i]}
               </button>
             ))}
             <button
@@ -794,6 +794,38 @@ const EncoderPage = () => {
           <div style={{ overflowX: "auto" }}>
             {/* FIX: Always pass diag8InputVals and diag8Result — never zeroed-out defaults */}
             <Encoder8to3SVG inputVals={diag8InputVals} result={diag8Result} />
+          </div>
+          <div
+            style={{
+              marginTop: "12px",
+              padding: "10px 14px",
+              background: "rgba(0,0,0,0.4)",
+              borderRadius: "8px",
+              fontFamily: "monospace",
+              fontSize: "0.85rem",
+            }}
+          >
+            {diag8Result.active >= 0 ? (
+              <>
+                <span style={{ color: "#9ca3af" }}>Active: </span>
+                <span style={{ color: "#00ff88", fontWeight: "600" }}>
+                  I{diag8Result.active}
+                </span>
+                <span style={{ color: "#9ca3af" }}> → Code: </span>
+                <span style={{ color: "#fbbf24", fontWeight: "600" }}>
+                  A2={diag8Result.A2} A1={diag8Result.A1} A0={diag8Result.A0}
+                </span>
+                <span style={{ color: "#9ca3af" }}>
+                  {" "}
+                  ({diag8Result.active}₁₀ ={" "}
+                  {diag8Result.active.toString(2).padStart(3, "0")}₂) &nbsp; V=1
+                </span>
+              </>
+            ) : (
+              <span style={{ color: "#6b7280" }}>
+                No inputs active — V=0, outputs indeterminate
+              </span>
+            )}
           </div>
         </div>
 
