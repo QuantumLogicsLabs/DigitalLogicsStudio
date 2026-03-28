@@ -35,6 +35,17 @@ import CircuitCost from "./pages/CircuitCost";
 import UniversalGates from "./pages/UniversalGates";
 import OddFunction from "./pages/OddFunction";
 
+import BinaryAdders from "./pages/ArithmeticFunctionsAndHDLs/BinaryAdders";
+import BinarySubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinarySubtractor";
+import BinaryAddSubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinaryAddSubtractor";
+import BinaryMultipliers from "./pages/ArithmeticFunctionsAndHDLs/BinaryMultipliers";
+import CodeConversion from "./pages/ArithmeticFunctionsAndHDLs/CodeConversion";
+import MagnitudeComparator from "./pages/ArithmeticFunctionsAndHDLs/MagnitudeComparator";
+import ParityGenerators from "./pages/ArithmeticFunctionsAndHDLs/ParityGenerators";
+import DesignApplications from "./pages/ArithmeticFunctionsAndHDLs/DesignApplications";
+import Complements from "./pages/ArithmeticFunctionsAndHDLs/Complements";
+import SignedUnsignedArithmetic from "./pages/ArithmeticFunctionsAndHDLs/SignedUnsignedArithmetic";
+
 // COMBINATIONAL CIRCUITS:
 import EncoderPage from "./pages/EncoderPage";
 import DecoderPage from "./pages/DecoderPage";
@@ -86,6 +97,40 @@ function App() {
           <Route path="/circuit-cost" element={<CircuitCost />} />
           <Route path="/universal-gates" element={<UniversalGates />} />
           <Route path="/odd-function" element={<OddFunction />} />
+          <Route path="/arithmetic/binary-adders" element={<BinaryAdders />} />
+          <Route
+            path="/arithmetic/binary-subtractor"
+            element={<BinarySubtractor />}
+          />
+          <Route
+            path="/arithmetic/binary-add-subtractor"
+            element={<BinaryAddSubtractor />}
+          />
+          <Route
+            path="/arithmetic/binary-multipliers"
+            element={<BinaryMultipliers />}
+          />
+          <Route
+            path="/arithmetic/code-conversion"
+            element={<CodeConversion />}
+          />
+          <Route
+            path="/arithmetic/magnitude-comparator"
+            element={<MagnitudeComparator />}
+          />
+          <Route
+            path="/arithmetic/parity-generators"
+            element={<ParityGenerators />}
+          />
+          <Route
+            path="/arithmetic/design-applications"
+            element={<DesignApplications />}
+          />
+          <Route path="/arithmetic/complements" element={<Complements />} />
+          <Route
+            path="/arithmetic/signed-unsigned"
+            element={<SignedUnsignedArithmetic />}
+          />
 
           {/* Combinational Circuits */}
           <Route path="/encoder" element={<EncoderPage />} />
