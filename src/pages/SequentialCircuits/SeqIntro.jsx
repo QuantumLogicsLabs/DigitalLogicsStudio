@@ -5,6 +5,7 @@ import SeqTable from "./components/SeqTable";
 import SeqGrid from "./components/SeqGrid";
 import SeqDiagram from "./components/SeqDiagram";
 import SeqGridData from "./data/SeqGridData";
+import SeqBoxData from "./data/SeqBoxData";
 import SeqBoxInfo from "./components/SeqBoxInfo";
 import SeqBoxSuccess from "./components/SeqBoxSuccess";
 
@@ -14,7 +15,7 @@ const SeqIntro = () => (
     subtitle="Understanding circuits with memory — where outputs depend on both current inputs and past history."
   >
     <div className="seq-content-body">
-      <SeqBox />
+      <SeqBox data={SeqBoxData.sequentialcircuit} />
       <h2>Combinational vs Sequential</h2>
       <p>
         In a <strong>combinational circuit</strong>, output is determined purely

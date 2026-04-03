@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import SeqLayout from "./SeqLayout";
+import SeqBox from "./components/SeqBox";
+import SeqBoxData from "./data/SeqBoxData";
 
 const SRLatchSim = () => {
   const [S, setS] = useState(0);
@@ -122,16 +124,7 @@ const SeqLatches = () => (
     subtitle="The simplest bistable memory elements — level-sensitive storage that responds directly to input levels."
   >
     <div className="seq-content-body">
-      <div className="seq-box">
-        <span className="seq-box-title">What is a Latch?</span>
-        <p>
-          A <strong>latch</strong> is a bistable multivibrator — a circuit with
-          two stable output states (0 and 1). It is the most primitive memory
-          element and is <strong>level-sensitive</strong>: it responds
-          continuously while the enable signal is asserted, not just at a clock
-          edge.
-        </p>
-      </div>
+      <SeqBox data={SeqBoxData.sequentialcircuit} />
 
       <h2>SR Latch — NOR Implementation</h2>
       <p>
