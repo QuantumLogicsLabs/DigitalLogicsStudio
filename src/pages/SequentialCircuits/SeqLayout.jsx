@@ -2,14 +2,54 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const seqPages = [
-  { path: "/sequential/intro",             label: "Introduction",                 icon: "📡", short: "Intro" },
-  { path: "/sequential/latches",           label: "Latches",                      icon: "🔒", short: "Latches" },
-  { path: "/sequential/flip-flops",        label: "Flip-Flops",                   icon: "🔁", short: "Flip-Flops" },
-  { path: "/sequential/flip-flop-types",   label: "Types of Flip-Flops",          icon: "📋", short: "FF Types" },
-  { path: "/sequential/analysis",          label: "Analysis",                     icon: "🔬", short: "Analysis" },
-  { path: "/sequential/design-procedures", label: "Design Procedures",            icon: "🏗️", short: "Design" },
-  { path: "/sequential/state-diagram",     label: "State Diagrams & Tables",      icon: "🗺️", short: "States" },
-  { path: "/sequential/state-reduction",   label: "State Reduction & Excitation", icon: "⚡", short: "Reduction" },
+  {
+    path: "/sequential/intro",
+    label: "Introduction",
+    icon: "📡",
+    short: "Intro",
+  },
+  {
+    path: "/sequential/latches",
+    label: "Latches",
+    icon: "🔒",
+    short: "Latches",
+  },
+  {
+    path: "/sequential/flip-flops",
+    label: "Flip-Flops",
+    icon: "🔁",
+    short: "Flip-Flops",
+  },
+  {
+    path: "/sequential/flip-flop-types",
+    label: "Types of Flip-Flops",
+    icon: "📋",
+    short: "FF Types",
+  },
+  {
+    path: "/sequential/analysis",
+    label: "Analysis",
+    icon: "🔬",
+    short: "Analysis",
+  },
+  {
+    path: "/sequential/design-procedures",
+    label: "Design Procedures",
+    icon: "🏗️",
+    short: "Design",
+  },
+  {
+    path: "/sequential/state-diagram",
+    label: "State Diagrams & Tables",
+    icon: "🗺️",
+    short: "States",
+  },
+  {
+    path: "/sequential/state-reduction",
+    label: "State Reduction & Excitation",
+    icon: "⚡",
+    short: "Reduction",
+  },
 ];
 
 const SeqLayout = ({ children, title, subtitle }) => {
@@ -22,7 +62,6 @@ const SeqLayout = ({ children, title, subtitle }) => {
 
   return (
     <div className="seq-layout">
-
       {/* ── Ambient background blobs ── */}
       <div className="seq-bg-blob seq-bg-blob-1" />
       <div className="seq-bg-blob seq-bg-blob-2" />
@@ -31,12 +70,24 @@ const SeqLayout = ({ children, title, subtitle }) => {
       {/* ── Top navigation bar ── */}
       <header className="seq-topbar">
         <div className="seq-topbar-left">
-          <button className="seq-hamburger" onClick={() => setSidebarOpen(o => !o)} aria-label="Toggle menu">
-            <span /><span /><span />
+          <button
+            className="seq-hamburger"
+            onClick={() => setSidebarOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            <span />
+            <span />
+            <span />
           </button>
           <Link to="/" className="seq-back-home">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M10 3L5 8l5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             Home
           </Link>
@@ -50,24 +101,44 @@ const SeqLayout = ({ children, title, subtitle }) => {
         </div>
 
         <div className="seq-topbar-right">
-          <div className="seq-progress-ring-wrap" title={`${currentIndex + 1} of ${seqPages.length}`}>
+          <div
+            className="seq-progress-ring-wrap"
+            title={`${currentIndex + 1} of ${seqPages.length}`}
+          >
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(99,102,241,0.2)" strokeWidth="3"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#818cf8" strokeWidth="3"
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="rgba(99,102,241,0.2)"
+                strokeWidth="3"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#818cf8"
+                strokeWidth="3"
                 strokeDasharray={`${progress * 0.879} 100`}
                 strokeLinecap="round"
                 transform="rotate(-90 18 18)"
-                style={{transition:"stroke-dasharray 0.4s ease"}}/>
+                style={{ transition: "stroke-dasharray 0.4s ease" }}
+              />
             </svg>
-            <span className="seq-progress-text">{currentIndex + 1}/{seqPages.length}</span>
+            <span className="seq-progress-text">
+              {currentIndex + 1}/{seqPages.length}
+            </span>
           </div>
         </div>
       </header>
 
       <div className="seq-body">
-
         {/* ── Sidebar overlay (mobile) ── */}
-        {sidebarOpen && <div className="seq-overlay" onClick={() => setSidebarOpen(false)} />}
+        {sidebarOpen && (
+          <div className="seq-overlay" onClick={() => setSidebarOpen(false)} />
+        )}
 
         {/* ── Sidebar ── */}
         <aside className={`seq-sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -83,14 +154,19 @@ const SeqLayout = ({ children, title, subtitle }) => {
             {/* Progress bar inside sidebar */}
             <div className="seq-sidebar-progress">
               <div className="seq-sidebar-progress-bar">
-                <div className="seq-sidebar-progress-fill" style={{width:`${progress}%`}} />
+                <div
+                  className="seq-sidebar-progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
-              <span className="seq-sidebar-progress-label">{progress}% complete</span>
+              <span className="seq-sidebar-progress-label">
+                {progress}% complete
+              </span>
             </div>
 
             <nav className="seq-sidebar-nav">
               {seqPages.map((p, i) => {
-                const isActive  = location.pathname === p.path;
+                const isActive = location.pathname === p.path;
                 const isVisited = i < currentIndex;
                 return (
                   <Link
@@ -99,11 +175,13 @@ const SeqLayout = ({ children, title, subtitle }) => {
                     className={`seq-nav-item${isActive ? " active" : ""}${isVisited ? " visited" : ""}`}
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <span className="seq-nav-num">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="seq-nav-num">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     <span className="seq-nav-icon">{p.icon}</span>
                     <span className="seq-nav-label-text">{p.label}</span>
                     <span className="seq-nav-status">
-                      {isActive  && <span className="seq-nav-dot-active" />}
+                      {isActive && <span className="seq-nav-dot-active" />}
                       {isVisited && <span className="seq-nav-check">✓</span>}
                     </span>
                   </Link>
@@ -112,18 +190,21 @@ const SeqLayout = ({ children, title, subtitle }) => {
             </nav>
 
             <div className="seq-sidebar-footer">
-              <Link to="/" className="seq-sidebar-home-btn">← Back to All Topics</Link>
+              <Link to="/" className="seq-sidebar-home-btn">
+                ← Back to All Topics
+              </Link>
             </div>
           </div>
         </aside>
 
         {/* ── Main content ── */}
         <main className="seq-main">
-
           {/* Page header */}
           <div className="seq-page-header">
             <nav className="seq-breadcrumb">
-              <Link to="/" className="seq-bc-link">Home</Link>
+              <Link to="/" className="seq-bc-link">
+                Home
+              </Link>
               <span className="seq-bc-chevron">›</span>
               <span className="seq-bc-mid">Sequential Circuits</span>
               <span className="seq-bc-chevron">›</span>
@@ -142,15 +223,18 @@ const SeqLayout = ({ children, title, subtitle }) => {
             {/* Chapter mini-nav dots */}
             <div className="seq-chapter-dots">
               {seqPages.map((p, i) => (
-                <Link key={p.path} to={p.path} className={`seq-dot${i === currentIndex ? " active" : ""}${i < currentIndex ? " done" : ""}`} title={p.label} />
+                <Link
+                  key={p.path}
+                  to={p.path}
+                  className={`seq-dot${i === currentIndex ? " active" : ""}${i < currentIndex ? " done" : ""}`}
+                  title={p.label}
+                />
               ))}
             </div>
           </div>
 
           {/* Content */}
-          <div className="seq-content-body">
-            {children}
-          </div>
+          <div className="seq-content-body">{children}</div>
 
           {/* Prev / Next */}
           <div className="seq-pagination">
@@ -158,25 +242,43 @@ const SeqLayout = ({ children, title, subtitle }) => {
               <Link to={prev.path} className="seq-pag-btn seq-pag-prev">
                 <div className="seq-pag-arrow">
                   <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                    <path d="M13 5l-5 5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path
+                      d="M13 5l-5 5 5 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 <div className="seq-pag-info">
                   <span className="seq-pag-hint">Previous</span>
-                  <span className="seq-pag-name">{prev.icon} {prev.label}</span>
+                  <span className="seq-pag-name">
+                    {prev.icon} {prev.label}
+                  </span>
                 </div>
               </Link>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
 
             {next ? (
               <Link to={next.path} className="seq-pag-btn seq-pag-next">
                 <div className="seq-pag-info seq-pag-info-right">
                   <span className="seq-pag-hint">Up Next</span>
-                  <span className="seq-pag-name">{next.icon} {next.label}</span>
+                  <span className="seq-pag-name">
+                    {next.icon} {next.label}
+                  </span>
                 </div>
                 <div className="seq-pag-arrow">
                   <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                    <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path
+                      d="M7 5l5 5-5 5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
               </Link>
