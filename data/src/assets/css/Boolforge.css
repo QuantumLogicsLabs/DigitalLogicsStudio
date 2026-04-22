@@ -1,0 +1,91 @@
+.simplified-expression-display {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(168, 85, 247, 0.15) 100%
+  );
+  border: 2px solid rgba(99, 102, 241, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.simplified-expression-display h3 {
+  color: #a78bfa;
+  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.expression-content {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  color: #fbbf24;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 1px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.expression-hint {
+  margin: 12px 0 0 0;
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  font-style: italic;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gates-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.gates-container > * {
+  pointer-events: auto;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.zoom-btn {
+  min-width: 40px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.zoom-level {
+  min-width: 50px;
+  text-align: center;
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 13px;
+}

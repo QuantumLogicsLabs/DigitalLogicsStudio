@@ -1,0 +1,636 @@
+================================================================================
+BOOLFORGE PROPRIETARY SOFTWARE
+LICENSE AGREEMENT (PPSLA v1.0)
+================================================================================
+Issued by: QuantumLogics Incorporated
+A Delaware Corporation — Legal Department
+quantumlogicslimited.com | +92 371 4467235
+Effective Date: January 1, 2025
+================================================================================
+
+!! READ CAREFULLY BEFORE INSTALLING, COPYING, OR USING THIS SOFTWARE !!
+
+BY INSTALLING, COPYING, DOWNLOADING, ACCESSING, ACTIVATING, OR OTHERWISE
+USING Boolforge, YOU ("LICENSEE") UNCONDITIONALLY ACCEPT AND AGREE TO BE
+BOUND BY EVERY TERM AND CONDITION IN THIS AGREEMENT IN FULL. IF YOU DO NOT
+AGREE, YOU MUST IMMEDIATELY CEASE ALL USE, DESTROY ALL COPIES, AND RETURN
+ALL MATERIALS TO QUANTUMLOGICS.
+
+================================================================================
+PREAMBLE
+================================================================================
+
+This BOOLFORGE Proprietary Software License Agreement ("Agreement," "License,"
+or "PPSLA") is a comprehensive, legally binding, and irrevocable instrument
+governing all access to, installation of, copying of, use of, redistribution
+of, sublicensing of, reverse engineering of, decompilation of, disassembly of,
+modification of, derivative creation from, and any other exploitation of the
+software product known as Boolforge ("Software," "Boolforge," or "the Product"),
+including all associated libraries, modules, plugins, extensions, APIs,
+binaries, source code (if disclosed), documentation, digital assets,
+configuration files, license keys, activation tokens, updates, upgrades,
+patches, hotfixes, and any other materials provided therewith by QuantumLogics
+Incorporated ("QuantumLogics," "Licensor," or "Company").
+
+This Agreement supersedes all prior oral or written representations,
+negotiations, understandings, or communications between the parties regarding
+the subject matter hereof. No waiver of any provision shall be effective unless
+in writing and signed by an authorized officer of QuantumLogics.
+
+================================================================================
+SECTION 1 — DEFINITIONS
+================================================================================
+
+For the purposes of this Agreement, the following terms shall have the meanings
+ascribed below:
+
+1.  "Software" means Boolforge in its entirety, including all object code,
+    machine code, compiled binaries, source code (whether or not delivered),
+    scripts, libraries, frameworks, runtime environments, configuration
+    files, sample code, templates, documentation, digital certificates,
+    license keys, and any other components or derivatives thereof, in any
+    form or medium whatsoever.
+
+2.  "QuantumLogics" means QuantumLogics Incorporated, its subsidiaries,
+    parent companies, affiliates, successors, assigns, officers, directors,
+    employees, agents, contractors, and licensors.
+
+3.  "Licensee" means any individual, entity, organization, government body,
+    corporation, partnership, association, educational institution, or other
+    legal or natural person who installs, accesses, copies, downloads, or
+    otherwise uses the Software.
+
+4.  "Authorized Use" means the limited, non-exclusive, non-transferable,
+    non-sublicensable, revocable right to execute compiled binaries of the
+    Software solely in a production environment owned and operated entirely
+    by the Licensee, subject to all restrictions in this Agreement.
+
+5.  "Modification" means any alteration, amendment, adaptation, translation,
+    abridgment, revision, enhancement, correction, transformation,
+    recombination, reformatting, or derivative creation based on,
+    incorporating, or derived from any part of the Software.
+
+6.  "Derivative Work" means any work, product, service, API, plugin, module,
+    extension, application, or system that: (a) incorporates any portion of
+    the Software; (b) is based on any algorithms, logic, design patterns, or
+    concepts disclosed in the Software; (c) interfaces with or depends upon
+    the Software at runtime; or (d) is inspired by or substantially similar
+    to the Software.
+
+7.  "Commercial Use" means any use of the Software in connection with any
+    commercial activity, including activity conducted for profit, revenue
+    generation, business operation, commercial services, paid subscriptions,
+    SaaS offerings, consulting services, or any direct or indirect
+    monetization.
+
+8.  "Distribution" means any act of transferring, transmitting, sharing,
+    publishing, posting, making available, providing access to, or otherwise
+    disseminating the Software or any part thereof to any third party by any
+    means, including physical, electronic, or network-based means.
+
+9.  "Reverse Engineering" means any effort to discover, reconstruct,
+    identify, analyze, or derive the source code, design, architecture,
+    algorithms, ideas, structure, or methodology of the Software through
+    decompilation, disassembly, decryption, binary analysis, dynamic
+    analysis, static analysis, side-channel analysis, or any other technique.
+
+10. "Intellectual Property" means all patents, patent applications,
+    copyrights, trademarks, trade secrets, trade names, service marks, moral
+    rights, database rights, and all other intellectual or industrial
+    property rights of any kind, whether registered or unregistered,
+    worldwide.
+
+11. "Authorized Personnel" means only those specific, named employees of the
+    Licensee who have been individually approved in writing by QuantumLogics
+    to access and use the Software.
+
+12. "License Fee" means the monetary compensation payable by Licensee to
+    QuantumLogics for the rights granted herein, as set forth in a separate
+    Order Form executed between the parties.
+
+================================================================================
+SECTION 2 — GRANT OF LICENSE
+================================================================================
+
+Subject to full compliance with all terms and conditions of this Agreement and
+timely payment of all applicable License Fees, QuantumLogics hereby grants to
+Licensee a limited, non-exclusive, non-transferable, non-sublicensable,
+revocable, personal license to:
+
+1.  Execute the compiled binary version of the Software on hardware owned or
+    leased by Licensee, solely for Licensee's own internal business purposes
+    and by Authorized Personnel only.
+
+2.  Make one (1) archival backup copy of the Software solely for disaster
+    recovery purposes, provided such copy includes all copyright notices and
+    license terms and is stored in a secure, access-controlled environment.
+
+3.  Access and read (but not reproduce or distribute) the accompanying
+    documentation solely for the purpose of operating the Software as
+    intended.
+
+ALL OTHER RIGHTS NOT EXPRESSLY GRANTED HEREIN ARE RESERVED EXCLUSIVELY BY
+QUANTUMLOGICS. No license, right, or permission is granted by implication,
+estoppel, course of dealing, or otherwise.
+
+================================================================================
+SECTION 3 — RESTRICTIONS AND PROHIBITIONS
+================================================================================
+
+The following acts are STRICTLY AND ABSOLUTELY PROHIBITED under this Agreement.
+Violation of any single restriction constitutes a material breach and entitles
+QuantumLogics to immediately terminate this License and pursue all available
+legal and equitable remedies, including emergency injunctive relief, specific
+performance, and monetary damages without limitation.
+
+---
+
+## 3.A — RESTRICTIONS ON MODIFICATION
+
+3.1 Licensee shall NOT, under any circumstances, modify, alter, adapt,
+translate, localize, correct, amend, revise, update, improve, refactor,
+optimize, restructure, reformat, reorder, rename, or otherwise change
+any portion of the Software, including its source code, object code,
+bytecode, configuration files, data files, documentation, digital
+assets, user interface elements, icons, fonts, color schemes, layout,
+logic flows, algorithms, data structures, or any other component.
+
+3.2 Licensee shall NOT create, develop, commission, or assist in the
+creation of any Derivative Work, fork, branch, spin-off, or variant
+based on, incorporating, or derived in any manner from the Software or
+any portion thereof.
+
+3.3 Licensee shall NOT merge the Software or any portion thereof with any
+other software, codebase, library, framework, or system, whether
+proprietary or open-source.
+
+3.4 Licensee shall NOT apply any patch, hotfix, workaround, override,
+monkeypatch, or other modification to the Software without the prior
+written consent of QuantumLogics, which may be withheld in
+QuantumLogics's sole and absolute discretion.
+
+3.5 Licensee shall NOT translate or port the Software to any programming
+language, runtime environment, operating system, hardware architecture,
+or platform not expressly approved in writing by QuantumLogics.
+
+3.6 Licensee shall NOT customize, configure beyond defaults, theme, skin,
+or alter the visual or functional appearance of the Software beyond the
+parameters expressly permitted within the Software's official
+configuration interface.
+
+3.7 Licensee shall NOT use the Software's design, user interface, user
+experience, workflows, iconography, naming conventions, or any other
+aesthetic or conceptual elements as the basis for any independently
+developed product.
+
+3.8 Licensee shall NOT add, remove, or modify any branding, copyright
+notices, trademarks, trade names, attributions, legends, or proprietary
+markings within or associated with the Software.
+
+3.9 Licensee shall NOT attempt to "improve," "fix," or "extend" the
+Software in any manner, regardless of intent or perceived benefit.
+
+3.10 Licensee shall NOT use any code generation tool, AI assistant, or
+automated system to produce code, configurations, or assets intended to
+modify or extend the Software.
+
+---
+
+## 3.B — RESTRICTIONS ON SALE, TRANSFER, AND DISTRIBUTION
+
+3.11 Licensee shall NOT sell, resell, license, sublicense, rent, lease,
+lend, loan, donate, bequeath, assign, transfer, or otherwise convey or
+dispose of the Software or any rights granted herein, in whole or in
+part, to any third party, with or without financial consideration.
+
+3.12 Licensee shall NOT distribute, publish, post, upload, transmit, stream,
+broadcast, or otherwise make the Software available to any third party
+via any means, including the internet, intranet, extranet, peer-to-peer
+networks, file-sharing platforms, cloud storage services, code
+repositories (public or private), package managers, or physical media.
+
+3.13 Licensee shall NOT include the Software, in whole or in part, in any
+software bundle, suite, package, appliance, offering, or distribution,
+whether commercial or non-commercial, proprietary or open-source.
+
+3.14 Licensee shall NOT offer the Software as a service, whether cloud-based,
+hosted, managed, or otherwise, to any third party (no SaaS, PaaS, IaaS,
+or any "as-a-service" exploitation of any kind is permitted).
+
+3.15 Licensee shall NOT auction, pledge, hypothecate, or use the Software or
+this License as collateral for any financial transaction or arrangement.
+
+3.16 Licensee shall NOT transfer this License or any rights hereunder as
+part of a corporate merger, acquisition, asset sale, reorganization, or
+change of control without the prior written consent of QuantumLogics,
+which consent may be withheld in QuantumLogics's absolute discretion
+and shall be subject to additional licensing fees and a new agreement.
+
+3.17 Licensee shall NOT give, gift, share access to, or enable use of the
+Software by any individual or entity outside of the Licensee's own
+organization and the specifically designated Authorized Personnel.
+
+3.18 Licensee shall NOT list, advertise, or promote the Software for sale,
+lease, or other disposition on any marketplace, platform, or medium.
+
+3.19 Licensee shall NOT resell access to any output, result, report, or
+artifact produced by the Software where such sale implies or depends
+upon the Software itself as a deliverable.
+
+3.20 Licensee shall NOT create any commercial product or service whose
+primary value derives from or is substantially enabled by the Software
+without entering into a separate, written OEM or commercial partnership
+agreement with QuantumLogics.
+
+---
+
+## 3.C — RESTRICTIONS ON REVERSE ENGINEERING AND ANALYSIS
+
+3.21 Licensee shall NOT decompile, disassemble, decrypt, decode, unpack,
+unobfuscate, recompile, or otherwise attempt to derive the source code,
+object code, intermediate representations, or underlying logic of the
+Software by any means.
+
+3.22 Licensee shall NOT perform any static analysis, dynamic analysis, binary
+analysis, memory analysis, network traffic analysis, side-channel
+analysis, or fuzzing of the Software.
+
+3.23 Licensee shall NOT use any debugging tools, profilers, disassemblers,
+hex editors, memory inspectors, API monitors, or other software analysis
+tools on or in connection with the Software.
+
+3.24 Licensee shall NOT attempt to identify, extract, or reconstruct the
+algorithms, data structures, protocols, file formats, encryption
+schemes, or other technical elements of the Software.
+
+3.25 Licensee shall NOT circumvent, disable, remove, tamper with, or bypass
+any technological protection measures, license enforcement mechanisms,
+copy protection, digital rights management (DRM), activation systems,
+obfuscation, or security controls incorporated in the Software.
+
+3.26 Licensee shall NOT conduct benchmark tests, performance evaluations,
+competitive analyses, or any comparative assessments of the Software
+without prior written consent of QuantumLogics.
+
+3.27 Licensee shall NOT intercept, monitor, log, or analyze any network
+communications, API calls, or inter-process communications made by or
+to the Software.
+
+3.28 Licensee shall NOT virtualize, emulate, or sandbox the Software in any
+way not expressly authorized by QuantumLogics for the purpose of
+analysis, testing outside of licensed use, or circumventing license
+controls.
+
+---
+
+## 3.D — RESTRICTIONS ON COMMERCIAL AND COMPETITIVE USE
+
+3.29 Licensee shall NOT use the Software for any purpose that directly or
+indirectly competes with QuantumLogics or any product or service
+offered by QuantumLogics, past, present, or future.
+
+3.30 Licensee shall NOT use any knowledge, insight, design pattern, or
+technical information derived from or inspired by the Software to
+develop, design, or enhance any competing product or service.
+
+3.31 Licensee shall NOT use the Software to train, fine-tune, benchmark,
+evaluate, or otherwise develop any artificial intelligence, machine
+learning model, neural network, or automated decision system.
+
+3.32 Licensee shall NOT use the Software as part of any academic research,
+published study, patent application, or standards development that
+could disadvantage QuantumLogics commercially or legally.
+
+3.33 Licensee shall NOT allow or enable any third party to use the Software,
+including by sharing access credentials, network access, virtual machine
+images, containers, or any other direct or indirect means.
+
+3.34 Licensee shall NOT use the Software to develop, test, validate, or
+operate any product, system, or service that has not been explicitly
+authorized in writing by QuantumLogics.
+
+---
+
+## 3.E — RESTRICTIONS ON DISCLOSURE AND PUBLICATION
+
+3.35 Licensee shall NOT publish, disclose, describe, summarize, review, blog
+about, tweet, post, or otherwise communicate any technical details,
+findings, observations, bugs, vulnerabilities, performance
+characteristics, or other information about the Software to any third
+party, including via academic publications, blog posts, conference
+presentations, social media, press releases, or any other medium,
+without prior written consent of QuantumLogics.
+
+3.36 Licensee shall NOT disclose the existence of any defects, security
+vulnerabilities, or performance limitations discovered in the Software
+to any party other than QuantumLogics through its official security
+disclosure channel.
+
+3.37 Licensee shall NOT discuss, describe, or reference the terms, pricing,
+or conditions of this Agreement with any third party without prior
+written consent of QuantumLogics.
+
+3.38 Licensee shall NOT reference, mention, or imply use of Boolforge or
+QuantumLogics in any marketing, advertising, case study, testimonial,
+press release, or investor communication without express written
+permission from QuantumLogics.
+
+---
+
+## 3.F — RESTRICTIONS ON BRANDING AND IDENTITY
+
+3.39 Licensee shall NOT use the name "Boolforge," "QuantumLogics," or any
+confusingly similar name, mark, logo, domain, or handle in connection
+with any product, service, promotional material, or public statement
+without prior written authorization from QuantumLogics.
+
+3.40 Licensee shall NOT register any domain name, social media handle,
+trademark, or business name that incorporates "Boolforge,"
+"QuantumLogics," or any variation or abbreviation thereof.
+
+3.41 Licensee shall NOT use QuantumLogics's branding to imply endorsement,
+partnership, certification, or affiliation of any kind.
+
+---
+
+## 3.G — MISCELLANEOUS ADDITIONAL RESTRICTIONS
+
+3.42 Licensee shall NOT use automated scripts, bots, crawlers, scrapers, or
+any other automated means to interact with, access, or extract data
+from the Software beyond normal licensed operation.
+
+3.43 Licensee shall NOT record, screenshot, screen-capture, photograph, or
+otherwise reproduce the visual output of the Software for distribution
+or publication without prior written consent.
+
+3.44 Licensee shall NOT use the Software after the expiration, termination,
+or revocation of this License and shall immediately cease all use and
+certifiably destroy all copies upon such event.
+
+3.45 Licensee shall NOT install or operate the Software on any server,
+virtual machine, container, or computing resource accessible to or
+shared with any third party.
+
+3.46 Licensee shall NOT permit any employee, contractor, consultant, agent,
+or other person acting on Licensee's behalf to perform any act
+prohibited by this Agreement.
+
+3.47 Licensee shall NOT use the Software in any jurisdiction where such use
+would be illegal, regulated, or restricted without first obtaining all
+necessary governmental authorizations.
+
+3.48 Licensee shall NOT use the Software in any life-critical, safety-
+critical, military, nuclear, weapons-related, or sensitive government
+systems without a separate, specifically negotiated written agreement.
+
+3.49 Licensee shall NOT import or export the Software in violation of any
+applicable export control laws, sanctions regulations, or trade
+restrictions of any jurisdiction.
+
+3.50 Licensee shall NOT take any action that would diminish, encumber,
+challenge, or impair QuantumLogics's ownership of or rights in the
+Software or any Intellectual Property therein.
+
+================================================================================
+SECTION 4 — INTELLECTUAL PROPERTY OWNERSHIP
+================================================================================
+
+QuantumLogics is and shall remain at all times the sole and exclusive owner of
+all right, title, and interest in and to the Software and all Intellectual
+Property rights therein, including all modifications, improvements,
+enhancements, and Derivative Works, whether or not made by or with the
+assistance of the Licensee.
+
+This Agreement conveys no ownership interest of any kind to the Licensee.
+Licensee acquires no rights in the Software other than the limited license
+expressly granted in Section 2.
+
+Any feedback, suggestions, ideas, improvements, or contributions ("Feedback")
+provided by the Licensee to QuantumLogics regarding the Software shall be
+deemed the sole and exclusive property of QuantumLogics. Licensee irrevocably
+assigns to QuantumLogics all rights in such Feedback without compensation of
+any kind, and waives all moral rights therein to the maximum extent permitted
+by law.
+
+The Boolforge name, logos, trademarks, and trade dress are the exclusive
+property of QuantumLogics. No right or license to use such marks is granted
+herein.
+
+================================================================================
+SECTION 5 — CONFIDENTIALITY
+================================================================================
+
+The Software, including its design, architecture, algorithms, features,
+functionality, source code, documentation, and any non-public technical
+specifications, constitutes the confidential and proprietary information of
+QuantumLogics ("Confidential Information").
+
+1.  Licensee shall maintain strict confidentiality of all Confidential
+    Information and shall not disclose any Confidential Information to any
+    third party without prior written consent of QuantumLogics.
+
+2.  Licensee shall implement and maintain reasonable security measures — no
+    less rigorous than those used to protect its own most sensitive
+    proprietary information, and in no event less than industry-standard
+    measures — to prevent unauthorized disclosure or use.
+
+3.  Confidentiality obligations shall survive the termination or expiration
+    of this Agreement for a period of ten (10) years.
+
+4.  Breach of confidentiality shall entitle QuantumLogics to seek injunctive
+    relief without bond, in addition to all other remedies available at law
+    or in equity.
+
+================================================================================
+SECTION 6 — AUDIT RIGHTS
+================================================================================
+
+1.  QuantumLogics reserves the right, upon thirty (30) days' written notice,
+    to audit Licensee's use of the Software to verify compliance with this
+    Agreement, no more than once per calendar year (or at any time in the
+    event of a suspected breach).
+
+2.  Licensee shall provide QuantumLogics's auditors with reasonable access
+    to all relevant systems, records, personnel, and facilities.
+
+3.  If an audit reveals non-compliance, Licensee shall bear all costs of the
+    audit and shall immediately remedy all violations and pay all resulting
+    fees, penalties, and damages.
+
+4.  The Software may include license monitoring, telemetry, or compliance
+    technology. Licensee consents to the collection of such compliance data.
+
+================================================================================
+SECTION 7 — TERM AND TERMINATION
+================================================================================
+
+1.  This Agreement is effective upon Licensee's first access to or use of
+    the Software and shall continue until terminated.
+
+2.  QuantumLogics may terminate this Agreement immediately, with or without
+    notice, upon any breach by Licensee of any provision hereof.
+
+3.  QuantumLogics may terminate this Agreement for convenience at any time
+    upon thirty (30) days' written notice.
+
+4.  Upon termination for any reason: (a) all rights granted herein
+    immediately cease; (b) Licensee must immediately cease all use of the
+    Software; (c) Licensee must permanently and securely destroy all copies
+    of the Software in its possession or control; and (d) Licensee must
+    provide written certification of such destruction to QuantumLogics within
+    five (5) business days.
+
+5.  Termination does not entitle Licensee to any refund of License Fees paid.
+
+6.  Sections 3, 4, 5, 8, 9, 10, 11, and 12 shall survive termination
+    indefinitely.
+
+================================================================================
+SECTION 8 — DISCLAIMER OF WARRANTIES
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, RELIABILITY,
+COMPLETENESS, OR QUIET ENJOYMENT. QUANTUMLOGICS DOES NOT WARRANT THAT THE
+SOFTWARE WILL MEET LICENSEE'S REQUIREMENTS, THAT OPERATION WILL BE
+UNINTERRUPTED OR ERROR-FREE, OR THAT DEFECTS WILL BE CORRECTED.
+
+LICENSEE ASSUMES ALL RISK ARISING FROM USE OR PERFORMANCE OF THE SOFTWARE.
+
+================================================================================
+SECTION 9 — LIMITATION OF LIABILITY
+================================================================================
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL
+QUANTUMLOGICS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
+EXEMPLARY, OR PUNITIVE DAMAGES (INCLUDING LOSS OF PROFITS, LOSS OF DATA,
+BUSINESS INTERRUPTION, OR ANY OTHER COMMERCIAL DAMAGES OR LOSSES), HOWEVER
+CAUSED AND UNDER ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, TORT
+(INCLUDING NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, EVEN IF QUANTUMLOGICS
+HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+QUANTUMLOGICS'S TOTAL CUMULATIVE LIABILITY ARISING OUT OF OR RELATING TO THIS
+AGREEMENT SHALL NOT EXCEED THE TOTAL LICENSE FEES PAID BY LICENSEE TO
+QUANTUMLOGICS IN THE TWELVE (12) MONTHS IMMEDIATELY PRECEDING THE CLAIM.
+
+================================================================================
+SECTION 10 — INDEMNIFICATION
+================================================================================
+
+Licensee shall indemnify, defend, and hold harmless QuantumLogics and its
+officers, directors, employees, agents, licensors, and successors from and
+against any and all claims, liabilities, damages, losses, costs, and expenses
+(including reasonable attorneys' fees) arising out of or related to:
+
+(a) Licensee's use of the Software in violation of this Agreement;
+(b) Licensee's breach of any representation, warranty, or obligation herein;
+(c) Any Derivative Work created, distributed, or used by Licensee;
+(d) Any claim by a third party arising from Licensee's unauthorized
+distribution, modification, or commercialization of the Software;
+(e) Any infringement of third-party Intellectual Property rights caused by
+Licensee's actions with respect to the Software.
+
+================================================================================
+SECTION 11 — GOVERNING LAW AND DISPUTE RESOLUTION
+================================================================================
+
+1.  This Agreement shall be governed by and construed in accordance with the
+    laws of the State of Delaware, United States of America, without regard
+    to its conflict-of-law principles.
+
+2.  Any dispute, controversy, or claim arising out of or relating to this
+    Agreement shall be submitted to binding arbitration administered by the
+    American Arbitration Association (AAA) under its Commercial Arbitration
+    Rules. The arbitration shall be conducted in Wilmington, Delaware, in
+    the English language.
+
+3.  Notwithstanding the foregoing, QuantumLogics shall have the right to
+    seek emergency injunctive or other equitable relief in any court of
+    competent jurisdiction to protect its Intellectual Property rights or
+    Confidential Information without first submitting to arbitration.
+
+4.  Licensee waives any right to participate in a class action, class-wide
+    arbitration, or any consolidated proceeding.
+
+5.  The prevailing party in any arbitration or litigation shall be entitled
+    to recover its reasonable attorneys' fees and costs from the other party.
+
+================================================================================
+SECTION 12 — GENERAL PROVISIONS
+================================================================================
+
+1.  ENTIRE AGREEMENT: This Agreement constitutes the entire agreement between
+    the parties with respect to the Software and supersedes all prior
+    agreements, representations, and understandings.
+
+2.  AMENDMENTS: This Agreement may only be amended by a written instrument
+    signed by an authorized officer of QuantumLogics. No amendment proposed
+    or accepted by Licensee shall be binding unless so executed.
+
+3.  SEVERABILITY: If any provision of this Agreement is held invalid or
+    unenforceable, such provision shall be modified to the minimum extent
+    necessary to make it enforceable, and all remaining provisions shall
+    remain in full force and effect.
+
+4.  NO WAIVER: Failure by QuantumLogics to enforce any provision of this
+    Agreement shall not constitute a waiver of the right to enforce such
+    provision in the future.
+
+5.  ASSIGNMENT: QuantumLogics may freely assign this Agreement and its rights
+    herein. Licensee may not assign this Agreement or any rights or
+    obligations hereunder without prior written consent of QuantumLogics.
+
+6.  NOTICES: All notices under this Agreement shall be in writing and
+    delivered to QuantumLogics at legal@quantumlogics.com or the address
+    listed above, and to Licensee at the address provided at the time of
+    license registration.
+
+7.  FORCE MAJEURE: QuantumLogics shall not be liable for delays or failures
+    in performance resulting from causes beyond its reasonable control.
+
+8.  HEADINGS: Section headings are for convenience only and shall not affect
+    the interpretation of this Agreement.
+
+9.  CONSTRUCTION: This Agreement shall not be construed against QuantumLogics
+    as the drafter. Both parties have had the opportunity to review and
+    negotiate its terms.
+
+10. U.S. GOVERNMENT USERS: The Software is a "commercial item" as defined in
+    FAR 2.101. Use by U.S. Government entities is subject to the restrictions
+    set forth herein.
+
+================================================================================
+SECTION 13 — CONTACT AND ENFORCEMENT
+================================================================================
+
+To report violations, request permissions, or contact QuantumLogics regarding
+this License:
+
+      QuantumLogics Incorporated — Legal & Compliance
+      1 QuantumLogics Plaza, Wilmington, DE 19801, USA
+      legal@quantumlogics.com
+      Violations Hotline: +1 (800) 555-QLGI x9
+
+QuantumLogics actively monitors for unauthorized use, distribution, and
+modification of Boolforge worldwide and will pursue all available legal remedies
+against violators to the fullest extent of applicable law, including civil
+litigation, criminal referrals, and international enforcement actions.
+
+================================================================================
+
+        COPYRIGHT (C) 2025 QUANTUMLOGICS INCORPORATED.
+                   ALL RIGHTS RESERVED.
+
+    Boolforge IS THE EXCLUSIVE PROPRIETARY PROPERTY OF QUANTUMLOGICS.
+
+UNAUTHORIZED USE, REPRODUCTION, MODIFICATION, OR DISTRIBUTION IS
+STRICTLY PROHIBITED AND WILL BE PROSECUTED TO THE FULLEST
+EXTENT OF ALL APPLICABLE LAWS.
+
+           QuantumLogics — Engineered for Tomorrow. Protected Today.
+
+================================================================================
+END OF LICENSE AGREEMENT
+Boolforge PPSLA v1.0 — 2025
+================================================================================
