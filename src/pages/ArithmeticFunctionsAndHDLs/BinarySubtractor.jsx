@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import ToolLayout from "../../components/ToolLayout";
 import AFHDLDivider from "./components/AFHDLDivider";
+import AFHDLCopyButton from "./components/AFHDLCopyButton";
 import { cleanBin, binarySubtract } from "../../utils/arithmeticHelpers";
 
 /* ── HELPERS ──────────────────────────────────────────────── */
