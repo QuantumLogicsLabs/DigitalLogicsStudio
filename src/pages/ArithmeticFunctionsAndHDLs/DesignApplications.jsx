@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ToolLayout from "../../components/ToolLayout";
 import ExplanationBlock from "../../components/ExplanationBlock";
 import AFHDLSection from "./components/AFHDLSection";
+import AFHDLCopyButton from "./components/AFHDLCopyButton";
 import { arithmeticDescriptions } from "./utils/arithmeticDescriptions";
 
 const DesignApplications = () => {

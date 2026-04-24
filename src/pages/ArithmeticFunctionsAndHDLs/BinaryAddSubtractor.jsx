@@ -835,7 +835,29 @@ const BinaryAddSubtractor = () => {
       {showHDL && (
         <div style={S.card}>
           <div style={S.codeBlock}>
-            <pre
+            <AFHDLCopyButton text={`// 4-bit Adder/Subtractor in Verilog
+// Mode=0 → A + B
+// Mode=1 → A - B  (using 2's complement of B)
+
+module adder_subtractor (
+  input  [3:0] A, B,
+  input        Mode,
+  output [3:0] Result,
+  output       Carry_Borrow
+);
+  wire [3:0] B_modified;
+  wire [4:0] sum;
+
+  // XOR every bit of B with Mode
+  // {4{Mode}} = repeat Mode 4 times = 0000 or 1111
+  assign B_modified = B ^ {4{Mode}};
+
+  // Add A + B_modified + Mode (Mode is carry-in too)
+  assign sum         = A + B_modified + Mode;
+  assign Result      = sum[3:0];
+  assign Carry_Borrow = sum[4];
+endmodule`} />
+          <pre
               style={{
                 margin: 0,
                 color: "#e2e8f0",
@@ -1084,74 +1106,121 @@ endmodule`}</pre>
 /* ── STYLES ──────────────────────────────────────────────── */
 const S = {
   sectionTitle: {
-    fontSize: "0.95rem",
+    fontSize: "1.1rem",
     fontWeight: 700,
-    color: "#e2e8f0",
-    margin: "1rem 0 0.3rem",
+    color: "#f8fafc",
+    margin: "1.5rem 0 0.5rem",
+    letterSpacing: "-0.01em",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem"
   },
   body: {
-    color: "#cbd5e1",
-    fontSize: "0.88rem",
-    lineHeight: 1.65,
-    margin: "0.2rem 0",
+    color: "#94a3b8",
+    fontSize: "0.95rem",
+    lineHeight: 1.7,
+    margin: "0.4rem 0"
   },
   card: {
-    background: "rgba(30,41,59,0.7)",
-    border: "1px solid rgba(148,163,184,0.15)",
-    borderRadius: "10px",
-    padding: "0.9rem 1rem",
-    marginTop: "0.4rem",
+    background: "rgba(30, 41, 59, 0.4)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "16px",
+    padding: "1.25rem",
+    marginTop: "0.75rem",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
   },
   formula: {
-    background: "rgba(15,23,42,0.75)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "6px",
-    padding: "0.5rem 0.8rem",
-    fontFamily: "monospace",
-    fontSize: "0.82rem",
-    color: "#a5b4fc",
-    margin: "0.5rem 0",
-    lineHeight: 1.8,
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(99, 102, 241, 0.2)",
+    borderRadius: "12px",
+    padding: "1rem",
+    fontFamily: "'Fira Code', monospace",
+    fontSize: "0.85rem",
+    color: "#818cf8",
+    margin: "0.75rem 0",
+    lineHeight: 1.6,
+    boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-all"
   },
   codeBlock: {
-    background: "rgba(15,23,42,0.85)",
-    border: "1px solid rgba(148,163,184,0.12)",
-    borderRadius: "6px",
-    padding: "0.7rem 1rem",
+    background: "#0f172a",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "12px",
+    padding: "1rem",
     overflowX: "auto",
+    position: "relative",
   },
   resultBanner: {
-    borderRadius: "10px",
-    padding: "0.65rem 1rem",
-    margin: "0.6rem 0",
+    background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))",
+    border: "1px solid rgba(99, 102, 241, 0.2)",
+    borderRadius: "16px",
+    padding: "1rem 1.5rem",
+    margin: "1rem 0",
+    backdropFilter: "blur(8px)",
+  },
+  tabPanel: {
+    background: "rgba(30, 41, 59, 0.3)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "0 16px 16px 16px",
+    padding: "1.5rem",
+    minHeight: "200px",
   },
   note: (c) => ({
-    background: `${c}12`,
-    border: `1px solid ${c}35`,
-    borderRadius: "6px",
-    padding: "0.5rem 0.75rem",
-    fontSize: "0.82rem",
-    color: "#e2e8f0",
-    lineHeight: 1.55,
-  }),
-  conceptBox: (c) => ({
-    background: `${c}12`,
-    border: `1px solid ${c}40`,
-    borderLeft: `3px solid ${c}`,
+    background: `${c}08`,
+    borderLeft: `4px solid ${c}`,
     borderRadius: "8px",
-    padding: "0.75rem 0.9rem",
+    padding: "1rem",
+    fontSize: "0.85rem",
+    color: "#e2e8f0",
+    lineHeight: 1.6,
+    margin: "0.75rem 0",
+  }),
+  signalBox: (c) => ({
+    background: `${c}05`,
+    border: `1px solid ${c}20`,
+    borderRadius: "12px",
+    padding: "0.75rem",
+    textAlign: "center",
+    transition: "transform 0.2s ease",
+  }),
+  conceptCard: (c) => ({
+    background: "rgba(30, 41, 59, 0.4)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderTop: `4px solid ${c}`,
+    borderRadius: "12px",
+    padding: "1rem",
+    cursor: "pointer",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   }),
   bitBtn: (bit, c) => ({
-    width: "32px",
-    height: "32px",
-    borderRadius: "5px",
-    border: `2px solid ${bit === "1" ? c : "rgba(148,163,184,0.2)"}`,
-    background: bit === "1" ? `${c}20` : "rgba(30,41,59,0.6)",
-    color: bit === "1" ? c : "#475569",
-    fontWeight: 800,
-    fontSize: "0.9rem",
+    width: "36px",
+    height: "36px",
+    borderRadius: "8px",
+    border: `2px solid ${bit === "1" ? c : "rgba(148, 163, 184, 0.1)"}`,
+    background: bit === "1" ? `${c}15` : "rgba(15, 23, 42, 0.4)",
+    color: bit === "1" ? c : "#64748b",
+    fontWeight: 700,
+    fontSize: "1rem",
     cursor: "pointer",
-    transition: "all 0.1s",
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }),
+  tabBtn: (active, c) => ({
+    padding: "0.6rem 1.25rem",
+    borderRadius: "10px 10px 0 0",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 600,
+    fontSize: "0.875rem",
+    background: active ? c : "transparent",
+    color: active ? "#ffffff" : "#94a3b8",
+    transition: "all 0.2s ease",
+    borderBottom: active ? "none" : "1px solid rgba(148, 163, 184, 0.1)",
   }),
 };
 
