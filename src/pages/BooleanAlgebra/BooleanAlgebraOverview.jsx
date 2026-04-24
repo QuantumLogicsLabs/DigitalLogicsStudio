@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import ToolLayout from '../components/ToolLayout';
-import ExplanationBlock from '../components/ExplanationBlock';
-import { generateTruthTable } from '../utils/boolMath';
+import ToolLayout from '../../components/ToolLayout';
+import ExplanationBlock from '../../components/ExplanationBlock';
+import { generateTruthTable } from '../../utils/boolMath';
 
 
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
