@@ -1,0 +1,225 @@
+/* Home Page Styles - Premium Digital Aesthetic */
+
+.home-page {
+    position: relative;
+    overflow-x: hidden;
+    background: var(--bg-color);
+    scroll-behavior: smooth;
+    min-height: 100vh;
+}
+
+/* Dynamic background grid */
+.grid-background {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.home-header {
+    background: var(--nav-bg) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color) !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.home-logo {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Logo Circuit Animations */
+.home-logo-container svg path {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: drawCircuit 1.5s ease-out forwards;
+}
+
+.home-logo-container svg circle {
+    opacity: 0;
+    animation: nodePulse 0.5s ease-out forwards;
+}
+
+.home-logo-container svg circle:nth-child(3) { animation-delay: 0.8s; }
+.home-logo-container svg circle:nth-child(4) { animation-delay: 1.1s; }
+.home-logo-container svg circle:nth-child(5) { animation-delay: 1.4s; }
+
+@keyframes drawCircuit {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes nodePulse {
+    from { opacity: 0; transform: scale(0); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.home-logo-container:hover .logo-trace {
+    filter: brightness(1.5) drop-shadow(0 0 15px rgba(59, 130, 246, 1));
+    stroke-width: 8;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-logo-container:hover .logo-node {
+    fill: var(--logo-node-color);
+    filter: brightness(1.5) url(#soft-glow);
+    transform: scale(1.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hero Section Enhancement */
+.home-hero {
+    position: relative;
+    padding: 6rem 1.5rem !important;
+    z-index: 1;
+}
+
+.home-hero-content h2 {
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    color: var(--text-color);
+    background: linear-gradient(to bottom right, var(--text-color), var(--secondary-text));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem !important;
+}
+
+.home-hero-content p {
+    font-size: 1.15rem !important;
+    color: var(--secondary-text) !important;
+    max-width: 600px;
+}
+
+.home-search-input:focus {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme='light'] .home-search-input:focus {
+    background: rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Premium Cards */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+    gap: 2rem !important;
+    padding: 2rem 1.5rem 6rem !important;
+    z-index: 1;
+    position: relative;
+}
+
+.home-card {
+    background: var(--card-bg) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem !important;
+    border-radius: 1.25rem !important;
+    animation: cardEntrance 0.6s ease-out both;
+}
+
+@keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.home-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.home-card h3 {
+    font-size: 1.25rem !important;
+    color: var(--text-color) !important;
+    margin-bottom: 0.75rem !important;
+    font-weight: 700 !important;
+}
+
+.home-card p {
+    color: var(--secondary-text) !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1.5rem !important;
+    flex-grow: 1;
+}
+
+/* Improved Button Grid inside Cards */
+.home-card-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem;
+    margin-top: auto;
+}
+
+.home-card-link {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.6rem !important;
+    color: var(--text-color) !important;
+    transition: all 0.2s !important;
+    text-decoration: none;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-card-link:hover {
+    background: var(--accent-color) !important;
+    color: white !important;
+    border-color: var(--accent-color) !important;
+    transform: translateY(-2px);
+}
+
+.primary-link {
+    grid-column: 1 / -1; /* Make primary buttons full width */
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    padding: 0.75rem !important;
+}
+
+/* Specific Accents */
+.featured-card {
+    /* Consistency override */
+}
+
+.sequential-card {
+    /* Consistency override */
+}
+
+/* Light Mode Specific Adjustments */
+[data-theme='light'] .home-card-link {
+    background: rgba(15, 23, 42, 0.05) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme='light'] .home-card-link:hover {
+    background: var(--accent-color) !important;
+    color: white !important;
+}
+
+[data-theme='light'] .primary-link {
+    background: rgba(37, 99, 235, 0.08) !important;
+}

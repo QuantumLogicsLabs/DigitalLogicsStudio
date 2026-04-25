@@ -1,15 +1,51 @@
 import { Link } from "react-router-dom";
 
-export function Navbar() {
+export function Navbar({ toggleTheme, theme }) {
   return (
     <>
       <header className="home-header">
         <div className="home-header-inner">
           <div className="home-brand">
-            <span className="home-logo">𝔅</span>
+            <div className="home-logo-container" style={{ position: 'relative', width: '45px', height: '45px' }}>
+              <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
+                <defs>
+                  <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: '#3b82f6' }} />
+                    <stop offset="100%" style={{ stopColor: '#8b5cf6' }} />
+                  </linearGradient>
+                  <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                {/* PCB Style Trace B */}
+                <path 
+                  d="M30,20 L70,20 L85,35 L85,45 L70,50 L30,50 L70,50 L85,55 L85,75 L70,80 L30,80 L30,20" 
+                  fill="none" 
+                  stroke="url(#logo-grad)" 
+                  strokeWidth="7" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="logo-trace"
+                />
+                
+                {/* Larger, Glowing Terminal Nodes */}
+                <circle cx="30" cy="20" r="7" fill="var(--logo-node-color)" className="logo-node" style={{ filter: 'url(#soft-glow)' }} />
+                <circle cx="30" cy="50" r="7" fill="var(--logo-node-color)" className="logo-node" style={{ filter: 'url(#soft-glow)' }} />
+                <circle cx="30" cy="80" r="7" fill="var(--logo-node-color)" className="logo-node" style={{ filter: 'url(#soft-glow)' }} />
+              </svg>
+            </div>
             <div>
-              <h1 className="home-title">Boolforge</h1>
-              <p className="home-tagline">Your digital logic playground</p>
+              <h1 className="home-title" style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: 'var(--text-color)',
+                letterSpacing: '-0.01em'
+              }}>Boolforge</h1>
+              <p className="home-tagline">The Digital Logic Playground</p>
             </div>
           </div>
 
@@ -62,6 +98,19 @@ export function Navbar() {
             <Link to="/sequential/intro" className="home-nav-link">
               Sequential
             </Link>
+            <button 
+              onClick={toggleTheme} 
+              className="home-nav-link theme-toggle"
+              style={{
+                background: 'rgba(59, 130, 246, 0.2)',
+                border: '1px solid rgba(59, 130, 246, 0.4)',
+                cursor: 'pointer',
+                fontSize: '1.2rem',
+                padding: '0.4rem 0.8rem'
+              }}
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
           </nav>
         </div>
       </header>

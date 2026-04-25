@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -61,12 +62,27 @@ import SeqStateDiagram from "./pages/SequentialCircuits/SeqStateDiagram";
 import SeqStateReduction from "./pages/SequentialCircuits/SeqStateReduction";
 
 function App() {
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // We can pass toggleTheme down to Navbar via a context or just pass it to Home if needed
+  // For simplicity, we'll just let components use the data-theme attribute for CSS
+  // and we'll add a theme toggle button to the Navbar.
+
   return (
-    <>
+    <div className={`app-root ${theme}`}>
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home toggleTheme={toggleTheme} theme={theme} />} />
           <Route path="/boolforge" element={<Boolforge />} />
           <Route path="/significant-digits" element={<SignificantDigits />} />
           <Route path="/bcd-notation" element={<BCDNotation />} />
@@ -169,7 +185,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 

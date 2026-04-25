@@ -10,6 +10,7 @@ const ArticleSection = ({ data }) => {
           className={`home-card ${
             article.featured ? "featured-card" : ""
           } ${article.className || ""}`}
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
           <h3>{article.title}</h3>
           <p>{article.description}</p>
