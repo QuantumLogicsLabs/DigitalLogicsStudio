@@ -1,4 +1,5 @@
 import React from "react";
+import { Layers, GitCompare, Merge, CheckCircle, Sparkles } from "lucide-react";
 import SeqLayout from "./SeqLayout";
 
 const SeqStateReduction = () => (
@@ -94,7 +95,9 @@ const SeqStateReduction = () => (
 
       <div className="seq-grid-2">
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">1️⃣</span>
+          <span className="seq-feature-icon">
+            <Layers size={32} />
+          </span>
           <p className="seq-feature-title">Group by Output</p>
           <p className="seq-feature-desc">
             {"{A, B, D}"} → output=0 &nbsp;|&nbsp; {"{C, E}"} → output=1. States
@@ -102,7 +105,9 @@ const SeqStateReduction = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">2️⃣</span>
+          <span className="seq-feature-icon">
+            <GitCompare size={32} />
+          </span>
           <p className="seq-feature-title">Compare Transitions</p>
           <p className="seq-feature-desc">
             B (x=0→A, x=1→D) and D (x=0→A, x=1→D) are identical →{" "}
@@ -111,7 +116,9 @@ const SeqStateReduction = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">3️⃣</span>
+          <span className="seq-feature-icon">
+            <Merge size={32} />
+          </span>
           <p className="seq-feature-title">Merge & Replace</p>
           <p className="seq-feature-desc">
             Replace D with B everywhere. Replace E with C everywhere. Recheck
@@ -119,7 +126,9 @@ const SeqStateReduction = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">✅</span>
+          <span className="seq-feature-icon">
+            <CheckCircle size={32} />
+          </span>
           <p className="seq-feature-title">Reduced Table</p>
           <p className="seq-feature-desc">
             5 states → 3 states. One less flip-flop and simpler logic.
@@ -435,7 +444,7 @@ const SeqStateReduction = () => (
       </div>
 
       <div className="seq-box success">
-        <span className="seq-box-title">🎉 Sequential Circuits Complete</span>
+        <span className="seq-box-title"><Sparkles size={20} style={{ display: "inline-block", marginRight: "0.5rem" }} /> Sequential Circuits Complete</span>
         <p>
           You have now covered the full theory of sequential circuits — from
           basic latches and flip-flops, through analysis and design, to state

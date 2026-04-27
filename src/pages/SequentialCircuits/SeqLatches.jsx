@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Lock, Unlock, Code2 } from "lucide-react";
 import SeqLayout from "./SeqLayout";
 import SeqTable from "./components/SeqTable";
 import SeqTableData from "./data/SeqTableData";
@@ -706,7 +707,7 @@ const SeqLatches = () => (
 
       <div className="seq-grid-2">
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔒</span>
+          <Lock className="seq-feature-icon" size={32} />
           <p className="seq-feature-title">EN = 0 — Locked</p>
           <p className="seq-feature-desc">
             The AND gates block S and R, sending 0s into the NOR gates
@@ -715,7 +716,7 @@ const SeqLatches = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔓</span>
+          <Unlock className="seq-feature-icon" size={32} />
           <p className="seq-feature-title">EN = 1 — Transparent</p>
           <p className="seq-feature-desc">
             The AND gates pass S and R through to the NOR gates. The latch now
@@ -770,7 +771,7 @@ const SeqLatches = () => (
       </p>
       <div className="seq-grid-2">
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">📐</span>
+          <Code2 className="seq-feature-icon" size={32} />
           <p className="seq-feature-title">SR Latch</p>
           <p className="seq-feature-desc">
             <code>Q⁺ = S + R̄·Q</code>
@@ -781,7 +782,7 @@ const SeqLatches = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">📐</span>
+          <Code2 className="seq-feature-icon" size={32} />
           <p className="seq-feature-title">D Latch</p>
           <p className="seq-feature-desc">
             <code>Q⁺ = EN·D + EN̄·Q</code>

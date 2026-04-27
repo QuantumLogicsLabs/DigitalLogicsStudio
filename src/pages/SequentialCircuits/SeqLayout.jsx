@@ -1,53 +1,65 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  BookOpen,
+  Lock,
+  ToggleRight,
+  Layers,
+  Microscope,
+  Blocks,
+  Waypoints,
+  Zap,
+  Sparkles,
+  Home
+} from "lucide-react";
 
 const seqPages = [
   {
     path: "/sequential/intro",
     label: "Introduction",
-    icon: "📡",
+    icon: <BookOpen size={18} />,
     short: "Intro",
   },
   {
     path: "/sequential/latches",
     label: "Latches",
-    icon: "🔒",
+    icon: <Lock size={18} />,
     short: "Latches",
   },
   {
     path: "/sequential/flip-flops",
     label: "Flip-Flops",
-    icon: "🔁",
+    icon: <ToggleRight size={18} />,
     short: "Flip-Flops",
   },
   {
     path: "/sequential/flip-flop-types",
     label: "Types of Flip-Flops",
-    icon: "📋",
+    icon: <Layers size={18} />,
     short: "FF Types",
   },
   {
     path: "/sequential/analysis",
     label: "Analysis",
-    icon: "🔬",
+    icon: <Microscope size={18} />,
     short: "Analysis",
   },
   {
     path: "/sequential/design-procedures",
     label: "Design Procedures",
-    icon: "🏗️",
+    icon: <Blocks size={18} />,
     short: "Design",
   },
   {
     path: "/sequential/state-diagram",
     label: "State Diagrams & Tables",
-    icon: "🗺️",
+    icon: <Waypoints size={18} />,
     short: "States",
   },
   {
     path: "/sequential/state-reduction",
     label: "State Reduction & Excitation",
-    icon: "⚡",
+    icon: <Zap size={18} />,
     short: "Reduction",
   },
 ];
@@ -285,10 +297,10 @@ const SeqLayout = ({ children, title, subtitle }) => {
             ) : (
               <Link to="/" className="seq-pag-btn seq-pag-finish">
                 <div className="seq-pag-info seq-pag-info-right">
-                  <span className="seq-pag-hint">🎉 All done!</span>
+                  <span className="seq-pag-hint"><Sparkles size={18} style={{ display: "inline-block", marginRight: "0.4rem" }} /> All done!</span>
                   <span className="seq-pag-name">Return to Home</span>
                 </div>
-                <div className="seq-pag-arrow seq-pag-arrow-home">🏠</div>
+                <div className="seq-pag-arrow seq-pag-arrow-home"><Home size={24} /></div>
               </Link>
             )}
           </div>
@@ -418,7 +430,13 @@ const SeqLayout = ({ children, title, subtitle }) => {
         }
 
         /* ─── Body ─── */
-        .seq-body { display: flex; flex: 1; position: relative; z-index: 1; }
+        .seq-body {
+          display: flex;
+          flex: 1;
+          position: relative;
+          z-index: 1;
+          align-items: flex-start;
+        }
 
         /* Mobile overlay */
         .seq-overlay {
@@ -432,8 +450,11 @@ const SeqLayout = ({ children, title, subtitle }) => {
           background: rgba(8,15,30,.75);
           border-right: 1px solid rgba(99,102,241,.12);
           backdrop-filter: blur(12px);
-          position: sticky; top: 56px;
-          height: calc(100vh - 56px); overflow-y: auto;
+          position: sticky;
+          top: 56px;
+          height: calc(100vh - 56px);
+          overflow: hidden;
+          align-self: flex-start;
           display: flex; flex-direction: column;
           transition: transform .25s cubic-bezier(.4,0,.2,1);
         }
@@ -452,17 +473,17 @@ const SeqLayout = ({ children, title, subtitle }) => {
         .seq-sidebar-logo {
           width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 1.1rem; font-weight: 700;
+          font-size: 1.5rem; font-weight: 700;
           background: linear-gradient(135deg, #4f46e5, #7c3aed);
           box-shadow: 0 4px 12px rgba(79,70,229,.4);
         }
-        .seq-sidebar-title  { font-size: .85rem; font-weight: 700; color: #e2e8f0; margin: 0; line-height: 1.2; }
-        .seq-sidebar-subtitle { font-size: .72rem; color: #6b7280; margin: 0; }
+        .seq-sidebar-title  { font-size: .99rem; font-weight: 700; color: #e2e8f0; margin: 0; line-height: 1.2; }
+        .seq-sidebar-subtitle { font-size: .99rem; color: #6b7280; margin: 0; }
 
         /* Progress bar */
-        .seq-sidebar-progress { padding: .75rem .5rem; margin-bottom: .5rem; }
+        .seq-sidebar-progress { padding: .85rem .5rem; margin-bottom: .5rem; }
         .seq-sidebar-progress-bar {
-          height: 3px; background: rgba(99,102,241,.15);
+          height: 8px; background: rgba(99,102,241,.15);
           border-radius: 2px; overflow: hidden; margin-bottom: .4rem;
         }
         .seq-sidebar-progress-fill {
@@ -502,9 +523,9 @@ const SeqLayout = ({ children, title, subtitle }) => {
         }
         .seq-nav-item.active::before { opacity: 1; }
 
-        .seq-nav-num   { font-size: .6rem; color: #374151; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 18px; }
+        .seq-nav-num   { font-size: .9rem; color: #374151; font-variant-numeric: tabular-nums; font-weight: 600; min-width: 18px; }
         .seq-nav-icon  { font-size: .9rem; flex-shrink: 0; }
-        .seq-nav-label-text { font-size: .78rem; font-weight: 500; flex: 1; line-height: 1.3; }
+        .seq-nav-label-text { font-size: .99rem; font-weight: 500; flex: 1; line-height: 1.3; }
         .seq-nav-status { flex-shrink: 0; }
         .seq-nav-dot-active {
           display: block; width: 6px; height: 6px; border-radius: 50%;
@@ -530,13 +551,16 @@ const SeqLayout = ({ children, title, subtitle }) => {
         .seq-main {
           flex: 1; min-width: 0;
           padding: 2.5rem 3.5rem 5rem;
-          max-width: 900px;
+          max-width: none;
+          width: calc(100vw - 272px);
+          height: calc(100vh - 56px);
+          overflow-y: auto;
         }
 
         /* ─── Page header ─── */
         .seq-breadcrumb {
           display: flex; align-items: center; gap: .4rem;
-          font-size: .72rem; color: #475569; margin-bottom: 1.5rem;
+          font-size: .92rem; color: #475569; margin-bottom: 1.5rem;
           flex-wrap: wrap;
         }
         .seq-bc-link { color: #6366f1; text-decoration: none; transition: color .15s; }
@@ -580,7 +604,7 @@ const SeqLayout = ({ children, title, subtitle }) => {
           background-clip: text;
         }
         .seq-page-subtitle {
-          font-size: .93rem; color: #64748b;
+          font-size: .99rem; color: #64748b;
           margin: 0; line-height: 1.7; max-width: 620px;
         }
 
@@ -589,13 +613,13 @@ const SeqLayout = ({ children, title, subtitle }) => {
           display: flex; gap: .4rem; margin-top: 1.25rem;
         }
         .seq-dot {
-          width: 8px; height: 8px; border-radius: 50%;
+          width: 10px; height: 10px; border-radius: 50%;
           background: rgba(99,102,241,.2);
-          border: 1px solid rgba(99,102,241,.25);
+          border: 1px solid white;
           transition: all .2s ease;
           text-decoration: none;
         }
-        .seq-dot:hover { background: rgba(99,102,241,.5); transform: scale(1.2); }
+        .seq-dot:hover { background: rgba(99,102,241,.5); transform: scale(1.5); }
         .seq-dot.active {
           background: #6366f1; width: 24px; border-radius: 4px;
           box-shadow: 0 0 8px rgba(99,102,241,.6);
@@ -608,7 +632,7 @@ const SeqLayout = ({ children, title, subtitle }) => {
 
         /* Section headings */
         .seq-content-body h2 {
-          font-size: 1.15rem; font-weight: 700; color: #c7d2fe;
+          font-size: 1.25rem; font-weight: 700; color: #c7d2fe;
           margin: 2.5rem 0 .8rem; display: flex; align-items: center; gap: .6rem;
           letter-spacing: -.01em;
         }
@@ -697,9 +721,9 @@ const SeqLayout = ({ children, title, subtitle }) => {
         }
         .seq-box.success::before { background: linear-gradient(180deg, #10b981, #34d399); }
 
-        .seq-box p { margin: 0; font-size: .88rem; line-height: 1.7; }
+        .seq-box p { margin: 0; font-size: .99rem; line-height: 1.7; }
         .seq-box-title {
-          font-size: .68rem !important; letter-spacing: .12em; font-weight: 700 !important;
+          font-size: .70rem !important; letter-spacing: .12em; font-weight: 700 !important;
           text-transform: uppercase; color: #818cf8 !important;
           margin-bottom: .5rem !important; display: block;
         }
@@ -717,12 +741,12 @@ const SeqLayout = ({ children, title, subtitle }) => {
         }
         .seq-table {
           width: 100%; border-collapse: collapse;
-          font-size: .8rem; font-family: 'JetBrains Mono','Courier New',monospace;
+          font-size: .9rem; font-family: 'JetBrains Mono','Courier New',monospace;
         }
         .seq-table thead tr { background: rgba(30,27,75,.9); }
         .seq-table th {
           color: #a5b4fc; padding: .75rem 1.1rem;
-          text-align: center; font-size: .72rem; letter-spacing: .07em;
+          text-align: center; font-size: .80rem; letter-spacing: .07em;
           font-weight: 700; white-space: nowrap;
           border-bottom: 1px solid rgba(99,102,241,.25);
           border-right: 1px solid rgba(99,102,241,.1);
@@ -730,7 +754,7 @@ const SeqLayout = ({ children, title, subtitle }) => {
         .seq-table th:last-child { border-right: none; }
         .seq-table td {
           background: rgba(8,15,30,.6); color: #cbd5e1;
-          padding: .65rem 1.1rem; text-align: center;
+          padding: .75rem 1.1rem; text-align: center;
           border-bottom: 1px solid rgba(99,102,241,.07);
           border-right: 1px solid rgba(99,102,241,.07);
           transition: background .15s;
@@ -857,12 +881,12 @@ const SeqLayout = ({ children, title, subtitle }) => {
         /* ─── Equation display ─── */
         .seq-equation {
           font-family: 'JetBrains Mono', monospace;
-          font-size: .95rem; font-weight: 600;
+          font-size: .99rem; font-weight: 600;
           color: #c7d2fe;
           background: rgba(99,102,241,.08);
           border: 1px solid rgba(99,102,241,.2);
           border-radius: .6rem;
-          padding: .75rem 1.2rem;
+          padding: .80rem 1.5rem;
           margin: .75rem 0;
           display: block;
           letter-spacing: .04em;
@@ -886,9 +910,118 @@ const SeqLayout = ({ children, title, subtitle }) => {
           transform: translateY(-2px);
           box-shadow: 0 8px 24px rgba(0,0,0,.3);
         }
-        .seq-feature-icon { font-size: 1.4rem; margin-bottom: .5rem; display: block; }
-        .seq-feature-title { font-size: .8rem; font-weight: 700; color: #a5b4fc; margin-bottom: .35rem; }
-        .seq-feature-desc  { font-size: .8rem; color: #64748b; line-height: 1.6; margin: 0; }
+        .seq-feature-icon { 
+          font-size: 1.4rem; 
+          margin-bottom: .5rem; 
+          display: block;
+          // color: #818cf8;
+        }
+        .seq-feature-icon svg {
+          display: block;
+          stroke: currentColor;
+          stroke-width: 1.5;
+        }
+        .seq-feature-title { 
+  font-size: 1.25rem; /* ~20px (Changed from .12rem) */
+  font-weight: 700; 
+  color: #a5b4fc; 
+  margin-bottom: 0.35rem; 
+}
+
+.seq-feature-desc { 
+  font-size: 1rem;    /* ~16px (Increased from .8rem) */
+  color: #64748b; 
+  line-height: 1.6; 
+  margin: 0; 
+}
+        /* ─── Carousel ─── */
+        .seq-carousel-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1.5rem;
+          margin: 2rem 0 4.5rem;
+          position: relative;
+        }
+
+        .seq-carousel-nav {
+          flex-shrink: 0;
+          width: 44px;
+          height: 44px;
+          border-radius: 0.75rem;
+          border: 1px solid rgba(99,102,241,.3);
+          background: rgba(99,102,241,.08);
+          color: #818cf8;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all .2s ease;
+        }
+
+        .seq-carousel-nav:hover {
+          background: rgba(99,102,241,.15);
+          border-color: rgba(99,102,241,.5);
+          color: #c7d2fe;
+          transform: scale(1.08);
+          box-shadow: 0 4px 12px rgba(99,102,241,.2);
+        }
+
+        .seq-carousel-nav:active {
+          transform: scale(0.95);
+        }
+
+        .seq-carousel-card {
+          flex: 1;
+          max-width: 500px;
+          background: rgba(15,23,42,.6);
+          border: 1px solid rgba(99,102,241,.15);
+          border-radius: .875rem;
+          padding: 1.5rem;
+          transition: all .3s ease;
+          animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .seq-carousel-counter {
+          position: absolute;
+          bottom: -2.5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: .75rem;
+          font-weight: 600;
+          color: #475569;
+          letter-spacing: .05em;
+        }
+
+        /* ─── Carousel Large Variant ─── */
+        .seq-carousel-card-large {
+          min-height: 280px;
+        }
+
+        .seq-carousel-title-large {
+          font-size: 1.1rem !important;
+          font-weight: 700 !important;
+          color: #c7d2fe !important;
+          margin-bottom: 1rem !important;
+          letter-spacing: -.01em;
+        }
+
+        .seq-carousel-desc-large {
+          font-size: .95rem !important;
+          color: #94a3b8 !important;
+          line-height: 1.8 !important;
+        }
 
         /* ─── Pagination ─── */
         .seq-pagination {
@@ -939,10 +1072,16 @@ const SeqLayout = ({ children, title, subtitle }) => {
           .seq-sidebar {
             position: fixed; top: 56px; left: 0; bottom: 0; z-index: 50;
             transform: translateX(-100%); width: 280px;
+            overflow-y: auto;
           }
           .seq-sidebar.open { transform: translateX(0); }
           .seq-overlay { display: block; }
-          .seq-main { padding: 1.75rem 1.5rem 4rem; max-width: 100%; }
+          .seq-main {
+            padding: 1.75rem 1.5rem 4rem;
+            max-width: 100%;
+            height: auto;
+            overflow-y: visible;
+          }
           .seq-topbar-center { display: none; }
         }
         @media (max-width: 560px) {

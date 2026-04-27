@@ -1,98 +1,128 @@
-import React from "react";
+import React, { useState } from "react";
 import SeqLayout from "./SeqLayout";
+import { 
+  ClipboardList, 
+  Workflow, 
+  TableProperties, 
+  Minimize2, 
+  Binary, 
+  Cpu, 
+  Ruler, 
+  Upload, 
+  CircuitBoard,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 
-const SeqDesignProcedures = () => (
-  <SeqLayout
-    title="Design Procedures"
-    subtitle="A systematic methodology for designing synchronous sequential circuits — from word problem to working schematic."
-  >
-    <div className="seq-content-body">
-      <div className="seq-box">
-        <span className="seq-box-title">Design vs Analysis</span>
-        <p>
-          <strong>Analysis</strong> starts with a circuit and finds its
-          behavior.
-          <strong>Design</strong> starts with a behavior specification and
-          derives the circuit. The process is systematic and reversible.
-        </p>
-      </div>
+const designSteps = [
+  {
+    icon: ClipboardList,
+    title: "1. Understand the Spec",
+    desc: "Identify inputs, outputs, and what must be remembered between clock cycles.",
+  },
+  {
+    icon: Workflow,
+    title: "2. Draw State Diagram",
+    desc: "Sketch a directed graph of all states and transitions for all inputs.",
+  },
+  {
+    icon: TableProperties,
+    title: "3. Build State Table",
+    desc: "Convert the diagram into a tabular form with all present state / input / next state / output entries.",
+  },
+  {
+    icon: Minimize2,
+    title: "4. Reduce States",
+    desc: "Merge equivalent states to minimize hardware. Fewer states = fewer flip-flops.",
+  },
+  {
+    icon: Binary,
+    title: "5. State Assignment",
+    desc: "Assign unique binary codes to each state. Need ⌈log₂(n)⌉ flip-flops for n states.",
+  },
+  {
+    icon: Cpu,
+    title: "6. Choose FF Type",
+    desc: "Select D, JK, T, or SR based on which gives simpler input logic for your state transitions.",
+  },
+  {
+    icon: Ruler,
+    title: "7. Derive FF Inputs",
+    desc: "Use excitation tables + K-maps to find minimal Boolean equations for each FF input.",
+  },
+  {
+    icon: Upload,
+    title: "8. Derive Outputs",
+    desc: "Use K-maps to find output equations — f(state) for Moore, f(state,input) for Mealy.",
+  },
+  {
+    icon: CircuitBoard,
+    title: "9. Draw the Circuit",
+    desc: "Implement all equations as gates feeding the flip-flops, with state feedback.",
+  },
+];
 
-      <h2>Complete 9-Step Design Flow</h2>
+const SeqDesignProcedures = () => {
+  const [currentStep, setCurrentStep] = useState(0);
 
-      <div className="seq-grid-2">
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">📋</span>
-          <p className="seq-feature-title">1. Understand the Spec</p>
-          <p className="seq-feature-desc">
-            Identify inputs, outputs, and what must be remembered between clock
-            cycles.
+  const goToPrevious = () => {
+    setCurrentStep((prev) => (prev === 0 ? designSteps.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentStep((prev) => (prev === designSteps.length - 1 ? 0 : prev + 1));
+  };
+
+  const step = designSteps[currentStep];
+  const IconComponent = step.icon;
+
+  return (
+    <SeqLayout
+      title="Design Procedures"
+      subtitle="A systematic methodology for designing synchronous sequential circuits — from word problem to working schematic."
+    >
+      <div className="seq-content-body">
+        <div className="seq-box">
+          <span className="seq-box-title">Design vs Analysis</span>
+          <p>
+            <strong>Analysis</strong> starts with a circuit and finds its
+            behavior.
+            <strong>Design</strong> starts with a behavior specification and
+            derives the circuit. The process is systematic and reversible.
           </p>
         </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🗺️</span>
-          <p className="seq-feature-title">2. Draw State Diagram</p>
-          <p className="seq-feature-desc">
-            Sketch a directed graph of all states and transitions for all
-            inputs.
-          </p>
+
+        <h2>Complete 9-Step Design Flow</h2>
+
+        <div className="seq-carousel-wrap">
+          <button
+            className="seq-carousel-nav seq-carousel-prev"
+            onClick={goToPrevious}
+            aria-label="Previous step"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <div className="seq-carousel-card">
+            <span className="seq-feature-icon">
+              <IconComponent size={32} />
+            </span>
+            <p className="seq-feature-title">{step.title}</p>
+            <p className="seq-feature-desc">{step.desc}</p>
+          </div>
+
+          <button
+            className="seq-carousel-nav seq-carousel-next"
+            onClick={goToNext}
+            aria-label="Next step"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          <div className="seq-carousel-counter">
+            {currentStep + 1} / {designSteps.length}
+          </div>
         </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">📊</span>
-          <p className="seq-feature-title">3. Build State Table</p>
-          <p className="seq-feature-desc">
-            Convert the diagram into a tabular form with all present state /
-            input / next state / output entries.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">✂️</span>
-          <p className="seq-feature-title">4. Reduce States</p>
-          <p className="seq-feature-desc">
-            Merge equivalent states to minimize hardware. Fewer states = fewer
-            flip-flops.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔢</span>
-          <p className="seq-feature-title">5. State Assignment</p>
-          <p className="seq-feature-desc">
-            Assign unique binary codes to each state. Need ⌈log₂(n)⌉ flip-flops
-            for n states.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔁</span>
-          <p className="seq-feature-title">6. Choose FF Type</p>
-          <p className="seq-feature-desc">
-            Select D, JK, T, or SR based on which gives simpler input logic for
-            your state transitions.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">📐</span>
-          <p className="seq-feature-title">7. Derive FF Inputs</p>
-          <p className="seq-feature-desc">
-            Use excitation tables + K-maps to find minimal Boolean equations for
-            each FF input.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">📤</span>
-          <p className="seq-feature-title">8. Derive Outputs</p>
-          <p className="seq-feature-desc">
-            Use K-maps to find output equations — f(state) for Moore,
-            f(state,input) for Mealy.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔌</span>
-          <p className="seq-feature-title">9. Draw the Circuit</p>
-          <p className="seq-feature-desc">
-            Implement all equations as gates feeding the flip-flops, with state
-            feedback.
-          </p>
-        </div>
-      </div>
 
       <h2>Step 1 — Problem Specification</h2>
       <p>Carefully identify:</p>
@@ -424,6 +454,7 @@ const SeqDesignProcedures = () => (
       </div>
     </div>
   </SeqLayout>
-);
+  );
+};
 
 export default SeqDesignProcedures;

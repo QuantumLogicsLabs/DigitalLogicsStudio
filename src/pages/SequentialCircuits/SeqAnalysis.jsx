@@ -1,14 +1,77 @@
-import React from "react";
+import React, { useState } from "react";
+import { 
+  Target, 
+  SearchCode, 
+  PenLine, 
+  Calculator, 
+  StepForward, 
+  TableProperties, 
+  Network, 
+  Info, 
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 import SeqLayout from "./SeqLayout";
 
-const SeqAnalysis = () => (
-  <SeqLayout
+const analysisSteps = [
+  {
+    icon: SearchCode,
+    title: "1. Identify State Variables",
+    desc: "Label each flip-flop output Q₁, Q₂, … Number of states = 2ⁿ for n flip-flops.",
+  },
+  {
+    icon: PenLine,
+    title: "2. Write FF Input Equations",
+    desc: "Express each flip-flop's input (D, J/K, T) as a Boolean function of state and external inputs.",
+  },
+  {
+    icon: Calculator,
+    title: "3. Write Output Equations",
+    desc: "Express each output as f(state) for Moore, or f(state, input) for Mealy.",
+  },
+  {
+    icon: StepForward,
+    title: "4. Find Next State",
+    desc: "Use the FF's characteristic equation to compute Q⁺ for every state-input combination.",
+  },
+  {
+    icon: TableProperties,
+    title: "5. Construct State Table",
+    desc: "Tabulate: present state | input | next state | output for every combination.",
+  },
+  {
+    icon: Network,
+    title: "6. Draw State Diagram",
+    desc: "Convert the table into a directed graph with labeled transitions.",
+  },
+];
+
+const SeqAnalysis = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const goToPrevious = () => {
+    setCurrentStep((prev) => (prev === 0 ? analysisSteps.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentStep((prev) => (prev === analysisSteps.length - 1 ? 0 : prev + 1));
+  };
+
+  const step = analysisSteps[currentStep];
+  const IconComponent = step.icon;
+
+  return (
+    <SeqLayout
     title="Analysis of Sequential Circuits"
     subtitle="Given a circuit schematic, systematically determine its state table, state diagram, and timing behavior."
   >
     <div className="seq-content-body">
       <div className="seq-box">
-        <span className="seq-box-title">Goal of Analysis</span>
+        <span className="seq-box-title">
+          <Target size={18} style={{ marginRight: "6px", verticalAlign: "text-bottom" }} />
+          Goal of Analysis
+        </span>
         <p>
           <strong>Analysis</strong> means: given a circuit schematic, determine
           what it
@@ -20,53 +83,33 @@ const SeqAnalysis = () => (
 
       <h2>Step-by-Step Procedure</h2>
 
-      <div className="seq-grid-2">
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">1️⃣</span>
-          <p className="seq-feature-title">Identify State Variables</p>
-          <p className="seq-feature-desc">
-            Label each flip-flop output Q₁, Q₂, … Number of states = 2ⁿ for n
-            flip-flops.
-          </p>
+      <div className="seq-carousel-wrap">
+        <button
+          className="seq-carousel-nav seq-carousel-prev"
+          onClick={goToPrevious}
+          aria-label="Previous step"
+        >
+          <ChevronLeft size={24} />
+        </button>
+
+        <div className="seq-carousel-card seq-carousel-card-large">
+          <span className="seq-feature-icon">
+            <IconComponent size={40} />
+          </span>
+          <p className="seq-feature-title seq-carousel-title-large">{step.title}</p>
+          <p className="seq-feature-desc seq-carousel-desc-large">{step.desc}</p>
         </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">2️⃣</span>
-          <p className="seq-feature-title">Write FF Input Equations</p>
-          <p className="seq-feature-desc">
-            Express each flip-flop's input (D, J/K, T) as a Boolean function of
-            state and external inputs.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">3️⃣</span>
-          <p className="seq-feature-title">Write Output Equations</p>
-          <p className="seq-feature-desc">
-            Express each output as f(state) for Moore, or f(state, input) for
-            Mealy.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">4️⃣</span>
-          <p className="seq-feature-title">Find Next State</p>
-          <p className="seq-feature-desc">
-            Use the FF's characteristic equation to compute Q⁺ for every
-            state-input combination.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">5️⃣</span>
-          <p className="seq-feature-title">Construct State Table</p>
-          <p className="seq-feature-desc">
-            Tabulate: present state | input | next state | output for every
-            combination.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">6️⃣</span>
-          <p className="seq-feature-title">Draw State Diagram</p>
-          <p className="seq-feature-desc">
-            Convert the table into a directed graph with labeled transitions.
-          </p>
+
+        <button
+          className="seq-carousel-nav seq-carousel-next"
+          onClick={goToNext}
+          aria-label="Next step"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+        <div className="seq-carousel-counter">
+          {currentStep + 1} / {analysisSteps.length}
         </div>
       </div>
 
@@ -77,7 +120,10 @@ const SeqAnalysis = () => (
       </p>
 
       <div className="seq-box info">
-        <span className="seq-box-title">Input Equations</span>
+        <span className="seq-box-title">
+          <Info size={18} style={{ marginRight: "6px", verticalAlign: "text-bottom" }} />
+          Input Equations
+        </span>
         <code className="seq-equation">D₁ = Q₁ ⊕ Q₀</code>
         <code className="seq-equation">D₀ = Q̄₀</code>
       </div>
@@ -438,7 +484,10 @@ const SeqAnalysis = () => (
       </div>
 
       <div className="seq-box warning">
-        <span className="seq-box-title">Common Mistakes</span>
+        <span className="seq-box-title">
+          <AlertTriangle size={18} style={{ marginRight: "6px", verticalAlign: "text-bottom" }} />
+          Common Mistakes
+        </span>
         <p>
           • Always use the state <em>before</em> the clock edge as "present
           state".
@@ -450,6 +499,7 @@ const SeqAnalysis = () => (
       </div>
     </div>
   </SeqLayout>
-);
+  );
+};
 
 export default SeqAnalysis;

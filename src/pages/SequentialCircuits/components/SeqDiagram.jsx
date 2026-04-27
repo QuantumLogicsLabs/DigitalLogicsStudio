@@ -80,7 +80,7 @@ export default function SeqDiagram() {
           </text>
           {/* Output */}
           <line
-            x1="260"
+            x1="240"
             y1="110"
             x2="400"
             y2="110"
@@ -89,7 +89,7 @@ export default function SeqDiagram() {
             markerEnd="url(#a0)"
             filter="url(#glow0)"
           />
-          <text x="408" y="114" fontSize="11" fill="#10b981" fontWeight="700">
+          <text x="365" y="100" fontSize="11" fill="#10b981" fontWeight="700">
             Outputs
           </text>
           {/* Next state */}

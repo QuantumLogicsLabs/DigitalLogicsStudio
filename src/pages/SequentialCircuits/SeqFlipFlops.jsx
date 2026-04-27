@@ -13,7 +13,7 @@ const SeqFlipFlops = () => (
           A <strong>flip-flop</strong> is an edge-triggered bistable memory
           element. Unlike a latch (level-sensitive), a flip-flop captures its
           input and changes state <em>only</em> on a specific edge of the clock
-          — the <strong>rising edge</strong> (0→1) or the
+          — the <strong> rising edge</strong> (0→1) or the{" "}
           <strong>falling edge</strong> (1→0).
         </p>
       </div>
@@ -142,7 +142,7 @@ const SeqFlipFlops = () => (
             strokeWidth="1.5"
             strokeDasharray="6"
           />
-          <text x="258" y="93" fontSize="9" fill="#475569">
+          <text x="258" y="93" fontSize="9" fill="white">
             Q_m
           </text>
           {/* Slave */}
@@ -226,7 +226,7 @@ const SeqFlipFlops = () => (
             Q
           </text>
           {/* CLK label */}
-          <text x="120" y="168" fontSize="8" fill="#f59e0b">
+          <text x="90" y="168" fontSize="8" fill="#f59e0b">
             inverted CLK
           </text>
         </svg>
@@ -304,11 +304,11 @@ const SeqFlipFlops = () => (
             ↓ Fall
           </text>
           {/* Legend */}
-          <rect x="10" y="110" width="12" height="3" rx="1" fill="#10b981" />
+          <rect x="16" y="116" width="12" height="3" rx="1" fill="#10b981" />
           <text x="28" y="121" fontSize="10" fill="#10b981">
             ▷ Positive-edge: captures D on ↑ (rising)
           </text>
-          <rect x="10" y="135" width="12" height="3" rx="1" fill="#f59e0b" />
+          <rect x="16" y="143" width="12" height="3" rx="1" fill="#f59e0b" />
           <text x="28" y="147" fontSize="10" fill="#f59e0b">
             ○▷ Negative-edge: captures D on ↓ (falling)
           </text>
@@ -442,7 +442,7 @@ const SeqFlipFlops = () => (
       <div className="seq-box warning">
         <span className="seq-box-title">Metastability Risk</span>
         <p>
-          Violating t<sub>su</sub> or t<sub>h</sub> puts the flip-flop into a
+          Violating t<sub>su</sub> or t<sub>h</sub> puts the flip-flop into a{" "}
           <strong>metastable</strong> state — an indeterminate voltage that may
           persist for a random duration. Synchronizer circuits mitigate this in
           clock-domain crossing designs.

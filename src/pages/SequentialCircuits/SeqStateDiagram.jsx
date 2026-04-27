@@ -1,8 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  Circle,
+  ArrowRight,
+  Dot,
+  Shuffle,
+  ChevronLeft,
+  ChevronRight,
+  Map,
+  BarChart3,
+} from "lucide-react";
 import SeqLayout from "./SeqLayout";
 
-const SeqStateDiagram = () => (
-  <SeqLayout
+const stateDiagramElements = [
+  {
+    icon: Circle,
+    title: "State (Node)",
+    desc: "Each circle represents a unique state. The initial state is marked with an entry arrow (\u2192\u25cb).",
+  },
+  {
+    icon: ArrowRight,
+    title: "Transition (Arc)",
+    desc: "Directed arrow from current to next state. Labeled with the input condition that causes it.",
+  },
+  {
+    icon: Dot,
+    title: "Moore Output",
+    desc: "Output labeled inside the state circle \u2014 only depends on the current state.",
+  },
+  {
+    icon: Shuffle,
+    title: "Mealy Output",
+    desc: "Output labeled on the arc as \"input/output\" \u2014 depends on state AND input.",
+  },
+];
+
+const SeqStateDiagram = () => {
+  const [currentElement, setCurrentElement] = useState(0);
+
+  const goToPrevious = () => {
+    setCurrentElement((prev) =>
+      prev === 0 ? stateDiagramElements.length - 1 : prev - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentElement((prev) =>
+      prev === stateDiagramElements.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const element = stateDiagramElements[currentElement];
+  const IconComponent = element.icon;
+  return (
+    <SeqLayout
     title="State Diagrams & State Tables"
     subtitle="The two primary representations for sequential circuit behavior — graphical and tabular forms."
   >
@@ -11,7 +61,7 @@ const SeqStateDiagram = () => (
         <span className="seq-box-title">Why Both Representations?</span>
         <p>
           <strong>State diagrams</strong> give an intuitive visual picture of
-          circuit behavior.
+          circuit behavior.{" "}
           <strong>State tables</strong> provide the complete, organized
           enumeration needed to derive flip-flop input equations. Mastering both
           is essential.
@@ -20,38 +70,33 @@ const SeqStateDiagram = () => (
 
       <h2>State Diagrams — Elements</h2>
 
-      <div className="seq-grid-2">
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">⭕</span>
-          <p className="seq-feature-title">State (Node)</p>
-          <p className="seq-feature-desc">
-            Each circle represents a unique state. The initial state is marked
-            with an entry arrow (→○).
-          </p>
+      <div className="seq-carousel-wrap">
+        <button
+          className="seq-carousel-nav seq-carousel-prev"
+          onClick={goToPrevious}
+          aria-label="Previous element"
+        >
+          <ChevronLeft size={24} />
+        </button>
+
+        <div className="seq-carousel-card seq-carousel-card-large">
+          <span className="seq-feature-icon">
+            <IconComponent size={40} />
+          </span>
+          <p className="seq-feature-title seq-carousel-title-large">{element.title}</p>
+          <p className="seq-feature-desc seq-carousel-desc-large">{element.desc}</p>
         </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">➡️</span>
-          <p className="seq-feature-title">Transition (Arc)</p>
-          <p className="seq-feature-desc">
-            Directed arrow from current to next state. Labeled with the input
-            condition that causes it.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🟢</span>
-          <p className="seq-feature-title">Moore Output</p>
-          <p className="seq-feature-desc">
-            Output labeled <em>inside</em> the state circle — only depends on
-            the current state.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <span className="seq-feature-icon">🔀</span>
-          <p className="seq-feature-title">Mealy Output</p>
-          <p className="seq-feature-desc">
-            Output labeled <em>on the arc</em> as "input/output" — depends on
-            state AND input.
-          </p>
+
+        <button
+          className="seq-carousel-nav seq-carousel-next"
+          onClick={goToNext}
+          aria-label="Next element"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+        <div className="seq-carousel-counter">
+          {currentElement + 1} / {stateDiagramElements.length}
         </div>
       </div>
 
@@ -85,7 +130,7 @@ const SeqStateDiagram = () => (
             strokeWidth="1.5"
             markerEnd="url(#aMo)"
           />
-          <text x="4" y="101" fontSize="8" fill="#64748b">
+          <text x="20" y="95" fontSize="8" fill="#64748b">
             start
           </text>
           {/* States: A, B, C, D */}
@@ -318,7 +363,7 @@ const SeqStateDiagram = () => (
             strokeWidth="2"
             markerEnd="url(#aMe)"
           />
-          <text x="148" y="132" fontSize="10" fill="#fbbf24" fontWeight="700">
+          <text x="148" y="140" fontSize="10" fill="#fbbf24" fontWeight="700">
             0/0
           </text>
           {/* S1→S2 (1/1) */}
@@ -411,7 +456,13 @@ const SeqStateDiagram = () => (
       <h2>Converting Between Diagram and Table</h2>
       <div className="seq-grid-2">
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">🗺️→📊</span>
+          <span className="seq-feature-icon">
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", justifyContent: "center" }}>
+              <Map size={24} />
+              <ArrowRight size={20} />
+              <BarChart3 size={24} />
+            </div>
+          </span>
           <p className="seq-feature-title">Diagram → Table</p>
           <p className="seq-feature-desc">
             For each state, follow every outgoing arc. Record destination state,
@@ -419,7 +470,13 @@ const SeqStateDiagram = () => (
           </p>
         </div>
         <div className="seq-feature-card">
-          <span className="seq-feature-icon">📊→🗺️</span>
+          <span className="seq-feature-icon">
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", justifyContent: "center" }}>
+              <BarChart3 size={24} />
+              <ArrowRight size={20} />
+              <Map size={24} />
+            </div>
+          </span>
           <p className="seq-feature-title">Table → Diagram</p>
           <p className="seq-feature-desc">
             For each row, draw the present state circle (if new), then draw an
@@ -451,6 +508,7 @@ const SeqStateDiagram = () => (
       </div>
     </div>
   </SeqLayout>
-);
+  );
+};
 
 export default SeqStateDiagram;
