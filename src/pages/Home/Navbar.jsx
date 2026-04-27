@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const NAV_LINKS = [
   { to: "/boolforge", label: "Circuit Forge" },
@@ -34,13 +34,22 @@ function MoonIcon() {
   );
 }
 
-export function Navbar({ toggleTheme, theme }) {
+export function Navbar({ toggleTheme, theme, onHomeClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const handleHomeClick = () => {
+    setMenuOpen(false);
+    onHomeClick?.();
+  };
 
   return (
     <header className="home-header">
       <div className="home-header-inner">
-        <div className="home-brand">
+        <Link
+          to="/"
+          className="home-brand home-brand-link"
+          aria-label="Go to home page"
+          onClick={handleHomeClick}
+        >
           <div className="home-logo-container">
             <svg viewBox="0 0 100 100" className="home-logo-svg">
               <defs>
@@ -74,7 +83,7 @@ export function Navbar({ toggleTheme, theme }) {
             <span className="home-title">Boolforge</span>
             <span className="home-tagline">The Digital Logic Playground</span>
           </div>
-        </div>
+        </Link>
 
         <nav className="home-nav" aria-label="Main navigation">
           {NAV_LINKS.map(({ to, label }) => (
@@ -84,6 +93,7 @@ export function Navbar({ toggleTheme, theme }) {
               className={({ isActive }) =>
                 isActive ? "home-nav-link home-nav-link--active" : "home-nav-link"
               }
+              onClick={() => setMenuOpen(false)}
             >
               {label}
             </NavLink>

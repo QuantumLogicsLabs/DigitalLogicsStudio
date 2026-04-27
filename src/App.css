@@ -81,6 +81,11 @@
   gap: 0.8rem;
 }
 
+.home-brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .home-logo {
   width: 40px;
   height: 40px;
@@ -198,10 +203,10 @@
 /* Hamburger — hidden on desktop, shown on mobile */
 .home-hamburger {
   display: none;
+  position: relative;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 5px;
   width: 34px;
   height: 34px;
   border-radius: 0.45rem;
@@ -218,7 +223,8 @@
 }
 
 .hamburger-bar {
-  display: block;
+  position: absolute;
+  left: 8px;
   width: 16px;
   height: 1.5px;
   background: var(--text-color);
@@ -227,8 +233,20 @@
   transform-origin: center;
 }
 
+.hamburger-bar:nth-child(1) {
+  transform: translateY(-5px);
+}
+
+.hamburger-bar:nth-child(2) {
+  transform: translateY(0);
+}
+
+.hamburger-bar:nth-child(3) {
+  transform: translateY(5px);
+}
+
 .home-hamburger.is-open .hamburger-bar:nth-child(1) {
-  transform: translateY(6.5px) rotate(45deg);
+  transform: translateY(0) rotate(45deg);
 }
 
 .home-hamburger.is-open .hamburger-bar:nth-child(2) {
@@ -237,7 +255,7 @@
 }
 
 .home-hamburger.is-open .hamburger-bar:nth-child(3) {
-  transform: translateY(-6.5px) rotate(-45deg);
+  transform: translateY(0) rotate(-45deg);
 }
 
 /* Mobile dropdown nav */

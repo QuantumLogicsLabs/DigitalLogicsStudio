@@ -15,6 +15,10 @@ const topicGroupOrder = {
 const Home = ({ toggleTheme, theme }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const resultsRef = React.useRef(null);
+  const handleHomeClick = React.useCallback(() => {
+    setSearchTerm("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const filteredData = homeData.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -52,7 +56,11 @@ const Home = ({ toggleTheme, theme }) => {
   return (
     <div className="home-page">
       <div className="grid-background" />
-      <Navbar toggleTheme={toggleTheme} theme={theme} />
+      <Navbar
+        toggleTheme={toggleTheme}
+        theme={theme}
+        onHomeClick={handleHomeClick}
+      />
 
       <main className="home-main">
         <HeroSection

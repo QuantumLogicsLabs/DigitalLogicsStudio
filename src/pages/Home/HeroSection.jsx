@@ -73,7 +73,7 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <input
-              type="search"
+              type="text"
               placeholder="Search tools — K-Map, Boolean, Flip-Flop..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
