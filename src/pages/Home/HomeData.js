@@ -3,6 +3,8 @@ const homeData = [
     title: "🔧 Circuit Forge",
     description:
       "Drag-and-drop logic gates, connect wires, and instantly see truth tables and outputs.",
+    section: "featured",
+    sortOrder: 1,
     links: [
       {
         text: "Open Circuit Forge →",
@@ -16,6 +18,8 @@ const homeData = [
     title: "🗺️ K-Map Generator",
     description:
       "Generate and simplify boolean expressions visually using interactive Karnaugh maps with SOP/POS optimization.",
+    section: "featured",
+    sortOrder: 2,
     links: [
       {
         text: "Go to K-Maps →",
@@ -29,6 +33,9 @@ const homeData = [
     title: "📐 Boolean Algebra",
     description:
       "Master the foundations of digital logic with interactive tools for identities, laws, and expressions.",
+    section: "topics",
+    topicGroup: "algebra",
+    topicOrder: 1,
     links: [
       { text: "Overview", to: "/boolean-algebra" },
       { text: "Identities", to: "/boolean-identities" },
@@ -46,6 +53,9 @@ const homeData = [
     title: "⚡ Advanced Logic",
     description:
       "Explore circuit optimization, universal gates, and special functions for deeper understanding.",
+    section: "topics",
+    topicGroup: "advanced",
+    topicOrder: 1,
     links: [
       { text: "Circuit Cost", to: "/circuit-cost" },
       { text: "Universal Gates", to: "/universal-gates" },
@@ -57,6 +67,9 @@ const homeData = [
     title: "🔀 Combinational Circuits",
     description:
       "Explore encoders and decoders — the core combinational building blocks used in memory systems.",
+    section: "topics",
+    topicGroup: "circuits",
+    topicOrder: 1,
     links: [
       { text: "Encoder", to: "/encoder" },
       { text: "Decoder", to: "/decoder" },
@@ -66,6 +79,9 @@ const homeData = [
     title: "🔁 Sequential Circuits",
     description:
       "Dive into memory elements, state machines, and time-dependent circuits.",
+    section: "topics",
+    topicGroup: "circuits",
+    topicOrder: 2,
     className: "sequential-card",
     links: [
       { text: "Introduction", to: "/sequential/intro" },
@@ -85,6 +101,9 @@ const homeData = [
     title: "🔢 Number Systems",
     description:
       "Convert between bases and run detailed step-by-step operations.",
+    section: "topics",
+    topicGroup: "algebra",
+    topicOrder: 2,
     links: [
       { text: "System Calculator", to: "/numbersystemcalculator" },
       { text: "Base Converter", to: "/numberconversation" },
@@ -96,6 +115,9 @@ const homeData = [
   {
     title: "➕ ARITHMETIC FUNCTIONS AND HDLs",
     description: "Dedicated interactive modules for arithmetic logic design.",
+    section: "topics",
+    topicGroup: "algebra",
+    topicOrder: 3,
     links: [
       { text: "Binary Adders", to: "/arithmetic/binary-adders" },
       { text: "Binary Subtractor", to: "/arithmetic/binary-subtractor" },
@@ -112,6 +134,8 @@ const homeData = [
   {
     title: "📚 Learning Resources",
     description: "Access curated problems and additional tools.",
+    section: "resources",
+    sortOrder: 1,
     links: [
       { text: "Book Ch1 Problems", to: "/book" },
       { text: "Book Ch2 Problems", to: "/book/ch2" },
