@@ -6,8 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Boolforge from "./pages/Boolforge";
 import SignificantDigits from "./pages/SignificantDigits";
-import BCDNotation from "./pages/BCDNotation";
-import ASCIINotation from "./pages/ASCIINotation";
+import BCDNotation from "./pages/NumberSystems/BCDNotation";
+import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
 import BitExtension from "./pages/BitExtension";
 import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
 import RegCounters from "./pages/RegistersAndTransfers/RegCounters";
@@ -21,9 +21,9 @@ import RegSyncBinaryCounters from "./pages/RegistersAndTransfers/RegSyncBinaryCo
 
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
-import NumberConverter from "./pages/NumberConversation";
-import NumberSystemCalculator from "./pages/NumberSystemCalculator";
-import BinaryRepresentation from "./pages/BinaryRepresentation";
+import NumberConverter from "./pages/NumberSystems/NumberConversation";
+import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator";
+import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
 import ProblemSolver from "./pages/Book/Ch1";
 import Ch2ProblemSolver from "./pages/Book/Ch2";
 import BitConverter from "./pages/Bitconverter";
