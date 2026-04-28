@@ -1,16 +1,62 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import "./RegStyles.css"; // ← THE MISSING LINE — this is why nothing was styled
 
 const regPages = [
-  { path: "/registers/intro",               label: "Registers",                  icon: "🗂️",  short: "Registers"    },
-  { path: "/registers/counters",            label: "Counters",                   icon: "🔢",  short: "Counters"     },
-  { path: "/registers/sync-async",          label: "Synchronous / Asynchronous", icon: "⏱️",  short: "Sync/Async"   },
-  { path: "/registers/shift-registers",     label: "Shift Registers",            icon: "➡️",  short: "Shift Reg"    },
-  { path: "/registers/serial-shift",        label: "Serial Shift Registers",     icon: "📡",  short: "Serial Shift" },
-  { path: "/registers/loading",             label: "Loading Registers",          icon: "📥",  short: "Loading"      },
-  { path: "/registers/parallel",            label: "Parallel Registers",         icon: "⟺",   short: "Parallel"     },
-  { path: "/registers/ripple-counters",     label: "Ripple Counters",            icon: "🌊",  short: "Ripple"       },
-  { path: "/registers/sync-binary-counters",label: "Synchronous Binary Counters",icon: "⚙️",  short: "Sync Binary"  },
+  {
+    path: "/registers/intro",
+    label: "Registers",
+    icon: "🗂️",
+    short: "Registers",
+  },
+  {
+    path: "/registers/counters",
+    label: "Counters",
+    icon: "🔢",
+    short: "Counters",
+  },
+  {
+    path: "/registers/sync-async",
+    label: "Synchronous / Asynchronous",
+    icon: "⏱️",
+    short: "Sync/Async",
+  },
+  {
+    path: "/registers/shift-registers",
+    label: "Shift Registers",
+    icon: "➡️",
+    short: "Shift Reg",
+  },
+  {
+    path: "/registers/serial-shift",
+    label: "Serial Shift Registers",
+    icon: "📡",
+    short: "Serial Shift",
+  },
+  {
+    path: "/registers/loading",
+    label: "Loading Registers",
+    icon: "📥",
+    short: "Loading",
+  },
+  {
+    path: "/registers/parallel",
+    label: "Parallel Registers",
+    icon: "⟺",
+    short: "Parallel",
+  },
+  {
+    path: "/registers/ripple-counters",
+    label: "Ripple Counters",
+    icon: "🌊",
+    short: "Ripple",
+  },
+  {
+    path: "/registers/sync-binary-counters",
+    label: "Synchronous Binary Counters",
+    icon: "⚙️",
+    short: "Sync Binary",
+  },
 ];
 
 const RegLayout = ({ children, title, subtitle }) => {
@@ -35,12 +81,19 @@ const RegLayout = ({ children, title, subtitle }) => {
             onClick={() => setSidebarOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </button>
           <Link to="/" className="reg-back-home">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M10 3L5 8l5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             Home
           </Link>
@@ -54,19 +107,35 @@ const RegLayout = ({ children, title, subtitle }) => {
         </div>
 
         <div className="reg-topbar-right">
-          <div className="reg-progress-ring-wrap" title={`${currentIndex + 1} of ${regPages.length}`}>
+          <div
+            className="reg-progress-ring-wrap"
+            title={`${currentIndex + 1} of ${regPages.length}`}
+          >
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none"
-                stroke="rgba(251,191,36,0.2)" strokeWidth="3" />
-              <circle cx="18" cy="18" r="14" fill="none"
-                stroke="#fbbf24" strokeWidth="3"
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="rgba(251,191,36,0.2)"
+                strokeWidth="3"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#fbbf24"
+                strokeWidth="3"
                 strokeDasharray={`${progress * 0.879} 100`}
                 strokeLinecap="round"
                 transform="rotate(-90 18 18)"
                 style={{ transition: "stroke-dasharray 0.4s ease" }}
               />
             </svg>
-            <span className="reg-progress-text">{currentIndex + 1}/{regPages.length}</span>
+            <span className="reg-progress-text">
+              {currentIndex + 1}/{regPages.length}
+            </span>
           </div>
         </div>
       </header>
@@ -89,9 +158,14 @@ const RegLayout = ({ children, title, subtitle }) => {
 
             <div className="reg-sidebar-progress">
               <div className="reg-sidebar-progress-bar">
-                <div className="reg-sidebar-progress-fill" style={{ width: `${progress}%` }} />
+                <div
+                  className="reg-sidebar-progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
-              <span className="reg-sidebar-progress-label">{progress}% complete</span>
+              <span className="reg-sidebar-progress-label">
+                {progress}% complete
+              </span>
             </div>
 
             <nav className="reg-sidebar-nav">
@@ -105,7 +179,9 @@ const RegLayout = ({ children, title, subtitle }) => {
                     className={`reg-nav-item${isActive ? " active" : ""}${isVisited ? " visited" : ""}`}
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <span className="reg-nav-num">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="reg-nav-num">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     <span className="reg-nav-icon">{p.icon}</span>
                     <span className="reg-nav-label-text">{p.label}</span>
                     <span className="reg-nav-status">
@@ -118,7 +194,9 @@ const RegLayout = ({ children, title, subtitle }) => {
             </nav>
 
             <div className="reg-sidebar-footer">
-              <Link to="/" className="reg-sidebar-home-btn">← Back to All Topics</Link>
+              <Link to="/" className="reg-sidebar-home-btn">
+                ← Back to All Topics
+              </Link>
             </div>
           </div>
         </aside>
@@ -138,18 +216,30 @@ const RegLayout = ({ children, title, subtitle }) => {
             {prev ? (
               <Link to={prev.path} className="reg-page-nav-btn reg-prev">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M10 3L5 8l5 5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 <span>{prev.label}</span>
               </Link>
-            ) : <div />}
+            ) : (
+              <div />
+            )}
             {next && (
               <Link to={next.path} className="reg-page-nav-btn reg-next">
                 <span>{next.label}</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2"
-                    strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M6 3l5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </Link>
             )}
