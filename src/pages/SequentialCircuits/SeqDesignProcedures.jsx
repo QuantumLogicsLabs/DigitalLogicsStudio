@@ -94,35 +94,41 @@ const SeqDesignProcedures = () => {
 
         <h2>Complete 9-Step Design Flow</h2>
 
-        <div className="seq-carousel-wrap">
-          <button
-            className="seq-carousel-nav seq-carousel-prev"
-            onClick={goToPrevious}
-            aria-label="Previous step"
-          >
-            <ChevronLeft size={24} />
-          </button>
-
-          <div className="seq-carousel-card">
-            <span className="seq-feature-icon">
-              <IconComponent size={32} />
-            </span>
-            <p className="seq-feature-title">{step.title}</p>
-            <p className="seq-feature-desc">{step.desc}</p>
-          </div>
-
-          <button
-            className="seq-carousel-nav seq-carousel-next"
-            onClick={goToNext}
-            aria-label="Next step"
-          >
-            <ChevronRight size={24} />
-          </button>
-
-          <div className="seq-carousel-counter">
-            {currentStep + 1} / {designSteps.length}
-          </div>
-        </div>
+         <div className="seq-carousel-wrap">
+                <div className="seq-carousel-row">
+                  <button
+                    className="seq-carousel-nav seq-carousel-prev"
+                    onClick={goToPrevious}
+                    aria-label="Previous step"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+        
+                  <div className="seq-carousel-card seq-carousel-card-large">
+                    <div className="seq-carousel-card-content">
+                      <div className="seq-feature-icon">
+                        <IconComponent size={40} />
+                      </div>
+                      <div className="seq-card-body">
+                        <p className="seq-feature-title seq-carousel-title-large">{step.title}</p>
+                        <p className="seq-feature-desc seq-carousel-desc-large">{step.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+        
+                  <button
+                    className="seq-carousel-nav seq-carousel-next"
+                    onClick={goToNext}
+                    aria-label="Next step"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </div>
+        
+                <div className="seq-carousel-counter-wrap">
+                  <div className="seq-carousel-counter">{currentStep + 1} / {designSteps.length}</div>
+                </div>
+              </div>
 
       <h2>Step 1 — Problem Specification</h2>
       <p>Carefully identify:</p>
@@ -143,8 +149,8 @@ const SeqDesignProcedures = () => {
       </ul>
 
       <h2>Step 5 — State Assignment Strategies</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Strategy</th>
@@ -178,8 +184,8 @@ const SeqDesignProcedures = () => {
       </div>
 
       <h2>Step 6 — Choosing Flip-Flop Type</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Flip-Flop</th>
@@ -400,8 +406,8 @@ const SeqDesignProcedures = () => {
       </div>
 
       <h2>State Table (after assignment: S0=00, S1=01, S2=10, S3=11)</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-flip-table">
           <thead>
             <tr>
               <th>Present Q₁Q₀</th>

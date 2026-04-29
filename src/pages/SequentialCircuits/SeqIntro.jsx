@@ -5,6 +5,7 @@ import SeqBox from "./components/SeqBox";
 import SeqTable from "./components/SeqTable";
 import SeqGrid from "./components/SeqGrid";
 import SeqDiagram from "./components/SeqDiagram";
+import SeqTerm from "./components/SeqTerm";
 import SeqGridData from "./data/SeqGridData";
 import SeqBoxData from "./data/SeqBoxData";
 import SeqBoxInfo from "./components/SeqBoxInfo";
@@ -94,9 +95,9 @@ const SeqIntro = () => {
       <SeqBox data={SeqBoxData.sequentialcircuit} />
       <h2>Combinational vs Sequential</h2>
       <p>
-        In a <strong>combinational circuit</strong>, output is determined purely
+        In a <strong><SeqTerm tooltip="No internal memory; outputs = function(inputs)">combinational circuit</SeqTerm></strong>, output is determined purely
         by the current inputs — there is no memory. In a{" "}
-        <strong>sequential circuit</strong>, feedback paths and storage elements
+        <strong><SeqTerm tooltip="Has feedback and storage; outputs depend on history">sequential circuit</SeqTerm></strong>, feedback paths and storage elements
         allow the circuit to "remember" previous states.
       </p>
 
@@ -106,32 +107,38 @@ const SeqIntro = () => {
       <p>Every sequential circuit has three fundamental parts:</p>
 
       <div className="seq-carousel-wrap">
-        <button
-          className="seq-carousel-nav seq-carousel-prev"
-          onClick={goToPreviousGeneral}
-          aria-label="Previous model"
-        >
-          <ChevronLeft size={24} />
-        </button>
+        <div className="seq-carousel-row">
+          <button
+            className="seq-carousel-nav seq-carousel-prev"
+            onClick={goToPreviousGeneral}
+            aria-label="Previous model"
+          >
+            <ChevronLeft size={24} />
+          </button>
 
-        <div className="seq-carousel-card seq-carousel-card-large">
-          <span className="seq-feature-icon">
-            <GeneralIconComponent size={40} />
-          </span>
-          <p className="seq-feature-title seq-carousel-title-large">{generalItem.title}</p>
-          <p className="seq-feature-desc seq-carousel-desc-large">{generalItem.desc}</p>
+          <div className="seq-carousel-card seq-carousel-card-large">
+            <div className="seq-carousel-card-content">
+              <div className="seq-feature-icon">
+                <GeneralIconComponent size={28} />
+              </div>
+              <div className="seq-card-body">
+                <p className="seq-feature-title seq-carousel-title-large">{generalItem.title}</p>
+                <p className="seq-feature-desc seq-carousel-desc-large">{generalItem.desc}</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="seq-carousel-nav seq-carousel-next"
+            onClick={goToNextGeneral}
+            aria-label="Next model"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
 
-        <button
-          className="seq-carousel-nav seq-carousel-next"
-          onClick={goToNextGeneral}
-          aria-label="Next model"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        <div className="seq-carousel-counter">
-          {currentGeneral + 1} / {generalModelItems.length}
+        <div className="seq-carousel-counter-wrap">
+          <div className="seq-carousel-counter">{currentGeneral + 1} / {generalModelItems.length}</div>
         </div>
       </div>
 
@@ -144,42 +151,48 @@ const SeqIntro = () => {
 
       <h2>The Clock Signal</h2>
       <p>
-        In synchronous circuits, a periodic square-wave <strong>clock</strong>{" "}
+        In synchronous circuits, a periodic square-wave <strong><SeqTerm tooltip="Coordinates state changes across flip-flops">clock</SeqTerm></strong>{" "}
         coordinates all state changes. Flip-flops respond on the{" "}
-        <strong>rising edge</strong> (positive-edge triggered) or
-        <strong>falling edge</strong> (negative-edge triggered).
+        <strong><SeqTerm tooltip="Transition from low to high">rising edge</SeqTerm></strong> (positive-edge triggered) or{" "}
+        <strong><SeqTerm tooltip="Transition from high to low">falling edge</SeqTerm></strong> (negative-edge triggered).
       </p>
 
       <SeqBoxInfo />
 
       <h2>Real-World Applications</h2>
       <div className="seq-carousel-wrap">
-        <button
-          className="seq-carousel-nav seq-carousel-prev"
-          onClick={goToPreviousRealWorld}
-          aria-label="Previous application"
-        >
-          <ChevronLeft size={24} />
-        </button>
+        <div className="seq-carousel-row">
+          <button
+            className="seq-carousel-nav seq-carousel-prev"
+            onClick={goToPreviousRealWorld}
+            aria-label="Previous application"
+          >
+            <ChevronLeft size={24} />
+          </button>
 
-        <div className="seq-carousel-card seq-carousel-card-large">
-          <span className="seq-feature-icon">
-            <RealWorldIconComponent size={40} />
-          </span>
-          <p className="seq-feature-title seq-carousel-title-large">{realWorldItem.title}</p>
-          <p className="seq-feature-desc seq-carousel-desc-large">{realWorldItem.desc}</p>
+          <div className="seq-carousel-card seq-carousel-card-large">
+            <div className="seq-carousel-card-content">
+              <div className="seq-feature-icon">
+                <RealWorldIconComponent size={28} />
+              </div>
+              <div className="seq-card-body">
+                <p className="seq-feature-title seq-carousel-title-large">{realWorldItem.title}</p>
+                <p className="seq-feature-desc seq-carousel-desc-large">{realWorldItem.desc}</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="seq-carousel-nav seq-carousel-next"
+            onClick={goToNextRealWorld}
+            aria-label="Next application"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
 
-        <button
-          className="seq-carousel-nav seq-carousel-next"
-          onClick={goToNextRealWorld}
-          aria-label="Next application"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        <div className="seq-carousel-counter">
-          {currentRealWorld + 1} / {realWorldItems.length}
+        <div className="seq-carousel-counter-wrap">
+          <div className="seq-carousel-counter">{currentRealWorld + 1} / {realWorldItems.length}</div>
         </div>
       </div>
 

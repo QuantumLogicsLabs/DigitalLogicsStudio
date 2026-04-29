@@ -71,35 +71,40 @@ const SeqStateDiagram = () => {
       <h2>State Diagrams — Elements</h2>
 
       <div className="seq-carousel-wrap">
-        <button
-          className="seq-carousel-nav seq-carousel-prev"
-          onClick={goToPrevious}
-          aria-label="Previous element"
-        >
-          <ChevronLeft size={24} />
-        </button>
+        <div className="seq-carousel-row">
+          <button
+            className="seq-carousel-nav seq-carousel-prev"
+            onClick={goToPrevious}
+            aria-label="Previous step"
+          >
+            <ChevronLeft size={24} />
+          </button>
 
-        <div className="seq-carousel-card seq-carousel-card-large">
-          <span className="seq-feature-icon">
-            <IconComponent size={40} />
-          </span>
-          <p className="seq-feature-title seq-carousel-title-large">{element.title}</p>
-          <p className="seq-feature-desc seq-carousel-desc-large">{element.desc}</p>
+          <div className="seq-carousel-card seq-carousel-card-large">
+            <div className="seq-carousel-card-content">
+              <div className="seq-feature-icon">
+                <IconComponent size={40} />
+              </div>
+              <div className="seq-card-body">
+                <p className="seq-feature-title seq-carousel-title-large">{element.title}</p>
+                <p className="seq-feature-desc seq-carousel-desc-large">{element.desc}</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="seq-carousel-nav seq-carousel-next"
+            onClick={goToNext}
+            aria-label="Next step"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
 
-        <button
-          className="seq-carousel-nav seq-carousel-next"
-          onClick={goToNext}
-          aria-label="Next element"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        <div className="seq-carousel-counter">
-          {currentElement + 1} / {stateDiagramElements.length}
+        <div className="seq-carousel-counter-wrap">
+          <div className="seq-carousel-counter">{currentElement + 1} / {stateDiagramElements.length}</div>
         </div>
       </div>
-
       <h2>Moore Machine — State Diagram</h2>
 
       <div className="seq-diagram">
@@ -246,8 +251,8 @@ const SeqStateDiagram = () => {
       </div>
 
       <h2>Moore Machine State Table</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th rowSpan="2">Present State</th>
@@ -412,8 +417,8 @@ const SeqStateDiagram = () => {
       </div>
 
       <h2>Mealy Machine State Table</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th rowSpan="2">Present State</th>
@@ -457,31 +462,35 @@ const SeqStateDiagram = () => {
       <div className="seq-grid-2">
         <div className="seq-feature-card">
           <span className="seq-feature-icon">
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", justifyContent: "center" }}>
-              <Map size={24} />
-              <ArrowRight size={20} />
-              <BarChart3 size={24} />
+            <div className="seq-convert-icon-group">
+              <Map size={16} />
+              <ArrowRight size={14} className="seq-convert-arrow" />
+              <BarChart3 size={16} />
             </div>
           </span>
-          <p className="seq-feature-title">Diagram → Table</p>
-          <p className="seq-feature-desc">
-            For each state, follow every outgoing arc. Record destination state,
-            input, and output as a row in the table.
-          </p>
+          <div className="seq-feature-card-content">
+            <p className="seq-feature-title">Diagram → Table</p>
+            <p className="seq-feature-desc">
+              For each state, follow every outgoing arc. Record destination state,
+              input, and output as a row in the table.
+            </p>
+          </div>
         </div>
         <div className="seq-feature-card">
           <span className="seq-feature-icon">
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", justifyContent: "center" }}>
-              <BarChart3 size={24} />
-              <ArrowRight size={20} />
-              <Map size={24} />
+            <div className="seq-convert-icon-group">
+              <BarChart3 size={16} />
+              <ArrowRight size={14} className="seq-convert-arrow" />
+              <Map size={16} />
             </div>
           </span>
-          <p className="seq-feature-title">Table → Diagram</p>
-          <p className="seq-feature-desc">
-            For each row, draw the present state circle (if new), then draw an
-            arc to the next state, labeled with input (and output for Mealy).
-          </p>
+          <div className="seq-feature-card-content">
+            <p className="seq-feature-title">Table → Diagram</p>
+            <p className="seq-feature-desc">
+              For each row, draw the present state circle (if new), then draw an
+              arc to the next state, labeled with input (and output for Mealy).
+            </p>
+          </div>
         </div>
       </div>
 

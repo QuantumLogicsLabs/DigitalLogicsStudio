@@ -2,7 +2,36 @@ import React, { useState } from "react";
 import { Lock, Unlock, Code2 } from "lucide-react";
 import SeqLayout from "./SeqLayout";
 import SeqTable from "./components/SeqTable";
+// import SeqBox from "./components/SeqBox";
+import SeqGrid from "./components/SeqGrid";
 import SeqTableData from "./data/SeqTableData";
+
+// ─── Feature data for grids ───────────────────────────────────────────────────
+const gatedSRLatchFeatures = [
+  {
+    icon: <Lock size={28} />,
+    title: "EN = 0 — Locked",
+    line: "The AND gates block S and R, sending 0s into the NOR gates regardless of what S and R are doing. Q is completely frozen. This is the hold state — the latch is remembering but not listening.",
+  },
+  {
+    icon: <Unlock size={28} />,
+    title: "EN = 1 — Transparent",
+    line: "The AND gates pass S and R through to the NOR gates. The latch now behaves exactly like a plain SR latch — it responds immediately to any S or R change. The forbidden S=R=1 condition still applies.",
+  },
+];
+
+const charEquationFeatures = [
+  {
+    icon: <Code2 size={28} />,
+    title: "SR Latch",
+    line: "Q⁺ = S + R̄·Q — Read: 'Q next equals S OR (NOT-R AND current Q).' The constraint S·R = 0 must always hold.",
+  },
+  {
+    icon: <Code2 size={28} />,
+    title: "D Latch",
+    line: "Q⁺ = EN·D + EN̄·Q — Read: 'Q next is D when enabled, otherwise it stays as Q.' No forbidden states — always valid.",
+  },
+];
 
 // ─── SR Latch Simulator ───────────────────────────────────────────────────────
 // Simulates a NOR-based SR latch. Tracks Q across state changes so that the
@@ -71,7 +100,7 @@ const SRLatchSim = () => {
 
       <div className="seq-sim-inputs">
         <label className="seq-sim-label">
-          S — Set
+          S — Set  {" "}
           <button
             className={`seq-sim-toggle ${S ? "on" : "off"}`}
             onClick={handleS}
@@ -80,7 +109,7 @@ const SRLatchSim = () => {
           </button>
         </label>
         <label className="seq-sim-label">
-          R — Reset
+         {" "} R — Reset {" "}
           <button
             className={`seq-sim-toggle ${R ? "on" : "off"}`}
             onClick={handleR}
@@ -107,59 +136,61 @@ const SRLatchSim = () => {
       {/* Live truth-table that highlights the active row */}
       <div className="seq-sim-truth">
         <p className="seq-sim-truth-label">Active row highlighted ↓</p>
-        <table className="seq-table seq-table--compact">
-          <thead>
-            <tr>
-              <th>S</th>
-              <th>R</th>
-              <th>Q next</th>
-              <th>Q̄ next</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              {
-                key: "00",
-                s: 0,
-                r: 0,
-                q: "Q",
-                qb: "Q̄",
-                action: "Hold (memory)",
-              },
-              { key: "10", s: 1, r: 0, q: "1", qb: "0", action: "SET" },
-              { key: "01", s: 0, r: 1, q: "0", qb: "1", action: "RESET" },
-              {
-                key: "11",
-                s: 1,
-                r: 1,
-                q: "?",
-                qb: "?",
-                action: "⚠ Forbidden",
-                warn: true,
-              },
-            ].map((row) => (
-              <tr
-                key={row.key}
-                className={
-                  activeRow === row.key
-                    ? row.warn
-                      ? "seq-row-active seq-row-warn"
-                      : "seq-row-active"
-                    : row.warn
-                      ? "seq-row-warn"
-                      : ""
-                }
-              >
-                <td>{row.s}</td>
-                <td>{row.r}</td>
-                <td>{row.q}</td>
-                <td>{row.qb}</td>
-                <td>{row.action}</td>
+        <div className="seq-table-wrap">
+          <table className="seq-table seq-table--compact">
+            <thead>
+              <tr>
+                <th>S</th>
+                <th>R</th>
+                <th>Q next</th>
+                <th>Q̄ next</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {[
+                {
+                  key: "00",
+                  s: 0,
+                  r: 0,
+                  q: "Q",
+                  qb: "Q̄",
+                  action: "Hold (memory)",
+                },
+                { key: "10", s: 1, r: 0, q: "1", qb: "0", action: "SET" },
+                { key: "01", s: 0, r: 1, q: "0", qb: "1", action: "RESET" },
+                {
+                  key: "11",
+                  s: 1,
+                  r: 1,
+                  q: "?",
+                  qb: "?",
+                  action: "⚠ Forbidden",
+                  warn: true,
+                },
+              ].map((row) => (
+                <tr
+                  key={row.key}
+                  className={
+                    activeRow === row.key
+                      ? row.warn
+                        ? "seq-row-active seq-row-warn"
+                        : "seq-row-active"
+                      : row.warn
+                        ? "seq-row-warn"
+                        : ""
+                  }
+                >
+                  <td>{row.s}</td>
+                  <td>{row.r}</td>
+                  <td>{row.q}</td>
+                  <td>{row.qb}</td>
+                  <td>{row.action}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -223,7 +254,7 @@ const GatedSRSim = () => {
       </p>
       <div className="seq-sim-inputs">
         <label className="seq-sim-label">
-          EN (enable)
+          EN (enable) {" "}
           <button
             className={`seq-sim-toggle ${EN ? "on" : "off"}`}
             onClick={handleEN}
@@ -232,7 +263,7 @@ const GatedSRSim = () => {
           </button>
         </label>
         <label className="seq-sim-label">
-          S
+         {" "} S{" "}
           <button
             className={`seq-sim-toggle ${S ? "on" : "off"}`}
             onClick={() => {
@@ -244,7 +275,7 @@ const GatedSRSim = () => {
           </button>
         </label>
         <label className="seq-sim-label">
-          R
+         {" "} R {" "}
           <button
             className={`seq-sim-toggle ${R ? "on" : "off"}`}
             onClick={() => {
@@ -307,7 +338,7 @@ const DLatchSim = () => {
       </p>
       <div className="seq-sim-inputs">
         <label className="seq-sim-label">
-          D (data)
+          D (data){" "}
           <button
             className={`seq-sim-toggle ${D ? "on" : "off"}`}
             onClick={() => handleD(1 - D)}
@@ -316,7 +347,7 @@ const DLatchSim = () => {
           </button>
         </label>
         <label className="seq-sim-label">
-          EN (enable)
+         {" "} EN (enable){" "}
           <button
             className={`seq-sim-toggle ${EN ? "on" : "off"}`}
             onClick={() => handleEN(1 - EN)}
@@ -344,45 +375,47 @@ const DLatchSim = () => {
       {/* Live truth table */}
       <div className="seq-sim-truth">
         <p className="seq-sim-truth-label">Active row highlighted ↓</p>
-        <table className="seq-table seq-table--compact">
-          <thead>
-            <tr>
-              <th>EN</th>
-              <th>D</th>
-              <th>Q next</th>
-              <th>Mode</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              {
-                key: "en0",
-                en: 0,
-                d: "X",
-                q: "Q (no change)",
-                mode: "Opaque / Hold",
-              },
-              { key: "en1d1", en: 1, d: 1, q: "1", mode: "Transparent → SET" },
-              {
-                key: "en1d0",
-                en: 1,
-                d: 0,
-                q: "0",
-                mode: "Transparent → RESET",
-              },
-            ].map((row) => (
-              <tr
-                key={row.key}
-                className={activeRow === row.key ? "seq-row-active" : ""}
-              >
-                <td>{row.en}</td>
-                <td>{row.d}</td>
-                <td>{row.q}</td>
-                <td>{row.mode}</td>
+        <div className="seq-table-wrap">
+          <table className="seq-table seq-table--compact">
+            <thead>
+              <tr>
+                <th>EN</th>
+                <th>D</th>
+                <th>Q next</th>
+                <th>Mode</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {[
+                {
+                  key: "en0",
+                  en: 0,
+                  d: "X",
+                  q: "Q (no change)",
+                  mode: "Opaque / Hold",
+                },
+                { key: "en1d1", en: 1, d: 1, q: "1", mode: "Transparent → SET" },
+                {
+                  key: "en1d0",
+                  en: 1,
+                  d: 0,
+                  q: "0",
+                  mode: "Transparent → RESET",
+                },
+              ].map((row) => (
+                <tr
+                  key={row.key}
+                  className={activeRow === row.key ? "seq-row-active" : ""}
+                >
+                  <td>{row.en}</td>
+                  <td>{row.d}</td>
+                  <td>{row.q}</td>
+                  <td>{row.mode}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -425,24 +458,31 @@ const SeqLatches = () => (
         </strong>
         . This cross-coupling is what creates the memory effect.
       </p>
-      <p>
-        It has two inputs and two outputs that are always complementary
-        (opposites):
-      </p>
-      <ul>
-        <li>
-          <strong>S (Set)</strong> — drive Q to 1
-        </li>
-        <li>
-          <strong>R (Reset)</strong> — drive Q to 0
-        </li>
-        <li>
-          <strong>Q</strong> — the stored bit (the "main" output)
-        </li>
-        <li>
-          <strong>Q̄</strong> — always the opposite of Q
-        </li>
-      </ul>
+
+      <div className="seq-latch-intro">
+        <p className="seq-latch-intro-title">Inputs & Outputs</p>
+        <p className="seq-latch-intro-desc">
+          It has two inputs and two outputs that are always complementary (opposites):
+        </p>
+        <ul className="seq-io-list">
+          <li className="seq-io-item">
+            <span className="seq-io-label">S (Set) :</span>
+            <span className="seq-io-value">Drive Q to 1</span>
+          </li>
+          <li className="seq-io-item">
+            <span className="seq-io-label">R (Reset) : </span>
+            <span className="seq-io-value">Drive Q to 0</span>
+          </li>
+          <li className="seq-io-item">
+            <span className="seq-io-label">Q : </span>
+            <span className="seq-io-value">The stored bit (the "main" output)</span>
+          </li>
+          <li className="seq-io-item">
+            <span className="seq-io-label">Q̄ :</span>
+            <span className="seq-io-value">Always the opposite of Q</span>
+          </li>
+        </ul>
+      </div>
 
       <SeqTable data={SeqTableData.SRLatch} />
 
@@ -621,8 +661,8 @@ const SeqLatches = () => (
           <line
             x1="340"
             y1="100"
-            x2="110"
-            y2="140"
+            x2="233"
+            y2="130"
             stroke="#f59e0b"
             strokeWidth="1.5"
             strokeDasharray="5"
@@ -642,8 +682,8 @@ const SeqLatches = () => (
           <line
             x1="340"
             y1="115"
-            x2="110"
-            y2="72"
+            x2="230"
+            y2="87"
             stroke="#f59e0b"
             strokeWidth="1.5"
             strokeDasharray="5"
@@ -705,26 +745,7 @@ const SeqLatches = () => (
         front of S and R. Now the latch only listens when EN=1.
       </p>
 
-      <div className="seq-grid-2">
-        <div className="seq-feature-card">
-          <Lock className="seq-feature-icon" size={32} />
-          <p className="seq-feature-title">EN = 0 — Locked</p>
-          <p className="seq-feature-desc">
-            The AND gates block S and R, sending 0s into the NOR gates
-            regardless of what S and R are doing. Q is completely frozen. This
-            is the "hold" state — the latch is remembering but not listening.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <Unlock className="seq-feature-icon" size={32} />
-          <p className="seq-feature-title">EN = 1 — Transparent</p>
-          <p className="seq-feature-desc">
-            The AND gates pass S and R through to the NOR gates. The latch now
-            behaves exactly like a plain SR latch — it responds immediately to
-            any S or R change. The forbidden S=R=1 condition still applies.
-          </p>
-        </div>
-      </div>
+      <SeqGrid data={gatedSRLatchFeatures} />
 
       <GatedSRSim />
 
@@ -769,30 +790,8 @@ const SeqLatches = () => (
         The characteristic equation mathematically describes what Q will become
         (Q⁺ = "Q next") based on the current inputs and current Q.
       </p>
-      <div className="seq-grid-2">
-        <div className="seq-feature-card">
-          <Code2 className="seq-feature-icon" size={32} />
-          <p className="seq-feature-title">SR Latch</p>
-          <p className="seq-feature-desc">
-            <code>Q⁺ = S + R̄·Q</code>
-            <br />
-            <br />
-            Read: "Q next equals S OR (NOT-R AND current Q)." The constraint S·R
-            = 0 must always hold.
-          </p>
-        </div>
-        <div className="seq-feature-card">
-          <Code2 className="seq-feature-icon" size={32} />
-          <p className="seq-feature-title">D Latch</p>
-          <p className="seq-feature-desc">
-            <code>Q⁺ = EN·D + EN̄·Q</code>
-            <br />
-            <br />
-            Read: "Q next is D when enabled, otherwise it stays as Q." No
-            forbidden states — always valid.
-          </p>
-        </div>
-      </div>
+
+      <SeqGrid data={charEquationFeatures} />
 
       {/* ── Latch vs Flip-Flop ── */}
       <div className="seq-box info">

@@ -66,7 +66,7 @@ const SeqAnalysis = () => {
     title="Analysis of Sequential Circuits"
     subtitle="Given a circuit schematic, systematically determine its state table, state diagram, and timing behavior."
   >
-    <div className="seq-content-body">
+    <div className="seq-content-body seq-analysis">
       <div className="seq-box">
         <span className="seq-box-title">
           <Target size={18} style={{ marginRight: "6px", verticalAlign: "text-bottom" }} />
@@ -84,32 +84,38 @@ const SeqAnalysis = () => {
       <h2>Step-by-Step Procedure</h2>
 
       <div className="seq-carousel-wrap">
-        <button
-          className="seq-carousel-nav seq-carousel-prev"
-          onClick={goToPrevious}
-          aria-label="Previous step"
-        >
-          <ChevronLeft size={24} />
-        </button>
+        <div className="seq-carousel-row">
+          <button
+            className="seq-carousel-nav seq-carousel-prev"
+            onClick={goToPrevious}
+            aria-label="Previous step"
+          >
+            <ChevronLeft size={24} />
+          </button>
 
-        <div className="seq-carousel-card seq-carousel-card-large">
-          <span className="seq-feature-icon">
-            <IconComponent size={40} />
-          </span>
-          <p className="seq-feature-title seq-carousel-title-large">{step.title}</p>
-          <p className="seq-feature-desc seq-carousel-desc-large">{step.desc}</p>
+          <div className="seq-carousel-card seq-carousel-card-large">
+            <div className="seq-carousel-card-content">
+              <div className="seq-feature-icon">
+                <IconComponent size={40} />
+              </div>
+              <div className="seq-card-body">
+                <p className="seq-feature-title seq-carousel-title-large">{step.title}</p>
+                <p className="seq-feature-desc seq-carousel-desc-large">{step.desc}</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="seq-carousel-nav seq-carousel-next"
+            onClick={goToNext}
+            aria-label="Next step"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
 
-        <button
-          className="seq-carousel-nav seq-carousel-next"
-          onClick={goToNext}
-          aria-label="Next step"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        <div className="seq-carousel-counter">
-          {currentStep + 1} / {analysisSteps.length}
+        <div className="seq-carousel-counter-wrap">
+          <div className="seq-carousel-counter">{currentStep + 1} / {analysisSteps.length}</div>
         </div>
       </div>
 
@@ -122,7 +128,7 @@ const SeqAnalysis = () => {
       <div className="seq-box info">
         <span className="seq-box-title">
           <Info size={18} style={{ marginRight: "6px", verticalAlign: "text-bottom" }} />
-          Input Equations
+          Input Equations:  {" "}
         </span>
         <code className="seq-equation">D₁ = Q₁ ⊕ Q₀</code>
         <code className="seq-equation">D₀ = Q̄₀</code>
@@ -130,8 +136,8 @@ const SeqAnalysis = () => {
 
       <p>Using Q⁺ = D for each flip-flop:</p>
 
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Present State Q₁Q₀</th>
@@ -258,7 +264,7 @@ const SeqAnalysis = () => {
           <line
             x1="136"
             y1="83"
-            x2="204"
+            x2="200"
             y2="62"
             stroke="#10b981"
             strokeWidth="2.5"
@@ -267,16 +273,16 @@ const SeqAnalysis = () => {
           <line
             x1="276"
             y1="62"
-            x2="344"
+            x2="340"
             y2="83"
             stroke="#10b981"
             strokeWidth="2.5"
             markerEnd="url(#aSA)"
           />
           <line
-            x1="362"
-            y1="136"
-            x2="276"
+            x1="355"
+            y1="130"
+            x2="280"
             y2="152"
             stroke="#10b981"
             strokeWidth="2.5"
@@ -317,8 +323,8 @@ const SeqAnalysis = () => {
       </div>
 
       <h2>Moore vs Mealy Machines</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Property</th>
@@ -449,8 +455,8 @@ const SeqAnalysis = () => {
       </div>
 
       <h2>Characteristic Equations Reference</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Flip-Flop</th>

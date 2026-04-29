@@ -9,7 +9,7 @@ const DFFSim = () => {
       <p className="seq-sim-title">⚡ D Flip-Flop Simulator</p>
       <div className="seq-sim-inputs">
         <label className="seq-sim-label">
-          D
+          D {" "}
           <button
             className={`seq-sim-toggle ${D ? "on" : "off"}`}
             onClick={() => setD((d) => 1 - d)}
@@ -18,7 +18,7 @@ const DFFSim = () => {
           </button>
         </label>
         <button className="seq-clk-btn" onClick={() => setQ(D)}>
-          ↑ Clock Edge
+          {" "} ↑ Clock Edge
         </button>
       </div>
       <div className="seq-sim-output">
@@ -61,7 +61,7 @@ const JKFFSim = () => {
       <p className="seq-sim-title">⚡ JK Flip-Flop Simulator</p>
       <div className="seq-sim-inputs">
         <label className="seq-sim-label">
-          J
+          J {" "}
           <button
             className={`seq-sim-toggle ${J ? "on" : "off"}`}
             onClick={() => setJ((j) => 1 - j)}
@@ -70,7 +70,7 @@ const JKFFSim = () => {
           </button>
         </label>
         <label className="seq-sim-label">
-          K
+          {" "} K {" "}
           <button
             className={`seq-sim-toggle ${K ? "on" : "off"}`}
             onClick={() => setK((k) => 1 - k)}
@@ -79,7 +79,7 @@ const JKFFSim = () => {
           </button>
         </label>
         <button className="seq-clk-btn" onClick={trigger}>
-          ↑ Clock Edge
+          {" "} ↑ Clock Edge
         </button>
       </div>
       <div className="seq-sim-output">
@@ -104,7 +104,7 @@ const SeqFlipFlopTypes = () => (
     title="Types of Flip-Flops"
     subtitle="SR, JK, D, and T — their characteristic tables, equations, excitation requirements, and trade-offs."
   >
-    <div className="seq-content-body">
+    <div className="seq-content-body seq-flipflop-types">
       <p>
         Four flip-flop types are fundamental to digital design. Each is defined
         by its
@@ -159,7 +159,7 @@ const SeqFlipFlopTypes = () => (
         </table>
       </div>
       <div className="seq-box">
-        <span className="seq-box-title">Characteristic Equation</span>
+        <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">
           Q⁺ = S + R̄·Q &nbsp;&nbsp; (constraint: S·R = 0)
         </code>
@@ -211,7 +211,7 @@ const SeqFlipFlopTypes = () => (
         </table>
       </div>
       <div className="seq-box">
-        <span className="seq-box-title">Characteristic Equation</span>
+        <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = J·Q̄ + K̄·Q</code>
       </div>
       <JKFFSim />
@@ -247,7 +247,7 @@ const SeqFlipFlopTypes = () => (
         </table>
       </div>
       <div className="seq-box">
-        <span className="seq-box-title">Characteristic Equation</span>
+        <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = D</code>
       </div>
       <DFFSim />
@@ -282,7 +282,7 @@ const SeqFlipFlopTypes = () => (
         </table>
       </div>
       <div className="seq-box">
-        <span className="seq-box-title">Characteristic Equation</span>
+        <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = T ⊕ Q</code>
       </div>
 

@@ -326,8 +326,8 @@ const SeqFlipFlops = () => (
         <strong>active-low</strong>.
       </p>
 
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>PRĒ</th>
@@ -370,8 +370,8 @@ const SeqFlipFlops = () => (
       </div>
 
       <h2>Key Timing Parameters</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Parameter</th>

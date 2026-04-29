@@ -48,8 +48,8 @@ const SeqStateReduction = () => (
         <p>Original 5-state table with one input x:</p>
       </div>
 
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Present State</th>
@@ -136,8 +136,8 @@ const SeqStateReduction = () => (
         </div>
       </div>
 
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Present State</th>
@@ -218,8 +218,8 @@ const SeqStateReduction = () => (
       <div className="seq-grid-2">
         <div>
           <h3>SR Flip-Flop</h3>
-          <div className="seq-table-wrap">
-            <table className="seq-table">
+          <div className="seq-table-wrap seq-flip-table-wrap">
+            <table className="seq-table seq-flip-table">
               <thead>
                 <tr>
                   <th>Q</th>
@@ -259,8 +259,8 @@ const SeqStateReduction = () => (
         </div>
         <div>
           <h3>JK Flip-Flop</h3>
-          <div className="seq-table-wrap">
-            <table className="seq-table">
+          <div className="seq-table-wrap seq-flip-table-wrap">
+            <table className="seq-table seq-flip-table">
               <thead>
                 <tr>
                   <th>Q</th>
@@ -300,8 +300,8 @@ const SeqStateReduction = () => (
         </div>
         <div>
           <h3>D Flip-Flop</h3>
-          <div className="seq-table-wrap">
-            <table className="seq-table">
+          <div className="seq-table-wrap seq-flip-table-wrap">
+            <table className="seq-table seq-flip-table">
               <thead>
                 <tr>
                   <th>Q</th>
@@ -336,8 +336,8 @@ const SeqStateReduction = () => (
         </div>
         <div>
           <h3>T Flip-Flop</h3>
-          <div className="seq-table-wrap">
-            <table className="seq-table">
+          <div className="seq-table-wrap seq-flip-table-wrap">
+            <table className="seq-table seq-flip-table">
               <thead>
                 <tr>
                   <th>Q</th>
@@ -373,8 +373,8 @@ const SeqStateReduction = () => (
       </div>
 
       <h2>Master Reference — All Excitation Tables</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
+      <div className="seq-table-wrap seq-flip-table-wrap">
+        <table className="seq-table seq-flip-table">
           <thead>
             <tr>
               <th>Q → Q⁺</th>

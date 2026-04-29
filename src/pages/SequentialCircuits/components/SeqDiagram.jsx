@@ -1,12 +1,35 @@
+import React, { useEffect, useState } from 'react';
+
 export default function SeqDiagram() {
+  const [showWork, setShowWork] = useState(false);
+
+  useEffect(() => {
+    const readFlag = () => {
+      try {
+        const v = document.documentElement.getAttribute('data-show-work');
+        setShowWork(v === 'true');
+      } catch (e) {}
+    };
+    readFlag();
+    const obs = new MutationObserver(readFlag);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-show-work'] });
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <>
       <div className="seq-diagram">
         <svg
           viewBox="0 0 620 270"
           xmlns="http://www.w3.org/2000/svg"
+          width="100%"
+          preserveAspectRatio="xMidYMid meet"
           style={{ fontFamily: "'JetBrains Mono',monospace" }}
         >
+          {/* group wrapper allows a small manual translate to better center the content
+              while `preserveAspectRatio="xMidYMid meet"` ensures the viewBox is centered
+              inside the available SVG viewport */}
+          <g transform="translate(40,-30)">
           <defs>
             <marker
               id="a0"
@@ -191,10 +214,22 @@ export default function SeqDiagram() {
           >
             CURRENT STATE FEEDBACK
           </text>
-        </svg>
+          </g>
+          </svg>
         <p className="seq-diagram-caption">
           Figure 1 — General block diagram of a synchronous sequential circuit
         </p>
+
+        {showWork && (
+          <div className="seq-diagram-work">
+            <strong>Show Work:</strong>
+            <ol>
+              <li>Inputs enter the combinational block.</li>
+              <li>The combinational logic computes next-state & outputs.</li>
+              <li>Memory elements store the next state for the following clock.</li>
+            </ol>
+          </div>
+        )}
       </div>
     </>
   );
