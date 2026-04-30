@@ -824,3 +824,77 @@ summary:hover {
   background: rgba(109, 40, 217, 0.2);
   box-shadow: 0 10px 25px rgba(109, 40, 217, 0.3);
 }
+
+/* Global Responsive Overrides for all pages */
+@media (max-width: 768px) {
+  /* Ensure all SVGs and Canvas elements scale down */
+  svg, canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Make all tables scrollable horizontally to prevent breaking layouts */
+  .table-container,
+  .truth-table-wrapper,
+  .kmap-wrapper,
+  .premium-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* Ensure inputs and buttons don't overflow */
+  input, select, textarea {
+    max-width: 100%;
+  }
+  
+  /* Stack flex rows that are acting as columns on mobile */
+  .flex-row,
+  .controls-row,
+  .button-group {
+    flex-wrap: wrap;
+  }
+  
+  /* Make control buttons take up appropriate space on mobile */
+  .glass-btn {
+    flex: 1 1 calc(50% - 0.5rem);
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .glass-btn.primary {
+    flex: 1 1 100%;
+  }
+
+  /* Padding adjustments for smaller screens */
+  .page-container,
+  .app-container,
+  .content-wrapper {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .evaluator-card,
+  .info-card,
+  .example-box,
+  .arithmetic-card {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even smaller devices */
+  .glass-btn {
+    flex: 1 1 100%;
+  }
+  
+  h1, .page-title {
+    font-size: 1.5rem !important;
+  }
+  
+  h2, .section-title {
+    font-size: 1.2rem !important;
+  }
+}
