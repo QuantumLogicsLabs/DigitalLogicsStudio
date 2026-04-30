@@ -13,6 +13,38 @@ import {
   ChevronRight
 } from "lucide-react";
 import SeqLayout from "./SeqLayout";
+import SeqTable from "./components/SeqTable";
+
+const counterStateData = {
+  headers: ['Present State Q₁Q₀', 'D₁ = Q₁⊕Q₀', 'D₀ = Q̄₀', 'Next State Q₁⁺Q₀⁺'],
+  rows: [
+    { 'Present State Q₁Q₀': '00', 'D₁ = Q₁⊕Q₀': '0⊕ 0 = <strong>0</strong>', 'D₀ = Q̄₀': '<strong>1</strong>', 'Next State Q₁⁺Q₀⁺': '01' },
+    { 'Present State Q₁Q₀': '01', 'D₁ = Q₁⊕Q₀': '0⊕ 1 = <strong>1</strong>', 'D₀ = Q̄₀': '<strong>0</strong>', 'Next State Q₁⁺Q₀⁺': '10' },
+    { 'Present State Q₁Q₀': '10', 'D₁ = Q₁⊕Q₀': '1⊕ 0 = <strong>1</strong>', 'D₀ = Q̄₀': '<strong>1</strong>', 'Next State Q₁⁺Q₀⁺': '11' },
+    { 'Present State Q₁Q₀': '11', 'D₁ = Q₁⊕Q₀': '1⊕ 1 = <strong>0</strong>', 'D₀ = Q̄₀': '<strong>0</strong>', 'Next State Q₁⁺Q₀⁺': '00' }
+  ]
+};
+
+const mooreMealyData = {
+  headers: ['Property', 'Moore Machine', 'Mealy Machine'],
+  rows: [
+    { 'Property': 'Output depends on', 'Moore Machine': 'Present state only', 'Mealy Machine': 'Present state + inputs' },
+    { 'Property': 'Output changes', 'Moore Machine': 'Only with clock edge', 'Mealy Machine': 'Immediately with inputs' },
+    { 'Property': 'States needed', 'Moore Machine': 'More (typically)', 'Mealy Machine': 'Fewer (typically)' },
+    { 'Property': 'Glitch risk', 'Moore Machine': 'Lower', 'Mealy Machine': 'Higher (input-sensitive)' },
+    { 'Property': 'Output labeling', 'Moore Machine': 'Inside state circle', 'Mealy Machine': 'On transition arrow' }
+  ]
+};
+
+const charEquationsData = {
+  headers: ['Flip-Flop', 'Characteristic Equation', 'Use in Analysis'],
+  rows: [
+    { 'Flip-Flop': 'D', 'Characteristic Equation': 'Q⁺ = D', 'Use in Analysis': 'Simplest — Q⁺ directly equals the D input' },
+    { 'Flip-Flop': 'JK', 'Characteristic Equation': 'Q⁺ = JQ̄ + K̄Q', 'Use in Analysis': 'Evaluate J and K, then apply equation' },
+    { 'Flip-Flop': 'T', 'Characteristic Equation': 'Q⁺ = T ⊕ Q', 'Use in Analysis': 'XOR T with current Q' },
+    { 'Flip-Flop': 'SR', 'Characteristic Equation': 'Q⁺ = S + R̄Q', 'Use in Analysis': 'Verify SR=0 constraint first' }
+  ]
+};;
 
 const analysisSteps = [
   {
@@ -136,60 +168,7 @@ const SeqAnalysis = () => {
 
       <p>Using Q⁺ = D for each flip-flop:</p>
 
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Present State Q₁Q₀</th>
-              <th>D₁ = Q₁⊕Q₀</th>
-              <th>D₀ = Q̄₀</th>
-              <th>Next State Q₁⁺Q₀⁺</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>00</td>
-              <td>
-                0⊕0 = <strong>0</strong>
-              </td>
-              <td>
-                <strong>1</strong>
-              </td>
-              <td>01</td>
-            </tr>
-            <tr>
-              <td>01</td>
-              <td>
-                0⊕1 = <strong>1</strong>
-              </td>
-              <td>
-                <strong>0</strong>
-              </td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>10</td>
-              <td>
-                1⊕0 = <strong>1</strong>
-              </td>
-              <td>
-                <strong>1</strong>
-              </td>
-              <td>11</td>
-            </tr>
-            <tr>
-              <td>11</td>
-              <td>
-                1⊕1 = <strong>0</strong>
-              </td>
-              <td>
-                <strong>0</strong>
-              </td>
-              <td>00</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={counterStateData} className="seq-flip-table" />
 
       <p>
         Sequence: <strong>00 → 01 → 10 → 11 → 00 → …</strong> — a 2-bit binary
@@ -323,44 +302,7 @@ const SeqAnalysis = () => {
       </div>
 
       <h2>Moore vs Mealy Machines</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Moore Machine</th>
-              <th>Mealy Machine</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Output depends on</td>
-              <td>Present state only</td>
-              <td>Present state + inputs</td>
-            </tr>
-            <tr>
-              <td>Output changes</td>
-              <td>Only with clock edge</td>
-              <td>Immediately with inputs</td>
-            </tr>
-            <tr>
-              <td>States needed</td>
-              <td>More (typically)</td>
-              <td>Fewer (typically)</td>
-            </tr>
-            <tr>
-              <td>Glitch risk</td>
-              <td>Lower</td>
-              <td>Higher (input-sensitive)</td>
-            </tr>
-            <tr>
-              <td>Output labeling</td>
-              <td>Inside state circle</td>
-              <td>On transition arrow</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={mooreMealyData} className="seq-flip-table" />
 
       <h2>Timing Diagram Analysis</h2>
       <p>
@@ -455,39 +397,7 @@ const SeqAnalysis = () => {
       </div>
 
       <h2>Characteristic Equations Reference</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Flip-Flop</th>
-              <th>Characteristic Equation</th>
-              <th>Use in Analysis</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>D</td>
-              <td>Q⁺ = D</td>
-              <td>Simplest — Q⁺ directly equals the D input</td>
-            </tr>
-            <tr>
-              <td>JK</td>
-              <td>Q⁺ = JQ̄ + K̄Q</td>
-              <td>Evaluate J and K, then apply equation</td>
-            </tr>
-            <tr>
-              <td>T</td>
-              <td>Q⁺ = T ⊕ Q</td>
-              <td>XOR T with current Q</td>
-            </tr>
-            <tr>
-              <td>SR</td>
-              <td>Q⁺ = S + R̄Q</td>
-              <td>Verify SR=0 constraint first</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={charEquationsData} className="seq-flip-table" />
 
       <div className="seq-box warning">
         <span className="seq-box-title">

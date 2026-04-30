@@ -1,5 +1,27 @@
 import React from "react";
 import SeqLayout from "./SeqLayout";
+import SeqTable from "./components/SeqTable";
+
+const asyncOverrideData = {
+  headers: ['PRĒ', 'CLR̄', 'Q', 'Q̄', 'Effect'],
+  rows: [
+    { 'PRĒ': '0', 'CLR̄': '1', 'Q': '1', 'Q̄': '0', 'Effect': 'Force Set (async)' },
+    { 'PRĒ': '1', 'CLR̄': '0', 'Q': '0', 'Q̄': '1', 'Effect': 'Force Clear (async)' },
+    { 'PRĒ': '1', 'CLR̄': '1', 'Q': 'Normal', 'Q̄': 'Normal', 'Effect': 'Clock controls Q' },
+    { 'PRĒ': '0', 'CLR̄': '0', 'Q': '?', 'Q̄': '?', 'Effect': 'Forbidden' }
+  ]
+};
+
+const timingParamsData = {
+  headers: ['Parameter', 'Symbol', 'Meaning'],
+  rows: [
+    { 'Parameter': 'Setup time', 'Symbol': 't<sub>su</sub>', 'Meaning': 'Input must be stable before clock edge' },
+    { 'Parameter': 'Hold time', 'Symbol': 't<sub>h</sub>', 'Meaning': 'Input must remain stable after clock edge' },
+    { 'Parameter': 'CLK → Q delay', 'Symbol': 't<sub>p</sub>', 'Meaning': 'Delay from clock edge to valid Q output' },
+    { 'Parameter': 'Minimum period', 'Symbol': 'T<sub>min</sub>', 'Meaning': 't<sub>p</sub> + t<sub>su</sub> + routing' },
+    { 'Parameter': 'Max frequency', 'Symbol': 'f<sub>max</sub>', 'Meaning': '1 / T<sub>min</sub>' }
+  ]
+};
 
 const SeqFlipFlops = () => (
   <SeqLayout
@@ -326,102 +348,10 @@ const SeqFlipFlops = () => (
         <strong>active-low</strong>.
       </p>
 
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>PRĒ</th>
-              <th>CLR̄</th>
-              <th>Q</th>
-              <th>Q̄</th>
-              <th>Effect</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>1</td>
-              <td>1</td>
-              <td>0</td>
-              <td>Force Set (async)</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>0</td>
-              <td>0</td>
-              <td>1</td>
-              <td>Force Clear (async)</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td colspan="2">Normal</td>
-              <td>Clock controls Q</td>
-            </tr>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>?</td>
-              <td>?</td>
-              <td>Forbidden</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={asyncOverrideData} className="seq-flip-table" />
 
       <h2>Key Timing Parameters</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Symbol</th>
-              <th>Meaning</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Setup time</td>
-              <td>
-                t<sub>su</sub>
-              </td>
-              <td>Input must be stable before clock edge</td>
-            </tr>
-            <tr>
-              <td>Hold time</td>
-              <td>
-                t<sub>h</sub>
-              </td>
-              <td>Input must remain stable after clock edge</td>
-            </tr>
-            <tr>
-              <td>CLK → Q delay</td>
-              <td>
-                t<sub>p</sub>
-              </td>
-              <td>Delay from clock edge to valid Q output</td>
-            </tr>
-            <tr>
-              <td>Minimum period</td>
-              <td>
-                T<sub>min</sub>
-              </td>
-              <td>
-                t<sub>p</sub> + t<sub>su</sub> + routing
-              </td>
-            </tr>
-            <tr>
-              <td>Max frequency</td>
-              <td>
-                f<sub>max</sub>
-              </td>
-              <td>
-                1 / T<sub>min</sub>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={timingParamsData} className="seq-flip-table" />
 
       <div className="seq-box info">
         <span className="seq-box-title">Flip-Flop vs Latch — Summary</span>

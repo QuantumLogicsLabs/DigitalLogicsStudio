@@ -14,7 +14,6 @@ import './SeqLayout.css';
 import SeqTopbar from "./components/SeqTopbar";
 import SeqSidebar from "./components/SeqSidebar";
 import SeqMain from "./components/SeqMain";
-import { ThemeProvider } from "../../context/ThemeContext";
 
 const seqPages = [
   { path: "/sequential/intro", label: "Introduction", icon: <BookOpen size={18} />, short: "Intro" },
@@ -36,23 +35,21 @@ const SeqLayout = ({ children, title, subtitle }) => {
   const progress = Math.round(((currentIndex + 1) / seqPages.length) * 100);
 
   return (
-    <ThemeProvider>
-      <div className="seq-layout" data-component="sequential-layout">
-        <div className="seq-bg-blob seq-bg-blob-1" />
-        <div className="seq-bg-blob seq-bg-blob-2" />
-        <div className="seq-bg-blob seq-bg-blob-3" />
+    <div className="seq-layout" data-component="sequential-layout">
+      <div className="seq-bg-blob seq-bg-blob-1" />
+      <div className="seq-bg-blob seq-bg-blob-2" />
+      <div className="seq-bg-blob seq-bg-blob-3" />
 
-        <SeqTopbar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <SeqTopbar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        <div className="seq-body">
-          {sidebarOpen && <div className="seq-overlay" onClick={() => setSidebarOpen(false)} />}
+      <div className="seq-body">
+        {sidebarOpen && <div className="seq-overlay" onClick={() => setSidebarOpen(false)} />}
 
-          <SeqSidebar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <SeqSidebar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-          <SeqMain seqPages={seqPages} currentIndex={currentIndex} prev={prev} next={next} title={title} subtitle={subtitle} children={children} />
-        </div>
+        <SeqMain seqPages={seqPages} currentIndex={currentIndex} prev={prev} next={next} title={title} subtitle={subtitle} children={children} />
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

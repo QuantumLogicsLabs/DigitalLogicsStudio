@@ -1,5 +1,63 @@
 import React, { useState } from "react";
 import SeqLayout from "./SeqLayout";
+import SeqTable from "./components/SeqTable";
+
+const srData = {
+  headers: ['S', 'R', 'Q⁺', 'Operation'],
+  rows: [
+    { 'S': '0', 'R': '0', 'Q⁺': 'Q', 'Operation': 'No change' },
+    { 'S': '0', 'R': '1', 'Q⁺': '0', 'Operation': 'Reset' },
+    { 'S': '1', 'R': '0', 'Q⁺': '1', 'Operation': 'Set' },
+    { 'S': '1', 'R': '1', 'Q⁺': '?', 'Operation': '⚠ Undefined' }
+  ]
+};
+
+const jkData = {
+  headers: ['J', 'K', 'Q⁺', 'Operation'],
+  rows: [
+    { 'J': '0', 'K': '0', 'Q⁺': 'Q', 'Operation': 'No change' },
+    { 'J': '0', 'K': '1', 'Q⁺': '0', 'Operation': 'Reset' },
+    { 'J': '1', 'K': '0', 'Q⁺': '1', 'Operation': 'Set' },
+    { 'J': '1', 'K': '1', 'Q⁺': 'Q̄', 'Operation': 'Toggle' }
+  ]
+};
+
+const dData = {
+  headers: ['D', 'Q⁺', 'Operation'],
+  rows: [
+    { 'D': '0', 'Q⁺': '0', 'Operation': 'Reset' },
+    { 'D': '1', 'Q⁺': '1', 'Operation': 'Set' }
+  ]
+};
+
+const tData = {
+  headers: ['T', 'Q⁺', 'Operation'],
+  rows: [
+    { 'T': '0', 'Q⁺': 'Q', 'Operation': 'Hold' },
+    { 'T': '1', 'Q⁺': 'Q̄', 'Operation': 'Toggle' }
+  ]
+};
+
+const comparisonData = {
+  headers: ['Type', 'Inputs', 'Char. Equation', 'Key Property', 'Best Use'],
+  rows: [
+    { 'Type': '<strong>SR</strong>', 'Inputs': 'S, R', 'Char. Equation': 'S + R̄Q', 'Key Property': 'Forbidden SR=11', 'Best Use': 'Direct set/reset' },
+    { 'Type': '<strong>JK</strong>', 'Inputs': 'J, K', 'Char. Equation': 'JQ̄ + K̄Q', 'Key Property': 'Toggle JK=11; universal', 'Best Use': 'Versatile design' },
+    { 'Type': '<strong>D</strong>', 'Inputs': 'D', 'Char. Equation': 'D', 'Key Property': 'No forbidden state', 'Best Use': 'VLSI / all modern design' },
+    { 'Type': '<strong>T</strong>', 'Inputs': 'T', 'Char. Equation': 'T ⊕ Q', 'Key Property': 'Toggles on T=1', 'Best Use': 'Counters' }
+  ]
+};
+
+const conversionsData = {
+  headers: ['Have → Want', 'Connect inputs as:'],
+  rows: [
+    { 'Have → Want': 'JK → D', 'Connect inputs as:': 'J = D, K = D̄' },
+    { 'Have → Want': 'JK → T', 'Connect inputs as:': 'J = T, K = T' },
+    { 'Have → Want': 'D → JK', 'Connect inputs as:': 'D = JQ̄ + K̄Q' },
+    { 'Have → Want': 'D → T', 'Connect inputs as:': 'D = T ⊕ Q' },
+    { 'Have → Want': 'D → SR', 'Connect inputs as:': 'D = S + R̄Q (ensure SR=0)' }
+  ]
+};
 
 const DFFSim = () => {
   const [D, setD] = useState(0);
@@ -120,44 +178,7 @@ const SeqFlipFlopTypes = () => (
         <strong>R</strong>, state changes only on the clock edge. The S=R=1
         condition remains undefined.
       </p>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>S</th>
-              <th>R</th>
-              <th>Q⁺</th>
-              <th>Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>Q</td>
-              <td>No change</td>
-            </tr>
-            <tr>
-              <td>0</td>
-              <td>1</td>
-              <td>0</td>
-              <td>Reset</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-              <td>Set</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td>?</td>
-              <td>⚠ Undefined</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={srData} className="seq-table" />
       <div className="seq-box">
         <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">
@@ -172,44 +193,7 @@ const SeqFlipFlopTypes = () => (
         <strong> toggle</strong>. This is the most versatile flip-flop and can
         emulate all others.
       </p>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>J</th>
-              <th>K</th>
-              <th>Q⁺</th>
-              <th>Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>Q</td>
-              <td>No change</td>
-            </tr>
-            <tr>
-              <td>0</td>
-              <td>1</td>
-              <td>0</td>
-              <td>Reset</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-              <td>Set</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td>Q̄</td>
-              <td>Toggle</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={jkData} className="seq-table" />
       <div className="seq-box">
         <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = J·Q̄ + K̄·Q</code>
@@ -223,29 +207,7 @@ const SeqFlipFlopTypes = () => (
         <strong>D</strong> is copied to Q on each clock edge. No forbidden
         states. The dominant element in VLSI synthesis.
       </p>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>D</th>
-              <th>Q⁺</th>
-              <th>Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>0</td>
-              <td>Reset</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>1</td>
-              <td>Set</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={dData} className="seq-table" />
       <div className="seq-box">
         <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = D</code>
@@ -258,120 +220,17 @@ const SeqFlipFlopTypes = () => (
         Single input <strong>T</strong>: T=1 toggles the output each clock edge;
         T=0 holds. The natural element for building binary counters.
       </p>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>T</th>
-              <th>Q⁺</th>
-              <th>Operation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0</td>
-              <td>Q</td>
-              <td>Hold</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>Q̄</td>
-              <td>Toggle</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={tData} className="seq-table" />
       <div className="seq-box">
         <span className="seq-box-title">Characteristic Equation : {" "}</span>
         <code className="seq-equation">Q⁺ = T ⊕ Q</code>
       </div>
 
       <h2>Comparison Summary</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Inputs</th>
-              <th>Char. Equation</th>
-              <th>Key Property</th>
-              <th>Best Use</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <strong>SR</strong>
-              </td>
-              <td>S, R</td>
-              <td>S + R̄Q</td>
-              <td>Forbidden SR=11</td>
-              <td>Direct set/reset</td>
-            </tr>
-            <tr>
-              <td>
-                <strong>JK</strong>
-              </td>
-              <td>J, K</td>
-              <td>JQ̄ + K̄Q</td>
-              <td>Toggle JK=11; universal</td>
-              <td>Versatile design</td>
-            </tr>
-            <tr>
-              <td>
-                <strong>D</strong>
-              </td>
-              <td>D</td>
-              <td>D</td>
-              <td>No forbidden state</td>
-              <td>VLSI / all modern design</td>
-            </tr>
-            <tr>
-              <td>
-                <strong>T</strong>
-              </td>
-              <td>T</td>
-              <td>T ⊕ Q</td>
-              <td>Toggles on T=1</td>
-              <td>Counters</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={comparisonData} className="seq-table" />
 
       <h2>Flip-Flop Conversions</h2>
-      <div className="seq-table-wrap">
-        <table className="seq-table">
-          <thead>
-            <tr>
-              <th>Have → Want</th>
-              <th>Connect inputs as:</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>JK → D</td>
-              <td>J = D, K = D̄</td>
-            </tr>
-            <tr>
-              <td>JK → T</td>
-              <td>J = T, K = T</td>
-            </tr>
-            <tr>
-              <td>D → JK</td>
-              <td>D = JQ̄ + K̄Q</td>
-            </tr>
-            <tr>
-              <td>D → T</td>
-              <td>D = T ⊕ Q</td>
-            </tr>
-            <tr>
-              <td>D → SR</td>
-              <td>D = S + R̄Q (ensure SR=0)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={conversionsData} className="seq-table" />
 
       <div className="seq-box info">
         <span className="seq-box-title">Industry Practice</span>

@@ -1,6 +1,77 @@
 import React from "react";
 import { Layers, GitCompare, Merge, CheckCircle, Sparkles } from "lucide-react";
 import SeqLayout from "./SeqLayout";
+import SeqTable from "./components/SeqTable";
+
+const original5StateData = {
+  headers: ['Present State', 'Next (x=0)', 'Next (x=1)', 'Output'],
+  rows: [
+    { 'Present State': 'A', 'Next (x=0)': 'B', 'Next (x=1)': 'C', 'Output': '0' },
+    { 'Present State': 'B', 'Next (x=0)': 'A', 'Next (x=1)': 'D', 'Output': '0' },
+    { 'Present State': 'C', 'Next (x=0)': 'B', 'Next (x=1)': 'C', 'Output': '1' },
+    { 'Present State': 'D', 'Next (x=0)': 'A', 'Next (x=1)': 'D', 'Output': '0' },
+    { 'Present State': 'E', 'Next (x=0)': 'B', 'Next (x=1)': 'E', 'Output': '1' }
+  ]
+};
+
+const reduced3StateData = {
+  headers: ['Present State', 'Next (x=0)', 'Next (x=1)', 'Output'],
+  rows: [
+    { 'Present State': 'A', 'Next (x=0)': 'B', 'Next (x=1)': 'C', 'Output': '0' },
+    { 'Present State': 'B', 'Next (x=0)': 'A', 'Next (x=1)': 'B', 'Output': '0' },
+    { 'Present State': 'C', 'Next (x=0)': 'B', 'Next (x=1)': 'C', 'Output': '1' }
+  ]
+};
+
+const srExcitationData = {
+  headers: ['Q', 'Q⁺', 'S', 'R'],
+  rows: [
+    { 'Q': '0', 'Q⁺': '0', 'S': '0', 'R': 'X' },
+    { 'Q': '0', 'Q⁺': '1', 'S': '1', 'R': '0' },
+    { 'Q': '1', 'Q⁺': '0', 'S': '0', 'R': '1' },
+    { 'Q': '1', 'Q⁺': '1', 'S': 'X', 'R': '0' }
+  ]
+};
+
+const jkExcitationData = {
+  headers: ['Q', 'Q⁺', 'J', 'K'],
+  rows: [
+    { 'Q': '0', 'Q⁺': '0', 'J': '0', 'K': 'X' },
+    { 'Q': '0', 'Q⁺': '1', 'J': '1', 'K': 'X' },
+    { 'Q': '1', 'Q⁺': '0', 'J': 'X', 'K': '1' },
+    { 'Q': '1', 'Q⁺': '1', 'J': 'X', 'K': '0' }
+  ]
+};
+
+const dExcitationData = {
+  headers: ['Q', 'Q⁺', 'D'],
+  rows: [
+    { 'Q': '0', 'Q⁺': '0', 'D': '0' },
+    { 'Q': '0', 'Q⁺': '1', 'D': '1' },
+    { 'Q': '1', 'Q⁺': '0', 'D': '0' },
+    { 'Q': '1', 'Q⁺': '1', 'D': '1' }
+  ]
+};
+
+const tExcitationData = {
+  headers: ['Q', 'Q⁺', 'T'],
+  rows: [
+    { 'Q': '0', 'Q⁺': '0', 'T': '0' },
+    { 'Q': '0', 'Q⁺': '1', 'T': '1' },
+    { 'Q': '1', 'Q⁺': '0', 'T': '1' },
+    { 'Q': '1', 'Q⁺': '1', 'T': '0' }
+  ]
+};
+
+const masterExcitationData = {
+  headers: ['Q → Q⁺', 'SR: (S,R)', 'JK: (J,K)', 'D', 'T'],
+  rows: [
+    { 'Q → Q⁺': '0 → 0', 'SR: (S,R)': '(0, X)', 'JK: (J,K)': '(0, X)', 'D': '0', 'T': '0' },
+    { 'Q → Q⁺': '0 → 1', 'SR: (S,R)': '(1, 0)', 'JK: (J,K)': '(1, X)', 'D': '1', 'T': '1' },
+    { 'Q → Q⁺': '1 → 0', 'SR: (S,R)': '(0, 1)', 'JK: (J,K)': '(X, 1)', 'D': '0', 'T': '1' },
+    { 'Q → Q⁺': '1 → 1', 'SR: (S,R)': '(X, 0)', 'JK: (J,K)': '(X, 0)', 'D': '1', 'T': '0' }
+  ]
+};;
 
 const SeqStateReduction = () => (
   <SeqLayout
@@ -48,50 +119,7 @@ const SeqStateReduction = () => (
         <p>Original 5-state table with one input x:</p>
       </div>
 
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Present State</th>
-              <th>Next (x=0)</th>
-              <th>Next (x=1)</th>
-              <th>Output</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>A</td>
-              <td>B</td>
-              <td>C</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>B</td>
-              <td>A</td>
-              <td>D</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>C</td>
-              <td>B</td>
-              <td>C</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>D</td>
-              <td>A</td>
-              <td>D</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>E</td>
-              <td>B</td>
-              <td>E</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={original5StateData} className="seq-flip-table" />
 
       <div className="seq-grid-2">
         <div className="seq-feature-card">
@@ -136,38 +164,7 @@ const SeqStateReduction = () => (
         </div>
       </div>
 
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Present State</th>
-              <th>Next (x=0)</th>
-              <th>Next (x=1)</th>
-              <th>Output</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>A</td>
-              <td>B</td>
-              <td>C</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>B</td>
-              <td>A</td>
-              <td>B</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>C</td>
-              <td>B</td>
-              <td>C</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={reduced3StateData} className="seq-flip-table" />
 
       <h2>Method 2 — Implication Chart</h2>
       <p>
@@ -218,204 +215,24 @@ const SeqStateReduction = () => (
       <div className="seq-grid-2">
         <div>
           <h3>SR Flip-Flop</h3>
-          <div className="seq-table-wrap seq-flip-table-wrap">
-            <table className="seq-table seq-flip-table">
-              <thead>
-                <tr>
-                  <th>Q</th>
-                  <th>Q⁺</th>
-                  <th>S</th>
-                  <th>R</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>X</td>
-                </tr>
-                <tr>
-                  <td>0</td>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>0</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>X</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <SeqTable data={srExcitationData} className="seq-flip-table" />
         </div>
         <div>
           <h3>JK Flip-Flop</h3>
-          <div className="seq-table-wrap seq-flip-table-wrap">
-            <table className="seq-table seq-flip-table">
-              <thead>
-                <tr>
-                  <th>Q</th>
-                  <th>Q⁺</th>
-                  <th>J</th>
-                  <th>K</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>X</td>
-                </tr>
-                <tr>
-                  <td>0</td>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>X</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>X</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>X</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <SeqTable data={jkExcitationData} className="seq-flip-table" />
         </div>
         <div>
           <h3>D Flip-Flop</h3>
-          <div className="seq-table-wrap seq-flip-table-wrap">
-            <table className="seq-table seq-flip-table">
-              <thead>
-                <tr>
-                  <th>Q</th>
-                  <th>Q⁺</th>
-                  <th>D</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                </tr>
-                <tr>
-                  <td>0</td>
-                  <td>1</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>0</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>1</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <SeqTable data={dExcitationData} className="seq-flip-table" />
         </div>
         <div>
           <h3>T Flip-Flop</h3>
-          <div className="seq-table-wrap seq-flip-table-wrap">
-            <table className="seq-table seq-flip-table">
-              <thead>
-                <tr>
-                  <th>Q</th>
-                  <th>Q⁺</th>
-                  <th>T</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>0</td>
-                  <td>0</td>
-                  <td>0</td>
-                </tr>
-                <tr>
-                  <td>0</td>
-                  <td>1</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>0</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>1</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <SeqTable data={tExcitationData} className="seq-flip-table" />
         </div>
       </div>
 
       <h2>Master Reference — All Excitation Tables</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Q → Q⁺</th>
-              <th>SR: (S,R)</th>
-              <th>JK: (J,K)</th>
-              <th>D</th>
-              <th>T</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0 → 0</td>
-              <td>(0, X)</td>
-              <td>(0, X)</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>0 → 1</td>
-              <td>(1, 0)</td>
-              <td>(1, X)</td>
-              <td>1</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>1 → 0</td>
-              <td>(0, 1)</td>
-              <td>(X, 1)</td>
-              <td>0</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>1 → 1</td>
-              <td>(X, 0)</td>
-              <td>(X, 0)</td>
-              <td>1</td>
-              <td>0</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={masterExcitationData} className="seq-flip-table" />
 
       <h2>Using Excitation Tables in Design</h2>
       <ol>

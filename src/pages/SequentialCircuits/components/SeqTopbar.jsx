@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
- 
-import ThemeToggle from './ThemeToggle';
 
 const SeqTopbar = ({ currentIndex, progress, sidebarOpen, setSidebarOpen }) => {
   return (
@@ -45,8 +43,6 @@ const SeqTopbar = ({ currentIndex, progress, sidebarOpen, setSidebarOpen }) => {
           </svg>
           <span className="seq-progress-text">{currentIndex + 1}/8</span>
         </div>
-
-        <ThemeToggle />
       </div>
     </header>
   );

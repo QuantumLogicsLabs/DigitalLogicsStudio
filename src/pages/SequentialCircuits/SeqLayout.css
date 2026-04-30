@@ -533,7 +533,8 @@ body,
 }
 
 .seq-table-wrap {
-  overflow: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 0.9rem;
   border: 1px solid var(--border-color);
   margin: 0rem 0 1rem;
@@ -541,19 +542,19 @@ body,
   padding: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  max-width: 100%;
 }
 .seq-table {
   width: 100%;
   border-collapse: collapse;
   font-family: monospace;
-  table-layout: fixed;
-  min-width: 640px;
+  table-layout: auto;
   font-size: 0.94rem;
   margin: 0;
   border-radius: 0.9rem;
 }
 .seq-table-head {
-  padding: 0.95rem 1rem;
+  padding: 0.95rem 0.75rem;
   text-align: center;
   font-weight: 700;
   color: #34d399;
@@ -565,18 +566,20 @@ body,
   top: 0;
   z-index: 1;
   vertical-align: middle;
+  white-space: normal;
 }
 .seq-table-head-feature {
   text-align: left;
-  padding-left: 1.1rem;
+  padding-left: 0.8rem;
 }
 .seq-table-cell {
-  padding: 0.9rem 1rem;
+  padding: 0.8rem 0.75rem;
   text-align: center;
   color: var(--text);
   border-top: 1px solid var(--border-color);
   border-right: 1px solid rgba(52, 211, 153, 0.1);
   vertical-align: middle;
+  font-size: 0.9rem;
 }
 .seq-table-cell-feature {
   text-align: left;
@@ -594,20 +597,19 @@ body,
 /* Flip-Flop Types page tables */
 .seq-flipflop-types .seq-table-wrap {
   overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   border-radius: 1rem;
   border: 1px solid rgba(79, 70, 229, 0.14);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  max-width: 100%;
 }
 
 .seq-flipflop-types .seq-table {
   width: 100%;
-  min-width: 42rem;
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: fixed;
+  table-layout: auto;
   font-family: "JetBrains Mono", Consolas, monospace;
   font-size: 0.92rem;
   margin: 0;
@@ -615,13 +617,13 @@ body,
 
 .seq-flipflop-types .seq-table thead th,
 .seq-flipflop-types .seq-table tbody td {
-  padding: 0.92rem 1rem;
+  padding: 0.92rem 0.8rem;
   text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid var(--border-color);
   border-right: 1px solid rgba(79, 70, 229, 0.08);
   color: var(--text);
-  white-space: nowrap;
+  word-wrap: break-word;
 }
 
 .seq-flipflop-types .seq-table thead th {

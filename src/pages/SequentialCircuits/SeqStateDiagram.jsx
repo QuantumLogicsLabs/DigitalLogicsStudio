@@ -251,8 +251,8 @@ const SeqStateDiagram = () => {
       </div>
 
       <h2>Moore Machine State Table</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
+      <div className="seq-table-wrap">
+        <table className="seq-table">
           <thead>
             <tr>
               <th rowSpan="2">Present State</th>
@@ -417,8 +417,8 @@ const SeqStateDiagram = () => {
       </div>
 
       <h2>Mealy Machine State Table</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
+      <div className="seq-table-wrap">
+        <table className="seq-table">
           <thead>
             <tr>
               <th rowSpan="2">Present State</th>

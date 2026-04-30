@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SeqLayout from "./SeqLayout";
+import SeqTable from "./components/SeqTable";
 import { 
   ClipboardList, 
   Workflow, 
@@ -13,6 +14,36 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+
+const stateAssignmentData = {
+  headers: ['Strategy', 'Description', 'Best For'],
+  rows: [
+    { 'Strategy': 'Binary sequential', 'Description': '00, 01, 10, 11 …', 'Best For': 'Simple, easy to analyze' },
+    { 'Strategy': 'Gray code', 'Description': '00, 01, 11, 10 …', 'Best For': 'Minimizes transitions → simpler logic' },
+    { 'Strategy': 'One-hot', 'Description': '0001, 0010, 0100 …', 'Best For': 'FPGAs with abundant flip-flops' },
+    { 'Strategy': 'Output-based', 'Description': 'State code = output value', 'Best For': 'Simplifies output logic' }
+  ]
+};
+
+const ffTypeData = {
+  headers: ['Flip-Flop', 'Input Logic Complexity', 'Don\'t-Cares in Excitation'],
+  rows: [
+    { 'Flip-Flop': 'D', 'Input Logic Complexity': 'Simplest (D = Q⁺)', 'Don\'t-Cares in Excitation': 'None' },
+    { 'Flip-Flop': 'JK', 'Input Logic Complexity': 'Moderate, but more X\'s help K-maps', 'Don\'t-Cares in Excitation': 'Most (2 per row)' },
+    { 'Flip-Flop': 'T', 'Input Logic Complexity': 'Simple for counters', 'Don\'t-Cares in Excitation': 'None' },
+    { 'Flip-Flop': 'SR', 'Input Logic Complexity': 'Moderate, has forbidden state', 'Don\'t-Cares in Excitation': 'Some' }
+  ]
+};
+
+const designExampleStateData = {
+  headers: ['Present Q₁Q₀', 'x=0 → Next', 'x=1 → Next', 'Output Z'],
+  rows: [
+    { 'Present Q₁Q₀': '00 (S0)', 'x=0 → Next': '00', 'x=1 → Next': '01', 'Output Z': '0' },
+    { 'Present Q₁Q₀': '01 (S1)', 'x=0 → Next': '10', 'x=1 → Next': '01', 'Output Z': '0' },
+    { 'Present Q₁Q₀': '10 (S2)', 'x=0 → Next': '00', 'x=1 → Next': '11', 'Output Z': '0' },
+    { 'Present Q₁Q₀': '11 (S3)', 'x=0 → Next': '00', 'x=1 → Next': '01', 'Output Z': '1' }
+  ]
+};;
 
 const designSteps = [
   {
@@ -149,74 +180,10 @@ const SeqDesignProcedures = () => {
       </ul>
 
       <h2>Step 5 — State Assignment Strategies</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Strategy</th>
-              <th>Description</th>
-              <th>Best For</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Binary sequential</td>
-              <td>00, 01, 10, 11 …</td>
-              <td>Simple, easy to analyze</td>
-            </tr>
-            <tr>
-              <td>Gray code</td>
-              <td>00, 01, 11, 10 …</td>
-              <td>Minimizes transitions → simpler logic</td>
-            </tr>
-            <tr>
-              <td>One-hot</td>
-              <td>0001, 0010, 0100 …</td>
-              <td>FPGAs with abundant flip-flops</td>
-            </tr>
-            <tr>
-              <td>Output-based</td>
-              <td>State code = output value</td>
-              <td>Simplifies output logic</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={stateAssignmentData} className="seq-flip-table" />
 
       <h2>Step 6 — Choosing Flip-Flop Type</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-table seq-flip-table">
-          <thead>
-            <tr>
-              <th>Flip-Flop</th>
-              <th>Input Logic Complexity</th>
-              <th>Don't-Cares in Excitation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>D</td>
-              <td>Simplest (D = Q⁺)</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td>JK</td>
-              <td>Moderate, but more X's help K-maps</td>
-              <td>Most (2 per row)</td>
-            </tr>
-            <tr>
-              <td>T</td>
-              <td>Simple for counters</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td>SR</td>
-              <td>Moderate, has forbidden state</td>
-              <td>Some</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={ffTypeData} className="seq-flip-table" />
 
       <h2>Design Example — "101" Sequence Detector</h2>
       <p>
@@ -406,44 +373,7 @@ const SeqDesignProcedures = () => {
       </div>
 
       <h2>State Table (after assignment: S0=00, S1=01, S2=10, S3=11)</h2>
-      <div className="seq-table-wrap seq-flip-table-wrap">
-        <table className="seq-flip-table">
-          <thead>
-            <tr>
-              <th>Present Q₁Q₀</th>
-              <th>x=0 → Next</th>
-              <th>x=1 → Next</th>
-              <th>Output Z</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>00 (S0)</td>
-              <td>00</td>
-              <td>01</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>01 (S1)</td>
-              <td>10</td>
-              <td>01</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>10 (S2)</td>
-              <td>00</td>
-              <td>11</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>11 (S3)</td>
-              <td>00</td>
-              <td>01</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <SeqTable data={designExampleStateData} className="seq-flip-table" />
 
       <div className="seq-box success">
         <span className="seq-box-title">Design Checklist</span>
