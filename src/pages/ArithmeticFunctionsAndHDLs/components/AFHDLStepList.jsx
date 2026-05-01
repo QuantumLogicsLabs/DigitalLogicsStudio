@@ -1,11 +1,9 @@
 import React from "react";
 
 const AFHDLStepList = ({ steps }) => (
-  <ol style={{ textAlign: "left", marginLeft: "1rem" }}>
+  <ol className="afhdl-steps">
     {steps.map((step, idx) => (
-      <li key={idx} style={{ margin: "0.32rem 0" }}>
-        {step}
-      </li>
+      <li key={idx}>{step}</li>
     ))}
   </ol>
 );

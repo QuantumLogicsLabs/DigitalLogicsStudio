@@ -1,11 +1,10 @@
 import React from "react";
 
 const AFHDLToggle = ({ checked, label, onChange }) => (
-  <div className="arithmetic-toggle">
-    <label>
-      <input type="checkbox" checked={checked} onChange={onChange} /> {label}
-    </label>
-  </div>
+  <label className="afhdl-toggle">
+    <input type="checkbox" checked={checked} onChange={onChange} />
+    <span>{label}</span>
+  </label>
 );
 
 export default AFHDLToggle;

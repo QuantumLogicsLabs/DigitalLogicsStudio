@@ -12,21 +12,8 @@ const AFHDLCopyButton = ({ text }) => {
     return (
         <button
             onClick={handleCopy}
-            style={{
-                position: "absolute",
-                top: "0.5rem",
-                right: "0.5rem",
-                padding: "0.4rem 0.8rem",
-                fontSize: "0.7rem",
-                background: copied ? "rgba(74, 222, 128, 0.2)" : "rgba(148, 163, 184, 0.1)",
-                border: `1px solid ${copied ? "#4ade80" : "rgba(148, 163, 184, 0.3)"}`,
-                borderRadius: "6px",
-                color: copied ? "#4ade80" : "#94a3b8",
-                cursor: "pointer",
-                zIndex: 10,
-                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                backdropFilter: "blur(4px)",
-            }}
+            className="afhdl-copy-btn"
+            style={{ position: "absolute", top: "0.5rem", right: "0.5rem", zIndex: 10 }}
         >
             {copied ? "Copied!" : "Copy"}
         </button>

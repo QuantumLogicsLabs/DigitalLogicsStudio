@@ -57,3 +57,7 @@ Thumbs.db
 .eslintcache
 .next
 out/
+
+# Claude Code
+.codex
+.claude/

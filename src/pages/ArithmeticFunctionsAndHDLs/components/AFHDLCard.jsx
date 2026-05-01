@@ -1,11 +1,11 @@
 import React from "react";
 
 const AFHDLCard = ({ title, subtitle, children }) => (
-  <div className="arithmetic-card">
-    <h3>{title}</h3>
-    {subtitle && <p className="subtext">{subtitle}</p>}
-    <div>{children}</div>
-  </div>
+  <article className="afhdl-card">
+    {title ? <h3 className="afhdl-card-title">{title}</h3> : null}
+    {subtitle ? <p className="afhdl-card-subtitle">{subtitle}</p> : null}
+    <div className="afhdl-card-content">{children}</div>
+  </article>
 );
 
 export default AFHDLCard;

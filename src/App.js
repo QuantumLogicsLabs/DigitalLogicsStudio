@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useTheme } from "./context/ThemeContext";
 
 // PAGES:
 import Home from "./pages/Home/Home";
@@ -71,16 +72,7 @@ import SeqStateDiagram from "./pages/SequentialCircuits/SeqStateDiagram";
 import SeqStateReduction from "./pages/SequentialCircuits/SeqStateReduction";
 
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  const { theme } = useTheme();
 
   return (
     <div className={`app-root ${theme}`}>
@@ -89,7 +81,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Home toggleTheme={toggleTheme} theme={theme} />}
+            element={<Home />}
           />
           <Route path="/boolforge" element={<Boolforge />} />
           <Route path="/significant-digits" element={<SignificantDigits />} />

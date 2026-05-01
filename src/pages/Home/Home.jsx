@@ -4,6 +4,7 @@ import HeroSection from "./HeroSection";
 import Footer from "./Footer";
 import ArticleSection from "./ArticleSection";
 import homeData from "./HomeData";
+import { useTheme } from "../../context/ThemeContext";
 import "./Home.css";
 
 const topicGroupOrder = {
@@ -12,7 +13,8 @@ const topicGroupOrder = {
   advanced: 3,
 };
 
-const Home = ({ toggleTheme, theme }) => {
+const Home = () => {
+  const { theme, toggle: toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = React.useState("");
   const resultsRef = React.useRef(null);
   const handleHomeClick = React.useCallback(() => {

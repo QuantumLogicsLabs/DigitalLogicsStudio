@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import ToolLayout from "../../components/ToolLayout";
 import AFHDLDivider from "./components/AFHDLDivider";
 import AFHDLCopyButton from "./components/AFHDLCopyButton";
+import AFHDLLayout from "./components/AFHDLLayout";
+import { afhdlTheme as S } from "./utils/afhdlTheme";
 import {
   cleanBin,
   binaryAdd,
@@ -179,9 +180,20 @@ const BinaryAddSubtractor = () => {
   const modeColor = mode === "add" ? "#22c55e" : "#f87171";
 
   return (
-    <ToolLayout
+    <AFHDLLayout
       title="Binary Adder / Subtractor"
       subtitle="One circuit, two operations — controlled by a single Mode bit"
+      intro="This lesson shows how a single arithmetic block can switch jobs. Instead of designing two separate circuits, you control one datapath with a mode bit and a clever complement trick."
+      highlights={[
+        {
+          title: "Key hardware idea",
+          text: "Mode = 0 performs A + B. Mode = 1 performs A + (NOT B) + 1, which is A − B.",
+        },
+        {
+          title: "Why students should care",
+          text: "This reuse pattern appears in ALUs and is one of the cleanest examples of efficient digital design.",
+        },
+      ]}
     >
       {/* ══ THE BIG IDEA ══════════════════════════════════════ */}
       <div style={S.sectionTitle}>💡 The Big Idea</div>
@@ -459,17 +471,9 @@ const BinaryAddSubtractor = () => {
         ].map(({ label, val, color, note }) => (
           <div
             key={label}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "rgba(30,41,59,0.5)",
-              borderRadius: "6px",
-              padding: "0.4rem 0.7rem",
-              border: "1px solid rgba(148,163,184,0.12)",
-            }}
+            style={S.interactiveRow}
           >
-            <span style={{ color: "#94a3b8", fontSize: "0.82rem" }}>
+            <span style={{ color: "var(--afhdl-muted)", fontSize: "0.82rem" }}>
               {label}
             </span>
             <span
@@ -477,7 +481,7 @@ const BinaryAddSubtractor = () => {
             >
               <strong style={{ color, fontFamily: "monospace" }}>{val}</strong>
               {note && (
-                <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
+                <span style={{ fontSize: "0.72rem", color: "var(--afhdl-muted)" }}>
                   {note}
                 </span>
               )}
@@ -578,15 +582,8 @@ const BinaryAddSubtractor = () => {
           <div style={{ display: "grid", gap: "2px", marginTop: "0.5rem" }}>
             <div
               style={{
-                display: "grid",
+                ...S.tableHeader,
                 gridTemplateColumns: "1fr 1fr 1fr 1fr 2fr",
-                background: "rgba(99,102,241,0.2)",
-                borderRadius: "4px",
-                padding: "0.3rem 0.5rem",
-                fontSize: "0.73rem",
-                fontWeight: 700,
-                color: "#a5b4fc",
-                textAlign: "center",
               }}
             >
               <span>Bit #</span>
@@ -602,14 +599,8 @@ const BinaryAddSubtractor = () => {
                 <div
                   key={i}
                   style={{
-                    display: "grid",
+                    ...S.tableRow,
                     gridTemplateColumns: "1fr 1fr 1fr 1fr 2fr",
-                    background: "rgba(30,41,59,0.5)",
-                    borderRadius: "3px",
-                    padding: "0.28rem 0.5rem",
-                    fontSize: "0.82rem",
-                    textAlign: "center",
-                    color: "#e2e8f0",
                   }}
                 >
                   <span style={{ color: "#475569" }}>bit {i}</span>
@@ -657,13 +648,7 @@ const BinaryAddSubtractor = () => {
         Side
       </button>
       {showSideBySide && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "0.6rem",
-          }}
-        >
+        <div className="afhdl-grid-2">
           <div style={{ ...S.card, border: "1px solid rgba(34,197,94,0.3)" }}>
             <div
               style={{
@@ -905,15 +890,8 @@ endmodule`}</pre>
           <div style={{ display: "grid", gap: "2px" }}>
             <div
               style={{
-                display: "grid",
+                ...S.tableHeader,
                 gridTemplateColumns: "2fr 1fr 2fr 2fr",
-                background: "rgba(99,102,241,0.2)",
-                borderRadius: "4px",
-                padding: "0.3rem 0.5rem",
-                fontSize: "0.73rem",
-                fontWeight: 700,
-                color: "#a5b4fc",
-                textAlign: "center",
               }}
             >
               <span>Situation</span>
@@ -935,14 +913,8 @@ endmodule`}</pre>
               <div
                 key={sit}
                 style={{
-                  display: "grid",
+                  ...S.tableRow,
                   gridTemplateColumns: "2fr 1fr 2fr 2fr",
-                  background: "rgba(30,41,59,0.5)",
-                  borderRadius: "3px",
-                  padding: "0.3rem 0.5rem",
-                  fontSize: "0.8rem",
-                  textAlign: "center",
-                  color: "#e2e8f0",
                 }}
               >
                 <span style={{ textAlign: "left" }}>{sit}</span>
@@ -1100,129 +1072,8 @@ endmodule`}</pre>
           )}
         </div>
       )}
-    </ToolLayout>
+    </AFHDLLayout>
   );
-};
-
-/* ── STYLES ──────────────────────────────────────────────── */
-const S = {
-  sectionTitle: {
-    fontSize: "1.1rem",
-    fontWeight: 700,
-    color: "#f8fafc",
-    margin: "1.5rem 0 0.5rem",
-    letterSpacing: "-0.01em",
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem"
-  },
-  body: {
-    color: "#94a3b8",
-    fontSize: "0.95rem",
-    lineHeight: 1.7,
-    margin: "0.4rem 0"
-  },
-  card: {
-    background: "rgba(30, 41, 59, 0.4)",
-    backdropFilter: "blur(12px)",
-    border: "1px solid rgba(148, 163, 184, 0.1)",
-    borderRadius: "16px",
-    padding: "1.25rem",
-    marginTop: "0.75rem",
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-  },
-  formula: {
-    background: "rgba(15, 23, 42, 0.6)",
-    border: "1px solid rgba(99, 102, 241, 0.2)",
-    borderRadius: "12px",
-    padding: "1rem",
-    fontFamily: "'Fira Code', monospace",
-    fontSize: "0.85rem",
-    color: "#818cf8",
-    margin: "0.75rem 0",
-    lineHeight: 1.6,
-    boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)",
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-all"
-  },
-  codeBlock: {
-    background: "#0f172a",
-    border: "1px solid rgba(148, 163, 184, 0.1)",
-    borderRadius: "12px",
-    padding: "1rem",
-    overflowX: "auto",
-    position: "relative",
-  },
-  resultBanner: {
-    background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))",
-    border: "1px solid rgba(99, 102, 241, 0.2)",
-    borderRadius: "16px",
-    padding: "1rem 1.5rem",
-    margin: "1rem 0",
-    backdropFilter: "blur(8px)",
-  },
-  tabPanel: {
-    background: "rgba(30, 41, 59, 0.3)",
-    backdropFilter: "blur(12px)",
-    border: "1px solid rgba(148, 163, 184, 0.1)",
-    borderRadius: "0 16px 16px 16px",
-    padding: "1.5rem",
-    minHeight: "200px",
-  },
-  note: (c) => ({
-    background: `${c}08`,
-    borderLeft: `4px solid ${c}`,
-    borderRadius: "8px",
-    padding: "1rem",
-    fontSize: "0.85rem",
-    color: "#e2e8f0",
-    lineHeight: 1.6,
-    margin: "0.75rem 0",
-  }),
-  signalBox: (c) => ({
-    background: `${c}05`,
-    border: `1px solid ${c}20`,
-    borderRadius: "12px",
-    padding: "0.75rem",
-    textAlign: "center",
-    transition: "transform 0.2s ease",
-  }),
-  conceptCard: (c) => ({
-    background: "rgba(30, 41, 59, 0.4)",
-    border: "1px solid rgba(148, 163, 184, 0.1)",
-    borderTop: `4px solid ${c}`,
-    borderRadius: "12px",
-    padding: "1rem",
-    cursor: "pointer",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  }),
-  bitBtn: (bit, c) => ({
-    width: "36px",
-    height: "36px",
-    borderRadius: "8px",
-    border: `2px solid ${bit === "1" ? c : "rgba(148, 163, 184, 0.1)"}`,
-    background: bit === "1" ? `${c}15` : "rgba(15, 23, 42, 0.4)",
-    color: bit === "1" ? c : "#64748b",
-    fontWeight: 700,
-    fontSize: "1rem",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }),
-  tabBtn: (active, c) => ({
-    padding: "0.6rem 1.25rem",
-    borderRadius: "10px 10px 0 0",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 600,
-    fontSize: "0.875rem",
-    background: active ? c : "transparent",
-    color: active ? "#ffffff" : "#94a3b8",
-    transition: "all 0.2s ease",
-    borderBottom: active ? "none" : "1px solid rgba(148, 163, 184, 0.1)",
-  }),
 };
 
 export default BinaryAddSubtractor;
