@@ -1925,6 +1925,25 @@ const EncoderSimulator = () => {
           ))}
         </div>
       </div>
+
+      {/* PRO TOOLS SECTION */}
+      <div style={{ gridColumn: "1 / -1", marginTop: "40px", borderTop: "1px solid rgba(249,115,22,0.2)", paddingTop: "32px" }}>
+        <h4 style={{ color: "#f97316", marginBottom: "20px", fontSize: "1rem", fontWeight: "800", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          🚀 Pro Engineering Tools
+        </h4>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "20px" }}>
+          <LogicAnalyzer 
+            inputs={activeVals} 
+            outputs={outputEntries.map(e => e.val)} 
+            labels={[...config.inputs, ...outputEntries.map(e => e.name)]} 
+          />
+          <VirtualBreadboard 
+            inputs={activeVals} 
+            outputs={outputEntries.map(e => e.val)} 
+            config={config} 
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -2033,6 +2052,187 @@ const TypeSelector = ({ selectedType, onChange }) => (
     ))}
   </div>
 );
+
+// ─── Encoder HDL Generator ───────────────────────────────────────────────────
+const EncoderHDLGenerator = ({ type }) => {
+  const [lang, setLang] = useState("Verilog");
+  const config = ENCODER_TYPES[type];
+  const numInputs = config.inputs.length;
+  const numOutputs = config.outputs.length;
+
+  const generateCode = () => {
+    if (lang === "Verilog") {
+      return `module encoder_${type}(
+    input [${numInputs - 1}:0] I,
+    output reg [${numOutputs - 1}:0] A,
+    output GS, // Group Select (Any input high)
+    output EO  // Enable Out
+);
+    always @(*) begin
+        A = ${numOutputs}'b0;
+        GS = |I;
+        if (I[${numInputs - 1}]) A = ${numInputs - 1};
+        ${config.label.includes("Priority") ? "// Priority Logic" : "// Basic Logic"}
+        // ... (priority hierarchy)
+    end
+endmodule`;
+    } else {
+      return `library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity encoder_${type} is
+    Port ( I  : in  STD_LOGIC_VECTOR (${numInputs - 1} downto 0);
+           A  : out STD_LOGIC_VECTOR (${numOutputs - 1} downto 0);
+           GS : out STD_LOGIC);
+end encoder_${type};
+
+architecture Behavioral of encoder_${type} is
+begin
+    process(I)
+    begin
+        A <= (others => '0');
+        GS <= '0';
+        for i in ${numInputs - 1} downto 0 loop
+            if I(i) = '1' then
+                A <= std_logic_vector(to_unsigned(i, ${numOutputs}));
+                GS <= '1';
+                exit;
+            end if;
+        end loop;
+    end process;
+end Behavioral;`;
+    }
+  };
+
+  return (
+    <div style={{ background: "rgba(15,23,42,0.6)", borderRadius: "12px", border: "1px solid rgba(99,102,241,0.2)", padding: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+        <h4 style={{ color: "#fbbf24", margin: 0, fontSize: "0.9rem" }}>💻 Hardware Description (HDL) Export</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {["Verilog", "VHDL"].map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{ padding: "4px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#fbbf24" : "rgba(148,163,184,0.2)"}`, background: lang === l ? "rgba(251,191,36,0.15)" : "transparent", color: lang === l ? "#fbbf24" : "#6b7280", cursor: "pointer", fontSize: "0.75rem" }}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <pre style={{ margin: 0, padding: "16px", background: "#020617", borderRadius: "8px", color: "#60a5fa", fontSize: "0.82rem", overflowX: "auto", fontFamily: "monospace", border: "1px solid rgba(251,191,36,0.1)" }}>
+        {generateCode()}
+      </pre>
+    </div>
+  );
+};
+
+// ─── Encoder Fault Debugger ───────────────────────────────────────────────────
+const EncoderFaultDebugger = () => {
+  const [level, setLevel] = useState(0);
+  const [userGuess, setUserGuess] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const faults = [
+    { type: "Priority Leak", effect: "I1 stays active even when I3 is HIGH", answer: "Priority Gate" },
+    { type: "Stuck-at-1", effect: "Output A0 is always HIGH even if only I0 is active", answer: "A0 Line" },
+    { type: "Floating Input", effect: "I2 doesn't trigger any output when pressed", answer: "I2 Line" }
+  ];
+
+  const check = (ans) => {
+    setUserGuess(ans);
+    setShowResult(true);
+  };
+
+  return (
+    <div style={{ background: "rgba(8,14,30,0.9)", borderRadius: "14px", padding: "22px", border: "1px solid rgba(249,115,22,0.25)" }}>
+      <h4 style={{ color: "#f97316", marginBottom: "14px", fontSize: "0.95rem" }}>🕵️ Encoder Fault Debugger — Level {level + 1}</h4>
+      <p style={{ color: "#9ca3af", fontSize: "0.85rem", marginBottom: "15px" }}><strong>Symptom:</strong> {faults[level].effect}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" }}>
+        {["Priority Gate", "A0 Line", "I2 Line", "OR Gate 1"].map(opt => (
+          <button key={opt} onClick={() => check(opt)} disabled={showResult} style={{ padding: "10px", borderRadius: "8px", border: `1.5px solid ${userGuess === opt ? (opt === faults[level].answer ? "#34d399" : "#f87171") : "rgba(249,115,22,0.2)"}`, background: userGuess === opt ? (opt === faults[level].answer ? "rgba(52,211,153,0.1)" : "rgba(248,113,113,0.1)") : "rgba(12,18,35,0.7)", color: userGuess === opt ? (opt === faults[level].answer ? "#34d399" : "#f87171") : "#9ca3af", cursor: "pointer" }}>{opt} Fault</button>
+        ))}
+      </div>
+      {showResult && (
+        <div style={{ padding: "12px", borderRadius: "8px", background: userGuess === faults[level].answer ? "rgba(52,211,153,0.1)" : "rgba(248,113,113,0.1)", border: `1px solid ${userGuess === faults[level].answer ? "#34d399" : "#f87171"}` }}>
+          <div style={{ color: userGuess === faults[level].answer ? "#34d399" : "#f87171", fontSize: "0.85rem", fontWeight: "700" }}>{userGuess === faults[level].answer ? "✅ Fixed! " : "❌ System Failure! "}</div>
+          <button onClick={() => { setLevel((level+1)%faults.length); setShowResult(false); setUserGuess(null); }} style={{ marginTop: "10px", padding: "5px 12px", borderRadius: "6px", background: "#f97316", border: "none", color: "white", cursor: "pointer", fontSize: "0.75rem" }}>Next Challenge</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Logic Analyzer (Timing Diagram) ──────────────────────────────────────────
+const LogicAnalyzer = ({ inputs, outputs, labels }) => {
+  const [history, setHistory] = useState([]);
+  const maxPoints = 40;
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setHistory(prev => {
+        const newState = [...inputs, ...outputs];
+        const updated = [...prev, newState];
+        return updated.slice(-maxPoints);
+      });
+    }, 200);
+    return () => clearInterval(timer);
+  }, [inputs, outputs]);
+
+  const height = 30;
+  const gap = 15;
+  const totalHeight = (inputs.length + outputs.length) * (height + gap);
+
+  return (
+    <div style={{ background: "#020617", borderRadius: "12px", padding: "20px", border: "1px solid rgba(249,115,22,0.2)", overflow: "hidden" }}>
+      <h4 style={{ color: "#f97316", marginTop: 0, marginBottom: "15px", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", boxShadow: "0 0 8px #ef4444" }} />
+        LIVE LOGIC ANALYZER — ENCODER SIGNALS
+      </h4>
+      <div style={{ overflowX: "auto" }}>
+        <svg width="100%" height={totalHeight} style={{ minWidth: "600px" }}>
+          {(labels || []).map((label, i) => {
+            const yBase = i * (height + gap);
+            return (
+              <g key={label}>
+                <text x="0" y={yBase + 20} fill="#4b5563" fontSize="10" fontFamily="monospace">{label}</text>
+                <line x1="45" y1={yBase + height} x2="100%" y2={yBase + height} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                <polyline
+                  points={history.map((state, idx) => {
+                    const x = 50 + (idx * (600 / maxPoints));
+                    const y = yBase + (state[i] ? 5 : height - 5);
+                    return `${x},${y}`;
+                  }).join(" ")}
+                  fill="none"
+                  stroke={i < inputs.length ? "#fbbf24" : "#60a5fa"}
+                  strokeWidth="2"
+                  strokeLinejoin="step-after"
+                  style={{ transition: "all 0.1s linear" }}
+                />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+// ─── Virtual Breadboard Guide ────────────────────────────────────────────────
+const VirtualBreadboard = ({ inputs, outputs, config }) => {
+  return (
+    <div style={{ background: "rgba(15,23,42,0.6)", borderRadius: "14px", padding: "24px", border: "1px solid rgba(249,115,22,0.2)", textAlign: "center" }}>
+      <h4 style={{ color: "#94a3b8", marginBottom: "20px", fontSize: "0.9rem" }}>🔌 Virtual Breadboard — Encoder Chipset (74LS148)</h4>
+      <div style={{ position: "relative", display: "inline-block", background: "#d1d5db", padding: "10px", borderRadius: "4px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(20, 10px)", gap: "5px" }}>
+          {Array(100).fill(0).map((_, i) => (
+            <div key={i} style={{ width: "8px", height: "8px", borderRadius: "1px", background: "#9ca3af" }} />
+          ))}
+        </div>
+        <div style={{ position: "absolute", top: "25%", left: "25%", width: "50%", height: "50%", background: "#1f2937", borderRadius: "3px" }}>
+          <div style={{ color: "#4b5563", fontSize: "10px", fontWeight: "800", transform: "rotate(-90deg)", marginTop: "25px" }}>74LS148</div>
+        </div>
+      </div>
+      <div style={{ marginTop: "15px", fontSize: "0.75rem", color: "#6b7280" }}>
+        IC 74LS148 handles 8 inputs and outputs a 3-bit binary code.
+      </div>
+    </div>
+  );
+};
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const EncoderPage = () => {
@@ -2387,6 +2587,25 @@ const EncoderPage = () => {
             onChange={handleTypeChange}
           />
           <EncoderSimulator key={selectedType} />
+          <div style={{ marginTop: "24px" }}>
+            <EncoderHDLGenerator type={selectedType} />
+          </div>
+        </Section>
+
+        {/* NEW SECTION: Troubleshooting */}
+        <Section title="🛠️ Troubleshooting — Find the Encoder Fault" accent="#f97316">
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            Encoders are susceptible to stuck lines and priority gate failures.
+            Put your debugging skills to the test!
+          </p>
+          <EncoderFaultDebugger />
         </Section>
 
         {/* SECTION 5: Priority Conflict */}

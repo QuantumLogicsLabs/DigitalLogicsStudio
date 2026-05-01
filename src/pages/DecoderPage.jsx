@@ -1886,6 +1886,80 @@ const DecoderSimulator = ({ selectedType, inputVals, setInputVals }) => {
           ))}
         </div>
       </div>
+
+      {/* PRO TOOLS SECTION */}
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(99,102,241,0.2)", paddingTop: "32px" }}>
+        <h4 style={{ color: "#60a5fa", marginBottom: "20px", fontSize: "1rem", fontWeight: "800", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          🚀 Pro Engineering Tools
+        </h4>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "20px" }}>
+          <LogicAnalyzer 
+            inputs={[...(config.enableInput ? [enable ? 1 : 0] : []), ...codeVals]} 
+            outputs={outputEntries.map(e => e.val)} 
+            labels={[...(config.enableInput ? ["E"] : []), ...config.codeInputs, ...config.outputs]} 
+          />
+          <VirtualBreadboard 
+            inputs={codeVals} 
+            outputs={outputEntries.map(e => e.val)} 
+            config={config} 
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Visual Cascading Demo (Decoder) ──────────────────────────────────────────
+const VisualCascadingDemo = () => {
+  const [chipSelect, setChipSelect] = useState(0); // A2 chooses which chip
+  const [innerAddr, setInnerAddr] = useState(0);   // A1, A0 choose output within chip
+  
+  const chips = ["Chip U1 (Outputs 0-3)", "Chip U2 (Outputs 4-7)"];
+  const activeGlobal = chipSelect * 4 + innerAddr;
+
+  return (
+    <div style={{ background: "rgba(15,23,42,0.4)", borderRadius: "14px", padding: "24px", border: "1px solid rgba(251,191,36,0.2)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "30px", alignItems: "center" }}>
+        <div>
+          <div style={{ marginBottom: "20px" }}>
+            <h5 style={{ color: "#fbbf24", fontSize: "0.85rem", marginBottom: "10px" }}>Step 1: Top-Level Address (A2)</h5>
+            <div style={{ display: "flex", gap: "10px" }}>
+              {[0, 1].map(v => (
+                <button key={v} onClick={() => setChipSelect(v)} style={{ padding: "8px 16px", borderRadius: "8px", border: `2px solid ${chipSelect === v ? "#fbbf24" : "rgba(148,163,184,0.1)"}`, background: chipSelect === v ? "rgba(251,191,36,0.15)" : "transparent", color: chipSelect === v ? "#fbbf24" : "#64748b", cursor: "pointer", fontFamily: "monospace" }}>A2 = {v}</button>
+              ))}
+            </div>
+            <p style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: "6px" }}>{chipSelect === 0 ? "A2=0 → Enable U1, Disable U2" : "A2=1 → Disable U1, Enable U2"}</p>
+          </div>
+
+          <div>
+            <h5 style={{ color: "#00ff88", fontSize: "0.85rem", marginBottom: "10px" }}>Step 2: Shared Inner Address (A1, A0)</h5>
+            <div style={{ display: "flex", gap: "8px" }}>
+              {[0, 1, 2, 3].map(v => (
+                <button key={v} onClick={() => setInnerAddr(v)} style={{ padding: "8px 12px", borderRadius: "8px", border: `2px solid ${innerAddr === v ? "#00ff88" : "rgba(148,163,184,0.1)"}`, background: innerAddr === v ? "rgba(0,255,136,0.1)" : "transparent", color: innerAddr === v ? "#00ff88" : "#64748b", cursor: "pointer", fontFamily: "monospace" }}>{v.toString(2).padStart(2, '0')}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ position: "relative", height: "220px", background: "rgba(0,0,0,0.2)", borderRadius: "12px", border: "1px dashed rgba(251,191,36,0.3)", padding: "15px" }}>
+           <div style={{ position: "absolute", left: "20px", top: chipSelect === 0 ? "30px" : "130px", width: "10px", height: "10px", borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 10px #fbbf24", transition: "all 0.3s" }} />
+           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              {chips.map((name, i) => (
+                <div key={i} style={{ padding: "15px", borderRadius: "8px", border: `1px solid ${chipSelect === i ? "#fbbf24" : "rgba(148,163,184,0.1)"}`, background: chipSelect === i ? "rgba(251,191,36,0.05)" : "rgba(12,18,35,0.6)", opacity: chipSelect === i ? 1 : 0.4, transition: "all 0.3s" }}>
+                  <div style={{ fontSize: "0.7rem", color: chipSelect === i ? "#fbbf24" : "#4b5563", fontWeight: "700" }}>{name}</div>
+                  <div style={{ display: "flex", gap: "4px", marginTop: "8px" }}>
+                    {[0,1,2,3].map(bit => (
+                      <div key={bit} style={{ width: "12px", height: "12px", borderRadius: "2px", background: (chipSelect === i && innerAddr === bit) ? "#00ff88" : "#1e293b", boxShadow: (chipSelect === i && innerAddr === bit) ? "0 0 5px #00ff88" : "none" }} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+           </div>
+           <div style={{ marginTop: "15px", textAlign: "center", color: "#00ff88", fontFamily: "monospace", fontSize: "0.9rem", fontWeight: "700" }}>
+              Global Output: D{activeGlobal}
+           </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -2229,6 +2303,263 @@ const BCDDigitPad = () => {
   );
 };
 
+// ─── HDL Code Generator ────────────────────────────────────────────────────────
+const HDLCodeGenerator = ({ type }) => {
+  const [lang, setLang] = useState("Verilog");
+  const config = DECODER_TYPES[type];
+  const numInputs = config.codeInputs.length;
+  const numOutputs = config.outputs.length;
+
+  const generateCode = () => {
+    if (lang === "Verilog") {
+      return `module decoder_${type}(
+    input [${numInputs - 1}:0] A,
+    input E,
+    output [${numOutputs - 1}:0] D
+);
+    assign D = E ? (1 << A) : ${numOutputs}'b0;
+endmodule`;
+    } else {
+      return `library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity decoder_${type} is
+    Port ( A : in  STD_LOGIC_VECTOR (${numInputs - 1} downto 0);
+           E : in  STD_LOGIC;
+           D : out STD_LOGIC_VECTOR (${numOutputs - 1} downto 0));
+end decoder_${type};
+
+architecture Behavioral of decoder_${type} is
+begin
+    process(A, E)
+    begin
+        D <= (others => '0');
+        if E = '1' then
+            D(to_integer(unsigned(A))) <= '1';
+        end if;
+    end process;
+end Behavioral;`;
+    }
+  };
+
+  return (
+    <div style={{ background: "rgba(15,23,42,0.6)", borderRadius: "12px", border: "1px solid rgba(99,102,241,0.2)", padding: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+        <h4 style={{ color: "#a78bfa", margin: 0, fontSize: "0.9rem" }}>💻 Hardware Description (HDL) Export</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {["Verilog", "VHDL"].map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{ padding: "4px 10px", borderRadius: "6px", border: `1px solid ${lang === l ? "#a78bfa" : "rgba(148,163,184,0.2)"}`, background: lang === l ? "rgba(167,139,250,0.15)" : "transparent", color: lang === l ? "#c084fc" : "#6b7280", cursor: "pointer", fontSize: "0.75rem" }}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <pre style={{ margin: 0, padding: "16px", background: "#020617", borderRadius: "8px", color: "#86efac", fontSize: "0.82rem", overflowX: "auto", fontFamily: "monospace", border: "1px solid rgba(167,139,250,0.1)" }}>
+        {generateCode()}
+      </pre>
+    </div>
+  );
+};
+
+// ─── 7-Segment Scroller ────────────────────────────────────────────────────────
+const SevenSegScroller = () => {
+  const [text, setText] = useState("HELLO");
+  const [idx, setIdx] = useState(0);
+  
+  const charMap = {
+    'H': [0, 1, 1, 0, 1, 1, 1], 'E': [1, 0, 0, 1, 1, 1, 1], 'L': [0, 0, 0, 1, 1, 1, 0], 'O': [1, 1, 1, 1, 1, 1, 0],
+    'P': [1, 1, 0, 0, 1, 1, 1], 'A': [1, 1, 1, 0, 1, 1, 1], 'C': [1, 0, 0, 1, 1, 1, 0], 'U': [0, 1, 1, 1, 1, 1, 0],
+    'F': [1, 0, 0, 0, 1, 1, 1], 'S': [1, 0, 1, 1, 0, 1, 1], 'b': [0, 0, 1, 1, 1, 1, 1], 'd': [0, 1, 1, 1, 1, 0, 1],
+    ' ': [0, 0, 0, 0, 0, 0, 0]
+  };
+
+  const currentChar = text[idx]?.toUpperCase() || ' ';
+  const segsArray = charMap[currentChar] || charMap[' '];
+  const segsObj = { a: segsArray[0], b: segsArray[1], c: segsArray[2], d: segsArray[3], e: segsArray[4], f: segsArray[5], g: segsArray[6] };
+
+  return (
+    <div style={{ background: "rgba(8,14,30,0.9)", borderRadius: "14px", padding: "22px", border: "1px solid rgba(0,255,136,0.25)" }}>
+      <h4 style={{ color: "#86efac", marginBottom: "14px", fontSize: "0.95rem" }}>🔡 Message Scroller — 7-Seg Translation</h4>
+      <div style={{ display: "flex", gap: "15px", alignItems: "center", marginBottom: "20px" }}>
+        <input 
+          type="text" 
+          value={text} 
+          onChange={(e) => setText(e.target.value.slice(0, 10))} 
+          placeholder="Type a word..."
+          style={{ flex: 1, background: "rgba(15,23,42,0.8)", border: "1px solid rgba(0,255,136,0.2)", borderRadius: "8px", padding: "10px", color: "#e2e8f0", fontFamily: "monospace" }}
+        />
+        <div style={{ display: "flex", gap: "5px" }}>
+          {text.split('').map((char, i) => (
+            <button key={i} onClick={() => setIdx(i)} style={{ width: "24px", height: "24px", borderRadius: "4px", border: `1px solid ${idx === i ? "#00ff88" : "#1e293b"}`, background: idx === i ? "rgba(0,255,136,0.2)" : "transparent", color: idx === i ? "#00ff88" : "#4b5563", fontSize: "0.7rem", cursor: "pointer" }}>{char.toUpperCase()}</button>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "40px" }}>
+        <SevenSeg segs={segsObj} digit={currentChar} />
+        <div style={{ padding: "15px", background: "rgba(0,255,136,0.05)", borderRadius: "10px", border: "1px solid rgba(0,255,136,0.15)" }}>
+          <div style={{ color: "#9ca3af", fontSize: "0.75rem", marginBottom: "8px" }}>Current Binary Map:</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+            {["a","b","c","d","e","f","g"].map((s, i) => (
+              <div key={s} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "0.65rem", color: "#4b5563" }}>{s}</div>
+                <div style={{ color: segsObj[s] ? "#00ff88" : "#1e293b", fontWeight: "700" }}>{segsObj[s]}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Logic Error Debugger ──────────────────────────────────────────────────────
+const LogicErrorDebugger = () => {
+  const [level, setLevel] = useState(0);
+  const [userGuess, setUserGuess] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const faults = [
+    { type: "Stuck-at-0", line: "Enable (E)", effect: "All outputs are LOW regardless of address", answer: "E" },
+    { type: "Stuck-at-1", line: "Input A1", effect: "Decoder thinks addresses are 10 or 11 only", answer: "A1" },
+    { type: "Short-Circuit", line: "D0 and D1", effect: "D0 and D1 both go HIGH for address 00 or 01", answer: "D0" }
+  ];
+
+  const check = (ans) => {
+    setUserGuess(ans);
+    setShowResult(true);
+  };
+
+  const next = () => {
+    setLevel((level + 1) % faults.length);
+    setShowResult(false);
+    setUserGuess(null);
+  };
+
+  return (
+    <div style={{ background: "rgba(8,14,30,0.9)", borderRadius: "14px", padding: "22px", border: "1px solid rgba(239,68,68,0.25)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "15px" }}>
+        <h4 style={{ color: "#f87171", margin: 0, fontSize: "0.95rem" }}>🕵️ Logic Fault Debugger — Level {level + 1}</h4>
+        <div style={{ background: "rgba(239,68,68,0.1)", color: "#f87171", padding: "4px 10px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: "700" }}>ERROR DETECTED</div>
+      </div>
+      <p style={{ color: "#9ca3af", fontSize: "0.85rem", marginBottom: "15px" }}><strong>Symptom:</strong> {faults[level].effect}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" }}>
+        {["E", "A1", "A0", "D0"].map(opt => (
+          <button key={opt} onClick={() => check(opt)} disabled={showResult} style={{ padding: "10px", borderRadius: "8px", border: `1.5px solid ${userGuess === opt ? (opt === faults[level].answer ? "#34d399" : "#f87171") : "rgba(239,68,68,0.2)"}`, background: userGuess === opt ? (opt === faults[level].answer ? "rgba(52,211,153,0.1)" : "rgba(248,113,113,0.1)") : "rgba(12,18,35,0.7)", color: userGuess === opt ? (opt === faults[level].answer ? "#34d399" : "#f87171") : "#9ca3af", cursor: "pointer" }}>Line {opt} Fault</button>
+        ))}
+      </div>
+      {showResult && (
+        <div style={{ padding: "12px", borderRadius: "8px", background: userGuess === faults[level].answer ? "rgba(52,211,153,0.1)" : "rgba(248,113,113,0.1)", border: `1px solid ${userGuess === faults[level].answer ? "#34d399" : "#f87171"}`, marginBottom: "15px" }}>
+          <div style={{ color: userGuess === faults[level].answer ? "#34d399" : "#f87171", fontSize: "0.85rem", fontWeight: "700" }}>{userGuess === faults[level].answer ? "✅ Correct! " : "❌ Try again! "}</div>
+          <div style={{ color: "#9ca3af", fontSize: "0.75rem", marginTop: "4px" }}>The fault is <strong>{faults[level].type}</strong> on line <strong>{faults[level].answer}</strong>.</div>
+          <button onClick={next} style={{ marginTop: "10px", padding: "5px 12px", borderRadius: "6px", background: "#f87171", border: "none", color: "white", cursor: "pointer", fontSize: "0.75rem" }}>Next Level</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Virtual Breadboard Guide ────────────────────────────────────────────────
+const VirtualBreadboard = ({ inputs, outputs, config }) => {
+  const isActive = (idx) => inputs[idx] === 1;
+  
+  return (
+    <div style={{ background: "rgba(15,23,42,0.6)", borderRadius: "14px", padding: "24px", border: "1px solid rgba(148,163,184,0.2)", textAlign: "center" }}>
+      <h4 style={{ color: "#94a3b8", marginBottom: "20px", fontSize: "0.9rem" }}>🔌 Virtual Breadboard — 74LS Series Wiring Guide</h4>
+      <div style={{ position: "relative", display: "inline-block", background: "#d1d5db", padding: "10px", borderRadius: "4px", boxShadow: "inset 0 0 10px rgba(0,0,0,0.2)" }}>
+        {/* Breadboard Holes */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(20, 10px)", gap: "5px" }}>
+          {Array(100).fill(0).map((_, i) => (
+            <div key={i} style={{ width: "8px", height: "8px", borderRadius: "1px", background: "#9ca3af", border: "1px solid rgba(0,0,0,0.1)" }} />
+          ))}
+        </div>
+        
+        {/* IC Chip */}
+        <div style={{ position: "absolute", top: "25%", left: "25%", width: "50%", height: "50%", background: "#1f2937", borderRadius: "3px", border: "1px solid #111827", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+          <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#111827", position: "absolute", top: "5px", left: "-5px" }} />
+          <div style={{ color: "#4b5563", fontSize: "10px", fontWeight: "800", transform: "rotate(-90deg)" }}>74LS138</div>
+          
+          {/* Pins */}
+          {[0,1,2,3,4,5,6,7].map(i => (
+            <div key={i} style={{ position: "absolute", left: "-12px", top: `${15 + i * 10}%`, width: "12px", height: "4px", background: "#9ca3af" }} />
+          ))}
+          {[0,1,2,3,4,5,6,7].map(i => (
+            <div key={i} style={{ position: "absolute", right: "-12px", top: `${15 + i * 10}%`, width: "12px", height: "4px", background: "#9ca3af" }} />
+          ))}
+        </div>
+
+        {/* Dynamic Wires */}
+        {inputs.map((val, i) => (
+          val === 1 && (
+            <svg key={i} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+              <path d={`M 10,${40 + i*20} Q 40,${40 + i*20} 60,70`} fill="none" stroke="#60a5fa" strokeWidth="2" strokeDasharray="4" style={{ filter: "drop-shadow(0 0 3px #60a5fa)" }} />
+            </svg>
+          )
+        ))}
+      </div>
+      <div style={{ marginTop: "15px", fontSize: "0.75rem", color: "#6b7280" }}>
+        Interactive wires glow when signals are <strong>HIGH (1)</strong>.
+      </div>
+    </div>
+  );
+};
+
+// ─── Logic Analyzer (Timing Diagram) ──────────────────────────────────────────
+const LogicAnalyzer = ({ inputs, outputs, labels }) => {
+  const [history, setHistory] = useState([]);
+  const maxPoints = 40;
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setHistory(prev => {
+        const newState = [...inputs, ...outputs];
+        const updated = [...prev, newState];
+        return updated.slice(-maxPoints);
+      });
+    }, 200);
+    return () => clearInterval(timer);
+  }, [inputs, outputs]);
+
+  const height = 30;
+  const gap = 15;
+  const totalHeight = (inputs.length + outputs.length) * (height + gap);
+
+  return (
+    <div style={{ background: "#020617", borderRadius: "12px", padding: "20px", border: "1px solid rgba(96,165,250,0.2)", overflow: "hidden" }}>
+      <h4 style={{ color: "#60a5fa", marginTop: 0, marginBottom: "15px", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", boxShadow: "0 0 8px #ef4444" }} />
+        LIVE LOGIC ANALYZER — TIMING DIAGRAM
+      </h4>
+      <div style={{ overflowX: "auto" }}>
+        <svg width="100%" height={totalHeight} style={{ minWidth: "600px" }}>
+          {(labels || []).map((label, i) => {
+            const yBase = i * (height + gap);
+            return (
+              <g key={label}>
+                <text x="0" y={yBase + 20} fill="#4b5563" fontSize="10" fontFamily="monospace">{label}</text>
+                <line x1="45" y1={yBase + height} x2="100%" y2={yBase + height} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                <polyline
+                  points={history.map((state, idx) => {
+                    const x = 50 + (idx * (600 / maxPoints));
+                    const y = yBase + (state[i] ? 5 : height - 5);
+                    return `${x},${y}`;
+                  }).join(" ")}
+                  fill="none"
+                  stroke={i < inputs.length ? "#60a5fa" : "#00ff88"}
+                  strokeWidth="2"
+                  strokeLinejoin="step-after"
+                  style={{ transition: "all 0.1s linear" }}
+                />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div style={{ marginTop: "10px", color: "#4b5563", fontSize: "0.7rem", textAlign: "right" }}>
+        Scan Rate: 5Hz • Resolution: 8-bit
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const DecoderPage = () => {
   const [selectedType, setSelectedType] = useState("2to4");
@@ -2550,6 +2881,9 @@ const DecoderPage = () => {
             inputVals={inputVals}
             setInputVals={setInputVals}
           />
+          <div style={{ marginTop: "24px" }}>
+            <HDLCodeGenerator type={selectedType} />
+          </div>
         </Section>
 
         {/* SECTION 4: 7-Seg Demo */}
@@ -2564,9 +2898,12 @@ const DecoderPage = () => {
           >
             A BCD-to-7-segment decoder converts a 4-bit BCD number to 7 segment
             control signals. Click any digit below to see which segments light
-            up and what the BCD code is.
+            up, or use the <strong>Message Scroller</strong> to translate text!
           </p>
-          <BCDDigitPad />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
+            <BCDDigitPad />
+            <SevenSegScroller />
+          </div>
           <div
             style={{
               marginTop: "18px",
@@ -2618,6 +2955,22 @@ const DecoderPage = () => {
           </div>
         </Section>
 
+        {/* NEW SECTION: Troubleshooting */}
+        <Section title="🛠️ Troubleshooting — Find the Logic Fault" accent="#f87171">
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.88rem",
+              lineHeight: "1.6",
+              marginBottom: "18px",
+            }}
+          >
+            Real-world circuits aren't always perfect. Use your knowledge of
+            decoder truth tables to identify which internal line has a fault.
+          </p>
+          <LogicErrorDebugger />
+        </Section>
+
         {/* SECTION 5: Function Generator */}
         <Section
           title="🧩 Decoder as Function Generator — Zero Extra Gates!"
@@ -2656,7 +3009,7 @@ const DecoderPage = () => {
             top-level decoder selects which of four child decoders is active
             using the high address bits.
           </p>
-          <CascadingExplainer />
+          <VisualCascadingDemo />
         </Section>
 
         {/* SECTION 7: Real World */}
