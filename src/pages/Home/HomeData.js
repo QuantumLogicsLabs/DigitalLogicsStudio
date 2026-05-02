@@ -41,6 +41,7 @@ const homeData = [
       { text: "Identities", to: "/boolean-identities" },
       { text: "Laws", to: "/boolean-laws" },
       { text: "Duality", to: "/duality-principle" },
+      { text: "Significant Digits", to: "/significant-digits" },
       { text: "Consensus", to: "/consensus-theorem" },
       { text: "Complement", to: "/complement" },
       { text: "SOP & POS", to: "/standard-forms" },

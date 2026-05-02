@@ -6,13 +6,12 @@ import { useTheme } from "./context/ThemeContext";
 // PAGES:
 import Home from "./pages/Home/Home";
 import Boolforge from "./pages/Boolforge";
-import SignificantDigits from "./pages/SignificantDigits";
-import BCDNotation from "./pages/NumberSystems/BCDNotation";
-import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
-import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
+
+// REGISTER AND TRANSFERS:
 import RegCounters from "./pages/RegistersAndTransfers/RegCounters";
 import RegSyncAsync from "./pages/RegistersAndTransfers/RegSyncAsync";
 import RegShiftRegisters from "./pages/RegistersAndTransfers/RegShiftRegisters";
+import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
 import RegSerialShift from "./pages/RegistersAndTransfers/RegSerialShift";
 import RegLoading from "./pages/RegistersAndTransfers/RegLoading";
 import RegParallel from "./pages/RegistersAndTransfers/RegParallel";
@@ -21,9 +20,6 @@ import RegSyncBinaryCounters from "./pages/RegistersAndTransfers/RegSyncBinaryCo
 
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
-import NumberConverter from "./pages/NumberSystems/NumberConversation";
-import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator";
-import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
 import ProblemSolver from "./pages/Book/Ch1";
 import Ch2ProblemSolver from "./pages/Book/Ch2";
 import ParityBitCalculator from "./pages/ParityBitCalculator";
@@ -31,11 +27,7 @@ import KMapGenerator from "./pages/KmapGenerator";
 import GateExplanation from "./pages/GateExplanation";
 import TimeDiagrams from "./pages/TimeDiagrams";
 import BooleanAlgebraOverview from "./pages/BooleanAlgebra/BooleanAlgebraOverview";
-import DualityPrinciple from "./pages/DualityPrinciple";
 import StandardForms from "./pages/StandardForms";
-import MintermsPage from "./pages/MintermsPage";
-import MaxtermsPage from "./pages/MaxtermsPage";
-import MintermsMaxtermsRelation from "./pages/MintermsMaxtermsRelation";
 import CircuitCost from "./pages/CircuitCost";
 import UniversalGates from "./pages/UniversalGates";
 import OddFunction from "./pages/OddFunction";
@@ -43,8 +35,13 @@ import OddFunction from "./pages/OddFunction";
 // BOOLEAN ALGEBRA:
 import BooleanLaws from "./pages/BooleanAlgebra/BooleanLaws";
 import BooleanIdentities from "./pages/BooleanAlgebra/BooleanIdentities";
+import MintermsPage from "./pages/BooleanAlgebra/MintermsPage";
+import MaxtermsPage from "./pages/BooleanAlgebra/MaxtermsPage";
 import ComplementPage from "./pages/BooleanAlgebra/ComplementPage";
 import ConsensusTheorem from "./pages/BooleanAlgebra/ConsensusTheorem";
+import DualityPrinciple from "./pages/BooleanAlgebra/DualityPrinciple";
+import MintermsMaxtermsRelation from "./pages/BooleanAlgebra/MintermsMaxtermsRelation";
+import SignificantDigits from "./pages/BooleanAlgebra/SignificantDigits";
 
 // ARITHMETIC FUNCTIONS AND HDLs:
 import BinaryAdders from "./pages/ArithmeticFunctionsAndHDLs/BinaryAdders";
@@ -61,6 +58,11 @@ import SignedUnsignedArithmetic from "./pages/ArithmeticFunctionsAndHDLs/SignedU
 // NUMBER SYSTEMS:
 import BitConverter from "./pages/NumberSystems/Bitconverter";
 import BitExtension from "./pages/NumberSystems/BitExtension";
+import NumberConverter from "./pages/NumberSystems/NumberConversation";
+import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator";
+import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
+import BCDNotation from "./pages/NumberSystems/BCDNotation";
+import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
 
 // COMBINATIONAL CIRCUITS:
 import EncoderPage from "./pages/EncoderAndDecoder/encoder/EncoderPage";
