@@ -131,6 +131,8 @@ const homeData = [
       { text: "Binary Visualizer", to: "/binaryrepresentation" },
       { text: "BCD Notation", to: "/bcd-notation" },
       { text: "ASCII Codes", to: "/ascii-notation" },
+      { text: "Bit Converter", to: "/bitconvertor" },
+      { text: "Bit Extension", to: "/bit-extension" },
     ],
   },
   {

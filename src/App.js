@@ -9,7 +9,6 @@ import Boolforge from "./pages/Boolforge";
 import SignificantDigits from "./pages/SignificantDigits";
 import BCDNotation from "./pages/NumberSystems/BCDNotation";
 import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
-import BitExtension from "./pages/BitExtension";
 import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
 import RegCounters from "./pages/RegistersAndTransfers/RegCounters";
 import RegSyncAsync from "./pages/RegistersAndTransfers/RegSyncAsync";
@@ -27,17 +26,12 @@ import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator
 import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
 import ProblemSolver from "./pages/Book/Ch1";
 import Ch2ProblemSolver from "./pages/Book/Ch2";
-import BitConverter from "./pages/Bitconverter";
 import ParityBitCalculator from "./pages/ParityBitCalculator";
 import KMapGenerator from "./pages/KmapGenerator";
 import GateExplanation from "./pages/GateExplanation";
 import TimeDiagrams from "./pages/TimeDiagrams";
 import BooleanAlgebraOverview from "./pages/BooleanAlgebra/BooleanAlgebraOverview";
-import BooleanIdentities from "./pages/BooleanIdentities";
 import DualityPrinciple from "./pages/DualityPrinciple";
-import BooleanLaws from "./pages/BooleanLaws";
-import ConsensusTheorem from "./pages/ConsensusTheorem";
-import ComplementPage from "./pages/ComplementPage";
 import StandardForms from "./pages/StandardForms";
 import MintermsPage from "./pages/MintermsPage";
 import MaxtermsPage from "./pages/MaxtermsPage";
@@ -46,6 +40,13 @@ import CircuitCost from "./pages/CircuitCost";
 import UniversalGates from "./pages/UniversalGates";
 import OddFunction from "./pages/OddFunction";
 
+// BOOLEAN ALGEBRA:
+import BooleanLaws from "./pages/BooleanAlgebra/BooleanLaws";
+import BooleanIdentities from "./pages/BooleanAlgebra/BooleanIdentities";
+import ComplementPage from "./pages/BooleanAlgebra/ComplementPage";
+import ConsensusTheorem from "./pages/BooleanAlgebra/ConsensusTheorem";
+
+// ARITHMETIC FUNCTIONS AND HDLs:
 import BinaryAdders from "./pages/ArithmeticFunctionsAndHDLs/BinaryAdders";
 import BinarySubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinarySubtractor";
 import BinaryAddSubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinaryAddSubtractor";
@@ -57,9 +58,13 @@ import DesignApplications from "./pages/ArithmeticFunctionsAndHDLs/DesignApplica
 import Complements from "./pages/ArithmeticFunctionsAndHDLs/Complements";
 import SignedUnsignedArithmetic from "./pages/ArithmeticFunctionsAndHDLs/SignedUnsignedArithmetic";
 
+// NUMBER SYSTEMS:
+import BitConverter from "./pages/NumberSystems/Bitconverter";
+import BitExtension from "./pages/NumberSystems/BitExtension";
+
 // COMBINATIONAL CIRCUITS:
-import EncoderPage from "./pages/EncoderPage";
-import DecoderPage from "./pages/DecoderPage";
+import EncoderPage from "./pages/EncoderAndDecoder/encoder/EncoderPage";
+import DecoderPage from "./pages/EncoderAndDecoder/decoder/DecoderPage";
 
 // SEQUENTIAL CIRCUITS:
 import SeqIntro from "./pages/SequentialCircuits/SeqIntro";
@@ -79,10 +84,7 @@ function App() {
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
-          <Route
-            path="/"
-            element={<Home />}
-          />
+          <Route path="/" element={<Home />} />
           <Route path="/boolforge" element={<Boolforge />} />
           <Route path="/significant-digits" element={<SignificantDigits />} />
           <Route path="/bcd-notation" element={<BCDNotation />} />
