@@ -16,7 +16,6 @@ import TruthTable from "../../shared/components/TruthTable.jsx";
 
 // ─── Sub: single input toggle button ──────────────────────────────────────────
 const InputToggle = ({ name, isActive, isWinner, onClick }) => {
-  const color = isActive ? (isWinner ? COLORS.high : "#f97316") : COLORS.indigoMuted;
   const bg = isActive ? (isWinner ? "rgba(0,255,136,0.1)" : "rgba(249,115,22,0.1)") : COLORS.inputBg;
 
   return (

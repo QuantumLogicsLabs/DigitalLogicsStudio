@@ -35,7 +35,6 @@ const BCDDigitPad = () => {
 
   const segs    = toSegsObj(BCD_TABLE[digit]);
   const bcdBits = digit.toString(2).padStart(4, "0");
-  const activeSegNames = SEG_NAMES.filter((_, i) => BCD_TABLE[digit][i]);
 
   return (
     <div>

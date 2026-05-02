@@ -78,6 +78,7 @@ const AppCard = ({ icon, color, title, items }) => (
 const DecoderPage = () => {
   const [selectedType, setSelectedType] = useState("2to4");
   // inputVals is shared across the simulator — up to 4 bits
+  // eslint-disable-next-line no-unused-vars
   const [inputVals, setInputVals] = useState(Array(4).fill(0));
 
   const handleTypeChange = (key) => {
