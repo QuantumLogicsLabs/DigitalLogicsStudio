@@ -1,420 +1,264 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const COLS = 63;
-const ROWS = 10;
-const CELL = 14;
-const GAP = 2;
-const PITCH = CELL + GAP;
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 
-// IC definitions: { name, pins (left top-to-bottom, right bottom-to-top like real DIP) }
-const IC_DEFS = {
-  7408: {
-    name: "74HC08 AND×4",
-    cols: 7,
-    pins: 14,
-    color: "#1a1a2e",
-    logic: (inputs) => ({
-      3: inputs[0] & inputs[1],
-      6: inputs[3] & inputs[4],
-      8: inputs[6] & inputs[7],
-      11: inputs[9] & inputs[10],
-    }),
-    pinNames: [
-      "A1",
-      "B1",
-      "Y1",
-      "A2",
-      "B2",
-      "Y2",
-      "GND",
-      "Y3",
-      "A3",
-      "B3",
-      "Y4",
-      "A4",
-      "B4",
-      "VCC",
-    ],
-  },
-  7432: {
-    name: "74HC32 OR×4",
-    cols: 7,
-    pins: 14,
-    color: "#1a2e1a",
-    logic: (inputs) => ({
-      3: inputs[0] | inputs[1],
-      6: inputs[3] | inputs[4],
-      8: inputs[6] | inputs[7],
-      11: inputs[9] | inputs[10],
-    }),
-    pinNames: [
-      "A1",
-      "B1",
-      "Y1",
-      "A2",
-      "B2",
-      "Y2",
-      "GND",
-      "Y3",
-      "A3",
-      "B3",
-      "Y4",
-      "A4",
-      "B4",
-      "VCC",
-    ],
-  },
-  7404: {
-    name: "74HC04 NOT×6",
-    cols: 7,
-    pins: 14,
-    color: "#2e1a1a",
-    logic: (inputs) => ({
-      2: inputs[0] ^ 1,
-      4: inputs[2] ^ 1,
-      6: inputs[4] ^ 1,
-      8: inputs[6] ^ 1,
-      10: inputs[8] ^ 1,
-      12: inputs[10] ^ 1,
-    }),
-    pinNames: [
-      "A1",
-      "Y1",
-      "A2",
-      "Y2",
-      "A3",
-      "Y3",
-      "GND",
-      "Y4",
-      "A4",
-      "Y5",
-      "A5",
-      "Y6",
-      "A6",
-      "VCC",
-    ],
-  },
-  7486: {
-    name: "74HC86 XOR×4",
-    cols: 7,
-    pins: 14,
-    color: "#2e2e1a",
-    logic: (inputs) => ({
-      3: inputs[0] ^ inputs[1],
-      6: inputs[3] ^ inputs[4],
-      8: inputs[6] ^ inputs[7],
-      11: inputs[9] ^ inputs[10],
-    }),
-    pinNames: [
-      "A1",
-      "B1",
-      "Y1",
-      "A2",
-      "B2",
-      "Y2",
-      "GND",
-      "Y3",
-      "A3",
-      "B3",
-      "Y4",
-      "A4",
-      "B4",
-      "VCC",
-    ],
-  },
-};
-
-const COLORS = [
-  "#e63946",
-  "#2196f3",
-  "#4caf50",
-  "#ff9800",
-  "#9c27b0",
-  "#00bcd4",
-  "#f06292",
-  "#8bc34a",
-  "#ffc107",
-  "#03a9f4",
-];
-
-// ─── Utility ─────────────────────────────────────────────────────────────────
-function pinToHole(col, row) {
-  // col: 0-based breadboard column, row: 0-based row
-  return { col, row };
+.dld-root *{box-sizing:border-box;}
+.dld-root{
+  font-family:'Share Tech Mono',monospace;
+  background:radial-gradient(ellipse at center,#3a3a3a,#1a1a1a);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:24px; user-select:none;
 }
 
-function holePos(col, row) {
-  // Returns SVG x,y center of a breadboard hole
-  // Layout: top power rail (rows 0-1), main grid rows 2-6, gap, main grid rows 7-11 (rows 7-11 mapped to 5-9 visually), bottom power rail (rows 12-13)
-  const LEFT_MARGIN = 36;
-  const TOP_MARGIN = 48;
-  const RAIL_H = PITCH * 2;
-  const MAIN_H = PITCH * 5;
-  const GAP_H = PITCH;
-
-  let x = LEFT_MARGIN + col * PITCH + PITCH / 2;
-  let y;
-
-  if (row < 2) {
-    // Top power rail
-    y = TOP_MARGIN + row * PITCH + PITCH / 2;
-  } else if (row < 7) {
-    // Top main grid (a-e)
-    y = TOP_MARGIN + RAIL_H + 8 + (row - 2) * PITCH + PITCH / 2;
-  } else if (row < 12) {
-    // Bottom main grid (f-j)
-    y =
-      TOP_MARGIN + RAIL_H + 8 + MAIN_H + GAP_H + (row - 7) * PITCH + PITCH / 2;
-  } else {
-    // Bottom power rail
-    y =
-      TOP_MARGIN +
-      RAIL_H +
-      8 +
-      MAIN_H +
-      GAP_H +
-      MAIN_H +
-      8 +
-      (row - 12) * PITCH +
-      PITCH / 2;
-  }
-  return { x, y };
+.dld-case{
+  position:relative;
+  border-radius:16px 16px 6px 6px;
+  background:linear-gradient(160deg,#e0e0e0 0%,#c0c0c0 30%,#a0a0a0 70%,#909090 100%);
+  padding:14px 14px 0 14px;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.85),
+    0 12px 24px rgba(0,0,0,.5),
+    inset 0 3px 6px rgba(255,255,255,.5),
+    inset 0 -2px 4px rgba(0,0,0,.3);
+}
+.dld-case::before{
+  content:''; position:absolute;
+  bottom:-22px; left:8px; right:8px; height:22px;
+  background:linear-gradient(180deg,#888,#555);
+  border-radius:0 0 10px 10px;
+  box-shadow:0 8px 16px rgba(0,0,0,.7);
+}
+.dld-case::after{
+  content:''; position:absolute;
+  top:14px; bottom:0; right:-14px; width:14px;
+  background:linear-gradient(90deg,#aaa,#666);
+  border-radius:0 8px 8px 0;
 }
 
-// ─── Breadboard SVG dims
-const BB_LEFT = 36;
-const BB_TOP = 48;
-const RAIL_H = PITCH * 2;
-const MAIN_H = PITCH * 5;
-const GAP_H = PITCH;
-const BB_W = COLS * PITCH + 12;
-const BB_H = RAIL_H * 2 + MAIN_H * 2 + GAP_H + 16 + 16;
-
-// ─── Components ──────────────────────────────────────────────────────────────
-
-function Hole({ col, row, netVal, onMouseDown, onMouseEnter, isHighlighted }) {
-  const { x, y } = holePos(col, row);
-  const filled = netVal !== undefined && netVal !== null;
-  const color = filled ? (netVal === 1 ? "#ff6b35" : "#334") : "#1a1a2a";
-  const border = isHighlighted ? "#fff" : filled ? "#ff6b35" : "#2a2a3a";
-
-  return (
-    <circle
-      cx={x}
-      cy={y}
-      r={4.5}
-      fill={color}
-      stroke={border}
-      strokeWidth={isHighlighted ? 2 : 1}
-      style={{ cursor: "crosshair" }}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        onMouseDown(col, row);
-      }}
-      onMouseEnter={() => onMouseEnter(col, row)}
-    />
-  );
+.dld-pcb{
+  background:
+    radial-gradient(ellipse 60% 40% at 25% 20%,#1e5c35,transparent),
+    radial-gradient(ellipse 60% 40% at 75% 80%,#1a4a2e,transparent),
+    #122a18;
+  border-radius:8px;
+  padding:10px;
+  position:relative; overflow:hidden;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.6), inset 0 0 0 1px rgba(212,168,67,.12);
+}
+.dld-pcb::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(212,168,67,.05) 19px,rgba(212,168,67,.05) 20px),
+    repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(212,168,67,.05) 19px,rgba(212,168,67,.05) 20px);
 }
 
-function Wire({ wire, nets }) {
-  const p1 = holePos(wire.c1, wire.r1);
-  const p2 = holePos(wire.c2, wire.r2);
-  const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 - 18 };
-  const val = nets[wire.net];
-  const active = val === 1;
-  const baseColor = wire.color;
+.dld-header{
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(90deg,#061428,#0e2448,#061428);
+  border:1px solid #1e3a78; border-radius:5px;
+  padding:5px 12px; margin-bottom:8px;
+}
+.dld-brand{ display:flex; align-items:center; gap:8px; }
+.dld-infinity{ font-size:26px; color:#3a8fff; filter:drop-shadow(0 0 6px #3a8fff); line-height:1; }
+.dld-brand-text{ font-family:'Orbitron',monospace; }
+.dld-brand-name{ font-size:14px; font-weight:900; color:#d0e8ff; letter-spacing:2px; }
+.dld-brand-sub{ font-size:7px; color:#6080aa; letter-spacing:1px; }
+.dld-board-title{ font-family:'Orbitron',monospace; font-size:10px; color:#ffcc44; letter-spacing:3px; text-align:center; }
 
-  return (
-    <g>
-      <path
-        d={`M${p1.x},${p1.y} Q${mid.x},${mid.y} ${p2.x},${p2.y}`}
-        fill="none"
-        stroke={active ? "#ff6b35" : baseColor}
-        strokeWidth={active ? 4 : 3}
-        strokeLinecap="round"
-        opacity={0.9}
-      />
-      <circle cx={p1.x} cy={p1.y} r={5} fill={active ? "#ff6b35" : baseColor} />
-      <circle cx={p2.x} cy={p2.y} r={5} fill={active ? "#ff6b35" : baseColor} />
-    </g>
-  );
+.dld-main{ display:grid; grid-template-columns:150px 1fr 150px; gap:8px; }
+
+.sec{
+  background:linear-gradient(135deg,#0c1e0c,#162416);
+  border:1px solid rgba(212,168,67,.25);
+  border-radius:5px; padding:6px; margin-bottom:6px;
+}
+.sec-hdr{
+  font-size:7px; color:#d4a843; letter-spacing:2px; text-transform:uppercase;
+  border-bottom:1px solid rgba(212,168,67,.2); padding-bottom:3px; margin-bottom:5px;
+  text-align:center;
 }
 
-function ICChip({ ic, nets, onPinClick }) {
-  const def = IC_DEFS[ic.type];
-  if (!def) return null;
-  const halfPins = def.pins / 2;
-  const chipW = def.cols * PITCH;
-  const chipH = 2 * PITCH;
+.seg-wrap{ display:flex; gap:5px; align-items:center; justify-content:center; }
+.seg-unit{ position:relative; }
 
-  // IC sits across the middle gap between row 6 and row 7 (indices)
-  // Pin 1 top-left, goes down left side then up right side
-  const pinPositions = [];
-  for (let i = 0; i < halfPins; i++) {
-    const col = ic.col + i;
-    pinPositions.push({ pin: i + 1, col, row: 6, side: "top" }); // connects to row 6 (e row)
-  }
-  for (let i = 0; i < halfPins; i++) {
-    const col = ic.col + def.cols - 1 - i;
-    pinPositions.push({ pin: halfPins + i + 1, col, row: 7, side: "bottom" }); // connects to row 7 (f row)
-  }
+.led-lamp{
+  width:11px; height:11px; border-radius:50%;
+  border:1px solid rgba(0,0,0,.5); cursor:pointer;
+  transition:background .06s, box-shadow .06s; flex-shrink:0;
+}
+.led-off{ background:#1a1a1a; box-shadow:inset 0 1px 3px rgba(0,0,0,.7); }
+.led-red{ background:#ff2200; box-shadow:0 0 5px #ff2200,0 0 12px #ff440066; }
+.led-grn{ background:#00ff44; box-shadow:0 0 5px #00ff44,0 0 12px #00ff4466; }
+.led-yel{ background:#ffcc00; box-shadow:0 0 5px #ffcc00,0 0 12px #ffcc0066; }
+.led-blu{ background:#0088ff; box-shadow:0 0 5px #0088ff,0 0 12px #0088ff66; }
+.led-matrix{ display:flex; flex-wrap:wrap; gap:3px; justify-content:center; }
 
-  // Top-left corner of chip body
-  const tl = holePos(ic.col, 6);
-  const br = holePos(ic.col + def.cols - 1, 7);
-  const cx = (tl.x - PITCH / 2 + br.x + PITCH / 2) / 2;
-  const cy = (tl.y + br.y) / 2;
-  const bw = br.x - tl.x + PITCH;
-  const bh = br.y - tl.y + PITCH / 2;
+.sw-wrap{ display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; }
+.sw-body{
+  width:18px; height:36px; border-radius:3px;
+  background:linear-gradient(180deg,#2e2e2e,#1a1a1a);
+  border:1px solid #555; position:relative;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.6), 0 2px 4px rgba(0,0,0,.4);
+}
+.sw-lever{
+  position:absolute; left:2px; right:2px; height:15px;
+  background:linear-gradient(180deg,#ddd,#aaa);
+  border-radius:2px; transition:top .12s;
+  box-shadow:0 2px 4px rgba(0,0,0,.5);
+}
+.sw-lever.hi{ top:2px; }
+.sw-lever.lo{ top:18px; }
+.sw-lbl{ font-size:7px; color:#d4a843; }
+.sw-val{ font-size:9px; font-weight:bold; }
+.sw-val.on{ color:#00ff44; }
+.sw-val.off{ color:#334; }
 
-  return (
-    <g>
-      {/* Chip body */}
-      <rect
-        x={tl.x - PITCH / 2}
-        y={tl.y - 4}
-        width={bw}
-        height={bh}
-        rx={4}
-        fill={def.color}
-        stroke="#444"
-        strokeWidth={1.5}
-      />
-      {/* Notch */}
-      <ellipse
-        cx={cx}
-        cy={tl.y - 4}
-        rx={6}
-        ry={4}
-        fill={def.color}
-        stroke="#444"
-        strokeWidth={1}
-      />
-      {/* Label */}
-      <text
-        x={cx}
-        y={cy}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill="#eee"
-        fontSize={9}
-        fontFamily="monospace"
-        fontWeight="bold"
-      >
-        {ic.type}
-      </text>
-      {/* Pins */}
-      {pinPositions.map(({ pin, col, row, side }) => {
-        const hp = holePos(col, row);
-        const pinY = side === "top" ? hp.y + 6 : hp.y - 6;
-        const netKey = `ic_${ic.id}_${pin}`;
-        const val = nets[netKey];
-        return (
-          <g key={pin}>
-            <line
-              x1={hp.x}
-              y1={hp.y}
-              x2={hp.x}
-              y2={pinY}
-              stroke="#aaa"
-              strokeWidth={1.5}
-            />
-            <circle
-              cx={hp.x}
-              cy={hp.y}
-              r={3.5}
-              fill={val === 1 ? "#ff6b35" : "#222"}
-              stroke="#999"
-              strokeWidth={1}
-              style={{ cursor: "pointer" }}
-              onClick={() => onPinClick && onPinClick(ic, pin, col, row)}
-            />
-            <text
-              x={hp.x}
-              y={side === "top" ? hp.y - 8 : hp.y + 12}
-              textAnchor="middle"
-              fill="#888"
-              fontSize={7}
-              fontFamily="monospace"
-            >
-              {pin}
-            </text>
-          </g>
-        );
-      })}
-    </g>
-  );
+.pbtn{
+  border:none; cursor:pointer; border-radius:4px;
+  font-size:7px; color:#fff; font-family:'Share Tech Mono',monospace;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .08s, box-shadow .08s;
+}
+.pbtn:not(.pressed){ box-shadow:0 5px 0 rgba(0,0,0,.5), 0 3px 6px rgba(0,0,0,.4); }
+.pbtn.pressed{ transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,.5); }
+
+.pot-outer{
+  width:34px; height:34px; border-radius:50%;
+  background:radial-gradient(circle at 38% 35%,#999,#333);
+  border:2px solid #555;
+  box-shadow:0 4px 10px rgba(0,0,0,.7), inset 0 1px 3px rgba(255,255,255,.2);
+  position:relative; cursor:pointer;
+}
+.pot-marker{
+  position:absolute; top:4px; left:50%; transform:translateX(-50%);
+  width:3px; height:11px; background:#ddd; border-radius:2px;
+}
+.pot-wrap{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+.pot-lbl{ font-size:7px; color:#d4a843; }
+
+.bnc-con{
+  width:22px; height:22px; border-radius:50%;
+  background:radial-gradient(circle at 38% 35%,#aaa,#444);
+  border:2px solid #666;
+  box-shadow:0 3px 6px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.2);
 }
 
-function LED({ x, y, val, label, color }) {
-  const on = val === 1;
-  return (
-    <g>
-      {/* Base */}
-      <rect
-        x={x - 10}
-        y={y - 6}
-        width={20}
-        height={28}
-        rx={3}
-        fill="#222"
-        stroke="#444"
-        strokeWidth={1}
-      />
-      {/* LED lens */}
-      <ellipse
-        cx={x}
-        cy={y + 6}
-        rx={8}
-        ry={9}
-        fill={on ? color : "#333"}
-        stroke={on ? color : "#555"}
-        strokeWidth={on ? 2 : 1}
-        opacity={on ? 1 : 0.5}
-      />
-      {on && (
-        <ellipse
-          cx={x - 2}
-          cy={y + 3}
-          rx={2.5}
-          ry={3}
-          fill="rgba(255,255,255,0.4)"
-        />
-      )}
-      {/* Leads */}
-      <line
-        x1={x - 3}
-        y1={y + 15}
-        x2={x - 3}
-        y2={y + 22}
-        stroke="#aaa"
-        strokeWidth={1.5}
-      />
-      <line
-        x1={x + 3}
-        y1={y + 15}
-        x2={x + 3}
-        y2={y + 22}
-        stroke="#aaa"
-        strokeWidth={1.5}
-      />
-      <text
-        x={x}
-        y={y - 10}
-        textAnchor="middle"
-        fill="#aaa"
-        fontSize={9}
-        fontFamily="monospace"
-      >
-        {label}
-      </text>
-    </g>
-  );
+.screw{
+  width:14px; height:14px; border-radius:2px;
+  background:linear-gradient(135deg,#999,#555);
+  border:1px solid #333;
+  box-shadow:0 1px 3px rgba(0,0,0,.5);
+  position:relative;
+}
+.screw::before,.screw::after{
+  content:''; position:absolute;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#222;
+}
+.screw::before{ width:8px; height:1.5px; }
+.screw::after{ width:1.5px; height:8px; }
+
+.ic-pkg{
+  background:linear-gradient(180deg,#252525,#141414);
+  border:1px solid #555; border-radius:2px;
+  font-size:6px; color:#bbb; text-align:center;
+  padding:3px 5px;
+  box-shadow:0 2px 5px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.04);
+  position:relative;
+  font-family:'Share Tech Mono',monospace;
+}
+.ic-pkg::before{
+  content:''; position:absolute;
+  top:3px; left:50%; transform:translateX(-50%);
+  width:8px; height:8px; border-radius:50%;
+  border:1px solid #444; background:#1a1a1a;
 }
 
-function SevenSegDisplay({ x, y, value }) {
-  const digits = [
+.bb-wrap{
+  background:#e2d9c0;
+  border-radius:6px; padding:8px 7px;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.5);
+  display:inline-block; position:relative;
+}
+.bb-col-nums{ display:flex; gap:2px; margin-left:14px; margin-bottom:2px; }
+.bb-col-num{ width:8px; font-size:5.5px; color:#999; text-align:center; flex-shrink:0; font-family:'Share Tech Mono',monospace; }
+.bb-row-line{ display:flex; gap:2px; align-items:center; margin-bottom:2px; }
+.bb-rl{ font-size:6.5px; color:#888; width:12px; text-align:right; margin-right:1px; font-family:'Share Tech Mono',monospace; }
+.bb-h{
+  width:8px; height:8px; border-radius:50%;
+  background:#1a1a1a; border:1px solid #2e2e2e;
+  cursor:crosshair; flex-shrink:0; transition:background .08s, box-shadow .08s;
+}
+.bb-h:hover{ background:#2a2a2a; }
+.bb-h.h-active{ background:#ff6600; box-shadow:0 0 4px #ff660088; }
+.bb-h.h-vcc{ background:#aa1100; box-shadow:0 0 3px #cc220055; }
+.bb-h.h-gnd{ background:#00004a; }
+.bb-h.h-sel{ background:#ffffff; box-shadow:0 0 8px #fff; }
+.bb-grp-gap{ width:4px; flex-shrink:0; }
+.bb-center-gap{
+  height:12px; display:flex; align-items:center; justify-content:center;
+  color:rgba(180,160,100,.3); font-size:6.5px; letter-spacing:3px;
+  border-top:1px dashed rgba(180,160,100,.15);
+  border-bottom:1px dashed rgba(180,160,100,.15);
+  margin:3px 0;
+}
+.bb-rail{ display:flex; gap:2px; align-items:center; padding:2px 0; }
+.bb-rail-sym{ font-size:8px; font-weight:bold; width:12px; text-align:center; }
+.rail-vcc{ border-top:2px solid #cc2200; }
+.rail-gnd{ border-top:2px solid #2200cc; }
+.bb-spacer{ height:5px; }
+
+.osc-wave{
+  background:#000; border-radius:2px; height:16px;
+  display:flex; align-items:center; overflow:hidden;
+}
+
+.clk-dot{
+  width:9px; height:9px; border-radius:50%;
+  display:inline-block; vertical-align:middle;
+  transition:background .08s, box-shadow .08s;
+}
+
+.bin-readout{
+  font-family:'Share Tech Mono',monospace;
+  font-size:16px; color:#00ff44;
+  background:#000; padding:4px 8px; border-radius:3px;
+  text-align:center; letter-spacing:3px;
+  border:1px solid #112211;
+}
+
+.dld-status{
+  margin-top:8px; padding:4px 10px;
+  background:linear-gradient(90deg,#040c1e,#081428,#040c1e);
+  border:1px solid #0e2040; border-radius:4px;
+  display:flex; align-items:center; gap:10px;
+  font-size:8px; color:#3a6a88; font-family:'Share Tech Mono',monospace;
+}
+
+.wire-svg{
+  position:fixed; top:0; left:0;
+  pointer-events:none; z-index:200;
+}
+
+.dld-tip{
+  position:fixed; background:#000; color:#0f0;
+  font-size:9px; padding:2px 7px; border-radius:3px;
+  border:1px solid #0f0; pointer-events:none; z-index:300;
+  font-family:'Share Tech Mono',monospace; white-space:nowrap;
+}
+
+@keyframes pulse-glow{ 0%,100%{ box-shadow:0 0 5px #00ff44; } 50%{ box-shadow:0 0 14px #00ff44, 0 0 28px #00ff4466; } }
+.led-grn{ animation:pulse-glow 1.2s infinite; }
+`;
+
+function SevenSeg({ value, h = 44 }) {
+  const w = h * 0.58;
+  const t = h * 0.09;
+  const g = h * 0.035;
+  const ON = "#ff4400";
+  const OFF = "#1c0500";
+  const D = [
     [1, 1, 1, 1, 1, 1, 0],
     [0, 1, 1, 0, 0, 0, 0],
     [1, 1, 0, 1, 1, 0, 1],
@@ -426,948 +270,1017 @@ function SevenSegDisplay({ x, y, value }) {
     [1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 0, 1, 1],
   ];
-  const segs = value >= 0 && value <= 9 ? digits[value] : [0, 0, 0, 0, 0, 0, 0];
-  const on = "#ff4500";
-  const off = "#1a0a00";
-  const sw = 4;
-  const sl = 22;
+  const s = value >= 0 && value <= 9 ? D[value] : [0, 0, 0, 0, 0, 0, 0];
 
-  const segPath = (s) => {
-    switch (s) {
+  const hw = w - g * 2 - t;
+  const hh = h / 2 - g - t;
+
+  const seg = (i) => {
+    const x0 = g + t;
+    const x1 = g + t + hw;
+    const x2 = w - g;
+    const y0 = g;
+    const y1 = g + t;
+    const yM = h / 2;
+    const yB0 = h - g - t;
+    const yB1 = h - g;
+    switch (i) {
       case 0:
-        return `M${x + 4},${y + 2} h${sl - 8}`; // top
+        return `M${x0},${y0} h${hw} l${-t * 0.5},${t} H${x0 + t * 0.5} Z`;
       case 1:
-        return `M${x + sl - 2},${y + 4} v${sl - 8}`; // top-right
+        return `M${x2},${y1} v${hh} l${-t},${t * 0.3} V${y1 + t * 0.3} Z`;
       case 2:
-        return `M${x + sl - 2},${y + sl - 2} v${sl - 8}`; // bot-right
+        return `M${x2},${yM + t * 0.3} v${hh} l${-t},${-t * 0.3} V${yM + t * 0.6} Z`;
       case 3:
-        return `M${x + 4},${y + sl * 2 - 2} h${sl - 8}`; // bottom
+        return `M${x0},${yB1} h${hw} l${-t * 0.5},${-t} H${x0 + t * 0.5} Z`;
       case 4:
-        return `M${x + 2},${y + sl - 2} v${sl - 8}`; // bot-left
+        return `M${g},${yM + t * 0.3} v${hh} l${t},${-t * 0.3} V${yM + t * 0.6} Z`;
       case 5:
-        return `M${x + 2},${y + 4} v${sl - 8}`; // top-left
+        return `M${g},${y1} v${hh} l${t},${t * 0.3} V${y1 + t * 0.3} Z`;
       case 6:
-        return `M${x + 4},${y + sl - 1} h${sl - 8}`; // middle
+        return `M${x0},${yM - t * 0.4} h${hw} l${t * 0.4},${t * 0.4} l${-t * 0.4},${t * 0.4} H${x0} l${-t * 0.4},${-t * 0.4} Z`;
       default:
         return "";
     }
   };
 
   return (
-    <g>
-      <rect
-        x={x - 4}
-        y={y - 4}
-        width={sl + 8}
-        height={sl * 2 + 8}
-        rx={3}
-        fill="#0d0d0d"
-        stroke="#333"
-        strokeWidth={1}
-      />
-      {[0, 1, 2, 3, 4, 5, 6].map((s) => (
+    <svg width={w + 4} height={h + 4} style={{ display: "block" }}>
+      <rect width={w + 4} height={h + 4} rx={3} fill="#060200" />
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
         <path
-          key={s}
-          d={segPath(s)}
-          stroke={segs[s] ? on : off}
-          strokeWidth={sw}
-          strokeLinecap="round"
-          fill="none"
+          key={i}
+          d={seg(i)}
+          fill={s[i] ? ON : OFF}
+          transform="translate(2,2)"
         />
       ))}
-    </g>
+    </svg>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+function OscWave({ clk }) {
+  const pts =
+    "0,13 8,13 8,3 16,3 16,13 24,13 24,3 32,3 32,13 40,13 40,3 48,3 48,13 56,13";
+  return (
+    <svg width={60} height={16} style={{ display: "block" }}>
+      <rect width={60} height={16} fill="#000" rx={2} />
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={clk ? "#ff6600" : "#441100"}
+        strokeWidth={1.5}
+        strokeLinejoin="miter"
+      />
+      <circle cx={clk ? 56 : 8} cy={clk ? 3 : 13} r={2} fill="#ff8800" />
+    </svg>
+  );
+}
+
+const BB_COLS = 30;
+const ROWS_ALPHA = ["a", "b", "c", "d", "e"];
+const ROWS_BETA = ["f", "g", "h", "i", "j"];
+
+function Breadboard({ onHoleClick, onHoleEnter, wireStart, nets }) {
+  const renderRail = (id, isVcc) => (
+    <div className={`bb-rail ${isVcc ? "rail-vcc" : "rail-gnd"}`}>
+      <span className="bb-rail-sym" style={{ color: isVcc ? "#f44" : "#44f" }}>
+        {isVcc ? "+" : "\u2212"}
+      </span>
+      {Array.from({ length: BB_COLS }, (_, c) => {
+        const hid = `${id}_${isVcc ? "v" : "g"}_${c}`;
+        return (
+          <div
+            key={c}
+            className={`bb-h ${isVcc ? "h-vcc" : "h-gnd"}`}
+            data-hole={hid}
+            onMouseDown={() => onHoleClick(hid)}
+            onMouseEnter={() => onHoleEnter(hid)}
+            style={{ marginRight: [4, 9, 14, 19, 24].includes(c) ? 4 : 0 }}
+          />
+        );
+      })}
+    </div>
+  );
+
+  const renderSection = (rows, prefix) =>
+    rows.map((lbl) => (
+      <div key={lbl} className="bb-row-line">
+        <span className="bb-rl">{lbl}</span>
+        {Array.from({ length: BB_COLS }, (_, c) => {
+          const hid = `${prefix}_${c}_${rows.indexOf(lbl)}`;
+          const val = nets[hid];
+          let cls = "bb-h";
+          if (wireStart && wireStart.id === hid) cls += " h-sel";
+          else if (val === 1) cls += " h-active";
+          return (
+            <div
+              key={c}
+              className={cls}
+              data-hole={hid}
+              onMouseDown={() => onHoleClick(hid)}
+              onMouseEnter={() => onHoleEnter(hid)}
+              style={{ marginRight: [4, 9, 14, 19, 24].includes(c) ? 4 : 0 }}
+            />
+          );
+        })}
+      </div>
+    ));
+
+  return (
+    <div className="bb-wrap">
+      <div className="bb-col-nums">
+        {Array.from({ length: BB_COLS }, (_, i) => (
+          <span
+            key={i}
+            className="bb-col-num"
+            style={{ marginRight: [4, 9, 14, 19, 24].includes(i) ? 4 : 0 }}
+          >
+            {i + 1}
+          </span>
+        ))}
+      </div>
+
+      {renderRail("top", true)}
+      {renderRail("top", false)}
+      <div className="bb-spacer" />
+      {renderSection(ROWS_ALPHA, "top")}
+      <div className="bb-center-gap">
+        {"\u2500 \u2500 \u2500 IC SLOT \u2500 \u2500 \u2500"}
+      </div>
+      {renderSection(ROWS_BETA, "bot")}
+      <div className="bb-spacer" />
+      {renderRail("bot", true)}
+      {renderRail("bot", false)}
+    </div>
+  );
+}
+
+function WireOverlay({ wires, preview }) {
+  const [dims, setDims] = useState({
+    w: window.innerWidth,
+    h: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const onResize = () =>
+      setDims({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return (
+    <svg
+      className="wire-svg"
+      width={dims.w}
+      height={dims.h}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        pointerEvents: "none",
+        zIndex: 200,
+      }}
+    >
+      {wires.map((w) => {
+        const mx = (w.x1 + w.x2) / 2;
+        const my = Math.min(w.y1, w.y2) - Math.abs(w.x2 - w.x1) * 0.3 - 20;
+        return (
+          <path
+            key={w.id}
+            d={`M${w.x1},${w.y1} Q${mx},${my} ${w.x2},${w.y2}`}
+            stroke={w.color}
+            strokeWidth={2.5}
+            fill="none"
+            strokeLinecap="round"
+            opacity={0.92}
+          />
+        );
+      })}
+      {preview && (
+        <line
+          x1={preview.x1}
+          y1={preview.y1}
+          x2={preview.x2}
+          y2={preview.y2}
+          stroke={preview.color}
+          strokeWidth={2}
+          strokeDasharray="6,4"
+          opacity={0.7}
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}
+
 export default function DLDTrainerBoard() {
-  // Board state
   const [switches, setSwitches] = useState(Array(8).fill(0));
-  const [wires, setWires] = useState([]);
-  const [ics, setIcs] = useState([]);
-  const [nets, setNets] = useState({});
   const [clock, setClock] = useState(0);
   const [clockHz, setClockHz] = useState(2);
-  const [clockEnabled, setClockEnabled] = useState(true);
+  const [clkOn, setClkOn] = useState(true);
+  const [wires, setWires] = useState([]);
   const [wireStart, setWireStart] = useState(null);
-  const [wireColor, setWireColor] = useState(COLORS[0]);
-  const [hoveredHole, setHoveredHole] = useState(null);
-  const [mode, setMode] = useState("wire"); // wire | ic | delete
-  const [selectedIC, setSelectedIC] = useState("7408");
+  const [preview, setPreview] = useState(null);
+  const [wireColor, setWireColor] = useState("#e63946");
   const [colorIdx, setColorIdx] = useState(0);
-  const [sevenSegVal, setSevenSegVal] = useState(0);
+  const [nets, setNets] = useState({});
+  const [mode, setMode] = useState("wire");
+  const [selIC, setSelIC] = useState("7408");
+  const [btns, setBtns] = useState([0, 0, 0, 0]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const clockRef = useRef();
 
-  // Clock ticker
+  const WIRE_COLORS = [
+    "#e63946",
+    "#2196f3",
+    "#4caf50",
+    "#ff9800",
+    "#9c27b0",
+    "#00bcd4",
+    "#ffeb3b",
+    "#ff5722",
+    "#f48fb1",
+    "#80cbc4",
+  ];
+
+  const IC_LIST = {
+    7408: "74HC08 AND\xd74",
+    7432: "74HC32 OR\xd74",
+    7404: "74HC04 NOT\xd76",
+    7486: "74HC86 XOR\xd74",
+    7474: "74HC74 D-FF\xd72",
+    74138: "74HC138 Decoder",
+    74151: "74HC151 MUX",
+    7483: "74HC83 Adder",
+    7447: "74HC47 BCD-7Seg",
+  };
+
   useEffect(() => {
-    if (!clockEnabled) {
+    clearInterval(clockRef.current);
+    if (!clkOn) {
       setClock(0);
       return;
     }
-    clockRef.current = setInterval(
-      () => setClock((c) => c ^ 1),
-      1000 / (clockHz * 2),
-    );
+    clockRef.current = setInterval(() => setClock((c) => c ^ 1), 500 / clockHz);
     return () => clearInterval(clockRef.current);
-  }, [clockHz, clockEnabled]);
-
-  // Net solver: propagate signals through wires and ICs
-  const solveNets = useCallback(() => {
-    // Build adjacency: hole key -> net signal
-    const holeKey = (c, r) => `${c}_${r}`;
-    const signals = {};
-
-    // Power rails: top rail row0 = VCC(1), row1 = GND(0), bottom row12=VCC, row13=GND
-    for (let c = 0; c < COLS; c++) {
-      signals[holeKey(c, 0)] = 1;
-      signals[holeKey(c, 1)] = 0;
-      signals[holeKey(c, 12)] = 1;
-      signals[holeKey(c, 13)] = 0;
-    }
-
-    // Switches drive rows: switch i drives col=i*2, row=2..6 (top half) with value
-    switches.forEach((val, i) => {
-      const col = 4 + i * 4;
-      for (let r = 2; r <= 6; r++) signals[holeKey(col, r)] = val;
-    });
-
-    // Clock on col 0, rows 2-6
-    for (let r = 2; r <= 6; r++) signals[holeKey(0, r)] = clock;
-
-    // Wire connections: union-find style propagation
-    const unionFind = {};
-    const find = (k) => {
-      if (!unionFind[k]) unionFind[k] = k;
-      return unionFind[k] === k ? k : (unionFind[k] = find(unionFind[k]));
-    };
-    const unite = (a, b) => {
-      unionFind[find(a)] = find(b);
-    };
-
-    // Breadboard internal connections: all holes in same column, same half (rows 2-6 or 7-11) are connected
-    for (let c = 0; c < COLS; c++) {
-      const keys2_6 = [2, 3, 4, 5, 6].map((r) => holeKey(c, r));
-      const keys7_11 = [7, 8, 9, 10, 11].map((r) => holeKey(c, r));
-      for (let i = 1; i < keys2_6.length; i++) unite(keys2_6[0], keys2_6[i]);
-      for (let i = 1; i < keys7_11.length; i++) unite(keys7_11[0], keys7_11[i]);
-      // Power rails: rows 0,1 internal connection per group of 5
-      const pg = Math.floor(c / 5);
-      if (c % 5 !== 0) {
-        unite(holeKey(c, 0), holeKey(c - 1, 0));
-        unite(holeKey(c, 1), holeKey(c - 1, 1));
-        unite(holeKey(c, 12), holeKey(c - 1, 12));
-        unite(holeKey(c, 13), holeKey(c - 1, 13));
-      }
-    }
-
-    // Wire connections
-    wires.forEach((w) => unite(holeKey(w.c1, w.r1), holeKey(w.c2, w.r2)));
-
-    // Propagate known signals through union-find
-    const netSignals = {};
-    Object.entries(signals).forEach(([k, v]) => {
-      const root = find(k);
-      if (netSignals[root] === undefined) netSignals[root] = v;
-      else if (netSignals[root] !== v) netSignals[root] = 1; // conflict: default 1
-    });
-
-    // IC logic
-    ics.forEach((ic) => {
-      const def = IC_DEFS[ic.type];
-      if (!def) return;
-      const halfPins = def.pins / 2;
-      // Get pin hole keys
-      const getPinHole = (pin) => {
-        if (pin <= halfPins) {
-          return holeKey(ic.col + pin - 1, 6);
-        } else {
-          const idx = pin - halfPins - 1;
-          return holeKey(ic.col + halfPins - 1 - idx, 7);
-        }
-      };
-      const inputs = [];
-      for (let p = 1; p <= def.pins; p++) {
-        const k = getPinHole(p);
-        const root = find(k);
-        inputs.push(netSignals[root] ?? 0);
-      }
-      const outputs = def.logic(inputs);
-      Object.entries(outputs).forEach(([pin, val]) => {
-        const k = getPinHole(parseInt(pin));
-        const root = find(k);
-        netSignals[root] = val;
-        // Propagate back
-        for (let r = 2; r <= 11; r++) {
-          const hk = holeKey(
-            parseInt(pin) <= halfPins
-              ? ic.col + parseInt(pin) - 1
-              : ic.col + halfPins - 1 - (parseInt(pin) - halfPins - 1),
-            r,
-          );
-          const hr = find(hk);
-          netSignals[hr] = val;
-        }
-      });
-    });
-
-    // Resolve all holes
-    const resolved = {};
-    for (let c = 0; c < COLS; c++) {
-      for (let r = 0; r < 14; r++) {
-        const k = holeKey(c, r);
-        const root = find(k);
-        resolved[k] = netSignals[root] ?? 0;
-      }
-    }
-
-    // LED outputs: last 8 columns top section, row 5
-    const ledVals = [];
-    for (let i = 0; i < 8; i++) {
-      const col = COLS - 2 - i * 3;
-      ledVals.push(resolved[holeKey(col, 5)] ?? 0);
-    }
-
-    // 7-seg: read 4 bits from cols 50-53, row 9
-    const bits = [
-      resolved[holeKey(50, 9)],
-      resolved[holeKey(51, 9)],
-      resolved[holeKey(52, 9)],
-      resolved[holeKey(53, 9)],
-    ];
-    const seg =
-      (bits[3] ?? 0) * 8 +
-      (bits[2] ?? 0) * 4 +
-      (bits[1] ?? 0) * 2 +
-      (bits[0] ?? 0);
-    setSevenSegVal(seg > 9 ? -1 : seg);
-
-    setNets({ ...resolved, ledVals });
-  }, [switches, wires, ics, clock]);
+  }, [clockHz, clkOn]);
 
   useEffect(() => {
-    solveNets();
-  }, [solveNets]);
+    const n = {};
+    for (let c = 0; c < BB_COLS; c++) {
+      n[`top_v_${c}`] = 1;
+      n[`top_g_${c}`] = 0;
+      n[`bot_v_${c}`] = 1;
+      n[`bot_g_${c}`] = 0;
+    }
+    setNets(n);
+  }, [switches, clock, wires]);
 
-  // Wire drawing
-  const handleHoleDown = (col, row) => {
-    if (mode === "wire") {
+  const decVal = switches.reduce((a, b, i) => a + b * (1 << i), 0);
+  const segVal = decVal % 10;
+  const seg2 = Math.floor(decVal / 10) % 10;
+
+  useEffect(() => {
+    const mv = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      if (wireStart) {
+        setPreview({
+          x1: wireStart.x,
+          y1: wireStart.y,
+          x2: e.clientX,
+          y2: e.clientY,
+          color: wireColor,
+        });
+      }
+    };
+    window.addEventListener("mousemove", mv);
+    return () => window.removeEventListener("mousemove", mv);
+  }, [wireStart, wireColor]);
+
+  const handleHoleClick = useCallback(
+    (hid) => {
+      if (mode === "delete") {
+        setWires((prev) => prev.filter((w) => w.from !== hid && w.to !== hid));
+        return;
+      }
+      if (mode !== "wire") return;
+
+      const el = document.querySelector(`[data-hole="${hid}"]`);
+      const rect = el ? el.getBoundingClientRect() : null;
+      const x = rect ? rect.left + rect.width / 2 : mousePos.x;
+      const y = rect ? rect.top + rect.height / 2 : mousePos.y;
+
       if (!wireStart) {
-        setWireStart({ col, row });
+        setWireStart({ id: hid, x, y });
       } else {
-        if (wireStart.col !== col || wireStart.row !== row) {
-          setWires((w) => [
-            ...w,
+        if (wireStart.id !== hid) {
+          setWires((prev) => [
+            ...prev,
             {
               id: Date.now(),
-              c1: wireStart.col,
-              r1: wireStart.row,
-              c2: col,
-              r2: row,
+              from: wireStart.id,
+              to: hid,
+              x1: wireStart.x,
+              y1: wireStart.y,
+              x2: x,
+              y2: y,
               color: wireColor,
-              net: `wire_${Date.now()}`,
             },
           ]);
+          const nci = (colorIdx + 1) % WIRE_COLORS.length;
+          setColorIdx(nci);
+          setWireColor(WIRE_COLORS[nci]);
         }
         setWireStart(null);
-        setColorIdx((i) => (i + 1) % COLORS.length);
-        setWireColor(COLORS[(colorIdx + 1) % COLORS.length]);
+        setPreview(null);
       }
-    } else if (mode === "delete") {
-      // Remove wires near this hole
-      setWires((w) =>
-        w.filter(
-          (wire) =>
-            !(wire.c1 === col && wire.r1 === row) &&
-            !(wire.c2 === col && wire.r2 === row),
-        ),
-      );
-    }
-  };
+    },
+    [mode, wireStart, wireColor, colorIdx, mousePos, WIRE_COLORS],
+  );
 
-  const handlePlaceIC = (col) => {
-    const def = IC_DEFS[selectedIC];
-    if (!def) return;
-    if (col + def.cols > COLS) return;
-    setIcs((prev) => [...prev, { id: Date.now(), type: selectedIC, col }]);
-  };
+  const handleHoleEnter = useCallback((_hid) => {}, []);
 
-  const handleRemoveIC = (id) => {
-    setIcs((prev) => prev.filter((ic) => ic.id !== id));
-  };
+  const toggleSw = (i) =>
+    setSwitches((p) => {
+      const n = [...p];
+      n[i] ^= 1;
+      return n;
+    });
+  const pressBtn = (i, v) =>
+    setBtns((p) => {
+      const n = [...p];
+      n[i] = v;
+      return n;
+    });
 
-  // Render holes
-  const holes = [];
-  for (let r = 0; r < 14; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const key = `${c}_${r}`;
-      holes.push(
-        <Hole
-          key={key}
-          col={c}
-          row={r}
-          netVal={nets[key]}
-          onMouseDown={handleHoleDown}
-          onMouseEnter={setHoveredHole}
-          isHighlighted={
-            wireStart &&
-            hoveredHole &&
-            hoveredHole.col === c &&
-            hoveredHole.row === r
-          }
-        />,
-      );
-    }
-  }
+  const LED = ({ on, color = "red" }) => (
+    <div
+      className={`led-lamp ${on ? `led-${color.substring(0, 3)}` : "led-off"}`}
+    />
+  );
 
-  const svgH = BB_TOP + BB_H + 20;
-  const svgW = BB_LEFT + BB_W + 24;
+  const Pot = ({ label, angle = 120 }) => (
+    <div className="pot-wrap">
+      <div className="pot-outer" style={{ transform: `rotate(${angle}deg)` }}>
+        <div className="pot-marker" />
+      </div>
+      <span className="pot-lbl">{label}</span>
+    </div>
+  );
 
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #0a0a0f 0%, #0f1020 100%)",
-        minHeight: "100vh",
-        fontFamily: "'Courier New', monospace",
-        color: "#e0e0e0",
-        padding: "16px",
-        userSelect: "none",
-      }}
-    >
-      {/* Header */}
+    <>
+      <style>{CSS}</style>
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-          marginBottom: "12px",
-          flexWrap: "wrap",
+        className="dld-root"
+        onMouseLeave={() => {
+          setWireStart(null);
+          setPreview(null);
         }}
       >
-        <div
-          style={{
-            background: "#1a1a2e",
-            border: "1px solid #333",
-            borderRadius: "8px",
-            padding: "6px 16px",
-          }}
-        >
-          <span
-            style={{ fontSize: "11px", color: "#888", letterSpacing: "2px" }}
-          >
-            DLD TRAINER BOARD
-          </span>
-          <div
-            style={{ fontSize: "16px", fontWeight: "bold", color: "#4fc3f7" }}
-          >
-            Digital Logic Designer
-          </div>
-        </div>
+        <div className="dld-case">
+          <div className="dld-pcb">
+            {/* HEADER */}
+            <div className="dld-header">
+              <div className="dld-brand">
+                <span className="dld-infinity">{"\u221e"}</span>
+                <div className="dld-brand-text">
+                  <div className="dld-brand-name">INFINIT</div>
+                  <div className="dld-brand-sub">Technologies</div>
+                  <div className="dld-brand-sub">Redefining the Technology</div>
+                </div>
+              </div>
 
-        {/* Clock */}
-        <div
-          style={{
-            background: "#0d1117",
-            border: "1px solid #30363d",
-            borderRadius: "8px",
-            padding: "8px 14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <div
-            style={{
-              width: "16px",
-              height: "16px",
-              borderRadius: "50%",
-              background: clockEnabled && clock ? "#ff6b35" : "#333",
-              boxShadow: clockEnabled && clock ? "0 0 8px #ff6b35" : "none",
-              transition: "all 0.1s",
-            }}
-          />
-          <span style={{ fontSize: "11px", color: "#888" }}>CLK</span>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={clockHz}
-            onChange={(e) => setClockHz(+e.target.value)}
-            style={{ width: "70px", accentColor: "#ff6b35" }}
-          />
-          <span
-            style={{ fontSize: "11px", color: "#ff6b35", minWidth: "30px" }}
-          >
-            {clockHz}Hz
-          </span>
-          <button
-            onClick={() => setClockEnabled((e) => !e)}
-            style={{
-              background: clockEnabled ? "#1a3a1a" : "#3a1a1a",
-              color: clockEnabled ? "#4caf50" : "#f44336",
-              border: `1px solid ${clockEnabled ? "#4caf50" : "#f44336"}`,
-              borderRadius: "4px",
-              padding: "2px 8px",
-              cursor: "pointer",
-              fontSize: "11px",
-            }}
-          >
-            {clockEnabled ? "ON" : "OFF"}
-          </button>
-        </div>
+              <div className="dld-board-title">
+                DIGITAL LOGIC DESIGN TRAINER SYSTEM
+              </div>
 
-        {/* Mode */}
-        <div style={{ display: "flex", gap: "6px" }}>
-          {["wire", "ic", "delete"].map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div>
+                  <div
+                    style={{ fontSize: 7, color: "#7090cc", marginBottom: 2 }}
+                  >
+                    CLOCK
+                  </div>
+                  <div
+                    style={{
+                      background: "#000",
+                      border: "1px solid #222",
+                      borderRadius: 3,
+                      padding: "3px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: clkOn && clock ? "#ff8800" : "#444",
+                        fontFamily: "Share Tech Mono",
+                      }}
+                    >
+                      {clockHz}Hz
+                    </span>
+                    <span
+                      className="clk-dot"
+                      style={{
+                        background: clkOn && clock ? "#ff8800" : "#222",
+                        boxShadow: clkOn && clock ? "0 0 6px #ff8800" : "none",
+                      }}
+                    />
+                  </div>
+                </div>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 3 }}
+                >
+                  <button
+                    className={`pbtn ${clkOn ? "" : "pressed"}`}
+                    style={{
+                      background: clkOn ? "#1a4a1a" : "#4a1a1a",
+                      width: 44,
+                      height: 18,
+                      fontSize: 7,
+                    }}
+                    onClick={() => setClkOn((e) => !e)}
+                  >
+                    {clkOn ? "\u25cf ON" : "\u25cb OFF"}
+                  </button>
+                  <input
+                    type="range"
+                    min={1}
+                    max={20}
+                    value={clockHz}
+                    onChange={(e) => setClockHz(+e.target.value)}
+                    style={{ width: 60, accentColor: "#ff8800", height: 8 }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* MODE BAR */}
+            <div
               style={{
-                background: mode === m ? "#1a2a3a" : "#111",
-                color: mode === m ? "#4fc3f7" : "#666",
-                border: `1px solid ${mode === m ? "#4fc3f7" : "#333"}`,
-                borderRadius: "6px",
-                padding: "6px 12px",
-                cursor: "pointer",
-                fontSize: "12px",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
+                display: "flex",
+                gap: 5,
+                marginBottom: 6,
+                alignItems: "center",
+                flexWrap: "wrap",
               }}
             >
-              {m === "wire" ? "🔌 Wire" : m === "ic" ? "🔲 IC" : "✂️ Delete"}
-            </button>
-          ))}
-        </div>
-
-        {mode === "wire" && (
-          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-            <span style={{ fontSize: "11px", color: "#666" }}>Color:</span>
-            {COLORS.map((c, i) => (
-              <div
-                key={c}
-                onClick={() => setWireColor(c)}
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "50%",
-                  background: c,
-                  border:
-                    wireColor === c
-                      ? "2px solid #fff"
-                      : "2px solid transparent",
-                  cursor: "pointer",
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {mode === "ic" && (
-          <select
-            value={selectedIC}
-            onChange={(e) => setSelectedIC(e.target.value)}
-            style={{
-              background: "#1a1a2e",
-              color: "#4fc3f7",
-              border: "1px solid #333",
-              borderRadius: "6px",
-              padding: "6px 10px",
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
-          >
-            {Object.entries(IC_DEFS).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {/* Clear */}
-        <button
-          onClick={() => {
-            setWires([]);
-            setIcs([]);
-          }}
-          style={{
-            background: "#2a1a1a",
-            color: "#f44336",
-            border: "1px solid #f44336",
-            borderRadius: "6px",
-            padding: "6px 12px",
-            cursor: "pointer",
-            fontSize: "12px",
-            marginLeft: "auto",
-          }}
-        >
-          🗑 Clear All
-        </button>
-      </div>
-
-      {/* Instructions */}
-      <div
-        style={{
-          fontSize: "11px",
-          color: "#555",
-          marginBottom: "8px",
-          display: "flex",
-          gap: "16px",
-          flexWrap: "wrap",
-        }}
-      >
-        <span>▸ Wire mode: click start hole, click end hole to connect</span>
-        <span>
-          ▸ IC mode: click any column to place chip spanning the center gap
-        </span>
-        <span>▸ Delete mode: click a hole to remove connected wires</span>
-        <span>▸ Switch a-h: toggle logic inputs | LEDs: monitor outputs</span>
-      </div>
-
-      {/* Board */}
-      <div style={{ overflowX: "auto", overflowY: "hidden" }}>
-        <svg
-          width={svgW + 200}
-          height={svgH + 120}
-          style={{ display: "block", background: "transparent" }}
-          onMouseLeave={() => {
-            if (mode === "wire" && wireStart) setWireStart(null);
-          }}
-        >
-          {/* Board PCB background */}
-          <rect
-            x={10}
-            y={10}
-            width={svgW + 4}
-            height={svgH + 10}
-            rx={10}
-            fill="#0b1a0b"
-            stroke="#1a3a1a"
-            strokeWidth={2}
-          />
-          <rect
-            x={14}
-            y={14}
-            width={svgW - 4}
-            height={svgH + 2}
-            rx={8}
-            fill="#0d1f0d"
-            stroke="#224422"
-            strokeWidth={1}
-          />
-
-          {/* Breadboard body */}
-          <rect
-            x={BB_LEFT - 8}
-            y={BB_TOP - 8}
-            width={BB_W + 16}
-            height={BB_H + 16}
-            rx={6}
-            fill="#e8dcc8"
-            stroke="#c8b898"
-            strokeWidth={2}
-          />
-
-          {/* Power rail areas */}
-          <rect
-            x={BB_LEFT - 4}
-            y={BB_TOP - 4}
-            width={BB_W + 8}
-            height={RAIL_H + 8}
-            rx={4}
-            fill="#d4c8b0"
-            stroke="#b8a888"
-            strokeWidth={1}
-          />
-          <rect
-            x={BB_LEFT - 4}
-            y={BB_TOP + RAIL_H + 8 + MAIN_H + GAP_H - 4}
-            width={BB_W + 8}
-            height={RAIL_H + 8}
-            rx={4}
-            fill="#d4c8b0"
-            stroke="#b8a888"
-            strokeWidth={1}
-          />
-
-          {/* Row labels */}
-          {["a", "b", "c", "d", "e"].map((label, i) => (
-            <text
-              key={label}
-              x={BB_LEFT - 18}
-              y={BB_TOP + RAIL_H + 8 + i * PITCH + PITCH / 2 + 4}
-              fill="#888"
-              fontSize={10}
-              fontFamily="monospace"
-              textAnchor="middle"
-            >
-              {label}
-            </text>
-          ))}
-          {["f", "g", "h", "i", "j"].map((label, i) => (
-            <text
-              key={label}
-              x={BB_LEFT - 18}
-              y={
-                BB_TOP + RAIL_H + 8 + MAIN_H + GAP_H + i * PITCH + PITCH / 2 + 4
-              }
-              fill="#888"
-              fontSize={10}
-              fontFamily="monospace"
-              textAnchor="middle"
-            >
-              {label}
-            </text>
-          ))}
-
-          {/* Column numbers every 5 */}
-          {Array.from({ length: Math.floor(COLS / 5) }, (_, i) => (
-            <text
-              key={i}
-              x={BB_LEFT + (i * 5 + 2) * PITCH + PITCH / 2}
-              y={BB_TOP + RAIL_H + 2}
-              fill="#999"
-              fontSize={9}
-              fontFamily="monospace"
-              textAnchor="middle"
-            >
-              {i * 5 + 1}
-            </text>
-          ))}
-
-          {/* VCC/GND labels */}
-          <text
-            x={BB_LEFT - 18}
-            y={BB_TOP + PITCH / 2 + 4}
-            fill="#f55"
-            fontSize={9}
-            fontFamily="monospace"
-            textAnchor="middle"
-          >
-            +
-          </text>
-          <text
-            x={BB_LEFT - 18}
-            y={BB_TOP + PITCH + PITCH / 2 + 4}
-            fill="#55f"
-            fontSize={9}
-            fontFamily="monospace"
-            textAnchor="middle"
-          >
-            −
-          </text>
-
-          {/* Center divider */}
-          <rect
-            x={BB_LEFT - 4}
-            y={BB_TOP + RAIL_H + 8 + MAIN_H}
-            width={BB_W + 8}
-            height={GAP_H}
-            rx={2}
-            fill="#c8b898"
-          />
-
-          {/* Holes */}
-          {holes}
-
-          {/* IC placement zones (highlight on hover when in IC mode) */}
-          {mode === "ic" &&
-            hoveredHole &&
-            hoveredHole.row >= 2 &&
-            hoveredHole.row <= 11 &&
-            (() => {
-              const def = IC_DEFS[selectedIC];
-              if (!def) return null;
-              const startCol = Math.max(
-                0,
-                Math.min(hoveredHole.col, COLS - def.cols),
-              );
-              const tl = holePos(startCol, 6);
-              const br = holePos(startCol + def.cols - 1, 7);
-              return (
-                <rect
-                  x={tl.x - PITCH / 2 - 2}
-                  y={tl.y - 6}
-                  width={br.x - tl.x + PITCH + 4}
-                  height={br.y - tl.y + PITCH / 2 + 4}
-                  rx={4}
-                  fill="rgba(79,195,247,0.15)"
-                  stroke="#4fc3f7"
-                  strokeWidth={1}
-                  strokeDasharray="4,2"
-                  style={{ pointerEvents: "none" }}
-                  onClick={() => handlePlaceIC(startCol)}
-                />
-              );
-            })()}
-
-          {/* Placed ICs */}
-          {ics.map((ic) => (
-            <g key={ic.id}>
-              <ICChip ic={ic} nets={nets} />
-              <circle
-                cx={holePos(ic.col, 6).x - 8}
-                cy={holePos(ic.col, 6).y - 16}
-                r={6}
-                fill="#f44336"
-                stroke="#ff8a80"
-                strokeWidth={1}
-                style={{ cursor: "pointer" }}
-                onClick={() => handleRemoveIC(ic.id)}
-              />
-              <text
-                x={holePos(ic.col, 6).x - 8}
-                y={holePos(ic.col, 6).y - 12}
-                textAnchor="middle"
-                fill="#fff"
-                fontSize={9}
-                style={{ pointerEvents: "none" }}
-              >
-                ×
-              </text>
-            </g>
-          ))}
-
-          {/* Wires */}
-          {wires.map((w) => (
-            <Wire key={w.id} wire={w} nets={nets} />
-          ))}
-
-          {/* Active wire preview */}
-          {wireStart && hoveredHole && (
-            <line
-              x1={holePos(wireStart.col, wireStart.row).x}
-              y1={holePos(wireStart.col, wireStart.row).y}
-              x2={holePos(hoveredHole.col, hoveredHole.row).x}
-              y2={holePos(hoveredHole.col, hoveredHole.row).y}
-              stroke={wireColor}
-              strokeWidth={2}
-              strokeDasharray="6,3"
-              opacity={0.7}
-              style={{ pointerEvents: "none" }}
-            />
-          )}
-
-          {/* ── Components panel ── */}
-          {/* Switches */}
-          <g transform={`translate(${BB_LEFT}, ${BB_TOP + BB_H + 20})`}>
-            <text x={0} y={0} fill="#888" fontSize={11} fontFamily="monospace">
-              SWITCHES
-            </text>
-            {switches.map((val, i) => {
-              const sx = i * 40 + 10;
-              return (
-                <g
-                  key={i}
-                  style={{ cursor: "pointer" }}
-                  onClick={() =>
-                    setSwitches((s) => s.map((v, j) => (j === i ? v ^ 1 : v)))
-                  }
+              {["wire", "ic", "delete"].map((m) => (
+                <button
+                  key={m}
+                  style={{
+                    background: mode === m ? "#102840" : "#071018",
+                    color: mode === m ? "#4fc3f7" : "#445566",
+                    border: `1px solid ${mode === m ? "#4fc3f7" : "#223344"}`,
+                    borderRadius: 3,
+                    padding: "3px 9px",
+                    cursor: "pointer",
+                    fontSize: 9,
+                    fontFamily: "Share Tech Mono",
+                    letterSpacing: 1,
+                  }}
+                  onClick={() => setMode(m)}
                 >
-                  {/* Switch body */}
-                  <rect
-                    x={sx - 12}
-                    y={8}
-                    width={24}
-                    height={44}
-                    rx={5}
-                    fill="#1a1a2e"
-                    stroke="#333"
-                    strokeWidth={1.5}
-                  />
-                  {/* Toggle */}
-                  <rect
-                    x={sx - 8}
-                    y={val ? 10 : 32}
-                    width={16}
-                    height={16}
-                    rx={3}
-                    fill={val ? "#4caf50" : "#555"}
-                  />
-                  {/* Label */}
-                  <text
-                    x={sx}
-                    y={62}
-                    textAnchor="middle"
-                    fill={val ? "#4caf50" : "#666"}
-                    fontSize={9}
-                    fontFamily="monospace"
+                  {m === "wire"
+                    ? "\u26a1 WIRE"
+                    : m === "ic"
+                      ? "\u25a3 IC"
+                      : "\u2702 DEL"}
+                </button>
+              ))}
+
+              {mode === "wire" && (
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  <span style={{ fontSize: 8, color: "#556" }}>color:</span>
+                  {WIRE_COLORS.map((c, i) => (
+                    <div
+                      key={c}
+                      onClick={() => {
+                        setWireColor(c);
+                        setColorIdx(i);
+                      }}
+                      style={{
+                        width: 13,
+                        height: 13,
+                        borderRadius: "50%",
+                        background: c,
+                        cursor: "pointer",
+                        border:
+                          wireColor === c
+                            ? "2px solid #fff"
+                            : "2px solid transparent",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {mode === "ic" && (
+                <select
+                  value={selIC}
+                  onChange={(e) => setSelIC(e.target.value)}
+                  style={{
+                    background: "#071018",
+                    color: "#4fc3f7",
+                    border: "1px solid #223344",
+                    borderRadius: 3,
+                    padding: "3px 7px",
+                    fontSize: 9,
+                    fontFamily: "Share Tech Mono",
+                  }}
+                >
+                  {Object.entries(IC_LIST).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <button
+                onClick={() => {
+                  setWires([]);
+                  setWireStart(null);
+                  setPreview(null);
+                }}
+                style={{
+                  marginLeft: "auto",
+                  background: "#200a0a",
+                  color: "#f44336",
+                  border: "1px solid #f44336",
+                  borderRadius: 3,
+                  padding: "3px 9px",
+                  cursor: "pointer",
+                  fontSize: 9,
+                  fontFamily: "Share Tech Mono",
+                }}
+              >
+                {"\u{1f5d1}"} CLEAR ALL
+              </button>
+            </div>
+
+            {/* MAIN GRID */}
+            <div className="dld-main">
+              {/* LEFT PANEL */}
+              <div>
+                <div className="sec">
+                  <div className="sec-hdr">7-Segment Display</div>
+                  <div className="seg-wrap">
+                    <SevenSeg value={0} h={40} />
+                    <SevenSeg value={seg2} h={40} />
+                    <SevenSeg value={segVal} h={40} />
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      fontSize: 7,
+                      color: "#888",
+                      marginTop: 3,
+                    }}
                   >
-                    {String.fromCharCode(65 + i)}
-                  </text>
-                  <text
-                    x={sx}
-                    y={72}
-                    textAnchor="middle"
-                    fill={val ? "#4caf50" : "#444"}
-                    fontSize={8}
-                    fontFamily="monospace"
+                    {String(decVal).padStart(3, "0")} &middot; 0x
+                    {decVal.toString(16).toUpperCase().padStart(2, "0")}
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Potentiometers</div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "center",
+                      padding: "4px 0",
+                    }}
                   >
-                    {val}
-                  </text>
-                  {/* Wire to col */}
-                  <line
-                    x1={sx}
-                    y1={8}
-                    x2={sx}
-                    y2={0}
-                    stroke={val ? "#4caf50" : "#333"}
-                    strokeWidth={1.5}
-                    strokeDasharray={val ? "none" : "3,2"}
+                    <Pot label="CLK" angle={clockHz * 9} />
+                    <Pot label="DUTY" angle={140} />
+                    <Pot label="VCC" angle={200} />
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Power Supply</div>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-around" }}
+                  >
+                    {["+5V", "12V", "GND"].map((lbl, i) => (
+                      <div key={lbl} style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            width: 10,
+                            height: 18,
+                            borderRadius: "5px 5px 3px 3px",
+                            margin: "0 auto 2px",
+                            background: ["#ff2200", "#00ff44", "#ffcc00"][i],
+                            boxShadow: `0 0 8px ${["#ff2200", "#00ff44", "#ffcc00"][i]}`,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 6,
+                            color: ["#f44", "#4f4", "#fc0"][i],
+                          }}
+                        >
+                          {lbl}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Oscillator</div>
+                  <div
+                    style={{ display: "flex", gap: 5, alignItems: "center" }}
+                  >
+                    <div className="bnc-con" />
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontSize: 7,
+                          color: "#8888ff",
+                          marginBottom: 2,
+                        }}
+                      >
+                        {clockHz * 1000}Hz
+                      </div>
+                      <OscWave clk={clock} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Control Buttons</div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 5,
+                    }}
+                  >
+                    {[
+                      ["RST", "#cc2200"],
+                      ["CLR", "#1a33cc"],
+                      ["LD", "#228833"],
+                      ["RUN", "#886600"],
+                    ].map(([lbl, bg], i) => (
+                      <button
+                        key={i}
+                        className={`pbtn ${btns[i] ? "pressed" : ""}`}
+                        style={{ background: bg, width: "100%", height: 24 }}
+                        onMouseDown={() => pressBtn(i, 1)}
+                        onMouseUp={() => pressBtn(i, 0)}
+                        onMouseLeave={() => pressBtn(i, 0)}
+                      >
+                        {lbl}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">BNC Connectors</div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "center",
+                    }}
+                  >
+                    {["IN", "OUT", "CLK"].map((l) => (
+                      <div key={l} style={{ textAlign: "center" }}>
+                        <div
+                          className="bnc-con"
+                          style={{ margin: "0 auto 2px" }}
+                        />
+                        <span style={{ fontSize: 6, color: "#888" }}>{l}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* CENTER */}
+              <div>
+                <div style={{ textAlign: "center", marginBottom: 4 }}>
+                  <Breadboard
+                    onHoleClick={handleHoleClick}
+                    onHoleEnter={handleHoleEnter}
+                    wireStart={wireStart}
+                    nets={nets}
                   />
-                </g>
-              );
-            })}
-          </g>
+                  {wireStart && (
+                    <div
+                      style={{ fontSize: 8, color: "#4fc3f7", marginTop: 3 }}
+                    >
+                      {"\u25cf"} Wire from <strong>{wireStart.id}</strong> —
+                      click destination hole
+                    </div>
+                  )}
+                </div>
 
-          {/* LEDs */}
-          <g transform={`translate(${BB_LEFT + 380}, ${BB_TOP + BB_H + 16})`}>
-            <text x={0} y={2} fill="#888" fontSize={11} fontFamily="monospace">
-              OUTPUT LEDs
-            </text>
-            {Array.from({ length: 8 }, (_, i) => {
-              const ledColors = [
-                "#ff4444",
-                "#ff8800",
-                "#ffff00",
-                "#44ff44",
-                "#44ffff",
-                "#4488ff",
-                "#aa44ff",
-                "#ff44aa",
-              ];
-              const val = nets.ledVals ? nets.ledVals[i] : 0;
-              return (
-                <LED
-                  key={i}
-                  x={i * 28 + 18}
-                  y={10}
-                  val={val}
-                  label={`L${i + 1}`}
-                  color={ledColors[i]}
-                />
-              );
-            })}
-          </g>
+                <div className="sec">
+                  <div className="sec-hdr">IC Socket Bank</div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {[
+                      "7408",
+                      "7432",
+                      "7404",
+                      "7486",
+                      "7474",
+                      "74138",
+                      "74151",
+                      "7483",
+                      "7447",
+                    ].map((ic) => (
+                      <div
+                        key={ic}
+                        className="ic-pkg"
+                        style={{ width: 44, paddingTop: 14 }}
+                      >
+                        {ic}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-          {/* 7-Segment */}
-          <g transform={`translate(${BB_LEFT + 620}, ${BB_TOP + BB_H + 14})`}>
-            <text x={16} y={2} fill="#888" fontSize={11} fontFamily="monospace">
-              7-SEG
-            </text>
-            <SevenSegDisplay x={0} y={8} value={sevenSegVal} />
-            <text
-              x={16}
-              y={70}
-              fill="#555"
-              fontSize={9}
-              fontFamily="monospace"
-              textAnchor="middle"
-            >
-              {sevenSegVal >= 0 ? sevenSegVal : "-"}
-            </text>
-          </g>
+                <div className="sec">
+                  <div className="sec-hdr">Data Input Switches (A–H)</div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      justifyContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {switches.map((v, i) => (
+                      <div
+                        key={i}
+                        className="sw-wrap"
+                        onClick={() => toggleSw(i)}
+                      >
+                        <div className="sw-body">
+                          <div className={`sw-lever ${v ? "hi" : "lo"}`} />
+                        </div>
+                        <span className="sw-lbl">
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                        <span className={`sw-val ${v ? "on" : "off"}`}>
+                          {v}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      justifyContent: "center",
+                      marginTop: 5,
+                    }}
+                  >
+                    {switches.map((v, i) => (
+                      <LED key={i} on={!!v} color="grn" />
+                    ))}
+                  </div>
+                </div>
 
-          {/* Clock output indicator */}
-          <g transform={`translate(${BB_LEFT + 720}, ${BB_TOP + BB_H + 20})`}>
-            <text x={0} y={0} fill="#888" fontSize={11} fontFamily="monospace">
-              CLK OUT
-            </text>
-            <rect
-              x={0}
-              y={8}
-              width={44}
-              height={30}
-              rx={4}
-              fill="#0d1117"
-              stroke="#333"
-              strokeWidth={1}
-            />
-            {/* Square wave viz */}
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <line
-                key={i}
-                x1={3 + i * 6}
-                y1={i % 2 === 0 ? 12 : 30}
-                x2={3 + i * 6 + 6}
-                y2={i % 2 === 0 ? 12 : 30}
-                stroke="#ff6b35"
-                strokeWidth={1.5}
-              />
-            ))}
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <line
-                key={i}
-                x1={3 + i * 6 + 6}
-                y1={i % 2 === 0 ? 12 : 30}
-                x2={3 + i * 6 + 6}
-                y2={i % 2 === 0 ? 30 : 12}
-                stroke="#ff6b35"
-                strokeWidth={1.5}
-              />
-            ))}
-            <circle
-              cx={40}
-              cy={clock ? 16 : 28}
-              r={4}
-              fill={clock ? "#ff6b35" : "#333"}
-              style={{ transition: "all 0.1s" }}
-            />
-          </g>
+                <div className="sec">
+                  <div className="sec-hdr">Binary / Decimal Readout</div>
+                  <div className="bin-readout">
+                    {switches.slice().reverse().join("")}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      marginTop: 4,
+                      fontSize: 9,
+                      color: "#6a8a6a",
+                      fontFamily: "Share Tech Mono",
+                    }}
+                  >
+                    <span>DEC: {decVal}</span>
+                    <span>
+                      HEX: 0x
+                      {decVal.toString(16).toUpperCase().padStart(2, "0")}
+                    </span>
+                    <span>OCT: {decVal.toString(8).padStart(3, "0")}</span>
+                  </div>
+                </div>
+              </div>
 
-          {/* Board label */}
-          <text
-            x={svgW - 20}
-            y={30}
-            fill="#1a4a1a"
-            fontSize={11}
-            fontFamily="monospace"
-            textAnchor="end"
-            fontWeight="bold"
-          >
-            DLD TRAINER v2.0
-          </text>
-        </svg>
-      </div>
+              {/* RIGHT PANEL */}
+              <div>
+                <div className="sec">
+                  <div className="sec-hdr">Output LED Matrix</div>
 
-      {/* IC Legend */}
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          flexWrap: "wrap",
-          marginTop: "8px",
-        }}
-      >
-        {Object.entries(IC_DEFS).map(([k, v]) => (
-          <div
-            key={k}
-            style={{
-              background: v.color,
-              border: "1px solid #444",
-              borderRadius: "6px",
-              padding: "4px 10px",
-              fontSize: "11px",
-              color: "#ccc",
-            }}
-          >
-            <span style={{ color: "#4fc3f7", fontWeight: "bold" }}>{k}</span> —{" "}
-            {v.name}
+                  <div
+                    style={{
+                      fontSize: 6,
+                      color: "#f44",
+                      marginBottom: 2,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    DATA BUS D0–D7
+                  </div>
+                  <div className="led-matrix" style={{ marginBottom: 6 }}>
+                    {switches.map((v, i) => (
+                      <LED key={i} on={!!v} color="red" />
+                    ))}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 6,
+                      color: "#4f4",
+                      marginBottom: 2,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    LOGIC OUTPUT
+                  </div>
+                  <div className="led-matrix" style={{ marginBottom: 6 }}>
+                    {switches.map((v, i) => (
+                      <LED key={i} on={!!v} color="grn" />
+                    ))}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 6,
+                      color: "#fc0",
+                      marginBottom: 2,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    STATUS FLAGS
+                  </div>
+                  <div className="led-matrix" style={{ marginBottom: 6 }}>
+                    {[clock, ...btns, ...Array(3).fill(0)].map((v, i) => (
+                      <LED key={i} on={!!v} color="yel" />
+                    ))}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 6,
+                      color: "#4af",
+                      marginBottom: 2,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    CARRY / BORROW
+                  </div>
+                  <div className="led-matrix">
+                    {Array(8)
+                      .fill(0)
+                      .map((_, i) => (
+                        <LED key={i} on={i === 0 && decVal > 127} color="blu" />
+                      ))}
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Logic Probe</div>
+                  {[
+                    ["HIGH", clock === 1, "grn"],
+                    ["LOW", clock === 0, "red"],
+                    ["PULSE", clkOn, "yel"],
+                    ["HI-Z", false, "blu"],
+                  ].map(([lbl, on, col]) => (
+                    <div
+                      key={lbl}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                        marginBottom: 3,
+                      }}
+                    >
+                      <LED on={on} color={col} />
+                      <span style={{ fontSize: 7, color: "#aaa" }}>{lbl}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">I/O Terminals</div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 4,
+                    }}
+                  >
+                    {[
+                      "VCC",
+                      "GND",
+                      "+5V",
+                      "CLK",
+                      "DIN",
+                      "DOUT",
+                      "A0",
+                      "A1",
+                    ].map((lbl) => (
+                      <div
+                        key={lbl}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 3,
+                        }}
+                      >
+                        <div className="screw" />
+                        <span style={{ fontSize: 6.5, color: "#aaa" }}>
+                          {lbl}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="sec">
+                  <div className="sec-hdr">Wiring Info</div>
+                  <div style={{ fontSize: 7, color: "#558", lineHeight: 1.6 }}>
+                    <div>
+                      Wires:{" "}
+                      <span style={{ color: "#88aaff" }}>{wires.length}</span>
+                    </div>
+                    <div>
+                      Rail +: <span style={{ color: "#f44" }}>5V DC</span>
+                    </div>
+                    <div>
+                      Rail {"\u2212"}:{" "}
+                      <span style={{ color: "#44f" }}>GND</span>
+                    </div>
+                    <div>
+                      CLK col1:{" "}
+                      <span style={{ color: "#ff8800" }}>
+                        {clkOn ? `${clockHz}Hz` : "OFF"}
+                      </span>
+                    </div>
+                    <div style={{ marginTop: 4, color: "#334", fontSize: 6 }}>
+                      Click hole &rarr; click hole to connect wire.
+                      <br />
+                      Rows a–e top half, f–j bottom half.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STATUS BAR */}
+            <div className="dld-status">
+              <span style={{ color: "#ff8800" }}>
+                CLK {clkOn ? `${clockHz}Hz` : "OFF"}
+                {clkOn && (
+                  <span style={{ marginLeft: 5 }}>
+                    {clock ? "\u2590\u2588" : "\u2591\u2591"}
+                  </span>
+                )}
+              </span>
+              <span>|</span>
+              <span>
+                SW:{" "}
+                <span style={{ color: "#00ff44" }}>
+                  {switches.slice().reverse().join("")}b
+                </span>{" "}
+                = {decVal}
+              </span>
+              <span>|</span>
+              <span>
+                WIRES: <span style={{ color: "#4fc3f7" }}>{wires.length}</span>
+              </span>
+              <span>|</span>
+              <span>
+                MODE:{" "}
+                <span style={{ color: "#a0c0ff" }}>{mode.toUpperCase()}</span>
+              </span>
+              <span style={{ marginLeft: "auto", color: "#1a3050" }}>
+                {"\u221e"} INFINIT TECHNOLOGIES &middot; DTS-400 DIGITAL TRAINER
+                SYSTEM
+              </span>
+            </div>
           </div>
-        ))}
-        <div
-          style={{
-            background: "#1a1a1a",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            padding: "4px 10px",
-            fontSize: "11px",
-            color: "#666",
-          }}
-        >
-          Rows 0(+)/1(−) = VCC/GND | CLK on col 1 | Switches on cols 5,9,13... |
-          LEDs monitor last cols
         </div>
+
+        <WireOverlay wires={wires} preview={preview} />
       </div>
-    </div>
+    </>
   );
 }
