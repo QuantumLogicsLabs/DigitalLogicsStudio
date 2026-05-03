@@ -1,344 +1,188 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Home, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
-import "../ArithmeticFunctionsAndHDLs/AFHDLLayout.css";
+import "./MemorySystem.css";
 import { memoryPages } from "./memoryConfig";
 
-function SunIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="5" />
-      <line x1="12" y1="1" x2="12" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="23" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="1" y1="12" x2="3" y2="12" />
-      <line x1="21" y1="12" x2="23" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
-}
-
-const MemoryLayout = ({
-  title,
-  subtitle,
-  intro,
-  highlights = [],
-  children,
-  kicker,
-  description,
-}) => {
+const MemoryLayout = ({ title, kicker, description, children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggle: toggleTheme } = useTheme();
 
-  const currentIndex = memoryPages.findIndex(
-    (page) => page.path === location.pathname,
-  );
+  const currentIndex = memoryPages.findIndex((p) => p.path === location.pathname);
   const prev = currentIndex > 0 ? memoryPages[currentIndex - 1] : null;
-  const next =
-    currentIndex >= 0 && currentIndex < memoryPages.length - 1
-      ? memoryPages[currentIndex + 1]
-      : null;
+  const next = currentIndex >= 0 && currentIndex < memoryPages.length - 1
+    ? memoryPages[currentIndex + 1] : null;
   const progress = Math.round(((currentIndex + 1) / memoryPages.length) * 100);
-  const progressDash = progress * 0.879;
+  const circumference = 2 * Math.PI * 13;
+  const dashOffset = circumference - (progress / 100) * circumference;
 
-  // Support both prop styles: {title, kicker, description} or {title, subtitle, intro}
-  const heroKicker = kicker || "Memory Systems";
-  const heroTitle = title;
-  const heroDescription = description || intro;
+  // Close sidebar on route change
+  useEffect(() => { setSidebarOpen(false); }, [location.pathname]);
 
   return (
-    <div className="afhdl-layout">
-      <div className="afhdl-bg afhdl-bg-1" />
-      <div className="afhdl-bg afhdl-bg-2" />
+    <div className="mem-layout" data-theme={theme}>
+      {/* Ambient background */}
+      <div className="mem-bg-grid" />
+      <div className="mem-bg-orb mem-bg-orb-1" />
+      <div className="mem-bg-orb mem-bg-orb-2" />
 
-      {/* ── TOPBAR ──────────────────────────────────────────── */}
-      <header className="afhdl-topbar">
-        <div className="afhdl-topbar-left">
+      {/* ── TOPBAR ── */}
+      <header className="mem-topbar">
+        <div className="mem-topbar-left">
           <button
-            className={`afhdl-hamburger${sidebarOpen ? " is-open" : ""}`}
+            className={`mem-hamburger${sidebarOpen ? " open" : ""}`}
             onClick={() => setSidebarOpen((o) => !o)}
-            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={sidebarOpen}
+            aria-label="Toggle navigation"
           >
-            <span className="afhdl-ham-bar" />
-            <span className="afhdl-ham-bar" />
-            <span className="afhdl-ham-bar" />
+            <span className="mem-ham-bar" />
+            <span className="mem-ham-bar" />
+            <span className="mem-ham-bar" />
           </button>
-          <Link to="/" className="afhdl-topbar-link">
-            <Home size={15} aria-hidden="true" />
+          <Link to="/" className="mem-home-link">
+            <Home size={13} />
             <span>Home</span>
           </Link>
         </div>
 
-        <div className="afhdl-topbar-center">
-          <span className="afhdl-category-pill">
-            <span className="afhdl-pill-dot" />
-            Memory Systems
-          </span>
+        <div className="mem-pill">
+          <span className="mem-pill-dot" />
+          Memory Systems
         </div>
 
-        <div className="afhdl-topbar-right">
-          <button
-            className="afhdl-theme-btn"
-            onClick={toggleTheme}
-            aria-label={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
-          >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+        <div className="mem-topbar-right">
+          <button className="mem-theme-btn" onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
           </button>
-          <div
-            className="afhdl-progress-ring-wrap"
-            title={`${currentIndex + 1} of ${memoryPages.length}`}
-          >
-            <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+
+          <div className="mem-ring-wrap" title={`${currentIndex + 1} / ${memoryPages.length}`}>
+            <svg width="38" height="38" viewBox="0 0 38 38">
+              <circle cx="19" cy="19" r="13" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="2.5" />
               <circle
-                cx="18"
-                cy="18"
-                r="14"
-                fill="none"
-                stroke="rgba(99,102,241,0.2)"
-                strokeWidth="3"
-              />
-              <circle
-                cx="18"
-                cy="18"
-                r="14"
-                fill="none"
-                stroke="#818cf8"
-                strokeWidth="3"
-                strokeDasharray={`${progressDash} 100`}
+                cx="19" cy="19" r="13"
+                fill="none" stroke="#38bdf8" strokeWidth="2.5"
+                strokeDasharray={`${circumference}`}
+                strokeDashoffset={dashOffset}
                 strokeLinecap="round"
-                transform="rotate(-90 18 18)"
-                style={{ transition: "stroke-dasharray 0.4s ease" }}
+                transform="rotate(-90 19 19)"
+                style={{ transition: "stroke-dashoffset 0.5s ease" }}
               />
             </svg>
-            <span className="afhdl-progress-text">
-              {currentIndex + 1}/{memoryPages.length}
-            </span>
+            <span className="mem-ring-text">{currentIndex + 1}/{memoryPages.length}</span>
           </div>
         </div>
       </header>
 
-      {/* ── BODY ────────────────────────────────────────────── */}
-      <div className="afhdl-body">
+      {/* ── BODY ── */}
+      <div className="mem-body">
         {sidebarOpen && (
-          <div
-            className="afhdl-overlay"
-            onClick={() => setSidebarOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="mem-overlay" onClick={() => setSidebarOpen(false)} />
         )}
 
-        <aside
-          className={`afhdl-sidebar${sidebarOpen ? " is-open" : ""}`}
-          aria-label="Memory Systems module navigation"
-        >
-          <div className="afhdl-sidebar-inner">
-            <div className="afhdl-sidebar-card">
-              <p className="afhdl-sidebar-kicker">Learning Path</p>
-              <h2 className="afhdl-sidebar-title">Memory Systems</h2>
-              <p className="afhdl-sidebar-copy">
-                From ROM and PLA to RAM arrays — understand how digital systems
-                store data.
+        {/* ── SIDEBAR ── */}
+        <aside className={`mem-sidebar${sidebarOpen ? " open" : ""}`}>
+          <div className="mem-sidebar-inner">
+            <div className="mem-sidebar-card">
+              <p className="mem-sidebar-kicker">Learning Path</p>
+              <h2 className="mem-sidebar-title">Memory Systems</h2>
+              <p className="mem-sidebar-desc">
+                From ROM and PLA to RAM arrays — understand how digital systems store data.
               </p>
-              <div className="afhdl-sidebar-progress-bar">
-                <div
-                  className="afhdl-sidebar-progress-fill"
-                  style={{ width: `${progress}%` }}
-                />
+              <div className="mem-sidebar-prog-bar">
+                <div className="mem-sidebar-prog-fill" style={{ width: `${progress}%` }} />
               </div>
-              <span className="afhdl-sidebar-progress-label">
-                {progress}% complete
-              </span>
+              <span className="mem-sidebar-prog-label">{progress}% complete</span>
             </div>
 
-            <nav className="afhdl-sidebar-nav">
-              {memoryPages.map((page, index) => (
+            <nav className="mem-nav">
+              {memoryPages.map((page, i) => (
                 <NavLink
                   key={page.path}
                   to={page.path}
                   className={({ isActive }) =>
-                    `afhdl-nav-item${isActive ? " is-active" : ""}${index < currentIndex ? " is-visited" : ""}`
+                    `mem-nav-item${isActive ? " active" : ""}${i < currentIndex ? " visited" : ""}`
                   }
-                  onClick={() => setSidebarOpen(false)}
                 >
-                  <span className="afhdl-nav-index">
-                    {String(index + 1).padStart(2, "0")}
+                  <span className="mem-nav-idx">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mem-nav-copy">
+                    <span className="mem-nav-label">{page.icon} {page.label}</span>
+                    <span className="mem-nav-sub">{page.description}</span>
                   </span>
-                  <span className="afhdl-nav-copy">
-                    <span className="afhdl-nav-label">{page.label}</span>
-                    <span className="afhdl-nav-description">
-                      {page.description}
-                    </span>
-                  </span>
-                  <span className="afhdl-nav-status">
-                    {index < currentIndex && (
-                      <span className="afhdl-nav-check">✓</span>
-                    )}
-                  </span>
+                  <span className="mem-nav-check">{i < currentIndex ? "✓" : ""}</span>
                 </NavLink>
               ))}
             </nav>
 
-            <div className="afhdl-sidebar-footer">
-              <Link to="/" className="afhdl-sidebar-home-btn">
-                ← Back to All Topics
-              </Link>
-            </div>
+            <Link to="/" className="mem-sidebar-back">
+              <ChevronLeft size={14} /> Back to All Topics
+            </Link>
           </div>
         </aside>
 
-        {/* ── MAIN ──────────────────────────────────────────── */}
-        <main className="afhdl-main">
-          <nav className="afhdl-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/" className="afhdl-bc-link">
-              Home
-            </Link>
-            <span className="afhdl-bc-sep">›</span>
-            <span className="afhdl-bc-mid">Memory Systems</span>
-            <span className="afhdl-bc-sep">›</span>
-            <span className="afhdl-bc-current">{heroTitle}</span>
+        {/* ── MAIN ── */}
+        <main className="mem-main" key={location.pathname}>
+          {/* Breadcrumb */}
+          <nav className="mem-breadcrumb">
+            <Link to="/" className="mem-bc-link">Home</Link>
+            <span className="mem-bc-sep">›</span>
+            <span className="mem-bc-sep" style={{ color: "var(--mem-muted)" }}>Memory Systems</span>
+            <span className="mem-bc-sep">›</span>
+            <span className="mem-bc-current">{title}</span>
           </nav>
 
-          <section className="afhdl-hero">
-            <div className="afhdl-hero-badge">
-              <span className="afhdl-hero-badge-label">Chapter</span>
-              <strong className="afhdl-hero-badge-num">
-                {currentIndex + 1}
-              </strong>
+          {/* Hero */}
+          <section className="mem-hero">
+            <div className="mem-hero-badge">
+              <span className="mem-hero-badge-label">Chapter</span>
+              <strong className="mem-hero-badge-num">{currentIndex + 1}</strong>
             </div>
-            <p className="afhdl-hero-kicker">{heroKicker}</p>
-            <h1 className="afhdl-hero-title">{heroTitle}</h1>
-            {subtitle ? (
-              <p className="afhdl-hero-subtitle">{subtitle}</p>
-            ) : null}
-            {heroDescription ? (
-              <p className="afhdl-hero-intro">{heroDescription}</p>
-            ) : null}
+            <p className="mem-hero-kicker">{kicker || "Memory Systems"}</p>
+            <h1 className="mem-hero-title">{title}</h1>
+            {description && <p className="mem-hero-desc">{description}</p>}
 
-            {highlights.length > 0 ? (
-              <div className="afhdl-hero-highlights">
-                {highlights.map((item) => (
-                  <div key={item.title} className="afhdl-hero-highlight">
-                    <h3>{item.title}</h3>
-                    <p>{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-
-            <div className="afhdl-chapter-dots">
+            <div className="mem-chapter-dots">
               {memoryPages.map((p, i) => (
                 <Link
                   key={p.path}
                   to={p.path}
-                  className={`afhdl-dot${i === currentIndex ? " active" : ""}${i < currentIndex ? " done" : ""}`}
+                  className={`mem-chapter-dot${i === currentIndex ? " active" : ""}${i < currentIndex ? " done" : ""}`}
                   title={p.label}
                 />
               ))}
             </div>
           </section>
 
-          <div className="afhdl-content">{children}</div>
+          {/* Content */}
+          <div className="mem-content">{children}</div>
 
-          <footer className="afhdl-footer-nav">
+          {/* Footer Nav */}
+          <footer className="mem-footer-nav">
             {prev ? (
-              <NavLink to={prev.path} className="afhdl-footer-link">
-                <span className="afhdl-footer-arrow">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M13 5l-5 5 5 5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
+              <Link to={prev.path} className="mem-footer-link">
+                <span className="mem-footer-arrow"><ChevronLeft size={16} /></span>
                 <span>
-                  <span className="afhdl-footer-label">Previous</span>
-                  <span className="afhdl-footer-title">{prev.label}</span>
+                  <span className="mem-footer-label">Previous</span>
+                  <span className="mem-footer-title">{prev.icon} {prev.label}</span>
                 </span>
-              </NavLink>
-            ) : (
-              <div />
-            )}
+              </Link>
+            ) : <div />}
 
             {next ? (
-              <NavLink
-                to={next.path}
-                className="afhdl-footer-link afhdl-footer-link-next"
-              >
+              <Link to={next.path} className="mem-footer-link mem-footer-link-next">
                 <span>
-                  <span className="afhdl-footer-label">Next</span>
-                  <span className="afhdl-footer-title">{next.label}</span>
+                  <span className="mem-footer-label">Next</span>
+                  <span className="mem-footer-title">{next.icon} {next.label}</span>
                 </span>
-                <span className="afhdl-footer-arrow afhdl-footer-arrow-next">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M7 5l5 5-5 5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </NavLink>
+                <span className="mem-footer-arrow"><ChevronRight size={16} /></span>
+              </Link>
             ) : (
-              <Link to="/" className="afhdl-footer-link afhdl-footer-link-next">
+              <Link to="/" className="mem-footer-link mem-footer-link-next">
                 <span>
-                  <span className="afhdl-footer-label">All done!</span>
-                  <span className="afhdl-footer-title">Return to Home</span>
+                  <span className="mem-footer-label">All done!</span>
+                  <span className="mem-footer-title">Return to Home</span>
                 </span>
-                <span className="afhdl-footer-arrow afhdl-footer-arrow-next">
-                  <Home size={16} aria-hidden="true" />
-                </span>
+                <span className="mem-footer-arrow"><Home size={16} /></span>
               </Link>
             )}
           </footer>

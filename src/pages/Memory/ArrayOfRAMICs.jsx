@@ -1,43 +1,38 @@
-import React, { useState } from "react";
-import AFHDLSection from "../ArithmeticFunctionsAndHDLs/components/AFHDLSection";
-import AFHDLCard from "../ArithmeticFunctionsAndHDLs/components/AFHDLCard";
-import AFHDLCardGroup from "../ArithmeticFunctionsAndHDLs/components/AFHDLCardGroup";
-import AFHDLInfoPanel from "../ArithmeticFunctionsAndHDLs/components/AFHDLInfoPanel";
-import AFHDLDivider from "../ArithmeticFunctionsAndHDLs/components/AFHDLDivider";
-import AFHDLStepList from "../ArithmeticFunctionsAndHDLs/components/AFHDLStepList";
+import React from "react";
 import MemoryLayout from "./MemoryLayout";
+import {
+  MemSection, MemCard, MemCardGroup, MemInfoPanel,
+  MemStepList, MemCode, MemDivider, MemQuiz, MemTable, MemChip,
+} from "./components/MemComponents";
 
 const QUIZ = [
   {
     q: "To expand word length (bit width), how do you connect RAM chips?",
     opts: [
       "In series (cascade address lines)",
-      "In parallel (connect chips side-by-side sharing address lines)",
+      "In parallel (chips side-by-side sharing address lines)",
       "Use a decoder on data lines",
       "Increase the clock frequency",
     ],
     ans: 1,
-    explain:
-      "Word length expansion connects chips in parallel with shared address/control lines, each chip providing additional data bits.",
+    explain: "Word length expansion connects chips in parallel with shared address/control lines, each contributing additional data bits.",
   },
   {
     q: "To expand the number of addressable words (capacity), what is used?",
     opts: [
       "More data lines",
-      "A decoder to select chip enable",
+      "A decoder to drive different chip enable signals",
       "Larger capacitors",
       "Fewer address lines",
     ],
     ans: 1,
-    explain:
-      "Address capacity expansion uses a decoder to activate different chip select (CS) lines for different address ranges.",
+    explain: "Address capacity expansion uses a decoder to activate different chip select (CS) lines for different address ranges.",
   },
   {
     q: "Four 1K×8 RAM chips combined give a total capacity of:",
     opts: ["1K×8", "4K×8", "1K×32", "4K×32"],
     ans: 1,
-    explain:
-      "Combining 4 chips of 1K×8 in word-count expansion (using 2 address bits as chip select) gives 4K×8.",
+    explain: "4 chips of 1K×8 in word-count expansion (using 2 address bits as chip select) gives 4K×8.",
   },
   {
     q: "What signal is typically used to select which chip in an array is active?",
@@ -48,344 +43,118 @@ const QUIZ = [
       "VCC (Power)",
     ],
     ans: 2,
-    explain:
-      "The Chip Select (CS) signal activates a specific RAM chip in an array, determined by the decoder output.",
+    explain: "The Chip Select (CS) signal activates a specific RAM chip in an array, driven by the decoder output.",
   },
 ];
 
-const ArrayOfRAMICs = () => {
-  const [quizMode, setQuizMode] = useState(false);
-  const [quizIdx, setQuizIdx] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState(null);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizDone, setQuizDone] = useState(false);
-
-  const resetQuiz = () => {
-    setQuizIdx(0);
-    setQuizAnswer(null);
-    setQuizScore(0);
-    setQuizDone(false);
-  };
-  const handleQ = (i) => {
-    if (quizAnswer !== null) return;
-    setQuizAnswer(i);
-    if (i === QUIZ[quizIdx].ans) setQuizScore((s) => s + 1);
-  };
-  const nextQ = () => {
-    if (quizIdx + 1 >= QUIZ.length) {
-      setQuizDone(true);
-      return;
-    }
-    setQuizIdx((i) => i + 1);
-    setQuizAnswer(null);
-  };
-
-  const S = {
-    card: {
-      background: "var(--afhdl-card-bg)",
-      border: "1px solid var(--afhdl-border)",
-      borderRadius: "10px",
-      padding: "1rem",
-      marginBottom: "0.75rem",
-    },
-    note: (c) => ({
-      background: `${c}18`,
-      border: `1px solid ${c}55`,
-      borderRadius: "8px",
-      padding: "0.6rem 0.85rem",
-      fontSize: "0.85rem",
-      color: "var(--afhdl-text)",
-      marginTop: "0.5rem",
-    }),
-    sectionTitle: {
-      fontSize: "1rem",
-      fontWeight: 700,
-      color: "var(--afhdl-text)",
-      margin: "1rem 0 0.5rem",
-    },
-  };
-
-  return (
-    <MemoryLayout
-      kicker="Memory Systems"
-      title="Array of RAM ICs"
-      description="Large memory systems are built by combining multiple RAM chips in arrays. Two expansion techniques — word length expansion and address capacity expansion — allow any memory size to be constructed."
+const ArrayOfRAMICs = () => (
+  <MemoryLayout
+    kicker="Memory Systems"
+    title="Array of RAM ICs"
+    description="Large memory systems are built by combining multiple RAM chips in arrays. Two expansion techniques — word length and address capacity — let you build any memory size from standard chips."
+  >
+    <MemSection
+      kicker="Why Combine?"
+      title="Building Larger Memories"
+      description="Individual RAM ICs have fixed word lengths and capacities. Arrays of chips allow designers to build memory systems of any required size from standard off-the-shelf parts."
+      delay={0}
     >
-      <AFHDLSection
-        kicker="Concept"
-        title="Why Combine RAM Chips?"
-        description="Individual RAM ICs have fixed word lengths and capacities. Arrays of chips allow designers to build memory systems of any required size."
-      >
-        <AFHDLCardGroup>
-          <AFHDLInfoPanel
-            title="Word Length Expansion"
-            content="Increase data width (e.g., 4-bit → 8-bit)"
+      <MemCardGroup>
+        <MemInfoPanel icon="↔️" title="Word Length Expansion"  content="Increase data width (e.g., 4-bit → 8-bit)"        color="#38bdf8" />
+        <MemInfoPanel icon="↕️" title="Address Expansion"       content="Increase number of locations (e.g., 1K → 4K)"      color="#818cf8" />
+        <MemInfoPanel icon="🔀" title="Combined Expansion"      content="Expand both dimensions simultaneously"              color="#34d399" />
+      </MemCardGroup>
+    </MemSection>
+
+    <MemSection
+      kicker="Technique 1"
+      title="Word Length (Bit) Expansion"
+      description="To increase word width, place chips in parallel — all chips share the same address and control lines, but each chip contributes a different set of data bits to the output word."
+      delay={100}
+    >
+      <MemCard title="Example: Two 1K×4 chips → 1K×8 memory">
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+          <MemChip
+            label="Chip 1 (1K×4)"
+            pins={["A[9:0] shared", "CS shared", "WE shared"]}
+            dataPins={["D[3:0] → bits 3:0"]}
           />
-          <AFHDLInfoPanel
-            title="Address Expansion"
-            content="Increase number of locations (e.g., 1K → 4K)"
+          <MemChip
+            label="Chip 2 (1K×4)"
+            pins={["A[9:0] shared", "CS shared", "WE shared"]}
+            dataPins={["D[7:4] → bits 7:4"]}
           />
-          <AFHDLInfoPanel
-            title="Combined"
-            content="Expand both dimensions simultaneously"
-          />
-        </AFHDLCardGroup>
-      </AFHDLSection>
-
-      <AFHDLSection
-        kicker="Technique 1"
-        title="Word Length (Bit) Expansion"
-        description="To increase word width, place chips in parallel — all chips share the same address and control lines, but each contributes different data bits."
-      >
-        <AFHDLCard title="Example: 1K×4 → 1K×8 using two chips">
-          <div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.82rem",
-              background: "var(--afhdl-table-row-bg)",
-              borderRadius: "8px",
-              padding: "0.75rem",
-              lineHeight: 1.9,
-            }}
-          >
-            <div style={{ color: "#60a5fa" }}>
-              Chip 1 (1K×4): provides D[3:0]
-            </div>
-            <div style={{ color: "#c084fc" }}>
-              Chip 2 (1K×4): provides D[7:4]
-            </div>
-            <div style={{ color: "var(--afhdl-muted)", marginTop: "0.4rem" }}>
-              Both chips share: Address A[9:0], CS, WE
-            </div>
-            <div style={{ color: "#4ade80", marginTop: "0.4rem" }}>
-              Result: 1K × 8 bit memory
-            </div>
-          </div>
-        </AFHDLCard>
-      </AFHDLSection>
-
-      <AFHDLSection
-        kicker="Technique 2"
-        title="Address (Word Count) Expansion"
-        description="To increase the number of addressable locations, use a decoder to select different chips for different address ranges."
-      >
-        <AFHDLCard title="Example: 1K×8 → 4K×8 using four chips + 2-to-4 decoder">
-          <div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.82rem",
-              background: "var(--afhdl-table-row-bg)",
-              borderRadius: "8px",
-              padding: "0.75rem",
-              lineHeight: 1.9,
-            }}
-          >
-            <div style={{ color: "var(--afhdl-muted)" }}>
-              High address bits A[11:10] → 2-to-4 Decoder
-            </div>
-            <div style={{ color: "#60a5fa" }}>
-              Decoder Y0 → CS of Chip 0 (addresses 0x000–0x3FF)
-            </div>
-            <div style={{ color: "#60a5fa" }}>
-              Decoder Y1 → CS of Chip 1 (addresses 0x400–0x7FF)
-            </div>
-            <div style={{ color: "#60a5fa" }}>
-              Decoder Y2 → CS of Chip 2 (addresses 0x800–0xBFF)
-            </div>
-            <div style={{ color: "#60a5fa" }}>
-              Decoder Y3 → CS of Chip 3 (addresses 0xC00–0xFFF)
-            </div>
-            <div style={{ color: "#4ade80", marginTop: "0.4rem" }}>
-              Low address bits A[9:0] go to all chips (select row within chip)
-            </div>
-            <div style={{ color: "#4ade80" }}>Result: 4K × 8 bit memory</div>
-          </div>
-        </AFHDLCard>
-      </AFHDLSection>
-
-      <AFHDLSection
-        kicker="Summary"
-        title="Design Steps for RAM Arrays"
-        description=""
-      >
-        <AFHDLStepList
-          steps={[
-            "Determine required total capacity: total locations × word size.",
-            "Choose available RAM chip size (e.g., 1K×8).",
-            "Calculate chips needed for word length: required bits ÷ chip data bits.",
-            "Calculate chips needed for address expansion: required locations ÷ chip locations.",
-            "Total chips = (word expansion chips) × (address expansion chips).",
-            "Use a decoder with (log₂ of address expansion) inputs to drive the CS lines.",
-          ]}
-        />
-      </AFHDLSection>
-
-      <AFHDLDivider />
-      <div style={S.sectionTitle}>🧠 Quiz — Test Your Understanding</div>
-
-      {!quizMode ? (
-        <div style={S.card}>
-          <div style={{ color: "var(--afhdl-muted)", marginBottom: "0.5rem" }}>
-            Four questions on RAM arrays. Ready?
-          </div>
-          <button
-            className="kmap-btn"
-            style={{ width: "100%" }}
-            onClick={() => {
-              setQuizMode(true);
-              resetQuiz();
-            }}
-          >
-            Start Quiz ({QUIZ.length} questions) →
-          </button>
         </div>
-      ) : quizDone ? (
-        <div style={S.card}>
-          <div
-            style={{
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              color: "#4ade80",
-              marginBottom: "0.4rem",
-            }}
-          >
-            {quizScore >= 3 ? "🎉 Well done!" : "📚 Keep practicing!"}
-          </div>
-          <p style={{ color: "var(--afhdl-muted)" }}>
-            Score: <strong style={{ color: "#4ade80" }}>{quizScore}</strong> /{" "}
-            {QUIZ.length}
-          </p>
-          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.6rem" }}>
-            <button className="kmap-btn" onClick={resetQuiz}>
-              Try Again
-            </button>
-            <button
-              className="kmap-btn kmap-btn-secondary"
-              onClick={() => setQuizMode(false)}
-            >
-              Exit
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div style={S.card}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "0.4rem",
-            }}
-          >
-            <span style={{ color: "var(--afhdl-muted)", fontSize: "0.8rem" }}>
-              Q {quizIdx + 1}/{QUIZ.length}
-            </span>
-            <span style={{ color: "#4ade80", fontSize: "0.8rem" }}>
-              Score: {quizScore}
-            </span>
-          </div>
-          <div
-            style={{
-              height: "4px",
-              background: "var(--afhdl-border)",
-              borderRadius: "2px",
-              marginBottom: "0.8rem",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${(quizIdx / QUIZ.length) * 100}%`,
-                background: "#6366f1",
-                borderRadius: "2px",
-                transition: "width 0.3s",
-              }}
-            />
-          </div>
-          <div
-            style={{
-              color: "var(--afhdl-text)",
-              fontWeight: 600,
-              fontSize: "0.92rem",
-              marginBottom: "0.7rem",
-              lineHeight: 1.5,
-            }}
-          >
-            {QUIZ[quizIdx].q}
-          </div>
-          <div style={{ display: "grid", gap: "0.4rem" }}>
-            {QUIZ[quizIdx].opts.map((opt, i) => {
-              const isCorrect = i === QUIZ[quizIdx].ans;
-              const selected = quizAnswer === i;
-              let bg = "var(--afhdl-table-row-bg)",
-                border = "var(--afhdl-border)";
-              if (quizAnswer !== null) {
-                if (isCorrect) {
-                  bg = "rgba(74,222,128,0.12)";
-                  border = "#4ade80";
-                } else if (selected) {
-                  bg = "rgba(248,113,113,0.12)";
-                  border = "#f87171";
-                }
-              }
-              return (
-                <button
-                  key={i}
-                  disabled={quizAnswer !== null}
-                  onClick={() => handleQ(i)}
-                  style={{
-                    background: bg,
-                    border: `1px solid ${border}`,
-                    borderRadius: "8px",
-                    padding: "0.55rem 0.85rem",
-                    color: "var(--afhdl-text)",
-                    textAlign: "left",
-                    cursor: quizAnswer !== null ? "default" : "pointer",
-                    fontSize: "0.87rem",
-                    transition: "all 0.18s",
-                  }}
-                >
-                  {quizAnswer !== null &&
-                    (isCorrect ? "✅ " : selected ? "❌ " : "")}
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-          {quizAnswer !== null && (
-            <div
-              style={{
-                ...S.note(
-                  quizAnswer === QUIZ[quizIdx].ans ? "#4ade80" : "#f87171",
-                ),
-                marginTop: "0.65rem",
-              }}
-            >
-              <strong>
-                {quizAnswer === QUIZ[quizIdx].ans
-                  ? "✅ Correct!"
-                  : "❌ Not quite."}
-              </strong>
-              <br />
-              <span style={{ fontSize: "0.83rem" }}>
-                👩‍🏫 {QUIZ[quizIdx].explain}
-              </span>
-            </div>
-          )}
-          {quizAnswer !== null && (
-            <button
-              className="kmap-btn"
-              style={{ marginTop: "0.65rem", width: "100%" }}
-              onClick={nextQ}
-            >
-              {quizIdx + 1 >= QUIZ.length
-                ? "See My Results →"
-                : "Next Question →"}
-            </button>
-          )}
-        </div>
-      )}
-    </MemoryLayout>
-  );
-};
+
+        <MemCode lines={[
+          { text: "Shared:  Address A[9:0], CS, WE  → both chips", color: "var(--mem-muted)" },
+          { text: "Chip 1 drives → D[3:0]  (lower nibble)", color: "#38bdf8" },
+          { text: "Chip 2 drives → D[7:4]  (upper nibble)", color: "#818cf8" },
+          { text: "Result:  1K × 8 = 8 Kbits total  ✓", color: "#34d399" },
+        ]} />
+      </MemCard>
+    </MemSection>
+
+    <MemSection
+      kicker="Technique 2"
+      title="Address (Word Count) Expansion"
+      description="To increase the number of addressable locations, use a decoder to select different chips for different address ranges. Only one chip is active at a time."
+      delay={150}
+    >
+      <MemCard title="Example: Four 1K×8 chips + 2-to-4 decoder → 4K×8 memory">
+        <MemCode lines={[
+          { text: "High bits A[11:10] → 2-to-4 Decoder", color: "var(--mem-muted)" },
+          { text: "" },
+          { text: "Y0 → CS Chip 0  (addresses 0x000 – 0x3FF)", color: "#38bdf8" },
+          { text: "Y1 → CS Chip 1  (addresses 0x400 – 0x7FF)", color: "#38bdf8" },
+          { text: "Y2 → CS Chip 2  (addresses 0x800 – 0xBFF)", color: "#38bdf8" },
+          { text: "Y3 → CS Chip 3  (addresses 0xC00 – 0xFFF)", color: "#38bdf8" },
+          { text: "" },
+          { text: "Low bits A[9:0] → all 4 chips (internal row select)", color: "#34d399" },
+          { text: "Only the decoded chip is enabled at any time  ✓", color: "#34d399" },
+          { text: "Result:  4K × 8 memory  ✓", color: "#fb923c" },
+        ]} />
+      </MemCard>
+    </MemSection>
+
+    <MemSection
+      kicker="Quick Reference"
+      title="Expansion Summary Table"
+      delay={200}
+    >
+      <MemTable
+        headers={["Expansion Type", "How?", "Address Lines?", "Decoder?", "Data Bus?"]}
+        rows={[
+          ["Word Length (Bit)", "Chips in parallel",           "Shared — same",      "No",  "Wider (more bits)"],
+          ["Address (Word Count)", "Decoder selects chip",    "Split — high/low",   "Yes", "Same width"],
+          ["Both",              "Combine both techniques",    "Split — high/low",   "Yes", "Wider"],
+        ]}
+        colColors={[null, "#38bdf8", "#818cf8", "#fb923c", "#34d399"]}
+      />
+    </MemSection>
+
+    <MemSection
+      kicker="Design Steps"
+      title="How to Design a RAM Array"
+      delay={250}
+    >
+      <MemStepList
+        steps={[
+          "Determine required total capacity: total locations × word size (e.g., 8K × 16).",
+          "Choose available RAM chip size (e.g., 2K × 8).",
+          "Calculate chips needed for word length expansion: required bits ÷ chip data bits (16 ÷ 8 = 2).",
+          "Calculate chips needed for address expansion: required locations ÷ chip locations (8K ÷ 2K = 4 banks).",
+          "Total chips = word expansion × address expansion (2 × 4 = 8 chips).",
+          "Design a decoder with log₂(address expansion banks) inputs to drive the CS lines.",
+          "Connect low-order address bits to all chips; feed high-order bits to the decoder.",
+        ]}
+      />
+    </MemSection>
+
+    <MemDivider />
+
+    <MemQuiz questions={QUIZ} />
+  </MemoryLayout>
+);
 
 export default ArrayOfRAMICs;

@@ -1,43 +1,38 @@
-import React, { useState } from "react";
-import AFHDLSection from "../ArithmeticFunctionsAndHDLs/components/AFHDLSection";
-import AFHDLCard from "../ArithmeticFunctionsAndHDLs/components/AFHDLCard";
-import AFHDLCardGroup from "../ArithmeticFunctionsAndHDLs/components/AFHDLCardGroup";
-import AFHDLInfoPanel from "../ArithmeticFunctionsAndHDLs/components/AFHDLInfoPanel";
-import AFHDLDivider from "../ArithmeticFunctionsAndHDLs/components/AFHDLDivider";
-import AFHDLStepList from "../ArithmeticFunctionsAndHDLs/components/AFHDLStepList";
+import React from "react";
 import MemoryLayout from "./MemoryLayout";
+import {
+  MemSection, MemCard, MemCardGroup, MemInfoPanel,
+  MemStepList, MemCode, MemDivider, MemQuiz, MemTable,
+} from "./components/MemComponents";
 
 const QUIZ = [
   {
     q: "A system needs 8K×16 memory. You have 2K×8 chips. How many chips are needed?",
     opts: ["4", "8", "16", "2"],
     ans: 2,
-    explain:
-      "Word expansion: 16÷8 = 2 chips per bank. Address expansion: 8K÷2K = 4 banks. Total = 2×4 = 16 chips.",
+    explain: "Word expansion: 16÷8 = 2 chips per bank. Address expansion: 8K÷2K = 4 banks. Total = 2×4 = 16 chips.",
   },
   {
     q: "In memory system design, what does 'bank' refer to?",
     opts: [
       "A financial institution storing memory",
-      "A group of chips sharing the same address range",
+      "A group of chips sharing the same address range (same CS)",
       "A single memory chip",
       "The address decoder",
     ],
     ans: 1,
-    explain:
-      "A memory bank is a group of chips that are accessed simultaneously, selected by the same chip select signal.",
+    explain: "A memory bank is a group of chips that are accessed simultaneously, all selected by the same chip select signal.",
   },
   {
     q: "What is the role of the address decoder in a memory system?",
     opts: [
       "To decode binary data into decimal",
-      "To select which bank of chips is active based on high-order address bits",
+      "To select which bank is active based on high-order address bits",
       "To convert addresses to ASCII",
       "To increase the clock speed",
     ],
     ans: 1,
-    explain:
-      "The address decoder takes high-order address bits and asserts the CS signal for the appropriate memory bank.",
+    explain: "The address decoder takes high-order address bits and asserts the CS signal for the appropriate memory bank.",
   },
   {
     q: "Bus contention occurs when:",
@@ -48,352 +43,129 @@ const QUIZ = [
       "The decoder has too many outputs",
     ],
     ans: 1,
-    explain:
-      "Bus contention (or conflict) happens when two chips try to drive the shared data bus at the same time. Only one CS should be active at a time.",
+    explain: "Bus contention happens when two chips try to drive the shared data bus simultaneously. Only one CS should be active at a time, keeping other chips in tri-state (high-Z).",
   },
 ];
 
-const MemoryConstructionRAM = () => {
-  const [quizMode, setQuizMode] = useState(false);
-  const [quizIdx, setQuizIdx] = useState(0);
-  const [quizAnswer, setQuizAnswer] = useState(null);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizDone, setQuizDone] = useState(false);
-
-  const resetQuiz = () => {
-    setQuizIdx(0);
-    setQuizAnswer(null);
-    setQuizScore(0);
-    setQuizDone(false);
-  };
-  const handleQ = (i) => {
-    if (quizAnswer !== null) return;
-    setQuizAnswer(i);
-    if (i === QUIZ[quizIdx].ans) setQuizScore((s) => s + 1);
-  };
-  const nextQ = () => {
-    if (quizIdx + 1 >= QUIZ.length) {
-      setQuizDone(true);
-      return;
-    }
-    setQuizIdx((i) => i + 1);
-    setQuizAnswer(null);
-  };
-
-  const S = {
-    card: {
-      background: "var(--afhdl-card-bg)",
-      border: "1px solid var(--afhdl-border)",
-      borderRadius: "10px",
-      padding: "1rem",
-      marginBottom: "0.75rem",
-    },
-    note: (c) => ({
-      background: `${c}18`,
-      border: `1px solid ${c}55`,
-      borderRadius: "8px",
-      padding: "0.6rem 0.85rem",
-      fontSize: "0.85rem",
-      color: "var(--afhdl-text)",
-      marginTop: "0.5rem",
-    }),
-    sectionTitle: {
-      fontSize: "1rem",
-      fontWeight: 700,
-      color: "var(--afhdl-text)",
-      margin: "1rem 0 0.5rem",
-    },
-  };
-
-  return (
-    <MemoryLayout
-      kicker="Memory Systems"
-      title="Memory Construction using RAM ICs"
-      description="Real memory systems are designed by carefully arranging RAM ICs to meet a required capacity and word width. This involves systematic use of chip arrays, decoders, and bus connections."
+const MemoryConstructionRAM = () => (
+  <MemoryLayout
+    kicker="Memory Systems"
+    title="Memory Construction using RAM ICs"
+    description="Real memory systems are designed by systematically arranging RAM ICs to meet a required capacity and word width. This brings together chip arrays, decoders, and shared buses."
+  >
+    <MemSection
+      kicker="Overview"
+      title="System Memory Design Process"
+      description="Constructing a memory system from RAM ICs requires deciding on the number of chips, their arrangement into banks, and how addressing and control signals are distributed."
+      delay={0}
     >
-      <AFHDLSection
-        kicker="Overview"
-        title="System Memory Design"
-        description="Constructing a memory system from IC chips requires decisions about the number of chips, their arrangement, and how addressing and control signals are distributed."
-      >
-        <AFHDLCardGroup>
-          <AFHDLInfoPanel
-            title="Step 1"
-            content="Determine total capacity (words × bits)"
-          />
-          <AFHDLInfoPanel
-            title="Step 2"
-            content="Choose chip size and calculate chips needed"
-          />
-          <AFHDLInfoPanel
-            title="Step 3"
-            content="Design address decoder for chip selection"
-          />
-        </AFHDLCardGroup>
-      </AFHDLSection>
+      <MemCardGroup>
+        <MemInfoPanel icon="📐" title="Step 1" content="Determine total capacity (words × bits)"           color="#38bdf8" />
+        <MemInfoPanel icon="🔢" title="Step 2" content="Choose chip size, calculate chips per bank"         color="#818cf8" />
+        <MemInfoPanel icon="🎛️" title="Step 3" content="Design address decoder for bank selection"          color="#34d399" />
+        <MemInfoPanel icon="🔌" title="Step 4" content="Wire address, data, and control buses"              color="#fb923c" />
+      </MemCardGroup>
+    </MemSection>
 
-      <AFHDLSection
-        kicker="Worked Example"
-        title="Design a 16K×8 Memory from 4K×4 Chips"
-        description="Step-by-step construction of a 16K×8 memory system."
-      >
-        <AFHDLCard title="Calculation">
-          <div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.82rem",
-              background: "var(--afhdl-table-row-bg)",
-              borderRadius: "8px",
-              padding: "0.75rem",
-              lineHeight: 2,
-            }}
-          >
-            <div style={{ color: "#60a5fa" }}>Required: 16K × 8</div>
-            <div style={{ color: "#c084fc" }}>Chip size: 4K × 4</div>
-            <div
-              style={{
-                borderTop: "1px solid var(--afhdl-border)",
-                paddingTop: "6px",
-                color: "var(--afhdl-muted)",
-              }}
-            >
-              Word (bit) expansion: 8 ÷ 4 ={" "}
-              <span style={{ color: "#4ade80" }}>2 chips per bank</span>
-            </div>
-            <div style={{ color: "var(--afhdl-muted)" }}>
-              Address expansion: 16K ÷ 4K ={" "}
-              <span style={{ color: "#4ade80" }}>4 banks</span>
-            </div>
-            <div style={{ color: "var(--afhdl-muted)" }}>
-              Total chips: 2 × 4 ={" "}
-              <span style={{ color: "#4ade80" }}>8 chips</span>
-            </div>
-            <div style={{ color: "var(--afhdl-muted)" }}>
-              Decoder needed: 2-to-4 (uses A[13:12])
-            </div>
-            <div style={{ color: "var(--afhdl-muted)" }}>
-              Row address bits: A[11:0] → all chips in selected bank
-            </div>
-          </div>
-        </AFHDLCard>
+    <MemSection
+      kicker="Worked Example"
+      title="Design a 16K×8 Memory from 4K×4 Chips"
+      description="Step-by-step construction of a complete 16K×8 memory system."
+      delay={100}
+    >
+      <MemCard title="Step 1 — Chip Count Calculation">
+        <MemCode lines={[
+          { text: "Required capacity:  16K × 8", color: "#38bdf8" },
+          { text: "Chip size:          4K  × 4", color: "#818cf8" },
+          { text: "" },
+          { text: "Word (bit) expansion:   8 ÷ 4   =  2 chips per bank", color: "#34d399" },
+          { text: "Address expansion:   16K ÷ 4K  =  4 banks", color: "#34d399" },
+          { text: "Total chips:           2 × 4   =  8 chips  ✓", color: "#fb923c" },
+          { text: "" },
+          { text: "Decoder:  2-to-4  (inputs: A[13:12])", color: "var(--mem-muted)" },
+          { text: "Row addr: A[11:0] → all chips in active bank", color: "var(--mem-muted)" },
+        ]} />
+      </MemCard>
 
-        <AFHDLCard title="Bank Layout">
-          <div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.82rem",
-              background: "var(--afhdl-table-row-bg)",
-              borderRadius: "8px",
-              padding: "0.75rem",
-              lineHeight: 2,
-            }}
-          >
-            {[
-              ["Bank 0", "0x0000–0x0FFF", "Y0", "Chip0A(D3:0) + Chip0B(D7:4)"],
-              ["Bank 1", "0x1000–0x1FFF", "Y1", "Chip1A(D3:0) + Chip1B(D7:4)"],
-              ["Bank 2", "0x2000–0x2FFF", "Y2", "Chip2A(D3:0) + Chip2B(D7:4)"],
-              ["Bank 3", "0x3000–0x3FFF", "Y3", "Chip3A(D3:0) + Chip3B(D7:4)"],
-            ].map(([bank, range, cs, chips], i) => (
-              <div
-                key={i}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "0.5fr 1fr 0.5fr 1.5fr",
-                  gap: "6px",
-                  borderTop: i > 0 ? "1px solid var(--afhdl-border)" : "none",
-                }}
-              >
-                <span style={{ color: "#60a5fa" }}>{bank}</span>
-                <span style={{ color: "var(--afhdl-muted)" }}>{range}</span>
-                <span style={{ color: "#c084fc" }}>{cs}</span>
-                <span style={{ color: "#4ade80" }}>{chips}</span>
-              </div>
-            ))}
-          </div>
-        </AFHDLCard>
-      </AFHDLSection>
+      <div style={{ height: "0.75rem" }} />
 
-      <AFHDLSection
-        kicker="Bus"
-        title="Shared Bus Connections"
-        description="All chips in a memory system share common buses for address, data, and control."
-      >
-        <AFHDLStepList
-          steps={[
-            "Address Bus: Low-order bits connect to all chips (select internal row/column). High-order bits feed the decoder.",
-            "Data Bus: Each chip's data pins connect to corresponding bits of the shared data bus. Only the active chip drives the bus.",
-            "Control Bus: WE and OE connect to all chips. CS from decoder activates only one bank at a time.",
-            "Bus Contention Prevention: Only the selected chip (CS active) drives the data bus — others are in high-impedance (tri-state) mode.",
+      <MemCard title="Step 2 — Bank Layout">
+        <MemTable
+          headers={["Bank", "Address Range", "CS Signal", "Chips"]}
+          rows={[
+            ["Bank 0","0x0000 – 0x0FFF","Y0","Chip0A (D[3:0]) + Chip0B (D[7:4])"],
+            ["Bank 1","0x1000 – 0x1FFF","Y1","Chip1A (D[3:0]) + Chip1B (D[7:4])"],
+            ["Bank 2","0x2000 – 0x2FFF","Y2","Chip2A (D[3:0]) + Chip2B (D[7:4])"],
+            ["Bank 3","0x3000 – 0x3FFF","Y3","Chip3A (D[3:0]) + Chip3B (D[7:4])"],
           ]}
+          colColors={["#38bdf8", null, "#818cf8", "#34d399"]}
         />
-      </AFHDLSection>
+      </MemCard>
+    </MemSection>
 
-      <AFHDLDivider />
-      <div style={S.sectionTitle}>🧠 Quiz — Test Your Understanding</div>
+    <MemSection
+      kicker="Bus Architecture"
+      title="Shared Bus Connections"
+      description="All chips in a memory system share common buses for address, data, and control signals. Careful bus design prevents contention."
+      delay={150}
+    >
+      <MemCard title="Bus Wiring Rules">
+        <MemCode lines={[
+          { text: "ADDRESS BUS ─────────────────────────────", color: "#38bdf8" },
+          { text: "  Low bits  A[11:0]  → all chips (row/col select)", color: "#38bdf8" },
+          { text: "  High bits A[13:12] → decoder input", color: "#38bdf8" },
+          { text: "" },
+          { text: "DATA BUS ────────────────────────────────", color: "#818cf8" },
+          { text: "  Chip A (D[3:0]) → data bus bits 3:0", color: "#818cf8" },
+          { text: "  Chip B (D[7:4]) → data bus bits 7:4", color: "#818cf8" },
+          { text: "  Inactive chips: high-Z (tri-stated by CS̄ inactive)", color: "#818cf8" },
+          { text: "" },
+          { text: "CONTROL BUS ─────────────────────────────", color: "#34d399" },
+          { text: "  WE̅, OE̅ → all chips (broadcast)", color: "#34d399" },
+          { text: "  CS̄ bank → from decoder Yi (one active at a time)", color: "#34d399" },
+        ]} />
+      </MemCard>
+    </MemSection>
 
-      {!quizMode ? (
-        <div style={S.card}>
-          <div style={{ color: "var(--afhdl-muted)", marginBottom: "0.5rem" }}>
-            Four questions on memory construction. Ready?
-          </div>
-          <button
-            className="kmap-btn"
-            style={{ width: "100%" }}
-            onClick={() => {
-              setQuizMode(true);
-              resetQuiz();
-            }}
-          >
-            Start Quiz ({QUIZ.length} questions) →
-          </button>
-        </div>
-      ) : quizDone ? (
-        <div style={S.card}>
-          <div
-            style={{
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              color: "#4ade80",
-              marginBottom: "0.4rem",
-            }}
-          >
-            {quizScore >= 3 ? "🎉 Well done!" : "📚 Keep practicing!"}
-          </div>
-          <p style={{ color: "var(--afhdl-muted)" }}>
-            Score: <strong style={{ color: "#4ade80" }}>{quizScore}</strong> /{" "}
-            {QUIZ.length}
-          </p>
-          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.6rem" }}>
-            <button className="kmap-btn" onClick={resetQuiz}>
-              Try Again
-            </button>
-            <button
-              className="kmap-btn kmap-btn-secondary"
-              onClick={() => setQuizMode(false)}
-            >
-              Exit
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div style={S.card}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "0.4rem",
-            }}
-          >
-            <span style={{ color: "var(--afhdl-muted)", fontSize: "0.8rem" }}>
-              Q {quizIdx + 1}/{QUIZ.length}
-            </span>
-            <span style={{ color: "#4ade80", fontSize: "0.8rem" }}>
-              Score: {quizScore}
-            </span>
-          </div>
-          <div
-            style={{
-              height: "4px",
-              background: "var(--afhdl-border)",
-              borderRadius: "2px",
-              marginBottom: "0.8rem",
-            }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${(quizIdx / QUIZ.length) * 100}%`,
-                background: "#6366f1",
-                borderRadius: "2px",
-                transition: "width 0.3s",
-              }}
-            />
-          </div>
-          <div
-            style={{
-              color: "var(--afhdl-text)",
-              fontWeight: 600,
-              fontSize: "0.92rem",
-              marginBottom: "0.7rem",
-              lineHeight: 1.5,
-            }}
-          >
-            {QUIZ[quizIdx].q}
-          </div>
-          <div style={{ display: "grid", gap: "0.4rem" }}>
-            {QUIZ[quizIdx].opts.map((opt, i) => {
-              const isCorrect = i === QUIZ[quizIdx].ans;
-              const selected = quizAnswer === i;
-              let bg = "var(--afhdl-table-row-bg)",
-                border = "var(--afhdl-border)";
-              if (quizAnswer !== null) {
-                if (isCorrect) {
-                  bg = "rgba(74,222,128,0.12)";
-                  border = "#4ade80";
-                } else if (selected) {
-                  bg = "rgba(248,113,113,0.12)";
-                  border = "#f87171";
-                }
-              }
-              return (
-                <button
-                  key={i}
-                  disabled={quizAnswer !== null}
-                  onClick={() => handleQ(i)}
-                  style={{
-                    background: bg,
-                    border: `1px solid ${border}`,
-                    borderRadius: "8px",
-                    padding: "0.55rem 0.85rem",
-                    color: "var(--afhdl-text)",
-                    textAlign: "left",
-                    cursor: quizAnswer !== null ? "default" : "pointer",
-                    fontSize: "0.87rem",
-                    transition: "all 0.18s",
-                  }}
-                >
-                  {quizAnswer !== null &&
-                    (isCorrect ? "✅ " : selected ? "❌ " : "")}
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-          {quizAnswer !== null && (
-            <div
-              style={{
-                ...S.note(
-                  quizAnswer === QUIZ[quizIdx].ans ? "#4ade80" : "#f87171",
-                ),
-                marginTop: "0.65rem",
-              }}
-            >
-              <strong>
-                {quizAnswer === QUIZ[quizIdx].ans
-                  ? "✅ Correct!"
-                  : "❌ Not quite."}
-              </strong>
-              <br />
-              <span style={{ fontSize: "0.83rem" }}>
-                👩‍🏫 {QUIZ[quizIdx].explain}
-              </span>
-            </div>
-          )}
-          {quizAnswer !== null && (
-            <button
-              className="kmap-btn"
-              style={{ marginTop: "0.65rem", width: "100%" }}
-              onClick={nextQ}
-            >
-              {quizIdx + 1 >= QUIZ.length
-                ? "See My Results →"
-                : "Next Question →"}
-            </button>
-          )}
-        </div>
-      )}
-    </MemoryLayout>
-  );
-};
+    <MemSection
+      kicker="Safety"
+      title="Preventing Bus Contention"
+      description="Bus contention occurs when two chips simultaneously try to drive the data bus. It can damage chips and corrupt data."
+      delay={200}
+    >
+      <MemStepList
+        steps={[
+          "Only one CS̄ output from the decoder can be active at any given time — guaranteed by decoder design.",
+          "Inactive chips' data outputs float to high-impedance (tri-state) when CS̄ is deasserted.",
+          "Tri-state buffers on each chip's data output allow safe sharing of the common data bus.",
+          "The decoder must assert new CS̄ only after previous CS̄ is deasserted (no overlapping enables).",
+          "Bus contention prevention: use open-collector or tri-state drivers, never totem-pole on shared lines.",
+        ]}
+      />
+    </MemSection>
+
+    <MemSection
+      kicker="Practice"
+      title="General Design Formula"
+      delay={250}
+    >
+      <MemCard title="Chip Count Formula">
+        <MemCode lines={[
+          { text: "Given:  Required = W_total × B_total", color: "var(--mem-muted)" },
+          { text: "        Chip     = W_chip   × B_chip", color: "var(--mem-muted)" },
+          { text: "" },
+          { text: "Chips per bank  = B_total / B_chip   (bit expansion)", color: "#38bdf8" },
+          { text: "Banks needed    = W_total / W_chip   (address expansion)", color: "#818cf8" },
+          { text: "Total chips     = (B_total/B_chip) × (W_total/W_chip)", color: "#34d399" },
+          { text: "Decoder size    = log₂(Banks needed)-to-Banks needed", color: "#fb923c" },
+        ]} />
+      </MemCard>
+    </MemSection>
+
+    <MemDivider />
+
+    <MemQuiz questions={QUIZ} />
+  </MemoryLayout>
+);
 
 export default MemoryConstructionRAM;
