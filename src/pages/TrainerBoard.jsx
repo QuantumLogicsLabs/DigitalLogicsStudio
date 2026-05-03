@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 /* ================================================================
    IT-300 Digital Logic Training System — Infinit Technologies
@@ -263,7 +263,6 @@ const COLS = 30;
 const ROWS_A = ["a", "b", "c", "d", "e"];
 const ROWS_B = ["f", "g", "h", "i", "j"];
 const HOLE_PX = 12; // hole spacing px — increased for visibility
-const HOLE_R = 4.5; // hole radius — larger for easy clicking
 const GAP_AFTER = new Set([4, 9, 14, 19, 24]);
 
 // ── Breadboard SVG ────────────────────────────────────────────────
@@ -826,7 +825,6 @@ function TrayIC({ icKey, onMouseDown }) {
 function getBBDimensions() {
   const ROW_H = 14,
     TOP_RAIL_Y = 6;
-  const TOP_GND_Y = TOP_RAIL_Y + 18;
   const BODY_Y = TOP_RAIL_Y + 36;
   const TOP_ROWS_H = 5 * ROW_H;
   const CENTER_Y = BODY_Y + TOP_ROWS_H + 2;
@@ -864,7 +862,7 @@ export default function IT300() {
 
   const { W: bbW, H: bbH } = getBBDimensions();
 
-  const COLORS = [
+  const COLORS = useMemo(() => [
     "#e63946",
     "#2196f3",
     "#4caf50",
@@ -875,7 +873,7 @@ export default function IT300() {
     "#ff5722",
     "#f48fb1",
     "#80cbc4",
-  ];
+  ], []);
 
   // Clock
   useEffect(() => {
@@ -974,7 +972,7 @@ export default function IT300() {
         setPreview(null);
       }
     },
-    [mode, wireStart, wireCol, colIdx],
+    [mode, wireStart, wireCol, colIdx, COLORS],
   );
 
   const startTrayDrag = (e, icKey) => {
