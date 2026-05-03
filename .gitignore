@@ -61,3 +61,6 @@ out/
 # Claude Code
 .codex
 .claude/
+
+# make-folder-txt
+frontend.txt
