@@ -98,7 +98,6 @@ const homeData = [
       },
     ],
   },
-  // ── NEW ──────────────────────────────────────────────────────────
   {
     title: "⇌ Registers & Register Transfers",
     description:
@@ -118,7 +117,29 @@ const homeData = [
       { text: "Sync Binary Counters", to: "/registers/sync-binary-counters" },
     ],
   },
-  // ────────────────────────────────────────────────────────────────
+  {
+    title: "🧠 Memory Systems",
+    description:
+      "Explore how digital systems store data permanently and temporarily — from ROM and PLA devices to RAM construction using real IC chips.",
+    section: "topics",
+    topicGroup: "circuits",
+    topicOrder: 4,
+    links: [
+      { text: "Memory Basics", to: "/memory/basics" },
+      { text: "Read-Only Memories", to: "/memory/read-only-memories" },
+      {
+        text: "Programmable Logic Array",
+        to: "/memory/programmable-logic-array",
+      },
+      { text: "Random Access Memory", to: "/memory/random-access-memory" },
+      { text: "Static & Dynamic RAM", to: "/memory/static-dynamic-ram" },
+      { text: "Array of RAM ICs", to: "/memory/array-of-ram-ics" },
+      {
+        text: "Memory Construction (RAM)",
+        to: "/memory/memory-construction-ram",
+      },
+    ],
+  },
   {
     title: "🔢 Number Systems",
     description:

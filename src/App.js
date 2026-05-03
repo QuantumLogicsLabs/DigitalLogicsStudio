@@ -78,6 +78,15 @@ import SeqDesignProcedures from "./pages/SequentialCircuits/SeqDesignProcedures"
 import SeqStateDiagram from "./pages/SequentialCircuits/SeqStateDiagram";
 import SeqStateReduction from "./pages/SequentialCircuits/SeqStateReduction";
 
+// MEMORY SYSTEMS:
+import MemoryBasics from "./pages/Memory/MemoryBasics";
+import ReadOnlyMemories from "./pages/Memory/ReadOnlyMemories";
+import ProgrammableLogicArray from "./pages/Memory/ProgrammableLogicArray";
+import RandomAccessMemory from "./pages/Memory/RandomAccessMemory";
+import StaticDynamicRAM from "./pages/Memory/StaticDynamicRAM";
+import ArrayOfRAMICs from "./pages/Memory/ArrayOfRAMICs";
+import MemoryConstructionRAM from "./pages/Memory/MemoryConstructionRAM";
+
 function App() {
   const { theme } = useTheme();
 
@@ -205,6 +214,28 @@ function App() {
           <Route
             path="/registers/sync-binary-counters"
             element={<RegSyncBinaryCounters />}
+          />
+          <Route path="/memory/basics" element={<MemoryBasics />} />
+          <Route
+            path="/memory/read-only-memories"
+            element={<ReadOnlyMemories />}
+          />
+          <Route
+            path="/memory/programmable-logic-array"
+            element={<ProgrammableLogicArray />}
+          />
+          <Route
+            path="/memory/random-access-memory"
+            element={<RandomAccessMemory />}
+          />
+          <Route
+            path="/memory/static-dynamic-ram"
+            element={<StaticDynamicRAM />}
+          />
+          <Route path="/memory/array-of-ram-ics" element={<ArrayOfRAMICs />} />
+          <Route
+            path="/memory/memory-construction-ram"
+            element={<MemoryConstructionRAM />}
           />
         </Routes>
       </BrowserRouter>
