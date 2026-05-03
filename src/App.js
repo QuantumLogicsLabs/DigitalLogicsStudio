@@ -86,6 +86,7 @@ import RandomAccessMemory from "./pages/Memory/RandomAccessMemory";
 import StaticDynamicRAM from "./pages/Memory/StaticDynamicRAM";
 import ArrayOfRAMICs from "./pages/Memory/ArrayOfRAMICs";
 import MemoryConstructionRAM from "./pages/Memory/MemoryConstructionRAM";
+import DLDTrainerBoard from "./pages/TrainerBoard";
 
 function App() {
   const { theme } = useTheme();
@@ -228,6 +229,7 @@ function App() {
             path="/memory/random-access-memory"
             element={<RandomAccessMemory />}
           />
+          <Route path="/trainer-board" element={<DLDTrainerBoard />} />
           <Route
             path="/memory/static-dynamic-ram"
             element={<StaticDynamicRAM />}
