@@ -181,7 +181,7 @@ const BooleanIdentities = () => {
                   <strong>Example Application:</strong>
                 </p>
                 <p>Using {id.name} identity to simplify expressions:</p>
-                <ul>
+                <ul style={{ marginLeft: 30, marginTop: 10 }}>
                   <li>For OR: {id.add.replace("=", "→")}</li>
                   <li>For AND: {id.mul.replace("=", "→")}</li>
                 </ul>
