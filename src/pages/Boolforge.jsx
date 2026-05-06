@@ -43,6 +43,8 @@ const Boolforge = ({
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [renamingGate, setRenamingGate] = useState(null); // { id, currentLabel }
+  const [renameValue, setRenameValue] = useState("");
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -529,7 +531,34 @@ const Boolforge = ({
     );
   };
 
-  // ── Full evaluation for truth table (handles N inputs) ────────────────────
+  // ── Rename gate ────────────────────────────────────────────────────────────
+  const startRename = (e, gate) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setRenamingGate(gate);
+    setRenameValue(gate.label || gate.type);
+  };
+
+  const commitRename = () => {
+    if (!renamingGate) return;
+    const trimmed = renameValue.trim();
+    if (trimmed) {
+      setGates((prev) =>
+        prev.map((g) =>
+          g.id === renamingGate.id ? { ...g, label: trimmed } : g,
+        ),
+      );
+      saveToHistory();
+    }
+    setRenamingGate(null);
+    setRenameValue("");
+  };
+
+  const cancelRename = () => {
+    setRenamingGate(null);
+    setRenameValue("");
+  };
+
   const evaluateGateWithGates = useCallback(
     (gate, gatesArray, depth = 0, visited = new Set()) => {
       if (depth > 100) return false;
@@ -778,6 +807,7 @@ const Boolforge = ({
           <p>• Click output → input to connect</p>
           <p>• Click wire to delete it</p>
           <p>• Right-click gate to delete</p>
+          <p>• Double-click gate to rename it</p>
           <p>• Scroll to zoom in/out</p>
           {/* ← NEW instructions for multi-input */}
           <p>
@@ -828,6 +858,7 @@ const Boolforge = ({
                 className={`gate ${gate.type === "OUTPUT" ? "output-gate" : ""} ${selectedGate?.id === gate.id ? "selected" : ""} ${gate.type === "OUTPUT" && evaluateGate(gate) ? "active" : ""}`}
                 style={{ left: gate.x, top: gate.y }}
                 onMouseDown={(e) => startDrag(e, gate)}
+                onDoubleClick={(e) => startRename(e, gate)}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   deleteGate(gate);
@@ -1033,6 +1064,117 @@ const Boolforge = ({
           </div>
         </div>
       </div>
+      {/* ── Rename Modal ── */}
+      {renamingGate && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.6)",
+            backdropFilter: "blur(4px)",
+            zIndex: 2000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={cancelRename}
+        >
+          <div
+            style={{
+              background: "var(--bg-medium, #141b2d)",
+              border: "1px solid var(--border-color, #2a3550)",
+              borderRadius: "12px",
+              padding: "1.5rem",
+              minWidth: "280px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              style={{
+                margin: 0,
+                color: "var(--text-color, #e8f0ff)",
+                fontSize: "1rem",
+              }}
+            >
+              ✏️ Rename Gate
+            </h3>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.8rem",
+                color: "var(--secondary-text, #8899aa)",
+              }}
+            >
+              Enter a custom label for this{" "}
+              <strong style={{ color: "var(--accent-secondary, #00d4ff)" }}>
+                {renamingGate.type}
+              </strong>{" "}
+              gate.
+            </p>
+            <input
+              autoFocus
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitRename();
+                if (e.key === "Escape") cancelRename();
+              }}
+              style={{
+                background: "var(--bg-light, #1e2842)",
+                border: "1px solid var(--accent-secondary, #00d4ff)",
+                borderRadius: "6px",
+                padding: "0.5rem 0.75rem",
+                color: "var(--text-color, #e8f0ff)",
+                fontSize: "1rem",
+                outline: "none",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                onClick={cancelRename}
+                style={{
+                  background: "none",
+                  border: "1px solid var(--border-color, #2a3550)",
+                  color: "var(--secondary-text, #8899aa)",
+                  borderRadius: "6px",
+                  padding: "0.4rem 0.9rem",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={commitRename}
+                style={{
+                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  border: "none",
+                  color: "#fff",
+                  borderRadius: "6px",
+                  padding: "0.4rem 0.9rem",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                }}
+              >
+                Rename
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
