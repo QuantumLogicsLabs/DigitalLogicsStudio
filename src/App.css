@@ -43,26 +43,19 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(
-    circle at top left,
-    #0f172a 0,
-    #020617 45%,
-    #000 100%
-  );
-  color: #e5e7eb;
+  background: var(--app-bg);
+  color: var(--app-text);
+  position: relative;
+  overflow-x: hidden;
 }
 
 .home-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   backdrop-filter: blur(16px);
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 23, 42, 0.95),
-    rgba(15, 23, 42, 0.85)
-  );
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  background: color-mix(in srgb, var(--app-surface-strong) 85%, transparent);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .home-header-inner {

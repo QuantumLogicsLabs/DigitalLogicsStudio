@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const NAV_LINKS = [
   { to: "/boolforge", label: "Circuit Forge" },
@@ -34,7 +35,8 @@ function MoonIcon() {
   );
 }
 
-export function Navbar({ toggleTheme, theme, onHomeClick }) {
+export function Navbar({ onHomeClick }) {
+  const { theme, toggle: toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const handleHomeClick = () => {
     setMenuOpen(false);
@@ -54,8 +56,8 @@ export function Navbar({ toggleTheme, theme, onHomeClick }) {
             <svg viewBox="0 0 100 100" className="home-logo-svg">
               <defs>
                 <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: "#3b82f6" }} />
-                  <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
+                  <stop offset="0%" style={{ stopColor: "var(--app-accent)" }} />
+                  <stop offset="100%" style={{ stopColor: "var(--app-secondary)" }} />
                 </linearGradient>
                 <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />

@@ -1,0 +1,3454 @@
+================================================================================
+START OF FOLDER: EncoderAndDecoder
+================================================================================
+
+================================================================================
+PROJECT STRUCTURE
+================================================================================
+Root: C:\Web Development\Boolforge\src\pages\EncoderAndDecoder
+
+EncoderAndDecoder/
+├── decoder/
+│   ├── components/
+│   │   ├── BCDDigitPad.jsx
+│   │   ├── CascadingExplainer.jsx
+│   │   ├── FunctionGeneratorDemo.jsx
+│   │   ├── MintermEquationBuilder.jsx
+│   │   ├── SevenSeg.jsx
+│   │   └── TypeSelector.jsx
+│   ├── decoderData.js
+│   └── DecoderPage.jsx
+├── encoder/
+│   ├── components/
+│   │   ├── BinaryIndexExplorer.jsx
+│   │   ├── ComparisonTable.jsx
+│   │   ├── DecoderSimulator.jsx
+│   │   ├── EncoderSimulator.jsx
+│   │   ├── EncoderTypeSelector.jsx
+│   │   ├── PriorityConflictSim.jsx
+│   │   └── SignalFlowDiagram.jsx
+│   ├── encoderData.js
+│   └── EncoderPage.jsx
+├── shared/
+│   ├── components/
+│   │   ├── Quiz.jsx
+│   │   ├── Section.jsx
+│   │   ├── TipsPanel.jsx
+│   │   └── TruthTable.jsx
+│   └── theme.js
+└── README.md
+
+Total files: 23
+
+================================================================================
+FILE CONTENTS
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/BCDDigitPad.jsx
+--------------------------------------------------------------------------------
+/**
+ * BCDDigitPad.jsx — Interactive BCD-to-7-segment demo
+ *
+ * Shows a clickable digit pad (0–9). Clicking a digit updates the
+ * 7-segment display and shows the BCD code and active segments.
+ *
+ * Uses the SevenSeg component for the display itself.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+import SevenSeg from "./SevenSeg.jsx";
+
+// BCD truth table: index = digit, value = [a,b,c,d,e,f,g]
+const BCD_TABLE = [
+  [1,1,1,1,1,1,0], // 0
+  [0,1,1,0,0,0,0], // 1
+  [1,1,0,1,1,0,1], // 2
+  [1,1,1,1,0,0,1], // 3
+  [0,1,1,0,0,1,1], // 4
+  [1,0,1,1,0,1,1], // 5
+  [1,0,1,1,1,1,1], // 6
+  [1,1,1,0,0,0,0], // 7
+  [1,1,1,1,1,1,1], // 8
+  [1,1,1,1,0,1,1], // 9
+];
+
+const SEG_NAMES = ["a","b","c","d","e","f","g"];
+
+// Convert segment array to segs object expected by SevenSeg
+const toSegsObj = (arr) =>
+  Object.fromEntries(SEG_NAMES.map((name, i) => [name, arr[i]]));
+
+const BCDDigitPad = () => {
+  const [digit, setDigit] = useState(0);
+
+  const segs    = toSegsObj(BCD_TABLE[digit]);
+  const bcdBits = digit.toString(2).padStart(4, "0");
+  const activeSegNames = SEG_NAMES.filter((_, i) => BCD_TABLE[digit][i]);
+
+  return (
+    <div>
+      {/* ── Digit pad ── */}
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "24px" }}>
+        {Array.from({ length: 10 }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setDigit(i)}
+            style={{
+              width: "52px",
+              height: "52px",
+              borderRadius: "10px",
+              border: `2px solid ${digit === i ? COLORS.high : "rgba(99,102,241,0.25)"}`,
+              background: digit === i ? "rgba(0,255,136,0.15)" : "rgba(12,18,35,0.7)",
+              color: digit === i ? COLORS.high : COLORS.textMuted,
+              fontFamily: "monospace",
+              fontWeight: "700",
+              fontSize: "1.1rem",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              boxShadow: digit === i ? "0 0 12px rgba(0,255,136,0.3)" : "none",
+            }}
+          >
+            {i}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Display + info row ── */}
+      <div style={{ display: "flex", gap: "28px", alignItems: "flex-start", flexWrap: "wrap" }}>
+        {/* 7-segment display */}
+        <SevenSeg segs={segs} />
+
+        {/* BCD info panel */}
+        <div style={{ flex: 1, minWidth: "220px" }}>
+          {/* BCD code */}
+          <div style={{ marginBottom: "16px", padding: "14px", background: "rgba(12,18,35,0.8)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: "10px" }}>
+            <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "6px" }}>BCD CODE (ABCD)</div>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              {bcdBits.split("").map((bit, i) => (
+                <div key={i} style={{ textAlign: "center" }}>
+                  <div style={{ color: COLORS.textDim, fontSize: "0.65rem", marginBottom: "4px" }}>{"ABCD"[i]}</div>
+                  <div
+                    style={{
+                      width: "30px", height: "30px", borderRadius: "6px",
+                      background: bit === "1" ? "rgba(0,255,136,0.15)" : "rgba(99,102,241,0.1)",
+                      border: `1.5px solid ${bit === "1" ? COLORS.high : "rgba(99,102,241,0.2)"}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontFamily: "monospace", fontWeight: "700",
+                      color: bit === "1" ? COLORS.high : COLORS.textDim,
+                    }}
+                  >
+                    {bit}
+                  </div>
+                </div>
+              ))}
+              <div style={{ color: COLORS.textMuted, fontSize: "0.8rem", marginLeft: "6px" }}>
+                = {digit}₁₀
+              </div>
+            </div>
+          </div>
+
+          {/* Active segments */}
+          <div style={{ padding: "14px", background: "rgba(0,255,136,0.05)", border: "1px solid rgba(0,255,136,0.2)", borderRadius: "10px" }}>
+            <div style={{ color: "#86efac", fontSize: "0.75rem", marginBottom: "8px" }}>ACTIVE SEGMENTS</div>
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {SEG_NAMES.map((seg) => {
+                const isOn = segs[seg];
+                return (
+                  <span
+                    key={seg}
+                    style={{
+                      padding: "3px 10px",
+                      borderRadius: "5px",
+                      fontFamily: "monospace",
+                      fontWeight: "700",
+                      fontSize: "0.85rem",
+                      background: isOn ? "rgba(0,255,136,0.15)" : "rgba(99,102,241,0.08)",
+                      color: isOn ? COLORS.high : COLORS.textDim,
+                      border: `1px solid ${isOn ? "rgba(0,255,136,0.3)" : "rgba(99,102,241,0.15)"}`,
+                    }}
+                  >
+                    {seg}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Segment name reference ── */}
+      <div style={{ marginTop: "18px", padding: "14px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "10px" }}>
+        <h4 style={{ color: COLORS.warn, marginBottom: "10px", fontSize: "0.88rem" }}>
+          💡 7-Segment Label Reference
+        </h4>
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          {[
+            ["a","top horizontal bar"],
+            ["b","top-right vertical"],
+            ["c","bottom-right vertical"],
+            ["d","bottom horizontal bar"],
+            ["e","bottom-left vertical"],
+            ["f","top-left vertical"],
+            ["g","middle horizontal bar"],
+          ].map(([seg, name]) => (
+            <div key={seg} style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+              <span style={{ fontFamily: "monospace", color: COLORS.high, fontWeight: "700", width: "14px" }}>{seg}</span>
+              <span style={{ color: COLORS.textMuted, fontSize: "0.78rem" }}>{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BCDDigitPad;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/CascadingExplainer.jsx
+--------------------------------------------------------------------------------
+/**
+ * CascadingExplainer.jsx
+ *
+ * Demonstrates how two layers of 2-to-4 decoders can be cascaded
+ * to build a 4-to-16 decoder.
+ *
+ * The user selects:
+ *   - Top-level select bits (A3, A2) → which of four child decoders is active
+ *   - Inner address bits  (A1, A0)  → which of four outputs within that child
+ *
+ * The component computes and displays the final active output line.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+// Labels for each child decoder's output range
+const CHIPS = [
+  "Chip A (outputs 0–3)",
+  "Chip B (outputs 4–7)",
+  "Chip C (outputs 8–11)",
+  "Chip D (outputs 12–15)",
+];
+
+const CascadingExplainer = () => {
+  const [chipSelect, setChipSelect] = useState(0); // top-level 2-bit select (0–3)
+  const [innerAddr,  setInnerAddr]  = useState(0); // inner 2-bit address (0–3)
+
+  // Final output line in the 4-to-16 decoder
+  const activeOutput = chipSelect * 4 + innerAddr;
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(251,191,36,0.25)",
+      }}
+    >
+      <h4 style={{ color: COLORS.warn, marginBottom: "8px", fontSize: "0.95rem" }}>
+        🔗 Cascading — Building a 4-to-16 from 2-to-4 Decoders
+      </h4>
+      <p style={{ color: COLORS.textSecondary, fontSize: "0.83rem", lineHeight: "1.6", marginBottom: "18px" }}>
+        Connect high address bits to a top-level decoder. Each output enables one of four child
+        decoders, each handling 4 outputs.
+      </p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "16px", alignItems: "start" }}>
+
+        {/* ── Left: top-level select ── */}
+        <div style={{ textAlign: "center" }}>
+          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>
+            Top-level select (A3, A2)
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {CHIPS.map((label, i) => (
+              <button
+                key={i}
+                onClick={() => setChipSelect(i)}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${chipSelect === i ? COLORS.warn : "rgba(99,102,241,0.2)"}`,
+                  background: chipSelect === i ? "rgba(251,191,36,0.15)" : "rgba(12,18,35,0.7)",
+                  color: chipSelect === i ? COLORS.warn : COLORS.textMuted,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                  fontSize: "0.82rem",
+                  textAlign: "left",
+                }}
+              >
+                {i.toString(2).padStart(2, "0")}₂ → {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Right: inner address + result ── */}
+        <div>
+          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>
+            Inner address (A1, A0) — select within {CHIPS[chipSelect]}
+          </div>
+
+          {/* Inner address buttons */}
+          <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+            {[0, 1, 2, 3].map((i) => (
+              <button
+                key={i}
+                onClick={() => setInnerAddr(i)}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${innerAddr === i ? COLORS.high : "rgba(99,102,241,0.2)"}`,
+                  background: innerAddr === i ? "rgba(0,255,136,0.12)" : "rgba(12,18,35,0.7)",
+                  color: innerAddr === i ? COLORS.high : COLORS.textMuted,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {i.toString(2).padStart(2, "0")}₂
+              </button>
+            ))}
+          </div>
+
+          {/* Active output display */}
+          <div style={{ padding: "14px", background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.3)", borderRadius: "10px" }}>
+            <div style={{ color: "#86efac", fontSize: "0.75rem", fontWeight: "700", marginBottom: "6px" }}>ACTIVE OUTPUT</div>
+            <div style={{ fontFamily: "monospace", color: COLORS.high, fontSize: "1.1rem", fontWeight: "700" }}>
+              D{activeOutput} = output #{activeOutput} in the 4-to-16 decoder
+            </div>
+            <div style={{ color: COLORS.textSecondary, fontSize: "0.8rem", marginTop: "6px" }}>
+              Full address: {chipSelect.toString(2).padStart(2,"0")}{innerAddr.toString(2).padStart(2,"0")}₂ = {activeOutput}₁₀
+            </div>
+          </div>
+
+          {/* Architecture note */}
+          <div style={{ marginTop: "14px", padding: "12px 14px", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: "9px" }}>
+            <p style={{ color: COLORS.textSecondary, fontSize: "0.82rem", margin: 0, lineHeight: "1.6" }}>
+              💡 <strong style={{ color: COLORS.textPrimary }}>How it works:</strong>{" "}
+              A3,A2 go into the top decoder. Its output {chipSelect} (binary {chipSelect.toString(2).padStart(2,"0")}) becomes
+              the Enable for <strong style={{ color: COLORS.warn }}>{CHIPS[chipSelect]}</strong>.
+              Only that chip is enabled; the other three outputs are all LOW.
+              Then A1,A0 = {innerAddr.toString(2).padStart(2,"0")} selects D{innerAddr} within that chip → final output D{activeOutput}.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CascadingExplainer;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/FunctionGeneratorDemo.jsx
+--------------------------------------------------------------------------------
+/**
+ * FunctionGeneratorDemo.jsx
+ *
+ * Shows how a 2-to-4 decoder can implement any 2-input Boolean
+ * function by OR-ing selected outputs.  The user clicks table rows
+ * to toggle which minterms (outputs) contribute to F.
+ *
+ * Key insight: decoder outputs ARE minterms, so any SOP function
+ * can be built without additional AND gates — just one OR gate.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+const FunctionGeneratorDemo = () => {
+  // funcRows[i] = true means minterm i is selected (F=1 for that row)
+  const [funcRows, setFuncRows] = useState([false, false, false, false]);
+
+  const toggleRow = (i) =>
+    setFuncRows((prev) => {
+      const next = [...prev];
+      next[i] = !next[i];
+      return next;
+    });
+
+  // Indices of selected minterms
+  const selected = funcRows.map((on, i) => (on ? i : -1)).filter((i) => i >= 0);
+
+  // "F = D0 + D2" style equation using decoder output names
+  const decoderOutputEq =
+    selected.length === 0 ? "F = 0" : "F = " + selected.map((i) => `D${i}`).join(" + ");
+
+  // Fully expanded minterm SOP
+  const mintermSopEq =
+    selected.length === 0
+      ? "F = 0"
+      : "F = " +
+        selected
+          .map((i) => {
+            const a1 = (i >> 1) & 1;
+            const a0 = i & 1;
+            return `(${a1 ? "A1" : "A1'"}·${a0 ? "A0" : "A0'"})`;
+          })
+          .join(" + ");
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(0,255,136,0.25)",
+      }}
+    >
+      <h4 style={{ color: "#86efac", marginBottom: "8px", fontSize: "0.95rem" }}>
+        🧩 Decoder as Function Generator
+      </h4>
+      <p style={{ color: COLORS.textSecondary, fontSize: "0.83rem", lineHeight: "1.6", marginBottom: "18px" }}>
+        Check rows where your Boolean function = 1. The decoder + OR gate implements any function of A1, A0 — no K-map needed!
+      </p>
+
+      {/* ── Truth table with toggleable F column ── */}
+      <div style={{ overflowX: "auto", marginBottom: "18px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "monospace", fontSize: "0.85rem" }}>
+          <thead>
+            <tr>
+              {["Row", "A1", "A0", "Decoder Output", "F = ?"].map((h, i) => (
+                <th
+                  key={i}
+                  style={{
+                    padding: "9px 14px",
+                    background: "rgba(15,23,42,0.9)",
+                    color: i < 3 ? COLORS.blue : i === 3 ? COLORS.warn : COLORS.high,
+                    textAlign: "center",
+                    borderBottom: "1px solid rgba(99,102,241,0.3)",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[0, 1, 2, 3].map((i) => {
+              const a1 = (i >> 1) & 1;
+              const a0 = i & 1;
+              return (
+                <tr
+                  key={i}
+                  style={{ background: funcRows[i] ? "rgba(0,255,136,0.07)" : "transparent", cursor: "pointer" }}
+                  onClick={() => toggleRow(i)}
+                >
+                  {/* Row index */}
+                  <td style={{ padding: "9px 14px", textAlign: "center", color: COLORS.textSecondary, borderBottom: "1px solid rgba(30,40,60,0.4)" }}>{i}</td>
+                  {/* A1 */}
+                  <td style={{ padding: "9px 14px", textAlign: "center", color: a1 ? COLORS.blue : COLORS.textDim, borderBottom: "1px solid rgba(30,40,60,0.4)" }}>{a1}</td>
+                  {/* A0 */}
+                  <td style={{ padding: "9px 14px", textAlign: "center", color: a0 ? COLORS.blue : COLORS.textDim, borderBottom: "1px solid rgba(30,40,60,0.4)" }}>{a0}</td>
+                  {/* Decoder output name */}
+                  <td style={{ padding: "9px 14px", textAlign: "center", color: COLORS.warn, fontWeight: "600", borderBottom: "1px solid rgba(30,40,60,0.4)" }}>D{i}</td>
+                  {/* Toggle F */}
+                  <td style={{ padding: "9px 14px", textAlign: "center", borderBottom: "1px solid rgba(30,40,60,0.4)" }}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleRow(i); }}
+                      style={{
+                        width: "32px", height: "20px", borderRadius: "5px",
+                        background: funcRows[i] ? COLORS.high : "rgba(99,102,241,0.15)",
+                        border: `1.5px solid ${funcRows[i] ? COLORS.high : "rgba(99,102,241,0.3)"}`,
+                        color: funcRows[i] ? "#0a0f1a" : COLORS.textDim,
+                        cursor: "pointer", fontFamily: "monospace", fontWeight: "800", fontSize: "0.8rem",
+                      }}
+                    >
+                      {funcRows[i] ? "1" : "0"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Equation display ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+        <div style={{ padding: "14px", background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.25)", borderRadius: "10px" }}>
+          <div style={{ color: "#86efac", fontSize: "0.75rem", fontWeight: "700", marginBottom: "6px" }}>USING DECODER OUTPUTS</div>
+          <code style={{ color: COLORS.high, fontSize: "0.9rem" }}>{decoderOutputEq}</code>
+        </div>
+        <div style={{ padding: "14px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: "10px" }}>
+          <div style={{ color: COLORS.indigoLight, fontSize: "0.75rem", fontWeight: "700", marginBottom: "6px" }}>EQUIVALENT MINTERM SOP</div>
+          <code style={{ color: COLORS.indigoLight, fontSize: "0.85rem", lineHeight: "1.5" }}>{mintermSopEq}</code>
+        </div>
+      </div>
+
+      {selected.length > 0 && (
+        <div style={{ marginTop: "12px", padding: "10px 14px", background: "rgba(251,191,36,0.06)", borderRadius: "8px", color: COLORS.warn, fontSize: "0.82rem" }}>
+          ✨ OR gate connects D{selected.join(", D")} outputs → implements your function without any AND gates!
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FunctionGeneratorDemo;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/MintermEquationBuilder.jsx
+--------------------------------------------------------------------------------
+/**
+ * MintermEquationBuilder.jsx
+ *
+ * Teaches the minterm-to-equation derivation rule interactively.
+ * The user picks how many input bits and which output minterm to
+ * examine. The component shows:
+ *   - The binary representation of the selected address
+ *   - Which inputs are used direct vs complemented
+ *   - The resulting Boolean equation
+ *
+ * Key concept: bit=1 in address → use input directly
+ *              bit=0 in address → complement the input
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+// Generate input names for n bits: A, B, C... or A0, A1, A2...
+const makeInputNames = (n) => {
+  if (n <= 3) return ["A2", "A1", "A0"].slice(3 - n);
+  return Array.from({ length: n }, (_, i) => `A${n - 1 - i}`);
+};
+
+const MintermEquationBuilder = () => {
+  const [numBits,        setNumBits]        = useState(2); // number of address bits
+  const [selectedMinterm, setSelectedMinterm] = useState(0); // which output Di to explore
+
+  const numOutputs = 1 << numBits;  // 2^numBits
+  const inputs     = makeInputNames(numBits);
+  const binary     = selectedMinterm.toString(2).padStart(numBits, "0");
+
+  // Build the equation term for each input bit based on address bit value
+  const termParts = inputs.map((inp, i) => {
+    const bit = (selectedMinterm >> (numBits - 1 - i)) & 1;
+    return bit === 1 ? inp : inp + "'"; // complement if bit is 0
+  });
+  const equation = "E · " + termParts.join(" · ");
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(99,102,241,0.3)",
+      }}
+    >
+      <h4 style={{ color: "#86efac", marginBottom: "14px", fontSize: "0.95rem" }}>
+        🔢 Step-by-Step Equation Builder
+      </h4>
+
+      {/* ── Control row: bit count selector ── */}
+      <div style={{ marginBottom: "18px" }}>
+        <label style={{ color: COLORS.textSecondary, fontSize: "0.8rem", display: "block", marginBottom: "10px" }}>
+          Number of Input Bits:
+        </label>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {[1, 2, 3].map((n) => (
+            <button
+              key={n}
+              onClick={() => { setNumBits(n); setSelectedMinterm(0); }}
+              style={{
+                padding: "8px 18px",
+                borderRadius: "9px",
+                border: `1.5px solid ${numBits === n ? COLORS.indigo : "rgba(99,102,241,0.25)"}`,
+                background: numBits === n ? "rgba(99,102,241,0.25)" : "transparent",
+                color: numBits === n ? COLORS.indigoLight : COLORS.textMuted,
+                cursor: "pointer",
+                fontFamily: "monospace",
+              }}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Output minterm selector ── */}
+      <div style={{ marginBottom: "18px" }}>
+        <label style={{ color: COLORS.textSecondary, fontSize: "0.8rem", display: "block", marginBottom: "10px" }}>
+          Select Output (click to explore which minterm to build):
+        </label>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {Array.from({ length: numOutputs }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedMinterm(i)}
+              style={{
+                padding: "9px 14px",
+                borderRadius: "9px",
+                border: `2px solid ${selectedMinterm === i ? COLORS.warn : "rgba(99,102,241,0.2)"}`,
+                background: selectedMinterm === i ? "rgba(251,191,36,0.15)" : "rgba(12,18,35,0.6)",
+                color: selectedMinterm === i ? COLORS.warn : COLORS.textMuted,
+                cursor: "pointer",
+                fontFamily: "monospace",
+                fontWeight: selectedMinterm === i ? "700" : "400",
+                transition: "all 0.2s",
+              }}
+            >
+              D{i}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Binary address + rule display ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "18px" }}>
+        {/* Binary address card */}
+        <div style={{ padding: "16px", background: "rgba(12,18,35,0.8)", borderRadius: "10px", border: "1px solid rgba(99,102,241,0.2)" }}>
+          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>ADDRESS IN BINARY</div>
+          <div style={{ fontFamily: "monospace", fontSize: "1.3rem", color: COLORS.blue, fontWeight: "700", letterSpacing: "6px" }}>
+            {binary}₂
+          </div>
+          <div style={{ color: COLORS.textDim, fontSize: "0.78rem", marginTop: "4px" }}>
+            = {selectedMinterm}₁₀
+          </div>
+        </div>
+
+        {/* Complement / direct rule card */}
+        <div style={{ padding: "16px", background: "rgba(12,18,35,0.8)", borderRadius: "10px", border: "1px solid rgba(251,191,36,0.3)" }}>
+          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>RULE</div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {inputs.map((inp, i) => {
+              const bit = (selectedMinterm >> (numBits - 1 - i)) & 1;
+              return (
+                <div key={inp} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px" }}>
+                  <span style={{ fontFamily: "monospace", fontSize: "0.85rem", color: bit ? "#4ade80" : "#f87171" }}>
+                    {bit === 1 ? inp : inp + "'"}
+                  </span>
+                  <span style={{ fontSize: "0.65rem", color: bit ? "#4ade80" : "#f87171" }}>
+                    {bit === 1 ? "DIRECT" : "COMPLEMENT"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Resulting equation ── */}
+      <div style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "10px", padding: "16px" }}>
+        <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "6px" }}>RESULTING BOOLEAN EQUATION</div>
+        <code style={{ color: COLORS.warn, fontSize: "1.05rem", fontWeight: "700" }}>
+          D{selectedMinterm} = {equation}
+        </code>
+        <p style={{ color: COLORS.textSecondary, fontSize: "0.82rem", marginTop: "10px", lineHeight: "1.6", marginBottom: 0 }}>
+          🔑 <strong style={{ color: COLORS.textPrimary }}>Pattern:</strong> Bit=1 in address → use input directly.
+          Bit=0 → complement it. AND everything together with E.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default MintermEquationBuilder;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/SevenSeg.jsx
+--------------------------------------------------------------------------------
+/**
+ * SevenSeg.jsx — 7-segment display SVG
+ *
+ * Renders a single digit using seven rectangular segments (a–g).
+ * Segments that are ON glow bright green; OFF segments are nearly invisible.
+ *
+ * Props:
+ *   segs  : { a,b,c,d,e,f,g } — 1 = ON, 0 = OFF
+ *   digit : number             — decimal digit shown below (cosmetic only)
+ */
+import React from "react";
+
+const ON_COLOR  = "#00ff88";
+const OFF_COLOR = "rgba(0,255,136,0.06)";
+
+const SevenSeg = ({ segs }) => {
+  // Helper: pick ON or OFF color for a named segment
+  const s = (name) => (segs[name] ? ON_COLOR : OFF_COLOR);
+
+  const activeSegNames = ["a","b","c","d","e","f","g"].filter((k) => segs[k]);
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <svg
+        viewBox="0 0 70 120"
+        width="90"
+        height="130"
+        style={{ filter: "drop-shadow(0 0 10px rgba(0,255,136,0.25))" }}
+      >
+        {/* a — top horizontal bar */}
+        <rect x="10" y="4"   width="50" height="9"  rx="4" fill={s("a")} />
+        {/* b — top-right vertical */}
+        <rect x="58" y="8"   width="9"  height="48" rx="4" fill={s("b")} />
+        {/* c — bottom-right vertical */}
+        <rect x="58" y="62"  width="9"  height="48" rx="4" fill={s("c")} />
+        {/* d — bottom horizontal bar */}
+        <rect x="10" y="107" width="50" height="9"  rx="4" fill={s("d")} />
+        {/* e — bottom-left vertical */}
+        <rect x="3"  y="62"  width="9"  height="48" rx="4" fill={s("e")} />
+        {/* f — top-left vertical */}
+        <rect x="3"  y="8"   width="9"  height="48" rx="4" fill={s("f")} />
+        {/* g — middle horizontal bar */}
+        <rect x="10" y="56"  width="50" height="9"  rx="4" fill={s("g")} />
+      </svg>
+
+      {/* Active segments label (for reference) */}
+      <div
+        style={{
+          marginTop: "6px",
+          fontSize: "0.7rem",
+          color: "rgba(0,255,136,0.5)",
+          fontFamily: "monospace",
+          letterSpacing: "2px",
+        }}
+      >
+        {activeSegNames.length > 0 ? activeSegNames.join("") : "–"}
+      </div>
+    </div>
+  );
+};
+
+export default SevenSeg;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/components/TypeSelector.jsx
+--------------------------------------------------------------------------------
+/**
+ * TypeSelector.jsx — Decoder type picker
+ *
+ * Renders a row of buttons, one per decoder type.
+ * Highlights the currently selected type with a different color.
+ *
+ * Props:
+ *   selectedType : string   — key of the active decoder (e.g. "2to4")
+ *   types        : object   — DECODER_TYPES map  { key: { label } }
+ *   onChange     : fn(key)  — called when the user picks a different type
+ */
+import React from "react";
+import { COLORS } from "../../shared/theme.js";
+
+const TypeSelector = ({ selectedType, types, onChange }) => (
+  <div style={{ display: "flex", gap: "10px", marginBottom: "22px", flexWrap: "wrap" }}>
+    {Object.entries(types).map(([key, val]) => {
+      const isSelected = selectedType === key;
+      return (
+        <button
+          key={key}
+          onClick={() => onChange(key)}
+          style={{
+            padding: "10px 18px",
+            borderRadius: "10px",
+            border: `2px solid ${isSelected ? COLORS.indigo : COLORS.indigoMuted}`,
+            background: isSelected ? "rgba(99,102,241,0.2)" : COLORS.inputBg,
+            color: isSelected ? COLORS.indigoLight : COLORS.textMuted,
+            cursor: "pointer",
+            fontWeight: isSelected ? "700" : "400",
+            transition: "all 0.2s",
+            fontSize: "0.87rem",
+          }}
+        >
+          {val.label}
+        </button>
+      );
+    })}
+  </div>
+);
+
+export default TypeSelector;
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/decoderData.js
+--------------------------------------------------------------------------------
+/**
+ * decoderData.js — All static data for the Decoder page
+ *
+ * Keeping data separate from UI means you can add new decoder types
+ * (e.g. "4to16") without touching any component files.
+ *
+ * Structure per decoder type:
+ *   label        — human-readable name
+ *   codeInputs   — array of input pin names  (e.g. ["A1","A0"])
+ *   enableInput  — whether the type has an Enable pin
+ *   outputs      — array of output pin names (e.g. ["D0","D1","D2","D3"])
+ *   description  — one-line summary
+ *   analogy      — real-world comparison for students
+ *   decode()     — pure function (codeVals[], enable) → { [outName]: 0|1, active: number }
+ *   booleanEqs   — array of { out, eq, color, explanation, trick }
+ *   truthHeaders — column headers for the truth table
+ *   truthRows    — array of string[] rows
+ *   minterms     — array of { idx, binary, desc }
+ */
+
+export const DECODER_TYPES = {
+  // ── 1-to-2 ──────────────────────────────────────────────────────────────────
+  "1to2": {
+    label: "1-to-2 Decoder",
+    codeInputs: ["A"],
+    enableInput: true,
+    outputs: ["D0", "D1"],
+    description: "1-bit input + Enable → 2 output lines",
+    analogy: "Like a light switch that routes power to one of two lamps",
+    decode: (code, en) => {
+      if (!en) return { D0: 0, D1: 0, active: -1 };
+      const i = code[0];
+      return { D0: i === 0 ? 1 : 0, D1: i === 1 ? 1 : 0, active: i };
+    },
+    booleanEqs: [
+      {
+        out: "D0", eq: "D0 = E · A'", color: "#34d399",
+        explanation: "D0 fires when Enable=1 AND A=0. Since D0 is address 0 (binary 0), we complement A to get A'=1 when A=0. Rule: complement any bit that is 0 in the target address.",
+        trick: "Address 0 = '0' in binary → complement A to make it a 1 condition.",
+      },
+      {
+        out: "D1", eq: "D1 = E · A", color: "#60a5fa",
+        explanation: "D1 fires when Enable=1 AND A=1. Since address 1 has bit A=1, we use A directly (no complement). Rule: keep any bit that is 1 in the target address.",
+        trick: "Address 1 = '1' in binary → use A directly, it's already 1 when we need it.",
+      },
+    ],
+    truthHeaders: ["E", "A", "D0", "D1"],
+    truthRows: [
+      ["0", "x", "0", "0"],
+      ["1", "0", "1", "0"],
+      ["1", "1", "0", "1"],
+    ],
+    minterms: [
+      { idx: 0, binary: "0", desc: "m0: A'" },
+      { idx: 1, binary: "1", desc: "m1: A" },
+    ],
+  },
+
+  // ── 2-to-4 ──────────────────────────────────────────────────────────────────
+  "2to4": {
+    label: "2-to-4 Decoder",
+    codeInputs: ["A1", "A0"],
+    enableInput: true,
+    outputs: ["D0", "D1", "D2", "D3"],
+    description: "2-bit binary code + Enable → 4 output lines",
+    analogy: "Like a building directory that routes a visitor to one of 4 floors",
+    decode: (code, en) => {
+      if (!en) return { D0: 0, D1: 0, D2: 0, D3: 0, active: -1 };
+      const i = (code[0] << 1) | code[1];
+      return {
+        D0: i === 0 ? 1 : 0, D1: i === 1 ? 1 : 0,
+        D2: i === 2 ? 1 : 0, D3: i === 3 ? 1 : 0,
+        active: i,
+      };
+    },
+    booleanEqs: [
+      { out: "D0", eq: "D0 = E · A1' · A0'", color: "#34d399", explanation: "Address 00 → both bits are 0 → complement both. D0 fires ONLY when A1=0 AND A0=0. The equation is the minterm m0.", trick: "Address 00: both 0s → both complemented. A1'·A0'" },
+      { out: "D1", eq: "D1 = E · A1' · A0",  color: "#60a5fa", explanation: "Address 01 → A1=0 (complement it), A0=1 (keep it). D1 fires when A1=0 AND A0=1. Minterm m1.",          trick: "Address 01: first bit 0 → A1', second bit 1 → A0. A1'·A0" },
+      { out: "D2", eq: "D2 = E · A1 · A0'",  color: "#a78bfa", explanation: "Address 10 → A1=1 (keep it), A0=0 (complement it). D2 fires when A1=1 AND A0=0. Minterm m2.",          trick: "Address 10: first bit 1 → A1, second bit 0 → A0'. A1·A0'" },
+      { out: "D3", eq: "D3 = E · A1 · A0",   color: "#fbbf24", explanation: "Address 11 → both bits are 1 → keep both direct. D3 fires when A1=1 AND A0=1. Minterm m3.",           trick: "Address 11: both 1s → both direct. No complements needed! A1·A0" },
+    ],
+    truthHeaders: ["E", "A1", "A0", "D0", "D1", "D2", "D3"],
+    truthRows: [
+      ["0", "x", "x", "0", "0", "0", "0"],
+      ["1", "0", "0", "1", "0", "0", "0"],
+      ["1", "0", "1", "0", "1", "0", "0"],
+      ["1", "1", "0", "0", "0", "1", "0"],
+      ["1", "1", "1", "0", "0", "0", "1"],
+    ],
+    minterms: [
+      { idx: 0, binary: "00", desc: "m0: A1'A0'" },
+      { idx: 1, binary: "01", desc: "m1: A1'A0" },
+      { idx: 2, binary: "10", desc: "m2: A1A0'" },
+      { idx: 3, binary: "11", desc: "m3: A1A0" },
+    ],
+  },
+
+  // ── 3-to-8 ──────────────────────────────────────────────────────────────────
+  "3to8": {
+    label: "3-to-8 Decoder",
+    codeInputs: ["A2", "A1", "A0"],
+    enableInput: true,
+    outputs: ["D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+    description: "3-bit binary code + Enable → 8 output lines",
+    analogy: "Like a memory chip select: each output enables exactly one memory chip",
+    decode: (code, en) => {
+      const out = {};
+      for (let i = 0; i < 8; i++) out[`D${i}`] = 0;
+      if (!en) { out.active = -1; return out; }
+      const idx = (code[0] << 2) | (code[1] << 1) | code[2];
+      out[`D${idx}`] = 1;
+      out.active = idx;
+      return out;
+    },
+    booleanEqs: [
+      { out: "D0", eq: "D0 = E·A2'·A1'·A0'", color: "#34d399", explanation: "000 → all 0 → all complemented. Minterm m0.", trick: "All zeros → all complemented. The easiest to remember!" },
+      { out: "D1", eq: "D1 = E·A2'·A1'·A0",  color: "#4ade80", explanation: "001 → A0=1 direct, A2 & A1 complemented. Minterm m1.", trick: "Only the last bit is 1 → only A0 is direct." },
+      { out: "D2", eq: "D2 = E·A2'·A1·A0'",  color: "#60a5fa", explanation: "010 → A1=1 direct, A2 & A0 complemented. Minterm m2.", trick: "Middle bit is 1 → A1 is direct, others complemented." },
+      { out: "D3", eq: "D3 = E·A2'·A1·A0",   color: "#93c5fd", explanation: "011 → A1 & A0 direct, only A2 complemented. Minterm m3.", trick: "Two last bits are 1 → A1 and A0 direct, A2' still complements." },
+      { out: "D4", eq: "D4 = E·A2·A1'·A0'",  color: "#fbbf24", explanation: "100 → A2=1 direct, A1 & A0 complemented. Minterm m4.", trick: "First bit is 1 → A2 direct, others complemented." },
+      { out: "D5", eq: "D5 = E·A2·A1'·A0",   color: "#f97316", explanation: "101 → A2 & A0 direct, A1 complemented. Minterm m5.", trick: "Bits 2 and 0 are 1 → A2 and A0 direct." },
+      { out: "D6", eq: "D6 = E·A2·A1·A0'",   color: "#a78bfa", explanation: "110 → A2 & A1 direct, A0 complemented. Minterm m6.", trick: "First two bits are 1 → A2·A1 direct, A0' complement." },
+      { out: "D7", eq: "D7 = E·A2·A1·A0",    color: "#f472b6", explanation: "111 → all 1 → all direct. No complements at all! Minterm m7.", trick: "All ones → no complements. The other easy one!" },
+    ],
+    truthHeaders: ["E", "A2", "A1", "A0", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+    truthRows: Array.from({ length: 8 }, (_, i) => {
+      const a2 = (i >> 2) & 1, a1 = (i >> 1) & 1, a0 = i & 1;
+      const row = ["1", String(a2), String(a1), String(a0)];
+      for (let j = 0; j < 8; j++) row.push(j === i ? "1" : "0");
+      return row;
+    }),
+    minterms: Array.from({ length: 8 }, (_, i) => ({
+      idx: i, binary: i.toString(2).padStart(3, "0"), desc: `m${i}`,
+    })),
+  },
+
+  // ── BCD-to-7-Segment ────────────────────────────────────────────────────────
+  BCD7seg: {
+    label: "BCD-to-7-Segment",
+    codeInputs: ["A", "B", "C", "D"],
+    enableInput: false,
+    outputs: ["a", "b", "c", "d", "e", "f", "g"],
+    description: "4-bit BCD → 7 segment display signals",
+    analogy: "Like translating a number to a specific set of lit-up bars on a display",
+    decode: (code) => {
+      // Lookup table: each row = [a,b,c,d,e,f,g] for digits 0–9
+      const table = [
+        [1,1,1,1,1,1,0], // 0
+        [0,1,1,0,0,0,0], // 1
+        [1,1,0,1,1,0,1], // 2
+        [1,1,1,1,0,0,1], // 3
+        [0,1,1,0,0,1,1], // 4
+        [1,0,1,1,0,1,1], // 5
+        [1,0,1,1,1,1,1], // 6
+        [1,1,1,0,0,0,0], // 7
+        [1,1,1,1,1,1,1], // 8
+        [1,1,1,1,0,1,1], // 9
+      ];
+      const idx = (code[0] << 3) | (code[1] << 2) | (code[2] << 1) | code[3];
+      if (idx > 9) return { a:0, b:0, c:0, d:0, e:0, f:0, g:0, active: -1 };
+      const s = table[idx];
+      return { a:s[0], b:s[1], c:s[2], d:s[3], e:s[4], f:s[5], g:s[6], active: idx };
+    },
+    booleanEqs: [
+      { out: "a — top bar",      eq: "a = A + C + B'D' + BD",       color: "#f97316", explanation: "Segment a (top bar) is OFF only for digits 1 and 4.",       trick: "OFF for 1,4. All other digits need the top bar." },
+      { out: "b — top-right",   eq: "b = B' + CD + C'D'",           color: "#fbbf24", explanation: "Segment b is OFF only for digits 5 and 6.",                 trick: "OFF for 5,6. B'=1 handles digits 0,1,2,3 at once." },
+      { out: "c — bottom-right", eq: "c = B + C' + D",              color: "#34d399", explanation: "Segment c is OFF ONLY for digit 2. Simplest 7-seg equation!", trick: "OFF only for digit 2 — simplest equation in the whole decoder!" },
+      { out: "d — bottom bar",   eq: "d = A + B'C' + C'D' + BC'D + CD'", color: "#60a5fa", explanation: "Segment d is the most complex — ON for 0,2,3,5,6,8.", trick: "d is the hardest. ON for many digits, needs 4 AND terms." },
+      { out: "e — bottom-left",  eq: "e = B'D' + CD'",              color: "#a78bfa", explanation: "Segment e is ON only for 0,2,6,8. Just two product terms.", trick: "D'=0 means the digit is even AND needs the left side." },
+      { out: "f — top-left",     eq: "f = A + BC' + BD' + C'D'",   color: "#f472b6", explanation: "Segment f is ON for 0,4,5,6,7,8,9 — OFF only for 1,2,3.", trick: "ON for most digits. OFF for 1,2,3 — the 'plain' numbers." },
+      { out: "g — middle bar",   eq: "g = A + BC' + BC + C'D",     color: "#c084fc", explanation: "Segment g is OFF only for 0 and 1.", trick: "g is OFF only for 0 (no middle) and 1 (just sticks)." },
+    ],
+    truthHeaders: ["A", "B", "C", "D", "a", "b", "c", "d", "e", "f", "g"],
+    truthRows: [
+      ["0","0","0","0","1","1","1","1","1","1","0"],
+      ["0","0","0","1","0","1","1","0","0","0","0"],
+      ["0","0","1","0","1","1","0","1","1","0","1"],
+      ["0","0","1","1","1","1","1","1","0","0","1"],
+      ["0","1","0","0","0","1","1","0","0","1","1"],
+      ["0","1","0","1","1","0","1","1","0","1","1"],
+      ["0","1","1","0","1","0","1","1","1","1","1"],
+      ["0","1","1","1","1","1","1","0","0","0","0"],
+      ["1","0","0","0","1","1","1","1","1","1","1"],
+      ["1","0","0","1","1","1","1","1","0","1","1"],
+    ],
+    minterms: [],
+  },
+};
+
+// ─── Tips content ───────────────────────────────────────────────────────────────
+export const DECODER_TIPS = [
+  { icon: "📐", title: "The Minterm Rule", text: "Each decoder output Dᵢ is exactly minterm mᵢ. Write the binary for i, then: bit=1 → use input directly, bit=0 → complement it. AND them all." },
+  { icon: "🔌", title: "Enable Pin is Power", text: "E=0 kills ALL outputs. E=1 lets them work. In memory systems, this is how chips are selected — only one chip has E=1 at a time." },
+  { icon: "🧩", title: "Decoder as Function Generator", text: "Any Boolean function can be built from a decoder! Just OR the outputs for rows where your function = 1. No AND gates needed!" },
+  { icon: "📦", title: "Cascading Decoders", text: "A 2×4 decoder with cascading can become 4×16! Connect your high address bits to a 2×4 decoder, each output enables one of four 2×4 decoders." },
+  { icon: "🔢", title: "Count the Gates", text: "An n-to-2ⁿ decoder needs exactly 2ⁿ AND gates (one per output), n NOT gates (one per input), and 1 enable connection per AND gate." },
+  { icon: "⚡", title: "Output Is Exclusive", text: "Exactly ONE decoder output is HIGH at any time (when E=1). This is called 'one-hot encoding' — guaranteed mutual exclusion." },
+  { icon: "🏥", title: "Real World: Memory Chips", text: "A 20-bit CPU address uses bits [19:18] → 2-to-4 decoder → 4 chip-select lines. Each selects a different 256KB memory region." },
+  { icon: "🎯", title: "Exam Trick", text: "To find which output is active: convert address to decimal. D(decimal) is HIGH. Example: A1=1,A0=1 → 11₂ = 3 → D3 is HIGH." },
+];
+
+// ─── Quiz questions ─────────────────────────────────────────────────────────────
+export const DECODER_QUIZ = [
+  { q: "2-to-4 decoder: A1=1, A0=0, E=1. Which output is HIGH?", opts: ["D0","D1","D2","D3"], ans: 2, exp: "Binary 10 = decimal 2 → D2 HIGH. Just convert A1A0 from binary to decimal to find which D is active!", hint: "Convert the binary number A1A0 = 10 to decimal." },
+  { q: "3-to-8 decoder. Boolean equation for D5?", opts: ["E·A2'·A1·A0","E·A2·A1'·A0","E·A2·A1·A0'","E·A2'·A1·A0'"], ans: 1, exp: "5 = 101₂ → A2=1 (direct), A1=0 (complement→A1'), A0=1 (direct). Match each bit: 1=direct, 0=complemented.", hint: "Write 5 in binary: 101. Then: bit=1 means direct, bit=0 means complemented." },
+  { q: "How many AND gates in a 3-to-8 decoder?", opts: ["3","6","8","16"], ans: 2, exp: "2³ = 8 outputs → 8 AND gates. One AND gate per decoder output. Formula: always 2ⁿ AND gates.", hint: "Formula: 2^(number of input bits). Here n=3." },
+  { q: "Enable E=0. What happens to ALL outputs?", opts: ["All go HIGH","Selected output HIGH","All go LOW","Output is undefined"], ans: 2, exp: "E=0 disables the entire decoder chip. All outputs go LOW regardless of address inputs. E acts as a master chip-select or on/off switch.", hint: "E=0 means the chip is disabled. Think of it as cutting power." },
+  { q: "You want to implement F = A'B' + AB using a decoder. You use:", opts: ["8 AND gates","A 2-to-4 decoder + OR gate","Only NOT gates","A 4-to-1 MUX"], ans: 1, exp: "Decoder outputs ARE minterms! F = m0 + m3 (where inputs are 00 and 11). Just OR D0 and D3. No extra AND gates needed at all!", hint: "Which minterms (rows) make F=1? Those are rows 00 and 11." },
+  { q: "BCD input 1001 to 7-segment decoder. Which segment is OFF?", opts: ["a (top)","b (top-right)","e (bottom-left)","g (middle)"], ans: 2, exp: "1001₂ = digit 9. Digit 9 shows a,b,c,d,f,g ON. Segment e (bottom-left) is OFF for 9.", hint: "1001₂ = 9 in decimal. Look up digit 9 in your memory — which bars does it NOT light?" },
+];
+
+// Feedback message at end of quiz based on score
+export const decoderQuizFeedback = (score, total) => {
+  if (score >= total - 1) return "Excellent! You understand minterm logic and enable pins cold.";
+  if (score >= Math.floor(total / 2)) return "Good — practice the binary→decimal conversion for fast output identification.";
+  return "Review the minterm rule: binary 0 → complement, binary 1 → direct.";
+};
+
+
+--------------------------------------------------------------------------------
+FILE: /decoder/DecoderPage.jsx
+--------------------------------------------------------------------------------
+/**
+ * DecoderPage.jsx — Main page component for the Decoder topic
+ *
+ * This file is intentionally thin: it only wires together the smaller
+ * components and sections.  All data lives in decoderData.js; all
+ * sub-components live in ./components/.
+ *
+ * Section layout:
+ *   1. Concept & Minterm Explorer
+ *   2. Step-by-step Equation Builder
+ *   3. Interactive Simulator (type-selectable)
+ *   4. 7-Segment Live BCD Demo
+ *   5. Decoder as Function Generator
+ *   6. Cascading Decoders
+ *   7. Real-World Applications
+ *   8. Quiz
+ */
+import React, { useState } from "react";
+
+// ── Shared components ──────────────────────────────────────────────────────────
+import Section   from "../shared/components/Section.jsx";
+import Quiz      from "../shared/components/Quiz.jsx";
+import TipsPanel from "../shared/components/TipsPanel.jsx";
+
+// ── Decoder-specific components ────────────────────────────────────────────────
+import TypeSelector          from "./components/TypeSelector.jsx";
+import DecoderSimulator      from "./components/DecoderSimulator.jsx";
+import FunctionGeneratorDemo from "./components/FunctionGeneratorDemo.jsx";
+import BCDDigitPad           from "./components/BCDDigitPad.jsx";
+import MintermEquationBuilder from "./components/MintermEquationBuilder.jsx";
+import CascadingExplainer    from "./components/CascadingExplainer.jsx";
+
+// ── Data ───────────────────────────────────────────────────────────────────────
+import {
+  DECODER_TYPES,
+  DECODER_TIPS,
+  DECODER_QUIZ,
+  decoderQuizFeedback,
+} from "./decoderData.js";
+
+// ─── Real-world application card ───────────────────────────────────────────────
+const AppCard = ({ icon, color, title, items }) => (
+  <div
+    style={{
+      background: "rgba(12,18,35,0.7)",
+      border: `1px solid ${color}25`,
+      borderRadius: "12px",
+      padding: "18px",
+    }}
+  >
+    <div style={{ fontSize: "1.8rem", marginBottom: "8px" }}>{icon}</div>
+    <h5 style={{ color, marginBottom: "12px", fontSize: "0.88rem", fontWeight: "700" }}>
+      {title}
+    </h5>
+    <ul style={{ color: "#6b7280", paddingLeft: "18px", margin: 0, lineHeight: "1.7", fontSize: "0.83rem" }}>
+      {items.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  </div>
+);
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+const DecoderPage = () => {
+  const [selectedType, setSelectedType] = useState("2to4");
+  // inputVals is shared across the simulator — up to 4 bits
+  const [inputVals, setInputVals] = useState(Array(4).fill(0));
+
+  const handleTypeChange = (key) => {
+    setSelectedType(key);
+    setInputVals(Array(4).fill(0)); // reset inputs when switching decoder type
+  };
+
+  return (
+    <div style={{ padding: "24px", maxWidth: "900px", margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
+      <h1 style={{ color: "#e2e8f0", marginBottom: "8px", fontSize: "1.6rem" }}>
+        🔓 Binary Decoders
+      </h1>
+      <p style={{ color: "#9ca3af", marginBottom: "32px", lineHeight: "1.65" }}>
+        A decoder converts a binary code to a unique one-hot output.
+        Explore the interactive simulator, Boolean equations, and real-world applications below.
+      </p>
+
+      {/* ── 1: Concept & Minterm Explorer ── */}
+      <Section title="🧠 What Is a Decoder?" accent="#6366f1">
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", lineHeight: "1.65", marginBottom: "18px" }}>
+          A decoder takes an n-bit binary code and asserts exactly one of 2ⁿ output lines HIGH.
+          Each output corresponds to exactly one minterm of the input variables.
+        </p>
+        <MintermEquationBuilder />
+      </Section>
+
+      {/* ── 2: Simulator ── */}
+      <Section title="🎮 Interactive Decoder Simulator" accent="#60a5fa">
+        <TypeSelector
+          selectedType={selectedType}
+          types={DECODER_TYPES}
+          onChange={handleTypeChange}
+        />
+        <div
+          style={{
+            color: "#6b7280", fontSize: "0.8rem", marginBottom: "14px",
+            padding: "8px 12px", background: "rgba(251,191,36,0.05)",
+            border: "1px solid rgba(251,191,36,0.15)", borderRadius: "8px",
+          }}
+        >
+          💡 <em>Analogy: {DECODER_TYPES[selectedType].analogy}</em>
+        </div>
+        <DecoderSimulator
+          key={selectedType}
+          selectedType={selectedType}
+          inputVals={inputVals}
+          setInputVals={setInputVals}
+          types={DECODER_TYPES}
+        />
+      </Section>
+
+      {/* ── 3: 7-Segment Demo ── */}
+      <Section title="🔢 7-Segment Display — Live BCD Demo" accent="#00ff88">
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+          A BCD-to-7-segment decoder converts a 4-bit BCD number to 7 segment control signals.
+          Click any digit to see which segments light up.
+        </p>
+        <BCDDigitPad />
+      </Section>
+
+      {/* ── 4: Function Generator ── */}
+      <Section title="🧩 Decoder as Function Generator — Zero Extra Gates!" accent="#a78bfa">
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+          Since each output = one minterm, you can implement ANY Boolean function using a
+          decoder + a single OR gate. No K-map simplification needed!
+        </p>
+        <FunctionGeneratorDemo />
+      </Section>
+
+      {/* ── 5: Cascading ── */}
+      <Section title="🔗 Cascading Decoders — Building Larger Decoders" accent="#fbbf24">
+        <p style={{ color: "#9ca3af", fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+          Need 16 outputs but only have 2-to-4 decoders? Cascade them! One top-level decoder
+          selects which child decoder is active using the high address bits.
+        </p>
+        <CascadingExplainer />
+      </Section>
+
+      {/* ── 6: Real-World ── */}
+      <Section title="🌍 Real-World Applications" accent="#34d399">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
+          <AppCard icon="🧠" color="#60a5fa" title="Memory Address Decoding"
+            items={["CPU n-bit address → decoder inputs","Each output selects one memory chip","Only active chip drives the bus","74LS138 is the classic chip"]} />
+          <AppCard icon="📟" color="#00ff88" title="7-Segment Display (74LS47)"
+            items={["BCD from counter register","Decoder drives each LED segment","Used in clocks, meters, scoreboards","Handles all 10 decimal digits"]} />
+          <AppCard icon="🔀" color="#a78bfa" title="DEMUX (Demultiplexer)"
+            items={["Enable pin = data input line","Address selects destination output","Reconstructs TDM multiplexed signals","Same IC as decoder!"]} />
+          <AppCard icon="⚙️" color="#f97316" title="CPU Instruction Decoder"
+            items={["Opcode bits → decoder inputs","Each output activates one micro-op","Drives ALU and register controls","Core of hardwired control units"]} />
+        </div>
+      </Section>
+
+      {/* ── 7: Quiz ── */}
+      <Section title="🧪 Test Yourself — Quiz with Hints & Streaks" accent="#6366f1">
+        <Quiz questions={DECODER_QUIZ} feedbackText={decoderQuizFeedback} />
+      </Section>
+
+      {/* Floating tips button */}
+      <TipsPanel tips={DECODER_TIPS} />
+    </div>
+  );
+};
+
+export default DecoderPage;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/BinaryIndexExplorer.jsx
+--------------------------------------------------------------------------------
+/**
+ * BinaryIndexExplorer.jsx
+ *
+ * Teaches the "binary-index trick" interactively.
+ * The user picks a number of inputs (4, 8, or 16) and an output bit
+ * to examine (A0, A1, …).  The table highlights every input index
+ * whose binary representation has that bit set, and auto-generates
+ * the OR equation for that output.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+const BinaryIndexExplorer = () => {
+  const [numInputs,   setNumInputs]   = useState(8);
+  const [selectedBit, setSelectedBit] = useState(0);
+
+  const numBits   = Math.log2(numInputs);                          // number of output bits
+  const indices   = Array.from({ length: numInputs }, (_, i) => i);
+  const highlighted = indices.filter((i) => (i >> selectedBit) & 1); // indices where bit k = 1
+
+  const equation =
+    highlighted.length > 0
+      ? `A${selectedBit} = ${highlighted.map((i) => `I${i}`).join(" + ")}`
+      : `A${selectedBit} = 0`;
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(99,102,241,0.3)",
+      }}
+    >
+      {/* ── Controls row ── */}
+      <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
+        {/* Number of inputs picker */}
+        <div>
+          <label style={{ color: COLORS.textSecondary, fontSize: "0.8rem", display: "block", marginBottom: "6px" }}>
+            Number of Inputs
+          </label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {[4, 8, 16].map((n) => (
+              <button
+                key={n}
+                onClick={() => { setNumInputs(n); setSelectedBit(0); }}
+                style={{
+                  padding: "7px 16px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${numInputs === n ? COLORS.indigo : "rgba(99,102,241,0.25)"}`,
+                  background: numInputs === n ? "rgba(99,102,241,0.25)" : "transparent",
+                  color: numInputs === n ? COLORS.indigoLight : COLORS.textMuted,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Output bit picker */}
+        <div>
+          <label style={{ color: COLORS.textSecondary, fontSize: "0.8rem", display: "block", marginBottom: "6px" }}>
+            Select Output Bit Aₖ
+          </label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {Array.from({ length: numBits }, (_, k) => (
+              <button
+                key={k}
+                onClick={() => setSelectedBit(k)}
+                style={{
+                  padding: "7px 16px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${selectedBit === k ? COLORS.warn : "rgba(251,191,36,0.2)"}`,
+                  background: selectedBit === k ? "rgba(251,191,36,0.15)" : "transparent",
+                  color: selectedBit === k ? COLORS.warn : COLORS.textMuted,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                }}
+              >
+                A{k}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Binary index table ── */}
+      <div style={{ overflowX: "auto", marginBottom: "18px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "monospace", fontSize: "0.82rem" }}>
+          <thead>
+            <tr>
+              <th style={{ padding: "8px 12px", color: COLORS.blue, textAlign: "center", borderBottom: "1px solid rgba(99,102,241,0.3)", background: "rgba(15,23,42,0.8)" }}>
+                Index
+              </th>
+              {Array.from({ length: numBits }, (_, k) => (
+                <th
+                  key={k}
+                  style={{
+                    padding: "8px 12px",
+                    color: k === selectedBit ? COLORS.warn : COLORS.textSecondary,
+                    textAlign: "center",
+                    borderBottom: "1px solid rgba(99,102,241,0.3)",
+                    background: k === selectedBit ? "rgba(251,191,36,0.1)" : "rgba(15,23,42,0.8)",
+                    fontWeight: k === selectedBit ? "800" : "600",
+                  }}
+                >
+                  bit-{k} {k === selectedBit ? "← selected" : ""}
+                </th>
+              ))}
+              <th style={{ padding: "8px 12px", color: COLORS.textSecondary, textAlign: "center", borderBottom: "1px solid rgba(99,102,241,0.3)", background: "rgba(15,23,42,0.8)" }}>
+                Include in A{selectedBit}?
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {indices.map((i) => {
+              const isHighlighted = !!((i >> selectedBit) & 1);
+              return (
+                <tr
+                  key={i}
+                  style={{ background: isHighlighted ? "rgba(251,191,36,0.07)" : "transparent" }}
+                >
+                  {/* Index label */}
+                  <td style={{ padding: "7px 12px", textAlign: "center", color: COLORS.textPrimary, borderBottom: "1px solid rgba(30,40,60,0.5)" }}>
+                    I{i}
+                  </td>
+                  {/* Bit columns */}
+                  {Array.from({ length: numBits }, (_, k) => {
+                    const bit = (i >> k) & 1;
+                    return (
+                      <td
+                        key={k}
+                        style={{
+                          padding: "7px 12px",
+                          textAlign: "center",
+                          color: k === selectedBit ? (bit ? COLORS.warn : "#374151") : (bit ? COLORS.blue : "#374151"),
+                          fontWeight: k === selectedBit && bit ? "800" : "400",
+                          borderBottom: "1px solid rgba(30,40,60,0.5)",
+                          background: k === selectedBit ? "rgba(251,191,36,0.05)" : "transparent",
+                        }}
+                      >
+                        {bit}
+                      </td>
+                    );
+                  })}
+                  {/* Include? */}
+                  <td style={{ padding: "7px 12px", textAlign: "center", borderBottom: "1px solid rgba(30,40,60,0.5)" }}>
+                    {isHighlighted
+                      ? <span style={{ color: COLORS.high, fontWeight: "700" }}>✓ YES</span>
+                      : <span style={{ color: "#374151" }}>—</span>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Generated equation ── */}
+      <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.35)", borderRadius: "10px", padding: "16px" }}>
+        <div style={{ color: COLORS.textSecondary, fontSize: "0.8rem", marginBottom: "4px" }}>Generated Equation:</div>
+        <code style={{ color: COLORS.warn, fontSize: "1.05rem", fontWeight: "700" }}>{equation}</code>
+        <p style={{ color: COLORS.textSecondary, fontSize: "0.82rem", margin: "10px 0 0", lineHeight: "1.6" }}>
+          ✨ <strong style={{ color: COLORS.textPrimary }}>The trick:</strong>{" "}
+          Look at the column for bit-{selectedBit}. Every row with a 1 in that column
+          contributes its input to A{selectedBit}. Just OR them all!
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default BinaryIndexExplorer;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/ComparisonTable.jsx
+--------------------------------------------------------------------------------
+/**
+ * ComparisonTable.jsx — Basic vs Priority Encoder comparison
+ *
+ * A static reference table showing the key differences between
+ * a plain binary encoder and a priority encoder.
+ */
+import React from "react";
+import { COLORS } from "../../shared/theme.js";
+
+// Table data: [feature, basicEncoder, priorityEncoder]
+const ROWS = [
+  ["Multiple inputs HIGH?",  "❌ Undefined / garbage output",            "✅ Highest-indexed input wins"],
+  ["Valid flag V",            "Usually absent",                          "✅ Present — V=1 if any input active"],
+  ["Circuit complexity",      "Simpler — OR gates only",                 "Slightly more complex — adds masking"],
+  ["Use case",                "Keyboards (1 key at a time)",             "Interrupt controllers (concurrent events)"],
+  ["Equations",               "Direct OR of relevant inputs",            "Masking terms added for conflicts"],
+  ["Real IC example",         "74HC148 (basic)",                         "74LS148 (priority)"],
+];
+
+const ComparisonTable = () => (
+  <div style={{ overflowX: "auto" }}>
+    <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "system-ui", fontSize: "0.87rem" }}>
+      <thead>
+        <tr>
+          {["Feature", "Basic Binary Encoder", "Priority Encoder"].map((h, i) => (
+            <th
+              key={i}
+              style={{
+                padding: "12px 16px",
+                background: "rgba(15,23,42,0.9)",
+                color: i === 0 ? COLORS.textSecondary : i === 1 ? COLORS.blue : COLORS.warn,
+                textAlign: "left",
+                borderBottom: "2px solid rgba(99,102,241,0.3)",
+                fontWeight: "700",
+                fontSize: "0.82rem",
+                letterSpacing: "0.04em",
+              }}
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {ROWS.map(([feat, plain, prio], ri) => (
+          <tr key={ri} style={{ background: ri % 2 === 0 ? "rgba(15,23,42,0.4)" : "transparent" }}>
+            <td style={{ padding: "11px 16px", color: COLORS.textPrimary,  fontWeight: "600", borderBottom: "1px solid rgba(30,40,60,0.5)" }}>{feat}</td>
+            <td style={{ padding: "11px 16px", color: COLORS.blue,         lineHeight: "1.5", borderBottom: "1px solid rgba(30,40,60,0.5)" }}>{plain}</td>
+            <td style={{ padding: "11px 16px", color: COLORS.warn,         lineHeight: "1.5", borderBottom: "1px solid rgba(30,40,60,0.5)" }}>{prio}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+export default ComparisonTable;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/DecoderSimulator.jsx
+--------------------------------------------------------------------------------
+/**
+ * DecoderSimulator.jsx — Interactive decoder simulator
+ *
+ * Lets the user toggle address inputs (and the Enable pin) and watch
+ * which output goes HIGH in real time.  Also shows:
+ *   - A summary box with the active decoding
+ *   - The 7-segment display (BCD mode)
+ *   - Expandable Boolean equations with explanations
+ *
+ * Props:
+ *   selectedType : string
+ *   inputVals    : number[]   — current input bit array (shared with parent)
+ *   setInputVals : fn         — setter from parent
+ *   types        : object     — DECODER_TYPES map
+ */
+import React, { useState, useMemo } from "react";
+import { COLORS, bitIndicatorStyle } from "../../shared/theme.js";
+import TruthTable from "../../shared/components/TruthTable.jsx";
+import SevenSeg from "./SevenSeg.jsx";
+
+// ─── Sub: single input toggle button ──────────────────────────────────────────
+const InputToggle = ({ label, value, isActive, onClick, activeColor = COLORS.blue }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%",
+      padding: "10px 14px",
+      borderRadius: "9px",
+      border: `2px solid ${isActive ? activeColor : COLORS.indigoMuted}`,
+      background: isActive ? `${activeColor}1a` : COLORS.inputBg,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      cursor: "pointer",
+      marginBottom: "8px",
+      transition: "all 0.2s",
+    }}
+  >
+    <span style={{ color: isActive ? activeColor : COLORS.textMuted, fontFamily: "monospace", fontWeight: "700" }}>
+      {label}
+    </span>
+    <span style={bitIndicatorStyle(isActive, activeColor)}>
+      {value}
+    </span>
+  </button>
+);
+
+// ─── Sub: expandable Boolean equation row ─────────────────────────────────────
+const EquationRow = ({ eq, isExpanded, onToggle }) => (
+  <div
+    style={{
+      borderRadius: "10px",
+      border: `1px solid ${eq.color}30`,
+      background: "rgba(8,14,30,0.7)",
+      marginBottom: "8px",
+      overflow: "hidden",
+    }}
+  >
+    {/* Collapsed header (always visible) */}
+    <button
+      onClick={onToggle}
+      style={{
+        width: "100%",
+        padding: "12px 16px",
+        background: "transparent",
+        border: "none",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        cursor: "pointer",
+      }}
+    >
+      <div>
+        <span style={{ color: eq.color, fontFamily: "monospace", fontWeight: "700", fontSize: "0.88rem" }}>
+          {eq.out}
+        </span>
+        <span style={{ color: COLORS.textSecondary, fontFamily: "monospace", marginLeft: "12px", fontSize: "0.85rem" }}>
+          {eq.eq}
+        </span>
+      </div>
+      <span style={{ color: COLORS.textMuted, fontSize: "0.75rem" }}>
+        {isExpanded ? "▲" : "▼"}
+      </span>
+    </button>
+
+    {/* Expanded explanation */}
+    {isExpanded && (
+      <div style={{ padding: "0 16px 14px", borderTop: `1px solid ${eq.color}20` }}>
+        <p style={{ color: COLORS.textSecondary, fontSize: "0.86rem", lineHeight: "1.7", margin: "12px 0" }}>
+          {eq.explanation}
+        </p>
+        <div
+          style={{
+            padding: "10px 14px",
+            background: `${eq.color}12`,
+            border: `1px solid ${eq.color}35`,
+            borderRadius: "8px",
+          }}
+        >
+          <span style={{ color: eq.color, fontSize: "0.78rem", fontWeight: "700" }}>🎯 MEMORY TRICK: </span>
+          <span style={{ color: COLORS.textPrimary, fontSize: "0.82rem" }}>{eq.trick}</span>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+// ─── Main component ────────────────────────────────────────────────────────────
+const DecoderSimulator = ({ selectedType, inputVals, setInputVals, types }) => {
+  const config = types[selectedType];
+  const [expandedEq, setExpandedEq] = useState(null);
+  const [enable, setEnable]         = useState(true);
+
+  const is7seg = selectedType === "BCD7seg";
+
+  // Slice the input array to match how many code inputs this type has
+  const codeVals = config.codeInputs.map((_, i) => inputVals[i] ?? 0);
+
+  // Re-run the decode function whenever inputs change
+  const result = useMemo(
+    () => config.decode(codeVals, enable),
+    [config, codeVals, enable],
+  );
+
+  // The decimal value of the current address
+  const binaryValue = codeVals.reduce(
+    (acc, bit, i) => acc + (bit << (config.codeInputs.length - 1 - i)),
+    0,
+  );
+
+  const outputEntries = config.outputs.map((name) => ({ name, val: result[name] ?? 0 }));
+
+  const toggleCode = (idx) => {
+    const next = [...inputVals];
+    next[idx] = next[idx] ? 0 : 1;
+    setInputVals(next);
+  };
+
+  const resetInputs = () => setInputVals(Array(4).fill(0));
+
+  const toggleEq = (i) => setExpandedEq(expandedEq === i ? null : i);
+
+  // ── Render ──
+  return (
+    <div>
+      {/* ── Row: inputs on left, outputs on right ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
+
+        {/* Left: address inputs + enable */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+            <h4 style={{ color: COLORS.blue, margin: 0, fontSize: "0.9rem" }}>📥 Address Inputs</h4>
+            <button onClick={resetInputs} style={{ padding: "5px 12px", borderRadius: "7px", border: "1px solid rgba(148,163,184,0.2)", background: "transparent", color: COLORS.textMuted, cursor: "pointer", fontSize: "0.78rem" }}>
+              Reset
+            </button>
+          </div>
+
+          {/* Enable toggle (not shown for BCD-7seg) */}
+          {config.enableInput && (
+            <InputToggle
+              label="E (Enable)"
+              value={enable ? 1 : 0}
+              isActive={enable}
+              onClick={() => setEnable(!enable)}
+              activeColor={COLORS.warn}
+            />
+          )}
+
+          {/* Code input toggles */}
+          {config.codeInputs.map((name, idx) => (
+            <InputToggle
+              key={name}
+              label={name}
+              value={codeVals[idx]}
+              isActive={!!codeVals[idx]}
+              onClick={() => toggleCode(idx)}
+              activeColor={COLORS.blue}
+            />
+          ))}
+
+          {/* Decoding summary */}
+          <div style={{ padding: "12px 14px", background: "rgba(8,14,30,0.8)", border: `1px solid ${COLORS.indigoMuted}`, borderRadius: "9px", marginTop: "8px" }}>
+            {enable && result.active >= 0 ? (
+              <>
+                <div style={{ color: "#86efac", fontSize: "0.75rem", fontWeight: "700", marginBottom: "4px" }}>DECODING</div>
+                <div style={{ fontFamily: "monospace", color: COLORS.high, fontSize: "1.05rem", fontWeight: "700" }}>
+                  {codeVals.join("")}₂ = {binaryValue}₁₀ → {is7seg ? `digit ${binaryValue}` : `D${result.active}`}
+                </div>
+              </>
+            ) : !enable ? (
+              <div style={{ color: COLORS.low, fontSize: "0.85rem" }}>⚠️ Chip disabled (E=0) — all outputs LOW</div>
+            ) : (
+              <div style={{ color: COLORS.textDim, fontSize: "0.85rem", fontStyle: "italic" }}>
+                {is7seg ? "BCD > 9 = invalid input" : "No input selected"}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: output indicators */}
+        <div>
+          <h4 style={{ color: COLORS.warn, marginBottom: "12px", fontSize: "0.9rem" }}>
+            📤 Outputs {is7seg ? "— 7 Segment" : ""}
+          </h4>
+
+          {is7seg ? (
+            /* 7-seg display + segment list */
+            <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+              <SevenSeg segs={result} />
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {outputEntries.map(({ name, val }) => (
+                  <div key={name} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <span style={{ color: COLORS.textDim, fontFamily: "monospace", fontSize: "0.8rem", width: "16px" }}>{name}</span>
+                    <div style={{ ...bitIndicatorStyle(!!val, COLORS.high), width: "20px", height: "12px" }}>
+                      <span style={{ fontSize: "0.65rem" }}>{val}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Standard output list */
+            <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              {outputEntries.map(({ name, val }) => {
+                const isHigh = !!val;
+                return (
+                  <div key={name} style={{ padding: "9px 14px", borderRadius: "9px", border: `2px solid ${isHigh ? COLORS.high : "rgba(148,163,184,0.12)"}`, background: isHigh ? "rgba(0,255,136,0.08)" : COLORS.inputBg, display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.2s" }}>
+                    <span style={{ color: isHigh ? COLORS.high : COLORS.textSecondary, fontFamily: "monospace", fontWeight: "700" }}>{name}</span>
+                    <span style={bitIndicatorStyle(isHigh, COLORS.high)}>{val}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Boolean equations (expandable) ── */}
+      <h4 style={{ color: "#c4b5fd", marginBottom: "12px", fontSize: "0.9rem" }}>
+        📐 Boolean Equations — click to expand
+      </h4>
+      {config.booleanEqs.map((eq, i) => (
+        <EquationRow
+          key={eq.out}
+          eq={eq}
+          isExpanded={expandedEq === i}
+          onToggle={() => toggleEq(i)}
+        />
+      ))}
+
+      {/* ── Truth table ── */}
+      <h4 style={{ color: "#93c5fd", margin: "20px 0 12px", fontSize: "0.9rem" }}>📊 Truth Table</h4>
+      <TruthTable
+        headers={config.truthHeaders}
+        rows={config.truthRows}
+        activeRow={enable ? (result.active >= 0 ? result.active + (config.enableInput ? 1 : 0) : -1) : 0}
+        inputCount={config.codeInputs.length + (config.enableInput ? 1 : 0)}
+      />
+    </div>
+  );
+};
+
+export default DecoderSimulator;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/EncoderSimulator.jsx
+--------------------------------------------------------------------------------
+/**
+ * EncoderSimulator.jsx — Interactive encoder simulator
+ *
+ * Lets the user toggle input lines and watch which output code appears.
+ * Highlights the winner (highest-priority active input), shows overridden
+ * inputs in orange, and displays expandable Boolean equations.
+ *
+ * Props:
+ *   config      : one entry from ENCODER_TYPES
+ *   inputVals   : number[]  (shared with parent)
+ *   setInputVals: fn
+ */
+import React, { useState, useMemo } from "react";
+import { COLORS, bitIndicatorStyle } from "../../shared/theme.js";
+import TruthTable from "../../shared/components/TruthTable.jsx";
+
+// ─── Sub: single input toggle button ──────────────────────────────────────────
+const InputToggle = ({ name, isActive, isWinner, onClick }) => {
+  const color = isActive ? (isWinner ? COLORS.high : "#f97316") : COLORS.indigoMuted;
+  const bg    = isActive ? (isWinner ? "rgba(0,255,136,0.1)" : "rgba(249,115,22,0.1)") : COLORS.inputBg;
+
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "10px 14px",
+        borderRadius: "9px",
+        border: `2px solid ${isActive ? (isWinner ? COLORS.high : "#f97316") : "rgba(99,102,241,0.2)"}`,
+        background: bg,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        cursor: "pointer",
+        transition: "all 0.2s",
+        boxShadow: isWinner ? "0 0 10px rgba(0,255,136,0.3)" : "none",
+        width: "100%",
+        marginBottom: "6px",
+      }}
+    >
+      <span style={{ color: isActive ? (isWinner ? COLORS.high : "#f97316") : COLORS.textMuted, fontFamily: "monospace", fontWeight: "700", fontSize: "0.95rem" }}>
+        {name}
+      </span>
+      <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {isWinner  && <span style={{ color: COLORS.high,  fontSize: "0.72rem" }}>👑 WINNER</span>}
+        {isActive && !isWinner && <span style={{ color: "#f97316", fontSize: "0.72rem" }}>overridden</span>}
+        <span style={bitIndicatorStyle(isActive, isWinner ? COLORS.high : "#f97316")}>
+          {isActive ? "1" : "0"}
+        </span>
+      </span>
+    </button>
+  );
+};
+
+// ─── Sub: expandable equation row ─────────────────────────────────────────────
+const EquationRow = ({ eq, isExpanded, onToggle }) => (
+  <div
+    onClick={onToggle}
+    style={{
+      background: "rgba(12,18,35,0.8)",
+      border: `1.5px solid ${isExpanded ? eq.color + "60" : "rgba(99,102,241,0.18)"}`,
+      borderRadius: "10px",
+      padding: "14px 16px",
+      cursor: "pointer",
+      transition: "all 0.2s",
+      marginBottom: "8px",
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <code style={{ color: eq.color, fontFamily: "monospace", fontSize: "0.95rem", fontWeight: "700" }}>
+        {eq.eq}
+      </code>
+      <span style={{ color: COLORS.textMuted, fontSize: "0.75rem" }}>
+        {isExpanded ? "▲ less" : "▼ explain"}
+      </span>
+    </div>
+
+    {isExpanded && (
+      <div style={{ marginTop: "14px", borderTop: "1px solid rgba(99,102,241,0.15)", paddingTop: "14px" }}>
+        <p style={{ color: COLORS.textSecondary, fontSize: "0.87rem", lineHeight: "1.7", margin: "0 0 12px" }}>
+          {eq.explanation}
+        </p>
+        <div style={{ padding: "10px 14px", background: `${eq.color}12`, border: `1px solid ${eq.color}40`, borderRadius: "8px" }}>
+          <span style={{ color: eq.color, fontSize: "0.78rem", fontWeight: "700" }}>🎯 MEMORY TRICK: </span>
+          <span style={{ color: COLORS.textPrimary, fontSize: "0.82rem" }}>{eq.trick}</span>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+// ─── Main component ────────────────────────────────────────────────────────────
+const EncoderSimulator = ({ config, inputVals, setInputVals }) => {
+  const [expandedEq, setExpandedEq] = useState(null);
+
+  const activeVals = inputVals.slice(0, config.inputs.length);
+  const result = useMemo(() => config.encode(activeVals), [config, activeVals]);
+  const outputEntries = config.outputs.map((name) => ({ name, val: result[name] ?? 0 }));
+
+  const toggleInput = (idx) => {
+    const next = [...inputVals];
+    next[idx] = next[idx] ? 0 : 1;
+    setInputVals(next);
+  };
+
+  const resetInputs = () => setInputVals(Array(10).fill(0));
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+
+      {/* ── Left: inputs ── */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px", alignItems: "center" }}>
+          <h4 style={{ color: COLORS.blue, margin: 0, fontSize: "0.9rem" }}>📥 Inputs</h4>
+          <button
+            onClick={resetInputs}
+            style={{ padding: "5px 12px", borderRadius: "7px", border: "1px solid rgba(148,163,184,0.2)", background: "transparent", color: COLORS.textMuted, cursor: "pointer", fontSize: "0.78rem" }}
+          >
+            Reset
+          </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {config.inputs.map((name, idx) => (
+            <InputToggle
+              key={name}
+              name={name}
+              isActive={!!activeVals[idx]}
+              isWinner={result.active === idx}
+              onClick={() => toggleInput(idx)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Right: outputs + summary ── */}
+      <div>
+        <h4 style={{ color: COLORS.warn, marginBottom: "14px", fontSize: "0.9rem" }}>📤 Outputs</h4>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "7px", marginBottom: "20px" }}>
+          {outputEntries.map(({ name, val }) => (
+            <div
+              key={name}
+              style={{
+                padding: "10px 14px", borderRadius: "9px",
+                border: `2px solid ${val ? COLORS.warn : "rgba(148,163,184,0.12)"}`,
+                background: val ? "rgba(251,191,36,0.1)" : COLORS.inputBg,
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                transition: "all 0.2s",
+                boxShadow: val ? "0 0 8px rgba(251,191,36,0.2)" : "none",
+              }}
+            >
+              <span style={{ color: val ? COLORS.warn : COLORS.textSecondary, fontFamily: "monospace", fontWeight: "700" }}>
+                {name}
+              </span>
+              <span style={bitIndicatorStyle(!!val, COLORS.warn)}>{val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Encoding result summary */}
+        <div style={{ padding: "14px", background: "rgba(8,14,30,0.8)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: "10px" }}>
+          {result.active >= 0 ? (
+            <>
+              <div style={{ color: "#86efac", fontSize: "0.78rem", fontWeight: "700", marginBottom: "6px" }}>ENCODING RESULT</div>
+              <div style={{ fontFamily: "monospace", color: COLORS.high, fontSize: "1.15rem", fontWeight: "700" }}>
+                I{result.active} → {result.active.toString(2).padStart(config.outputs.filter((o) => o !== "V").length, "0")}₂
+              </div>
+              <div style={{ color: COLORS.textSecondary, fontSize: "0.78rem", marginTop: "4px" }}>
+                Input {result.active} encoded as binary {result.active}
+              </div>
+            </>
+          ) : (
+            <div style={{ color: COLORS.textDim, fontSize: "0.85rem", fontStyle: "italic" }}>
+              No inputs active. Output = 0, V = 0.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Truth table (full width) ── */}
+      <div style={{ gridColumn: "1 / -1" }}>
+        <h4 style={{ color: "#93c5fd", marginBottom: "12px", fontSize: "0.9rem" }}>📊 Truth Table</h4>
+        <TruthTable headers={config.truthHeaders} rows={config.truthRows} activeRow={result.active} inputCount={1} />
+      </div>
+
+      {/* ── Boolean equations (full width) ── */}
+      <div style={{ gridColumn: "1 / -1" }}>
+        <h4 style={{ color: COLORS.indigoLight, marginBottom: "14px", fontSize: "0.9rem" }}>
+          📐 Boolean Equations — Click to Expand
+        </h4>
+        {config.booleanEqs.map((eq, i) => (
+          <EquationRow
+            key={i}
+            eq={eq}
+            isExpanded={expandedEq === i}
+            onToggle={() => setExpandedEq(expandedEq === i ? null : i)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default EncoderSimulator;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/EncoderTypeSelector.jsx
+--------------------------------------------------------------------------------
+/**
+ * EncoderTypeSelector.jsx — Encoder type picker
+ *
+ * Renders a row of buttons, one per encoder type.
+ *
+ * Props:
+ *   selectedType : string
+ *   types        : object  — ENCODER_TYPES map { key: { label } }
+ *   onChange     : fn(key)
+ */
+import React from "react";
+import { COLORS } from "../../shared/theme.js";
+
+const EncoderTypeSelector = ({ selectedType, types, onChange }) => (
+  <div style={{ display: "flex", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
+    {Object.entries(types).map(([key, val]) => {
+      const isSelected = selectedType === key;
+      return (
+        <button
+          key={key}
+          onClick={() => onChange(key)}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "10px",
+            border: `2px solid ${isSelected ? COLORS.indigo : COLORS.indigoMuted}`,
+            background: isSelected ? "rgba(99,102,241,0.2)" : COLORS.inputBg,
+            color: isSelected ? COLORS.indigoLight : COLORS.textMuted,
+            cursor: "pointer",
+            fontWeight: isSelected ? "700" : "400",
+            transition: "all 0.2s",
+            fontSize: "0.88rem",
+          }}
+        >
+          {val.label}
+        </button>
+      );
+    })}
+  </div>
+);
+
+export default EncoderTypeSelector;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/PriorityConflictSim.jsx
+--------------------------------------------------------------------------------
+/**
+ * PriorityConflictSim.jsx
+ *
+ * Lets the user turn on multiple inputs simultaneously and observe
+ * how the priority encoder always picks the highest-numbered one.
+ * Includes a tip explaining why this matters in real hardware.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+const PriorityConflictSim = () => {
+  const [active, setActive] = useState(Array(8).fill(false));
+
+  const toggle = (i) =>
+    setActive((prev) => {
+      const next = [...prev];
+      next[i] = !next[i];
+      return next;
+    });
+
+  const clear = () => setActive(Array(8).fill(false));
+
+  // Find the winner: highest-numbered active input
+  let winner = -1;
+  for (let i = 7; i >= 0; i--) {
+    if (active[i]) { winner = i; break; }
+  }
+
+  const activeList = active.map((a, i) => (a ? i : -1)).filter((i) => i >= 0);
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(99,102,241,0.25)",
+      }}
+    >
+      <h4 style={{ color: COLORS.textPrimary, marginBottom: "6px", fontSize: "0.95rem" }}>
+        ⚔️ Priority Conflict Simulator
+      </h4>
+      <p style={{ color: COLORS.textSecondary, fontSize: "0.82rem", marginBottom: "18px", lineHeight: "1.5" }}>
+        Toggle multiple inputs ON at once to see how priority resolution works.
+        The highest-numbered active input always wins.
+      </p>
+
+      {/* ── Input grid ── */}
+      <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
+        {Array.from({ length: 8 }, (_, i) => {
+          const isActive = active[i];
+          const isWinner = i === winner;
+          return (
+            <button
+              key={i}
+              onClick={() => toggle(i)}
+              style={{
+                width: "52px",
+                height: "52px",
+                borderRadius: "10px",
+                border: `2px solid ${isActive ? (isWinner ? COLORS.high : "#f97316") : "rgba(99,102,241,0.25)"}`,
+                background: isActive
+                  ? isWinner ? "rgba(0,255,136,0.15)" : "rgba(249,115,22,0.15)"
+                  : "rgba(15,23,42,0.6)",
+                color: isActive ? (isWinner ? COLORS.high : "#f97316") : COLORS.textDim,
+                fontFamily: "monospace",
+                fontWeight: "700",
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                boxShadow: isActive && isWinner ? "0 0 12px rgba(0,255,136,0.4)" : "none",
+              }}
+            >
+              I{i}
+            </button>
+          );
+        })}
+
+        {/* Clear button */}
+        <button
+          onClick={clear}
+          style={{
+            padding: "0 16px",
+            borderRadius: "10px",
+            border: "1px solid rgba(148,163,184,0.2)",
+            background: "transparent",
+            color: COLORS.textMuted,
+            cursor: "pointer",
+            fontSize: "0.8rem",
+          }}
+        >
+          Clear
+        </button>
+      </div>
+
+      {/* ── Conflict resolution display ── */}
+      {activeList.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "20px", color: COLORS.textDim, fontStyle: "italic" }}>
+          No inputs active. Toggle some above.
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+          {/* Competing inputs */}
+          <div style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.3)", borderRadius: "10px", padding: "14px" }}>
+            <div style={{ color: "#fb923c", fontSize: "0.75rem", fontWeight: "700", marginBottom: "8px" }}>COMPETING INPUTS</div>
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {activeList.map((i) => (
+                <span
+                  key={i}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "6px",
+                    background: i === winner ? "rgba(0,255,136,0.15)" : "rgba(249,115,22,0.1)",
+                    border: `1px solid ${i === winner ? COLORS.high : "rgba(249,115,22,0.4)"}`,
+                    color: i === winner ? COLORS.high : "#f97316",
+                    fontFamily: "monospace",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  I{i} {i === winner ? "👑" : ""}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Encoded output */}
+          <div style={{ background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.3)", borderRadius: "10px", padding: "14px" }}>
+            <div style={{ color: "#86efac", fontSize: "0.75rem", fontWeight: "700", marginBottom: "8px" }}>ENCODED OUTPUT</div>
+            {winner >= 0 ? (
+              <>
+                <div style={{ fontFamily: "monospace", color: COLORS.high, fontSize: "1.1rem", fontWeight: "700" }}>
+                  {winner.toString(2).padStart(3, "0")}₂
+                </div>
+                <div style={{ color: COLORS.textSecondary, fontSize: "0.8rem", marginTop: "4px" }}>
+                  I{winner} wins — index {winner} in binary
+                </div>
+                <div style={{ color: "#4ade80", fontSize: "0.78rem", marginTop: "4px" }}>V = 1 (valid)</div>
+              </>
+            ) : (
+              <div style={{ color: COLORS.textDim, fontStyle: "italic" }}>No output</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Explanatory note */}
+      <div style={{ marginTop: "14px", padding: "12px", background: "rgba(99,102,241,0.08)", borderRadius: "8px", color: COLORS.textSecondary, fontSize: "0.8rem", lineHeight: "1.6" }}>
+        💡 <strong style={{ color: COLORS.textPrimary }}>Why priority matters:</strong>{" "}
+        In real systems, multiple interrupt signals can fire simultaneously.
+        The CPU needs ONE clear winner to service. Priority encoders guarantee exactly that.
+      </div>
+    </div>
+  );
+};
+
+export default PriorityConflictSim;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/components/SignalFlowDiagram.jsx
+--------------------------------------------------------------------------------
+/**
+ * SignalFlowDiagram.jsx — Animated step-by-step signal flow
+ *
+ * Shows 4 pipeline stages with a "Play Animation" button that
+ * lights them up sequentially, describing what happens inside the
+ * encoder at each step.
+ *
+ * Props:
+ *   config    : one entry from ENCODER_TYPES
+ *   inputVals : number[]
+ *   result    : encode() return value
+ */
+import React, { useState } from "react";
+import { COLORS } from "../../shared/theme.js";
+
+// The four stages of signal flow through an encoder
+const STAGE_ICONS = ["📥", "⚖️", "🔧", "📤"];
+
+const buildSteps = (activeIdx) => [
+  {
+    label: "Inputs Ready",
+    desc: "All input lines are stable. We're waiting for one (or more) to go HIGH.",
+    color: COLORS.blue,
+  },
+  {
+    label: "Priority Check",
+    desc: activeIdx >= 0
+      ? `Input I${activeIdx} is the highest active input. It wins priority.`
+      : "No inputs are active. Nothing to encode.",
+    color: COLORS.warn,
+  },
+  {
+    label: "OR Gate Layer",
+    desc: "Each output bit OR-gates the relevant inputs. Active inputs drive the OR gates.",
+    color: COLORS.purple,
+  },
+  {
+    label: "Output Ready",
+    desc: activeIdx >= 0
+      ? `Output code = ${activeIdx} in binary. Valid flag V=1.`
+      : "All outputs = 0. Valid flag V=0.",
+    color: COLORS.high,
+  },
+];
+
+const SignalFlowDiagram = ({ result }) => {
+  const [step, setStep]           = useState(0);
+  const [animating, setAnimating] = useState(false);
+
+  const steps = buildSteps(result.active);
+
+  // Auto-advance through steps with a delay between each
+  const runAnimation = () => {
+    setAnimating(true);
+    setStep(0);
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      setStep(current);
+      if (current >= steps.length - 1) {
+        clearInterval(interval);
+        setAnimating(false);
+      }
+    }, 900);
+  };
+
+  return (
+    <div
+      style={{
+        background: COLORS.darkBg,
+        borderRadius: "14px",
+        padding: "22px",
+        border: "1px solid rgba(99,102,241,0.25)",
+      }}
+    >
+      {/* Header row */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+        <h4 style={{ color: COLORS.textPrimary, margin: 0, fontSize: "0.95rem" }}>
+          ⚡ Signal Flow Animation
+        </h4>
+        <button
+          onClick={runAnimation}
+          disabled={animating}
+          style={{
+            padding: "8px 18px",
+            borderRadius: "8px",
+            background: animating ? "rgba(99,102,241,0.1)" : "rgba(99,102,241,0.25)",
+            border: "1.5px solid rgba(99,102,241,0.5)",
+            color: animating ? COLORS.textMuted : COLORS.indigoLight,
+            cursor: animating ? "default" : "pointer",
+            fontSize: "0.85rem",
+          }}
+        >
+          {animating ? "⏳ Playing..." : "▶ Play Animation"}
+        </button>
+      </div>
+
+      {/* Stage pipeline */}
+      <div style={{ display: "flex", gap: "0", overflowX: "auto", paddingBottom: "8px" }}>
+        {steps.map((s, i) => (
+          <React.Fragment key={i}>
+            {/* Stage bubble + label + description */}
+            <div
+              style={{
+                flex: "1",
+                minWidth: "120px",
+                textAlign: "center",
+                opacity: step >= i ? 1 : 0.3,
+                transition: "all 0.5s ease",
+              }}
+            >
+              {/* Circle icon */}
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  background: step >= i ? `${s.color}22` : "rgba(20,30,50,0.5)",
+                  border: `2px solid ${step >= i ? s.color : "rgba(99,102,241,0.2)"}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 10px",
+                  fontSize: "1.2rem",
+                  boxShadow: step >= i ? `0 0 12px ${s.color}55` : "none",
+                  transition: "all 0.5s ease",
+                }}
+              >
+                {STAGE_ICONS[i]}
+              </div>
+
+              {/* Stage label */}
+              <div
+                style={{
+                  color: step >= i ? s.color : COLORS.textDim,
+                  fontSize: "0.75rem",
+                  fontWeight: "700",
+                  marginBottom: "6px",
+                  transition: "all 0.5s",
+                }}
+              >
+                {s.label}
+              </div>
+
+              {/* Active description (only for current step) */}
+              {step === i && (
+                <div
+                  style={{
+                    color: COLORS.textSecondary,
+                    fontSize: "0.72rem",
+                    lineHeight: "1.5",
+                    padding: "8px",
+                    background: "rgba(0,0,0,0.3)",
+                    borderRadius: "8px",
+                    animation: "fadeInUp 0.4s ease",
+                  }}
+                >
+                  {s.desc}
+                </div>
+              )}
+            </div>
+
+            {/* Arrow connector between stages */}
+            {i < steps.length - 1 && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  paddingTop: "22px",
+                  color: step > i ? COLORS.indigo : "#1e293b",
+                  transition: "all 0.5s",
+                  fontSize: "1.1rem",
+                }}
+              >
+                →
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default SignalFlowDiagram;
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/encoderData.js
+--------------------------------------------------------------------------------
+/**
+ * encoderData.js — All static data for the Encoder page
+ *
+ * Structure per encoder type:
+ *   label       — human-readable name
+ *   inputs      — input pin names  (e.g. ["I0".."I7"])
+ *   outputs     — output pin names (e.g. ["A2","A1","A0","V"])
+ *   description — one-line summary
+ *   analogy     — real-world comparison for students
+ *   encode()    — pure function (vals[]) → { [outName]: 0|1, active: number }
+ *   booleanEqs  — array of { out, eq, color, explanation, trick }
+ *   truthHeaders— column headers for the truth table
+ *   truthRows   — string[][] data rows
+ */
+
+export const ENCODER_TYPES = {
+  // ── 4-to-2 Priority Encoder ─────────────────────────────────────────────────
+  "4to2": {
+    label: "4-to-2 Priority Encoder",
+    inputs: ["I0","I1","I2","I3"],
+    outputs: ["A1","A0","V"],
+    description: "4 data inputs → 2-bit binary code + Valid flag",
+    analogy: "Like a 4-button elevator that shows the highest requested floor",
+    encode: (vals) => {
+      const [i0, i1, i2, i3] = vals;
+      if (i3) return { A1:1, A0:1, V:1, active:3 };
+      if (i2) return { A1:1, A0:0, V:1, active:2 };
+      if (i1) return { A1:0, A0:1, V:1, active:1 };
+      if (i0) return { A1:0, A0:0, V:1, active:0 };
+      return { A1:0, A0:0, V:0, active:-1 };
+    },
+    booleanEqs: [
+      { out:"A1", eq:"A1 = I2 + I3",       color:"#f97316", explanation:"A1 is the MSB. It equals 1 for inputs 2 and 3, because both 2 (10₂) and 3 (11₂) have their bit-1 = 1. The rule: just OR the inputs whose binary index has that bit set.", trick:"Binary indices 2=10, 3=11 → both have bit-1 ON → A1 = I2 OR I3" },
+      { out:"A0", eq:"A0 = I3 + I1·I2'",   color:"#a78bfa", explanation:"A0 is the LSB. Inputs 1 (01₂) and 3 (11₂) have bit-0=1. But I3 has higher priority than I1, so we use I3 directly. For I1, we must ensure I2 is NOT active (priority masking): I1·I2'.", trick:"For priority: I3 always wins. I1 only fires when I2 is quiet (I2')." },
+      { out:"V",  eq:"V = I0 + I1 + I2 + I3", color:"#34d399", explanation:"Valid flag V = 1 whenever ANY input is HIGH. V = 0 means all inputs are LOW — nothing to encode.", trick:"V is simply OR of ALL inputs. If anything is happening, V says so." },
+    ],
+    truthHeaders: ["Active", "A1", "A0", "V"],
+    truthRows: [
+      ["none",           "—","—","0"],
+      ["I0 only",        "0","0","1"],
+      ["I1 only",        "0","1","1"],
+      ["I2 only",        "1","0","1"],
+      ["I3 only",        "1","1","1"],
+      ["I2+I3 (conflict)","1","1","1"],
+      ["I1+I2 (conflict)","1","0","1"],
+    ],
+  },
+
+  // ── 8-to-3 Priority Encoder ─────────────────────────────────────────────────
+  "8to3": {
+    label: "8-to-3 Priority Encoder",
+    inputs: ["I0","I1","I2","I3","I4","I5","I6","I7"],
+    outputs: ["A2","A1","A0","V"],
+    description: "8 data inputs → 3-bit binary code + Valid flag",
+    analogy: "Like a hospital triage system — highest priority patient gets encoded first",
+    encode: (vals) => {
+      for (let i = 7; i >= 0; i--) {
+        if (vals[i]) return { A2:(i>>2)&1, A1:(i>>1)&1, A0:i&1, V:1, active:i };
+      }
+      return { A2:0, A1:0, A0:0, V:0, active:-1 };
+    },
+    booleanEqs: [
+      { out:"A2", eq:"A2 = I4 + I5 + I6 + I7",       color:"#f97316", explanation:"A2 is bit-2. Indices 4–7 all have bit-2=1. OR those four inputs.", trick:"Indices 4–7 all ≥ 4, so they all have bit-2 ON. Think: top half of 0–7." },
+      { out:"A1", eq:"A1 = I2 + I3 + I6 + I7",       color:"#a78bfa", explanation:"A1 is bit-1. Indices with bit-1=1: 2,3,6,7. OR those four.", trick:"Pattern: pairs of 2 ON, 2 OFF, repeating. 0,1 OFF → 2,3 ON → 4,5 OFF → 6,7 ON." },
+      { out:"A0", eq:"A0 = I1 + I3 + I5 + I7",       color:"#34d399", explanation:"A0 is bit-0 = 1 for all ODD indices. OR all odd-indexed inputs.", trick:"All ODD numbers have LSB=1. So A0 = OR of all odd-index inputs. Simple!" },
+      { out:"V",  eq:"V = I0+I1+I2+I3+I4+I5+I6+I7", color:"#60a5fa", explanation:"Valid: any input active → V=1. Big OR of all 8 inputs.", trick:"V is always just the OR of everything. No exceptions." },
+    ],
+    truthHeaders: ["Active Input","A2","A1","A0","V"],
+    truthRows: [
+      ["I0 (0)","0","0","0","1"],["I1 (1)","0","0","1","1"],
+      ["I2 (2)","0","1","0","1"],["I3 (3)","0","1","1","1"],
+      ["I4 (4)","1","0","0","1"],["I5 (5)","1","0","1","1"],
+      ["I6 (6)","1","1","0","1"],["I7 (7)","1","1","1","1"],
+    ],
+  },
+
+  // ── Decimal-to-BCD ──────────────────────────────────────────────────────────
+  BCD: {
+    label: "Decimal-to-BCD Encoder",
+    inputs: ["D0","D1","D2","D3","D4","D5","D6","D7","D8","D9"],
+    outputs: ["A(8)","B(4)","C(2)","D(1)"],
+    description: "Decimal digit key (0–9) → 4-bit BCD code",
+    analogy: "Like a calculator keypad converting your key-press to binary for the CPU",
+    encode: (vals) => {
+      for (let i = 9; i >= 0; i--) {
+        if (vals[i]) return { "A(8)":(i>>3)&1, "B(4)":(i>>2)&1, "C(2)":(i>>1)&1, "D(1)":i&1, active:i };
+      }
+      return { "A(8)":0, "B(4)":0, "C(2)":0, "D(1)":0, active:-1 };
+    },
+    booleanEqs: [
+      { out:"A — 8s place", eq:"A = D8 + D9",                    color:"#f97316", explanation:"A is the 8s bit. Only digits 8 and 9 have this bit set.",           trick:"Only the TWO largest decimal digits need the 8s bit." },
+      { out:"B — 4s place", eq:"B = D4 + D5 + D6 + D7",         color:"#a78bfa", explanation:"B is the 4s bit. Digits 4–7 all have this bit set.",               trick:"Middle four: 4,5,6,7 all have 4s bit ON. Think: the second quarter." },
+      { out:"C — 2s place", eq:"C = D2 + D3 + D6 + D7",         color:"#34d399", explanation:"C is the 2s bit. Digits 2,3,6,7 have it set.",                     trick:"Alternating pairs: 2,3 ON → 4,5 OFF → 6,7 ON. Same pattern as binary bit-1!" },
+      { out:"D — 1s place", eq:"D = D1 + D3 + D5 + D7 + D9",   color:"#60a5fa", explanation:"D is the 1s bit. All ODD digits have this bit set.",               trick:"All ODD numbers end in 1 in binary. OR all 5 odd digit keys." },
+    ],
+    truthHeaders: ["Key Pressed","A(8)","B(4)","C(2)","D(1)"],
+    truthRows: [
+      ["D0 (0)","0","0","0","0"],["D1 (1)","0","0","0","1"],
+      ["D2 (2)","0","0","1","0"],["D3 (3)","0","0","1","1"],
+      ["D4 (4)","0","1","0","0"],["D5 (5)","0","1","0","1"],
+      ["D6 (6)","0","1","1","0"],["D7 (7)","0","1","1","1"],
+      ["D8 (8)","1","0","0","0"],["D9 (9)","1","0","0","1"],
+    ],
+  },
+};
+
+// ─── Tips content ───────────────────────────────────────────────────────────────
+export const ENCODER_TIPS = [
+  { icon:"🧠", title:"The Binary-Index Trick",  text:"For any output bit Aₖ: find all input indices where bit k = 1 in binary, then OR those inputs. This works for ANY encoder!" },
+  { icon:"⚡", title:"Priority Rule",            text:"If multiple inputs are HIGH, the HIGHEST-numbered input wins. The others are ignored. Always check from top to bottom." },
+  { icon:"✅", title:"Valid Flag Purpose",        text:"V=0 means 'nothing is happening'. This prevents the system from acting on a garbage code when all inputs are LOW." },
+  { icon:"🔄", title:"Encoder vs Decoder",       text:"Encoder compresses (many→few), Decoder expands (few→many). They are mathematical inverses of each other." },
+  { icon:"🔧", title:"OR Gates Only!",           text:"A basic (non-priority) encoder uses ONLY OR gates. No NOT, no AND needed. This makes it one of the simplest circuits." },
+  { icon:"📐", title:"Size Formula",             text:"An encoder with 2ⁿ inputs produces n output bits. So 4→2, 8→3, 16→4, 256→8. The pattern: outputs = log₂(inputs)." },
+  { icon:"🏥", title:"Real World: Keyboard",     text:"Your keyboard has an encoder! When you press 'A', it encodes key 65 into binary and sends it to the CPU. That's an encoder in action." },
+  { icon:"🎯", title:"Exam Tip",                 text:"To write encoder equations fast: write all indices in binary, circle bit-k column, OR the corresponding input lines. Takes 30 seconds!" },
+];
+
+// ─── Quiz questions ─────────────────────────────────────────────────────────────
+export const ENCODER_QUIZ = [
+  { q:"4-to-2 encoder: only I2 is HIGH. What is the output code (A1 A0)?", opts:["00","01","10","11"], ans:2, exp:"I2 = index 2 = 10₂. So A1=1, A0=0 → '10'. The output IS the binary version of the active input's index!", hint:"Convert the index number 2 to binary." },
+  { q:"8-to-3 encoder: both I3 and I5 are HIGH simultaneously. Which output code appears?", opts:["011 (I3)","101 (I5)","000 (undefined)","111 (error)"], ans:1, exp:"Priority encoder: highest-numbered input wins. I5 > I3. Output = 5 = 101₂. A2=1, A1=0, A0=1.", hint:"Priority means HIGHEST wins. Which is bigger, 3 or 5?" },
+  { q:"What does V=0 (Valid=LOW) mean in a priority encoder?", opts:["The code is 000","All inputs are LOW — nothing to encode","An error occurred","The highest input is I0"], ans:1, exp:"V=0 means ALL inputs are LOW. The output code is meaningless (garbage). V=1 means a real, valid code is present.", hint:"V stands for 'Valid'. When nothing is active..." },
+  { q:"Decimal-to-BCD encoder: key D7 pressed. What is the BCD output (A B C D)?", opts:["0111","1000","0110","1001"], ans:0, exp:"7 in BCD = 0111₂. A(8s)=0, B(4s)=1, C(2s)=1, D(1s)=1. Just convert 7 to 4-bit binary!", hint:"What is 7 in 4-bit binary? 8+4+2+1..." },
+  { q:"In 8-to-3 encoder, why is A0 = I1 + I3 + I5 + I7?", opts:["These are the highest inputs","These are all ODD-indexed inputs","These have A2=1","These have A1=0"], ans:1, exp:"A0 is the LSB. In binary, all odd numbers have their LSB=1 (e.g., 1=001, 3=011, 5=101, 7=111). So A0 = OR of all odd-indexed inputs.", hint:"Which numbers always have their last binary bit = 1?" },
+  { q:"What kind of gates does a BASIC (non-priority) encoder use?", opts:["AND gates only","NOT and AND gates","OR gates only","XOR gates"], ans:2, exp:"A basic binary encoder uses ONLY OR gates! Each output bit = OR of inputs whose index has that bit=1. No NOT or AND needed.", hint:"Each output is a logical sum of several inputs..." },
+];
+
+export const encoderQuizFeedback = (score, total) => {
+  if (score >= total - 1) return "Excellent encoder mastery! You understand priority logic cold.";
+  if (score >= Math.floor(total / 2)) return "Good — review the binary-index trick for faster equation writing.";
+  return "Keep going — the index-to-binary pattern will click with practice!";
+};
+
+
+--------------------------------------------------------------------------------
+FILE: /encoder/EncoderPage.jsx
+--------------------------------------------------------------------------------
+/**
+ * EncoderPage.jsx — Main page component for the Encoder topic
+ *
+ * Intentionally thin: wires together smaller components and sections.
+ * All data lives in encoderData.js; all sub-components in ./components/.
+ *
+ * Section layout:
+ *   1. Core Concept (what is an encoder + binary-index trick)
+ *   2. Binary-Index Explorer (interactive)
+ *   3. Signal Flow Animation + Type-selectable simulator
+ *   4. Full Interactive Simulator
+ *   5. Priority Conflict Resolution + Comparison Table
+ *   6. Real-World Applications
+ *   7. Quiz
+ */
+import React, { useState, useMemo } from "react";
+
+// ── Shared components ──────────────────────────────────────────────────────────
+import Section   from "../shared/components/Section.jsx";
+import Quiz      from "../shared/components/Quiz.jsx";
+import TipsPanel from "../shared/components/TipsPanel.jsx";
+
+// ── Encoder-specific components ────────────────────────────────────────────────
+import EncoderTypeSelector  from "./components/EncoderTypeSelector.jsx";
+import EncoderSimulator     from "./components/EncoderSimulator.jsx";
+import SignalFlowDiagram    from "./components/SignalFlowDiagram.jsx";
+import BinaryIndexExplorer  from "./components/BinaryIndexExplorer.jsx";
+import PriorityConflictSim  from "./components/PriorityConflictSim.jsx";
+import ComparisonTable      from "./components/ComparisonTable.jsx";
+
+// ── Data ───────────────────────────────────────────────────────────────────────
+import {
+  ENCODER_TYPES,
+  ENCODER_TIPS,
+  ENCODER_QUIZ,
+  encoderQuizFeedback,
+} from "./encoderData.js";
+
+import { COLORS } from "../shared/theme.js";
+
+// ─── Real-world application card ───────────────────────────────────────────────
+const AppCard = ({ icon, color, title, items }) => (
+  <div style={{ background: "rgba(12,18,35,0.7)", border: `1px solid ${color}25`, borderRadius: "12px", padding: "18px" }}>
+    <div style={{ fontSize: "1.8rem", marginBottom: "8px" }}>{icon}</div>
+    <h5 style={{ color, marginBottom: "12px", fontSize: "0.88rem", fontWeight: "700" }}>{title}</h5>
+    <ul style={{ color: COLORS.textMuted, paddingLeft: "18px", margin: 0, lineHeight: "1.7", fontSize: "0.83rem" }}>
+      {items.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  </div>
+);
+
+// ─── Key property card (used in concept section) ───────────────────────────────
+const PropertyCard = ({ icon, label, desc, color }) => (
+  <div style={{ display: "flex", gap: "12px", alignItems: "center", padding: "10px 14px", background: "rgba(12,18,35,0.6)", borderRadius: "9px", border: `1px solid ${color}20` }}>
+    <span style={{ fontSize: "1.2rem" }}>{icon}</span>
+    <div>
+      <div style={{ color, fontWeight: "700", fontSize: "0.82rem" }}>{label}</div>
+      <div style={{ color: COLORS.textMuted, fontSize: "0.78rem" }}>{desc}</div>
+    </div>
+  </div>
+);
+
+// ─── Main page ─────────────────────────────────────────────────────────────────
+const EncoderPage = () => {
+  const [selectedType, setSelectedType] = useState("4to2");
+  // A single flat array of up to 10 input bits shared across sections
+  const [inputVals, setInputVals] = useState(Array(10).fill(0));
+
+  const config     = ENCODER_TYPES[selectedType];
+  const activeVals = inputVals.slice(0, config.inputs.length);
+  const result     = useMemo(() => config.encode(activeVals), [config, activeVals]);
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    setInputVals(Array(10).fill(0));
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: "'Segoe UI', system-ui, sans-serif",
+        background: COLORS.pageBg,
+        minHeight: "100vh",
+        color: COLORS.textPrimary,
+        padding: "28px 20px 80px",
+      }}
+    >
+      <style>{`
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15,23,42,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 3px; }
+        button:hover { filter: brightness(1.1); }
+      `}</style>
+
+      {/* ── Page header ── */}
+      <div style={{ maxWidth: "900px", margin: "0 auto 32px" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "6px 14px", borderRadius: "20px", background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", marginBottom: "16px" }}>
+          <span style={{ color: COLORS.indigoLight, fontSize: "0.78rem", fontWeight: "700", letterSpacing: "0.1em" }}>DIGITAL LOGIC</span>
+        </div>
+        <h1 style={{ fontSize: "2.2rem", fontWeight: "800", background: "linear-gradient(135deg, #a5b4fc, #38bdf8, #34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: "0 0 12px", lineHeight: 1.2 }}>
+          Encoders — Complete Guide
+        </h1>
+        <p style={{ color: "#64748b", fontSize: "1rem", lineHeight: "1.6", margin: 0 }}>
+          Interactive simulator • Signal flow animations • Priority conflict resolver • Binary-index explorer • Quiz with hints
+        </p>
+      </div>
+
+      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+
+        {/* ── Section 1: Core Concept ── */}
+        <Section title="📖 What is an Encoder? — Core Concept" accent={COLORS.indigo}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
+            <div>
+              <p style={{ color: COLORS.textSecondary, lineHeight: "1.7", fontSize: "0.92rem", margin: "0 0 16px" }}>
+                An <strong style={{ color: COLORS.textPrimary }}>encoder</strong> is a combinational circuit that
+                converts an active input signal into a compact binary code. It is the{" "}
+                <em>opposite of a decoder</em>: given up to 2ⁿ input lines, it outputs n bits.
+              </p>
+              <p style={{ color: COLORS.textSecondary, lineHeight: "1.7", fontSize: "0.92rem", margin: 0 }}>
+                Think of it as a{" "}
+                <strong style={{ color: COLORS.warn }}>barcode scanner for signals</strong>{" "}
+                — you present one active line, and it outputs the binary "label" of that line.
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <PropertyCard icon="📉" label="Compression"    desc="2ⁿ inputs → n output bits"          color="#34d399" />
+              <PropertyCard icon="⭐" label="Priority"       desc="Highest active input wins"            color={COLORS.warn} />
+              <PropertyCard icon="✅" label="Valid Flag"      desc="V=1 means output is meaningful"      color={COLORS.blue} />
+              <PropertyCard icon="⚡" label="Combinational"  desc="No memory — instant output"          color={COLORS.purple} />
+            </div>
+          </div>
+
+          {/* Binary-Index Trick explainer */}
+          <div style={{ padding: "18px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "12px", marginBottom: "16px" }}>
+            <h4 style={{ color: COLORS.warn, marginBottom: "12px", fontSize: "0.9rem" }}>
+              🎯 The Binary-Index Trick — Write Any Encoder Equation in 30 Seconds
+            </h4>
+            <ol style={{ color: COLORS.textSecondary, paddingLeft: "18px", margin: 0, lineHeight: "1.8", fontSize: "0.88rem" }}>
+              <li>List all input indices from 0 to 2ⁿ−1</li>
+              <li>For output bit Aₖ, find every index where <strong style={{ color: COLORS.warn }}>bit k = 1</strong> in binary</li>
+              <li>OR those input lines together — that's your equation!</li>
+            </ol>
+            <div style={{ marginTop: "14px", padding: "12px", background: "rgba(0,0,0,0.3)", borderRadius: "8px", fontFamily: "monospace", fontSize: "0.87rem" }}>
+              <span style={{ color: COLORS.warn }}>Example — A0 in 8-to-3 encoder:</span><br />
+              <span style={{ color: COLORS.textSecondary }}>Indices 0–7 in binary: </span>
+              <span style={{ color: COLORS.textDim }}>000 001 010 011 100 101 110 111</span><br />
+              <span style={{ color: COLORS.textSecondary }}>Bit-0 = 1 for: </span>
+              <span style={{ color: COLORS.purple }}>1, 3, 5, 7 (odd indices)</span><br />
+              <span style={{ color: COLORS.high, fontWeight: "700" }}>∴ A0 = I1 + I3 + I5 + I7 ✅</span>
+            </div>
+          </div>
+
+          {/* Encoder vs Decoder note */}
+          <div style={{ padding: "16px", background: "rgba(0,255,136,0.05)", border: "1px solid rgba(0,255,136,0.25)", borderRadius: "12px" }}>
+            <h4 style={{ color: "#86efac", marginBottom: "8px", fontSize: "0.88rem" }}>
+              🔄 Encoder vs Decoder — Two Sides of the Same Coin
+            </h4>
+            <p style={{ color: COLORS.textSecondary, margin: 0, fontSize: "0.87rem", lineHeight: "1.6" }}>
+              <strong style={{ color: COLORS.blue }}>Decoder:</strong> n-bit code → one of 2ⁿ output lines HIGH (expand — like a tree branching out)<br />
+              <strong style={{ color: COLORS.warn }}>Encoder:</strong> one of 2ⁿ inputs HIGH → n-bit code (compress — like a funnel)<br />
+              They are <strong style={{ color: COLORS.high }}>mathematical inverses</strong>. Decoder followed by Encoder = original code back.
+            </p>
+          </div>
+        </Section>
+
+        {/* ── Section 2: Binary-Index Explorer ── */}
+        <Section title="🔬 Interactive Binary-Index Explorer — See the Trick in Action" accent={COLORS.purple}>
+          <p style={{ color: COLORS.textSecondary, fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+            Select how many inputs and which output bit to examine. The table highlights exactly which
+            inputs contribute to that output and shows the resulting equation automatically.
+          </p>
+          <BinaryIndexExplorer />
+        </Section>
+
+        {/* ── Section 3: Signal Flow ── */}
+        <Section title="⚡ Signal Flow — How Data Moves Through the Circuit" accent={COLORS.blue}>
+          <p style={{ color: COLORS.textSecondary, fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+            Use the simulator below, then watch the animated signal flow to understand what happens
+            inside the encoder step by step.
+          </p>
+          <EncoderTypeSelector selectedType={selectedType} types={ENCODER_TYPES} onChange={handleTypeChange} />
+          <div style={{ color: COLORS.textMuted, fontSize: "0.8rem", marginBottom: "12px", padding: "8px 12px", background: "rgba(251,191,36,0.05)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: "8px" }}>
+            💡 <em>Analogy: {config.analogy}</em>
+          </div>
+          <SignalFlowDiagram result={result} />
+        </Section>
+
+        {/* ── Section 4: Full Simulator ── */}
+        <Section title="🎮 Interactive Encoder Simulator" accent="#34d399">
+          <EncoderTypeSelector selectedType={selectedType} types={ENCODER_TYPES} onChange={handleTypeChange} />
+          <EncoderSimulator
+            key={selectedType}
+            config={config}
+            inputVals={inputVals}
+            setInputVals={setInputVals}
+          />
+        </Section>
+
+        {/* ── Section 5: Priority Conflict ── */}
+        <Section title="⚔️ Priority Conflict Resolution — What Happens with Multiple Inputs?" accent="#f97316">
+          <p style={{ color: COLORS.textSecondary, fontSize: "0.88rem", lineHeight: "1.6", marginBottom: "18px" }}>
+            Basic encoders break when two inputs are HIGH simultaneously. Priority encoders solve
+            this by always picking the highest-numbered input. Try it yourself:
+          </p>
+          <PriorityConflictSim />
+          <div style={{ marginTop: "20px" }}>
+            <ComparisonTable />
+          </div>
+        </Section>
+
+        {/* ── Section 6: Real-World Applications ── */}
+        <Section title="🌍 Real-World Applications" accent={COLORS.warn}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
+            <AppCard icon="⌨️" color={COLORS.blue}   title="Computer Keyboard"         items={["74 key presses → 7-bit ASCII encoder","One keypress = one active input","Output sent to CPU via serial","Priority handles stuck-key scenarios"]} />
+            <AppCard icon="🚨" color="#f97316"        title="CPU Interrupt Controller"  items={["Multiple devices request CPU attention","Priority encoder picks highest-priority","8259A PIC chip encodes 8 IRQs → 3 bits","OS interrupt table indexed by output"]} />
+            <AppCard icon="📡" color="#34d399"        title="ADC (Analog-to-Digital)"   items={["Flash ADC uses 2ⁿ comparators","Each comparator = one input line","Encoder converts thermometer code → binary","Fastest ADC architecture"]} />
+            <AppCard icon="🔀" color={COLORS.purple}  title="Multiplexer Control"       items={["Select lines for MUX/DEMUX","Encoder generates select bits","Reduces control wires","Used in memory address logic"]} />
+          </div>
+        </Section>
+
+        {/* ── Section 7: Quiz ── */}
+        <Section title="🧪 Test Yourself — Quiz with Hints & Streaks" accent={COLORS.indigo}>
+          <Quiz questions={ENCODER_QUIZ} feedbackText={encoderQuizFeedback} />
+        </Section>
+
+      </div>
+
+      {/* Floating tips button */}
+      <TipsPanel tips={ENCODER_TIPS} />
+    </div>
+  );
+};
+
+export default EncoderPage;
+
+
+--------------------------------------------------------------------------------
+FILE: /shared/components/Quiz.jsx
+--------------------------------------------------------------------------------
+/**
+ * Quiz.jsx — Reusable quiz widget
+ *
+ * Accepts a `questions` array so the same component works for both
+ * the Decoder page and the Encoder page — just pass different data.
+ *
+ * Each question object:
+ *   { q, opts, ans, exp, hint }
+ *   - q    : question string
+ *   - opts : string[]  (answer choices)
+ *   - ans  : number    (index of correct option)
+ *   - exp  : string    (explanation shown after answering)
+ *   - hint : string    (shown on demand before answering)
+ *
+ * Features: hint toggle, streak tracking, progress bar, score summary.
+ */
+import React, { useState } from "react";
+import { COLORS } from "../theme.js";
+
+// ─── Sub-component: score summary shown after finishing all questions ───────────
+const QuizResults = ({ score, total, bestStreak, onRestart, feedbackText }) => (
+  <div style={{ textAlign: "center", padding: "40px 20px" }}>
+    <div style={{ fontSize: "3.5rem", marginBottom: "12px" }}>
+      {score >= total - 1 ? "🏆" : score >= Math.floor(total / 2) ? "🎯" : "📚"}
+    </div>
+    <h3 style={{ color: COLORS.warn, marginBottom: "8px" }}>Quiz Complete!</h3>
+    <p style={{ color: COLORS.textSecondary, marginBottom: "4px" }}>
+      Score:{" "}
+      <strong style={{ color: COLORS.high, fontSize: "1.2rem" }}>
+        {score}/{total}
+      </strong>
+    </p>
+    <p style={{ color: COLORS.textSecondary, marginBottom: "4px" }}>
+      Best Streak: <strong style={{ color: "#f97316" }}>🔥 {bestStreak}</strong>
+    </p>
+    <p style={{ color: COLORS.textSecondary, marginBottom: "24px", fontSize: "0.9rem" }}>
+      {feedbackText}
+    </p>
+    <button
+      onClick={onRestart}
+      style={{
+        padding: "12px 28px",
+        borderRadius: "10px",
+        background: "rgba(99,102,241,0.25)",
+        border: "1.5px solid rgba(99,102,241,0.6)",
+        color: COLORS.indigoLight,
+        cursor: "pointer",
+        fontWeight: "600",
+      }}
+    >
+      ↺ Try Again
+    </button>
+  </div>
+);
+
+// ─── Sub-component: progress bar across all questions ─────────────────────────
+const ProgressBar = ({ total, current }) => (
+  <div style={{ display: "flex", gap: "4px" }}>
+    {Array.from({ length: total }, (_, i) => (
+      <div
+        key={i}
+        style={{
+          width: "28px",
+          height: "5px",
+          borderRadius: "3px",
+          background:
+            i < current
+              ? COLORS.high
+              : i === current
+              ? COLORS.indigo
+              : "rgba(99,102,241,0.2)",
+        }}
+      />
+    ))}
+  </div>
+);
+
+// ─── Main Quiz component ───────────────────────────────────────────────────────
+const Quiz = ({ questions, feedbackText }) => {
+  const [qi, setQi] = useState(0);          // current question index
+  const [sel, setSel] = useState(null);     // user's selected option index
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+
+  const q = questions[qi];
+
+  // Called when the user clicks an answer option
+  const choose = (i) => {
+    if (sel !== null) return; // already answered
+    setSel(i);
+    if (i === q.ans) {
+      setScore((s) => s + 1);
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      if (newStreak > bestStreak) setBestStreak(newStreak);
+    } else {
+      setStreak(0);
+    }
+  };
+
+  const next = () => {
+    if (qi + 1 >= questions.length) {
+      setDone(true);
+      return;
+    }
+    setQi(qi + 1);
+    setSel(null);
+    setShowHint(false);
+  };
+
+  const restart = () => {
+    setQi(0);
+    setSel(null);
+    setScore(0);
+    setDone(false);
+    setStreak(0);
+    setShowHint(false);
+  };
+
+  // ── Finished screen ──
+  if (done)
+    return (
+      <QuizResults
+        score={score}
+        total={questions.length}
+        bestStreak={bestStreak}
+        onRestart={restart}
+        feedbackText={feedbackText(score, questions.length)}
+      />
+    );
+
+  // ── Active question screen ──
+  return (
+    <div>
+      {/* Progress + streak row */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "16px",
+          alignItems: "center",
+        }}
+      >
+        <ProgressBar total={questions.length} current={qi} />
+        <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+          {streak >= 2 && (
+            <span style={{ color: "#f97316", fontSize: "0.82rem" }}>
+              🔥 {streak} streak!
+            </span>
+          )}
+          <span style={{ color: COLORS.high, fontSize: "0.85rem" }}>
+            Score: {score}
+          </span>
+        </div>
+      </div>
+
+      {/* Question text */}
+      <p
+        style={{
+          color: COLORS.textPrimary,
+          fontWeight: "600",
+          marginBottom: "18px",
+          lineHeight: "1.65",
+        }}
+      >
+        {q.q}
+      </p>
+
+      {/* Hint button (only before answering) */}
+      {!showHint && sel === null && (
+        <button
+          onClick={() => setShowHint(true)}
+          style={{
+            marginBottom: "12px",
+            padding: "6px 14px",
+            borderRadius: "7px",
+            background: "rgba(251,191,36,0.1)",
+            border: "1px solid rgba(251,191,36,0.3)",
+            color: COLORS.warn,
+            cursor: "pointer",
+            fontSize: "0.8rem",
+          }}
+        >
+          💡 Show Hint
+        </button>
+      )}
+
+      {/* Hint box */}
+      {showHint && (
+        <div
+          style={{
+            marginBottom: "14px",
+            padding: "10px 14px",
+            background: "rgba(251,191,36,0.07)",
+            border: "1px solid rgba(251,191,36,0.3)",
+            borderRadius: "8px",
+            color: COLORS.warn,
+            fontSize: "0.83rem",
+          }}
+        >
+          🔍 {q.hint}
+        </div>
+      )}
+
+      {/* Answer options */}
+      <div
+        style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "16px" }}
+      >
+        {q.opts.map((opt, i) => {
+          // Compute styles based on whether this is the correct / selected option
+          let border = "rgba(148,163,184,0.2)";
+          let bg = "rgba(15,23,42,0.6)";
+          let color = COLORS.textSecondary;
+
+          if (sel !== null) {
+            if (i === q.ans) {
+              bg = "rgba(0,255,136,0.1)";
+              border = COLORS.high;
+              color = COLORS.high;
+            } else if (i === sel) {
+              bg = "rgba(239,68,68,0.1)";
+              border = COLORS.low;
+              color = COLORS.low;
+            }
+          }
+
+          return (
+            <button
+              key={i}
+              onClick={() => choose(i)}
+              style={{
+                padding: "11px 16px",
+                borderRadius: "9px",
+                border: `1.5px solid ${border}`,
+                background: bg,
+                color,
+                fontFamily: COLORS.mono,
+                cursor: sel !== null ? "default" : "pointer",
+                textAlign: "left",
+                transition: "all 0.2s",
+                fontSize: "0.9rem",
+              }}
+            >
+              <span style={{ marginRight: "10px", opacity: 0.7 }}>
+                {String.fromCharCode(65 + i)}.
+              </span>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Explanation (shown after answering) */}
+      {sel !== null && (
+        <div
+          style={{
+            padding: "14px",
+            background: "rgba(99,102,241,0.08)",
+            border: "1px solid rgba(99,102,241,0.3)",
+            borderRadius: "10px",
+            marginBottom: "16px",
+          }}
+        >
+          <p
+            style={{
+              color: "#c4b5fd",
+              margin: 0,
+              fontSize: "0.88rem",
+              lineHeight: "1.65",
+            }}
+          >
+            {sel === q.ans ? "✅ " : "❌ "}
+            {q.exp}
+          </p>
+        </div>
+      )}
+
+      {/* Next / See Results button */}
+      {sel !== null && (
+        <button
+          onClick={next}
+          style={{
+            padding: "11px 24px",
+            borderRadius: "9px",
+            background: "rgba(99,102,241,0.25)",
+            border: "1.5px solid rgba(99,102,241,0.6)",
+            color: COLORS.indigoLight,
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
+        >
+          {qi + 1 < questions.length ? "Next Question →" : "See Results"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default Quiz;
+
+
+--------------------------------------------------------------------------------
+FILE: /shared/components/Section.jsx
+--------------------------------------------------------------------------------
+/**
+ * Section.jsx — Shared section wrapper
+ *
+ * A titled card used on both the Decoder and Encoder pages to group
+ * related content.  Accepts an optional `accent` color that tints the
+ * header and border so each section feels visually distinct.
+ *
+ * Usage:
+ *   <Section title="🔢 Truth Table" accent="#fbbf24">
+ *     <TruthTable ... />
+ *   </Section>
+ */
+import React from "react";
+import { COLORS } from "../theme.js";
+
+const Section = ({ title, children, accent = COLORS.indigo }) => (
+  <div
+    style={{
+      marginBottom: "32px",
+      background: COLORS.cardBg,
+      border: `1px solid ${accent}30`,
+      borderRadius: "16px",
+      overflow: "hidden",
+    }}
+  >
+    {/* ── Section header bar ── */}
+    <div
+      style={{
+        padding: "16px 22px",
+        borderBottom: `1px solid ${accent}25`,
+        background: `${accent}0a`,
+      }}
+    >
+      <h3
+        style={{
+          color: COLORS.textPrimary,
+          margin: 0,
+          fontSize: "1.05rem",
+          fontWeight: "700",
+        }}
+      >
+        {title}
+      </h3>
+    </div>
+
+    {/* ── Section body ── */}
+    <div style={{ padding: "22px" }}>{children}</div>
+  </div>
+);
+
+export default Section;
+
+
+--------------------------------------------------------------------------------
+FILE: /shared/components/TipsPanel.jsx
+--------------------------------------------------------------------------------
+/**
+ * TipsPanel.jsx — Floating tips & tricks panel
+ *
+ * A fixed-position button (bottom-right) that opens a pop-up card
+ * cycling through an array of tips.  Shared by both pages; just
+ * pass a different `tips` array.
+ *
+ * Each tip object: { icon, title, text }
+ */
+import React, { useState } from "react";
+import { COLORS } from "../theme.js";
+
+const TipsPanel = ({ tips }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [tipIdx, setTipIdx] = useState(0);
+
+  const tip = tips[tipIdx];
+
+  const prev = () => setTipIdx((tipIdx - 1 + tips.length) % tips.length);
+  const next = () => setTipIdx((tipIdx + 1) % tips.length);
+
+  return (
+    <>
+      {/* ── Toggle button ── */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          width: "52px",
+          height: "52px",
+          borderRadius: "50%",
+          background: isOpen ? "rgba(251,191,36,0.3)" : "rgba(99,102,241,0.85)",
+          border: `2px solid ${isOpen ? COLORS.warn : COLORS.indigo}`,
+          color: isOpen ? COLORS.warn : COLORS.textPrimary,
+          fontSize: "1.4rem",
+          cursor: "pointer",
+          zIndex: 999,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          transition: "all 0.2s",
+        }}
+      >
+        {isOpen ? "✕" : "💡"}
+      </button>
+
+      {/* ── Pop-up panel ── */}
+      {isOpen && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "88px",
+            right: "24px",
+            width: "320px",
+            background: "rgba(8,14,30,0.97)",
+            border: "1px solid rgba(99,102,241,0.4)",
+            borderRadius: "16px",
+            padding: "20px",
+            zIndex: 998,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              color: COLORS.indigoLight,
+              fontSize: "0.75rem",
+              fontWeight: "700",
+              marginBottom: "14px",
+              letterSpacing: "0.08em",
+            }}
+          >
+            💡 TIPS & TRICKS
+          </div>
+
+          {/* Tip content */}
+          <div style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{tip.icon}</div>
+          <div
+            style={{
+              color: COLORS.warn,
+              fontWeight: "700",
+              marginBottom: "8px",
+              fontSize: "0.9rem",
+            }}
+          >
+            {tip.title}
+          </div>
+          <p
+            style={{
+              color: COLORS.textSecondary,
+              fontSize: "0.83rem",
+              lineHeight: "1.65",
+              margin: "0 0 16px",
+            }}
+          >
+            {tip.text}
+          </p>
+
+          {/* Navigation row */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ color: COLORS.textDim, fontSize: "0.75rem" }}>
+              {tipIdx + 1} / {tips.length}
+            </span>
+            <div style={{ display: "flex", gap: "8px" }}>
+              {[{ label: "←", fn: prev }, { label: "→", fn: next }].map(({ label, fn }) => (
+                <button
+                  key={label}
+                  onClick={fn}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "6px",
+                    background: "rgba(99,102,241,0.15)",
+                    border: "1px solid rgba(99,102,241,0.3)",
+                    color: COLORS.indigoLight,
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default TipsPanel;
+
+
+--------------------------------------------------------------------------------
+FILE: /shared/components/TruthTable.jsx
+--------------------------------------------------------------------------------
+/**
+ * TruthTable.jsx — Shared truth-table renderer
+ *
+ * Renders a bordered table from plain arrays.  An optional
+ * `activeRow` index highlights the currently decoded/encoded row.
+ *
+ * Props:
+ *   headers    : string[]      — column headers
+ *   rows       : string[][]   — data rows
+ *   activeRow  : number | null — index of highlighted row (-1 = none)
+ *   inputCount : number        — how many leading columns are "inputs"
+ *                               (colored blue vs amber for outputs)
+ */
+import React from "react";
+import { COLORS } from "../theme.js";
+
+const TruthTable = ({ headers, rows, activeRow = -1, inputCount = 1 }) => (
+  <div style={{ overflowX: "auto" }}>
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        fontFamily: "monospace",
+        fontSize: "0.82rem",
+      }}
+    >
+      {/* ── Header row ── */}
+      <thead>
+        <tr>
+          {headers.map((h, i) => (
+            <th
+              key={i}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(15,23,42,0.9)",
+                color: i < inputCount ? COLORS.blue : COLORS.warn,
+                textAlign: "center",
+                borderBottom: "1px solid rgba(99,102,241,0.3)",
+                fontSize: "0.8rem",
+              }}
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+
+      {/* ── Data rows ── */}
+      <tbody>
+        {rows.map((row, ri) => {
+          const isActive = ri === activeRow;
+          return (
+            <tr
+              key={ri}
+              style={{
+                background: isActive
+                  ? "rgba(0,255,136,0.08)"
+                  : "transparent",
+                transition: "background 0.2s",
+              }}
+            >
+              {row.map((cell, ci) => (
+                <td
+                  key={ci}
+                  style={{
+                    padding: "8px 14px",
+                    textAlign: "center",
+                    borderBottom: "1px solid rgba(30,40,60,0.4)",
+                    color:
+                      isActive
+                        ? ci < inputCount
+                          ? COLORS.blue
+                          : COLORS.high
+                        : ci < inputCount
+                        ? COLORS.textMuted
+                        : COLORS.textDim,
+                    fontWeight: isActive ? "700" : "400",
+                  }}
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+);
+
+export default TruthTable;
+
+
+--------------------------------------------------------------------------------
+FILE: /shared/theme.js
+--------------------------------------------------------------------------------
+/**
+ * theme.js — Shared design tokens
+ *
+ * A single source of truth for colors, radii, and spacing used
+ * across both the Decoder and Encoder pages.  Import what you need
+ * rather than scattering magic strings throughout the codebase.
+ */
+
+// ─── Color palette ─────────────────────────────────────────────────────────────
+export const COLORS = {
+  // Backgrounds
+  pageBg: "#080e1e",
+  cardBg: "rgba(10,16,32,0.85)",
+  inputBg: "rgba(12,18,35,0.7)",
+  darkBg: "rgba(8,14,30,0.9)",
+  deepBg: "rgba(15,23,42,0.9)",
+
+  // Brand / accent
+  indigo: "#6366f1",
+  indigoLight: "#a5b4fc",
+  indigoMuted: "rgba(99,102,241,0.2)",
+
+  // Signal states
+  high: "#00ff88",   // Logic HIGH — bright green
+  low: "#ef4444",    // Logic LOW / error — red
+  warn: "#fbbf24",   // Enable / warning — amber
+  blue: "#60a5fa",   // Address inputs
+  purple: "#a78bfa", // Secondary accent
+
+  // Text
+  textPrimary: "#e2e8f0",
+  textSecondary: "#9ca3af",
+  textMuted: "#6b7280",
+  textDim: "#4b5563",
+};
+
+// ─── Typography ────────────────────────────────────────────────────────────────
+export const FONT = {
+  mono: "monospace",
+  base: "inherit",
+};
+
+// ─── Shared inline-style helpers ───────────────────────────────────────────────
+/**
+ * Returns inline styles for a "pill" bit indicator.
+ * @param {boolean} isActive - Whether this bit is HIGH (1)
+ * @param {string}  activeColor - Color when HIGH
+ */
+export const bitIndicatorStyle = (isActive, activeColor = COLORS.high) => ({
+  width: "28px",
+  height: "16px",
+  borderRadius: "4px",
+  background: isActive ? activeColor : "rgba(99,102,241,0.15)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontFamily: FONT.mono,
+  fontSize: "0.78rem",
+  color: isActive ? "#0a0f1a" : COLORS.textDim,
+  fontWeight: "800",
+  transition: "all 0.2s",
+});
+
+/**
+ * Returns inline styles for a generic card / panel box.
+ * @param {string} accentColor - Border accent color
+ */
+export const cardStyle = (accentColor = COLORS.indigo) => ({
+  background: COLORS.cardBg,
+  border: `1px solid ${accentColor}30`,
+  borderRadius: "16px",
+  overflow: "hidden",
+});
+
+
+--------------------------------------------------------------------------------
+FILE: /README.md
+--------------------------------------------------------------------------------
+# Modular Refactor — Decoder & Encoder Pages
+
+## What Changed
+
+Both original files were single monolithic JSX files (~2500 lines each) with
+all data, logic, and UI mixed together.  They have been split into small,
+focused modules following the **single-responsibility principle**.
+
+---
+
+## Directory Structure
+
+```
+shared/
+  theme.js                        ← Design tokens (colors, helpers)
+  components/
+    Section.jsx                   ← Titled card wrapper used on both pages
+    Quiz.jsx                      ← Reusable quiz widget (pass any questions array)
+    TipsPanel.jsx                 ← Floating tips pop-up (pass any tips array)
+    TruthTable.jsx                ← Truth-table renderer (headers + rows arrays)
+
+decoder/
+  decoderData.js                  ← ALL static data: types, tips, quiz questions
+  DecoderPage.jsx                 ← Main page — thin orchestrator, no logic
+  components/
+    TypeSelector.jsx              ← Decoder type picker buttons
+    DecoderSimulator.jsx          ← Input toggles, output LEDs, equations
+    SevenSeg.jsx                  ← SVG 7-segment display
+    BCDDigitPad.jsx               ← Clickable digit pad + BCD demo
+    MintermEquationBuilder.jsx    ← Interactive minterm → equation builder
+    FunctionGeneratorDemo.jsx     ← Decoder-as-function-generator demo
+    CascadingExplainer.jsx        ← 4-to-16 cascading decoder demo
+
+encoder/
+  encoderData.js                  ← ALL static data: types, tips, quiz questions
+  EncoderPage.jsx                 ← Main page — thin orchestrator, no logic
+  components/
+    EncoderTypeSelector.jsx       ← Encoder type picker buttons
+    EncoderSimulator.jsx          ← Input toggles, output LEDs, equations
+    SignalFlowDiagram.jsx         ← Animated signal-flow pipeline
+    BinaryIndexExplorer.jsx       ← Binary-index trick interactive table
+    PriorityConflictSim.jsx       ← Multi-input priority conflict demo
+    ComparisonTable.jsx           ← Basic vs Priority encoder comparison
+```
+
+---
+
+## Key Design Decisions
+
+### 1. Data is completely separated from UI
+`decoderData.js` and `encoderData.js` hold every piece of static content:
+decoder configurations, truth tables, Boolean equations, tips, and quiz
+questions.  Adding a new decoder type (e.g. "4to16") requires editing only
+the data file — no component changes needed.
+
+### 2. Shared components are truly generic
+`Quiz`, `TipsPanel`, `TruthTable`, and `Section` accept their content as
+**props**, so the same component runs identically on both pages.
+
+Before (duplicated in both files):
+```jsx
+// ~150 lines of Quiz code in DecoderPage.jsx
+// ~150 lines of Quiz code in EncoderPage.jsx (identical structure!)
+```
+
+After:
+```jsx
+// shared/components/Quiz.jsx — written once
+<Quiz questions={DECODER_QUIZ} feedbackText={decoderQuizFeedback} />
+<Quiz questions={ENCODER_QUIZ} feedbackText={encoderQuizFeedback} />
+```
+
+### 3. Main page files are thin orchestrators
+`DecoderPage.jsx` and `EncoderPage.jsx` only:
+- Import sub-components
+- Own the top-level state (`selectedType`, `inputVals`)
+- Arrange sections using `<Section>`
+
+They contain no rendering logic themselves.
+
+### 4. Design tokens in one place
+`shared/theme.js` exports `COLORS`, font constants, and reusable style
+helpers (`bitIndicatorStyle`, `cardStyle`).  Changing the brand color
+means editing one file, not hunting through 5000 lines.
+
+---
+
+## How to Add a New Decoder Type
+
+1. Open `decoder/decoderData.js`
+2. Add a new key to `DECODER_TYPES` following the existing pattern
+3. Provide: `label`, `codeInputs`, `outputs`, `decode()`, `booleanEqs`, `truthHeaders`, `truthRows`, `minterms`
+4. Done — `TypeSelector` and `DecoderSimulator` automatically pick it up
+
+## How to Add a New Quiz Question
+
+1. Open `decoder/decoderData.js` (or `encoder/encoderData.js`)
+2. Push a new object onto `DECODER_QUIZ` (or `ENCODER_QUIZ`):
+   ```js
+   { q: "...", opts: ["A","B","C","D"], ans: 2, exp: "...", hint: "..." }
+   ```
+3. Done — `Quiz` renders all questions dynamically
+
+
+================================================================================
+END OF FOLDER: EncoderAndDecoder
+================================================================================

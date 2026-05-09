@@ -9,16 +9,16 @@
 // ─── Color palette ─────────────────────────────────────────────────────────────
 export const COLORS = {
   // Backgrounds
-  pageBg: "#080e1e",
-  cardBg: "rgba(10,16,32,0.85)",
-  inputBg: "rgba(12,18,35,0.7)",
-  darkBg: "rgba(8,14,30,0.9)",
-  deepBg: "rgba(15,23,42,0.9)",
+  pageBg: "var(--app-bg)",
+  cardBg: "var(--app-surface)",
+  inputBg: "var(--app-interactive-bg)",
+  darkBg: "var(--app-surface-strong)",
+  deepBg: "var(--app-surface-strong)",
 
   // Brand / accent
-  indigo: "#6366f1",
-  indigoLight: "#a5b4fc",
-  indigoMuted: "rgba(99,102,241,0.2)",
+  indigo: "var(--app-accent)",
+  indigoLight: "color-mix(in srgb, var(--app-accent) 80%, white)",
+  indigoMuted: "var(--app-accent-soft)",
 
   // Signal states
   high: "#00ff88",   // Logic HIGH — bright green
@@ -28,15 +28,15 @@ export const COLORS = {
   purple: "#a78bfa", // Secondary accent
 
   // Text
-  textPrimary: "#e2e8f0",
-  textSecondary: "#9ca3af",
-  textMuted: "#6b7280",
-  textDim: "#4b5563",
+  textPrimary: "var(--app-text)",
+  textSecondary: "var(--app-muted-strong)",
+  textMuted: "var(--app-muted)",
+  textDim: "var(--app-muted)",
 
   // Glassmorphism & Misc
-  glassBg: "rgba(10, 16, 32, 0.4)",
-  glassBorder: "rgba(255, 255, 255, 0.1)",
-  glassShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+  glassBg: "var(--app-surface)",
+  glassBorder: "var(--app-border)",
+  glassShadow: "var(--app-shadow)",
   glowShadow: (color) => `0 0 15px ${color}60, 0 0 5px ${color}40`,
 };
 

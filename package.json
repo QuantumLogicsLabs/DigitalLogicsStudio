@@ -17,6 +17,7 @@
     "dld-books": "^1.0.1",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.563.0",
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",

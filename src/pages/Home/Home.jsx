@@ -4,9 +4,9 @@ import HeroSection from "./HeroSection";
 import Footer from "./Footer";
 import ArticleSection from "./ArticleSection";
 import homeData from "./HomeData";
-import { useTheme } from "../../context/ThemeContext";
-import ProblemsSection from "../Problems/ProblemsSection";
 import "./Home.css";
+
+import { useTheme } from "../../context/ThemeContext";
 
 const topicGroupOrder = {
   algebra: 1,
@@ -23,14 +23,17 @@ const Home = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const filteredData = homeData.filter(
-    (item) =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.links.some((link) =>
-        link.text.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
-  );
+  const normalize = (str) => str.toLowerCase().replace(/[-_\s]+/g, ' ').trim();
+  const normalizedSearchTerm = normalize(searchTerm);
+
+  const filteredData = homeData.filter(item => {
+    const matchTitle = normalize(item.title).includes(normalizedSearchTerm);
+    const matchDesc = normalize(item.description).includes(normalizedSearchTerm);
+    const matchLinks = item.links?.some(link => normalize(link.text).includes(normalizedSearchTerm));
+    const matchKeywords = item.keywords?.some(kw => normalize(kw).includes(normalizedSearchTerm));
+    
+    return matchTitle || matchDesc || matchLinks || matchKeywords;
+  });
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -47,7 +50,11 @@ const Home = () => {
       const groupDiff =
         (topicGroupOrder[a.topicGroup] || 99) -
         (topicGroupOrder[b.topicGroup] || 99);
-      if (groupDiff !== 0) return groupDiff;
+
+      if (groupDiff !== 0) {
+        return groupDiff;
+      }
+
       return (a.topicOrder || 0) - (b.topicOrder || 0);
     });
 
@@ -57,6 +64,10 @@ const Home = () => {
 
   return (
     <div className="home-page">
+      {/* Premium AFHDL-style background blobs */}
+      <div className="app-bg-blob app-bg-1" />
+      <div className="app-bg-blob app-bg-2" />
+      
       <div className="grid-background" />
       <Navbar
         toggleTheme={toggleTheme}
@@ -94,38 +105,28 @@ const Home = () => {
                 sectionClassName="home-resource-section"
                 gridClassName="home-resource-grid"
               />
-
-              {/* ===== PROBLEMS SECTION ===== */}
-              <ProblemsSection />
             </>
           ) : (
-            <div
-              className="no-results"
-              style={{
-                textAlign: "center",
-                padding: "4rem",
-                color: "var(--secondary-text)",
-                background: "var(--card-bg)",
-                borderRadius: "1rem",
-                border: "1px dashed var(--border-color)",
-              }}
-            >
-              <p style={{ fontSize: "1.2rem" }}>
-                🔍 No tools found matching "<strong>{searchTerm}</strong>"
-              </p>
-              <button
+            <div className="no-results" style={{
+              textAlign: 'center',
+              padding: '4rem',
+              color: 'var(--secondary-text)',
+              background: 'var(--card-bg)',
+              borderRadius: '1rem',
+              border: '1px dashed var(--border-color)'
+            }}>
+              <p style={{ fontSize: '1.2rem' }}>🔍 No tools found matching "<strong>{searchTerm}</strong>"</p>
+              <button 
                 onClick={() => setSearchTerm("")}
                 style={{
-                  marginTop: "1rem",
-                  background: "none",
-                  border: "none",
-                  color: "var(--accent-color)",
-                  cursor: "pointer",
-                  textDecoration: "underline",
+                  marginTop: '1rem',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--accent-color)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
                 }}
-              >
-                Clear search
-              </button>
+              >Clear search</button>
             </div>
           )}
         </div>

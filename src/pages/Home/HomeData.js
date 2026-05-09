@@ -3,6 +3,7 @@ const homeData = [
     title: "🔧 Circuit Forge",
     description:
       "Drag-and-drop logic gates, connect wires, and instantly see truth tables and outputs.",
+    keywords: ["circuit", "forge", "gate", "logic", "truth table", "simulate", "build", "wire", "boolean", "drag and drop"],
     section: "featured",
     sortOrder: 1,
     links: [
@@ -18,6 +19,7 @@ const homeData = [
     title: "🗺️ K-Map Generator",
     description:
       "Generate and simplify boolean expressions visually using interactive Karnaugh maps with SOP/POS optimization.",
+    keywords: ["kmap", "k map", "k-map", "karnaugh map", "simplify", "sop", "pos", "boolean expression", "generator"],
     section: "featured",
     sortOrder: 2,
     links: [
@@ -33,6 +35,7 @@ const homeData = [
     title: "📐 Boolean Algebra",
     description:
       "Master the foundations of digital logic with interactive tools for identities, laws, and expressions.",
+    keywords: ["boolean algebra", "identities", "laws", "duality", "consensus", "complement", "sop", "pos", "minterms", "maxterms"],
     section: "topics",
     topicGroup: "algebra",
     topicOrder: 1,
@@ -41,7 +44,6 @@ const homeData = [
       { text: "Identities", to: "/boolean-identities" },
       { text: "Laws", to: "/boolean-laws" },
       { text: "Duality", to: "/duality-principle" },
-      { text: "Significant Digits", to: "/significant-digits" },
       { text: "Consensus", to: "/consensus-theorem" },
       { text: "Complement", to: "/complement" },
       { text: "SOP & POS", to: "/standard-forms" },
@@ -54,6 +56,7 @@ const homeData = [
     title: "⚡ Advanced Logic",
     description:
       "Explore circuit optimization, universal gates, and special functions for deeper understanding.",
+    keywords: ["advanced logic", "circuit cost", "universal gates", "nand", "nor", "odd function", "gate explanation"],
     section: "topics",
     topicGroup: "advanced",
     topicOrder: 1,
@@ -67,21 +70,21 @@ const homeData = [
   {
     title: "🔀 Combinational Circuits",
     description:
-      "Explore encoders, decoders, multiplexers, and demultiplexers — the core combinational building blocks used in memory and data-routing systems.",
+      "Explore encoders and decoders — the core combinational building blocks used in memory systems.",
+    keywords: ["combinational", "circuits", "encoder", "decoder", "multiplexer", "demultiplexer"],
     section: "topics",
     topicGroup: "circuits",
     topicOrder: 1,
     links: [
       { text: "Encoder", to: "/encoder" },
       { text: "Decoder", to: "/decoder" },
-      { text: "Multiplexer", to: "/mux" },
-      { text: "Demultiplexer", to: "/demux" },
     ],
   },
   {
     title: "🔁 Sequential Circuits",
     description:
       "Dive into memory elements, state machines, and time-dependent circuits.",
+    keywords: ["sequential", "circuits", "latches", "flip flop", "flip-flops", "state machine", "state diagram", "excitation", "memory"],
     section: "topics",
     topicGroup: "circuits",
     topicOrder: 2,
@@ -100,10 +103,12 @@ const homeData = [
       },
     ],
   },
+  // ── NEW ──────────────────────────────────────────────────────────
   {
     title: "⇌ Registers & Register Transfers",
     description:
       "Explore how digital systems store and move data — from basic flip-flop registers to shift registers, counters, and synchronous binary counting circuits.",
+    keywords: ["registers", "counters", "shift register", "serial", "parallel", "ripple counter", "synchronous", "asynchronous"],
     section: "topics",
     topicGroup: "circuits",
     topicOrder: 3,
@@ -119,33 +124,12 @@ const homeData = [
       { text: "Sync Binary Counters", to: "/registers/sync-binary-counters" },
     ],
   },
-  {
-    title: "🧠 Memory Systems",
-    description:
-      "Explore how digital systems store data permanently and temporarily — from ROM and PLA devices to RAM construction using real IC chips.",
-    section: "topics",
-    topicGroup: "circuits",
-    topicOrder: 4,
-    links: [
-      { text: "Memory Basics", to: "/memory/basics" },
-      { text: "Read-Only Memories", to: "/memory/read-only-memories" },
-      {
-        text: "Programmable Logic Array",
-        to: "/memory/programmable-logic-array",
-      },
-      { text: "Random Access Memory", to: "/memory/random-access-memory" },
-      { text: "Static & Dynamic RAM", to: "/memory/static-dynamic-ram" },
-      { text: "Array of RAM ICs", to: "/memory/array-of-ram-ics" },
-      {
-        text: "Memory Construction (RAM)",
-        to: "/memory/memory-construction-ram",
-      },
-    ],
-  },
+  // ────────────────────────────────────────────────────────────────
   {
     title: "🔢 Number Systems",
     description:
       "Convert between bases and run detailed step-by-step operations.",
+    keywords: ["number systems", "calculator", "base converter", "binary", "hexadecimal", "octal", "decimal", "bcd", "ascii"],
     section: "topics",
     topicGroup: "algebra",
     topicOrder: 2,
@@ -155,13 +139,12 @@ const homeData = [
       { text: "Binary Visualizer", to: "/binaryrepresentation" },
       { text: "BCD Notation", to: "/bcd-notation" },
       { text: "ASCII Codes", to: "/ascii-notation" },
-      { text: "Bit Converter", to: "/bitconvertor" },
-      { text: "Bit Extension", to: "/bit-extension" },
     ],
   },
   {
     title: "➕ ARITHMETIC FUNCTIONS AND HDLs",
     description: "Dedicated interactive modules for arithmetic logic design.",
+    keywords: ["arithmetic", "hdl", "adder", "subtractor", "multiplier", "code conversion", "magnitude comparator", "parity generator", "complements", "signed"],
     section: "topics",
     topicGroup: "algebra",
     topicOrder: 3,

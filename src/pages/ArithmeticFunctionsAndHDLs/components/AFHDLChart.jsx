@@ -1,11 +1,11 @@
 import React from "react";
 
 const AFHDLChart = ({ data }) => (
-  <div className="afhdl-chart">
-    <h4 className="afhdl-info-title">Binary metrics</h4>
+  <div className="arithmetic-card" style={{ padding: "0.8rem" }}>
+    <h4>Binary metrics</h4>
     <ul>
       {data.map((item, idx) => (
-        <li key={idx}>
+        <li key={idx} style={{ marginBottom: "0.3rem" }}>
           <strong>{item.label}:</strong> {item.value}
         </li>
       ))}

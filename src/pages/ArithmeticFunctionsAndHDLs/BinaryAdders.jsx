@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import ToolLayout from "../../components/ToolLayout";
 import AFHDLDivider from "./components/AFHDLDivider";
 import AFHDLCopyButton from "./components/AFHDLCopyButton";
-import AFHDLLayout from "./components/AFHDLLayout";
-import { afhdlTheme as S } from "./utils/afhdlTheme";
-import CircuitModal from "../../components/CircuitModal";
 import {
   cleanBin,
   halfAdder,
@@ -177,8 +175,6 @@ const BinaryAdders = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [teacherNoteIdx, setTeacherNoteIdx] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const [showCircuitModal, setShowCircuitModal] = useState(false);
-  const [circuitModalTarget, setCircuitModalTarget] = useState("half"); // "half" | "full"
 
   const cleanA = cleanBin(a) || "0";
   const cleanB = cleanBin(b) || "0";
@@ -268,20 +264,9 @@ const BinaryAdders = () => {
   const currentNote = currentNotes[teacherNoteIdx % currentNotes.length];
 
   return (
-    <AFHDLLayout
+    <ToolLayout
       title="Binary Adders"
       subtitle="Learn step by step — Half · Full · Ripple Carry · CLA"
-      intro="This lesson starts with the smallest possible addition problem and gradually scales it into the multi-bit adder structures used inside real digital systems."
-      highlights={[
-        {
-          title: "Beginner path",
-          text: "Understand one-bit addition first, then reuse the same idea with carry to build larger adders.",
-        },
-        {
-          title: "Why adders matter",
-          text: "Adders sit inside ALUs, counters, address generators, and many control/data-path circuits.",
-        },
-      ]}
     >
       {/* ══ WELCOME BANNER ══════════════════════════════════ */}
       <div style={S.welcomeBanner}>
@@ -322,7 +307,14 @@ const BinaryAdders = () => {
         </div>
       </div>
 
-      <div className="afhdl-grid-3">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: "0.6rem",
+          margin: "0.75rem 0",
+        }}
+      >
         {[
           { dec: "0", bin: "0000", label: "Zero", color: "#475569" },
           { dec: "5", bin: "0101", label: "Five", color: "#60a5fa" },
@@ -376,7 +368,14 @@ const BinaryAdders = () => {
         advanced. Click any card to explore it in detail below!
       </p>
 
-      <div className="afhdl-grid-2">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0.6rem",
+          margin: "0.75rem 0",
+        }}
+      >
         {[
           {
             color: "#3b82f6",
@@ -841,7 +840,14 @@ const BinaryAdders = () => {
               <strong style={{ color: "#fbbf24" }}>{h.carry}</strong>
             </div>
 
-            <div className="afhdl-grid-2-sm">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "0.5rem",
+                margin: "0.6rem 0",
+              }}
+            >
               {[
                 {
                   label: "Input A (last bit)",
@@ -911,20 +917,6 @@ const BinaryAdders = () => {
               (like 1010 + 0101), you need Full Adders that can also receive a
               carry from the previous column. Half Adders are only used for the
               very first (rightmost) bit!
-            </div>
-
-            {/* Visualize Half Adder Circuit */}
-            <div style={{ marginTop: "1rem" }}>
-              <button
-                className="kmap-btn kmap-btn-primary kmap-btn-full"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("half");
-                  setShowCircuitModal(true);
-                }}
-              >
-                🔌 Visualize Half Adder Circuit
-              </button>
             </div>
           </div>
         )}
@@ -1019,7 +1011,14 @@ const BinaryAdders = () => {
               <strong style={{ color: "#fbbf24" }}>{f.carry}</strong>
             </div>
 
-            <div className="afhdl-grid-3-sm">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3,1fr)",
+                gap: "0.45rem",
+                margin: "0.6rem 0",
+              }}
+            >
               {[
                 {
                   label: "A (last bit)",
@@ -1074,20 +1073,6 @@ const BinaryAdders = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Visualize Full Adder Circuit */}
-            <div style={{ marginTop: "1rem" }}>
-              <button
-                className="kmap-btn kmap-btn-primary kmap-btn-full"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("full");
-                  setShowCircuitModal(true);
-                }}
-              >
-                🔌 Visualize Full Adder Circuit
-              </button>
             </div>
           </div>
         )}
@@ -1327,7 +1312,14 @@ const BinaryAdders = () => {
               answer before doing the work!
             </div>
 
-            <div className="afhdl-grid-2-sm">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "0.5rem",
+                margin: "0.75rem 0",
+              }}
+            >
               <div style={S.note("#f87171")}>
                 <strong style={{ color: "#f87171" }}>🔴 G = Generate</strong>
                 <br />
@@ -1378,8 +1370,15 @@ const BinaryAdders = () => {
             <div style={{ display: "grid", gap: "2px", marginTop: "0.5rem" }}>
               <div
                 style={{
-                  ...S.tableHeader,
+                  display: "grid",
                   gridTemplateColumns: "1fr 1fr 1fr 1.5fr 1.5fr 2fr",
+                  background: "rgba(99,102,241,0.2)",
+                  borderRadius: "6px",
+                  padding: "0.35rem 0.5rem",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  color: "#a5b4fc",
+                  textAlign: "center",
                 }}
               >
                 <span>Column</span>
@@ -1393,8 +1392,14 @@ const BinaryAdders = () => {
                 <div
                   key={row.pos}
                   style={{
-                    ...S.tableRow,
+                    display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr 1.5fr 1.5fr 2fr",
+                    background: "rgba(30,41,59,0.5)",
+                    borderRadius: "4px",
+                    padding: "0.3rem 0.5rem",
+                    fontSize: "0.8rem",
+                    textAlign: "center",
+                    color: "#e2e8f0",
                   }}
                 >
                   <span style={{ color: "#475569" }}>
@@ -1404,7 +1409,7 @@ const BinaryAdders = () => {
                   <span style={{ color: "#c084fc" }}>{row.bi}</span>
                   <span
                     style={{
-                      color: row.G ? "#f87171" : "var(--afhdl-muted)",
+                      color: row.G ? "#f87171" : "#334155",
                       fontWeight: row.G ? 700 : 400,
                     }}
                   >
@@ -1412,15 +1417,13 @@ const BinaryAdders = () => {
                   </span>
                   <span
                     style={{
-                      color: row.P ? "#60a5fa" : "var(--afhdl-muted)",
+                      color: row.P ? "#60a5fa" : "#334155",
                       fontWeight: row.P ? 700 : 400,
                     }}
                   >
                     {row.P}
                   </span>
-                  <span
-                    style={{ fontSize: "0.7rem", color: "var(--afhdl-muted)" }}
-                  >
+                  <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>
                     {row.G
                       ? "🔴 creates carry"
                       : row.P
@@ -1467,8 +1470,15 @@ const BinaryAdders = () => {
           <div style={{ display: "grid", gap: "3px", marginTop: "0.6rem" }}>
             <div
               style={{
-                ...S.tableHeader,
+                display: "grid",
                 gridTemplateColumns: "repeat(6,1fr)",
+                background: "rgba(99,102,241,0.25)",
+                borderRadius: "5px",
+                padding: "0.35rem 0.5rem",
+                fontSize: "0.76rem",
+                fontWeight: 700,
+                color: "#a5b4fc",
+                textAlign: "center",
               }}
             >
               <span>A</span>
@@ -1499,8 +1509,8 @@ const BinaryAdders = () => {
                     display: "grid",
                     gridTemplateColumns: "repeat(6,1fr)",
                     background: match
-                      ? "var(--afhdl-table-header-bg)"
-                      : "var(--afhdl-table-row-bg)",
+                      ? "rgba(99,102,241,0.25)"
+                      : "rgba(30,41,59,0.5)",
                     border: match
                       ? "1px solid #6366f1"
                       : "1px solid transparent",
@@ -1508,7 +1518,7 @@ const BinaryAdders = () => {
                     padding: "0.3rem 0.5rem",
                     fontSize: "0.82rem",
                     textAlign: "center",
-                    color: "var(--afhdl-text)",
+                    color: "#e2e8f0",
                     transition: "background 0.15s",
                   }}
                 >
@@ -1822,58 +1832,251 @@ endmodule`}</pre>
           )}
         </div>
       )}
-
-      {/* ══ VISUALIZE CIRCUIT ═════════════════════════════════ */}
-      <div style={S.card}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            marginBottom: "0.5rem",
-          }}
-        >
-          <span style={{ fontSize: "1.3rem" }}>🔌</span>
-          <div>
-            <div
-              style={{ fontWeight: 700, color: "#f8fafc", fontSize: "0.95rem" }}
-            >
-              Visualize the Adder Circuit
-            </div>
-            <div
-              style={{
-                color: "#94a3b8",
-                fontSize: "0.8rem",
-                marginTop: "0.15rem",
-              }}
-            >
-              Open the interactive logic gate editor with the Full Adder
-              expression pre-loaded.
-            </div>
-          </div>
-        </div>
-        <button
-          className="kmap-btn kmap-btn-primary kmap-btn-full"
-          onClick={() => {
-            setCircuitModalTarget("full");
-            setShowCircuitModal(true);
-          }}
-          style={{ width: "100%", marginTop: "0.25rem" }}
-        >
-          🔌 Visualize Full Adder Circuit
-        </button>
-      </div>
-
-      <CircuitModal
-        open={showCircuitModal}
-        onClose={() => setShowCircuitModal(false)}
-        expression={circuitModalTarget === "half" ? "S = A⊕B" : "S = A⊕B⊕Cin"}
-        variables={
-          circuitModalTarget === "half" ? ["A", "B"] : ["A", "B", "Cin"]
-        }
-      />
-    </AFHDLLayout>
+    </ToolLayout>
   );
+};
+
+/* ── STYLES ──────────────────────────────────────────────── */
+const S = {
+  sectionTitle: {
+    fontSize: "1.25rem",
+    fontWeight: 800,
+    color: "var(--app-text)",
+    margin: "1.5rem 0 1rem",
+    letterSpacing: "-0.02em",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    fontFamily: "'Sora', sans-serif",
+  },
+  body: {
+    color: "var(--app-muted)",
+    fontSize: "1rem",
+    lineHeight: 1.8,
+    margin: "0.5rem 0",
+  },
+  welcomeBanner: {
+    background: "var(--app-accent-soft)",
+    border: "1px solid var(--app-accent)",
+    borderRadius: "1rem",
+    padding: "1.25rem 1.5rem",
+    marginBottom: "1rem",
+  },
+  welcomeHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+  },
+  teacherBubble: {
+    display: "flex",
+    gap: "0.8rem",
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1rem",
+    padding: "1rem 1.25rem",
+    margin: "0.75rem 0",
+    alignItems: "flex-start",
+    backdropFilter: "blur(var(--app-glass-blur))",
+  },
+  teacherAvatar: {
+    fontSize: "1.75rem",
+    flexShrink: 0,
+    lineHeight: 1,
+  },
+  teacherText: {
+    color: "var(--app-text)",
+    fontSize: "0.9rem",
+    lineHeight: 1.7,
+    opacity: 0.9,
+  },
+  teacherCallout: {
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border-strong)",
+    borderRadius: "1rem",
+    padding: "1.25rem",
+    marginBottom: "1.5rem",
+  },
+  nextTipBtn: {
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-accent)",
+    borderRadius: "0.5rem",
+    color: "var(--app-accent)",
+    padding: "0.4rem 1rem",
+    cursor: "pointer",
+    fontSize: "0.8rem",
+    fontWeight: "700",
+    transition: "all 0.2s",
+  },
+  card: {
+    background: "var(--app-surface)",
+    backdropFilter: "blur(var(--app-glass-blur))",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1.25rem",
+    padding: "1.5rem",
+    marginTop: "1rem",
+    boxShadow: "var(--app-shadow)",
+  },
+  formula: {
+    background: "rgba(0, 0, 0, 0.3)",
+    border: "1px solid var(--app-accent-soft)",
+    borderRadius: "0.75rem",
+    padding: "1rem",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: "0.9rem",
+    color: "var(--app-secondary)",
+    margin: "1rem 0",
+    lineHeight: 1.6,
+  },
+  codeBlock: {
+    background: "var(--app-bg-alt)",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1rem",
+    padding: "1.25rem",
+    overflowX: "auto",
+    position: "relative",
+  },
+  resultBanner: {
+    background: "var(--app-accent-soft)",
+    border: "1px solid var(--app-accent)",
+    borderRadius: "1.25rem",
+    padding: "1.25rem 1.5rem",
+    margin: "1.5rem 0",
+  },
+  tabPanel: {
+    background: "var(--app-surface)",
+    backdropFilter: "blur(var(--app-glass-blur))",
+    border: "1px solid var(--app-border)",
+    borderRadius: "0 1.25rem 1.25rem 1.25rem",
+    padding: "1.5rem",
+    minHeight: "250px",
+  },
+  note: (c) => ({
+    background: "var(--app-surface-soft)",
+    borderLeft: `4px solid ${c}`,
+    borderRadius: "0.5rem",
+    padding: "1rem 1.25rem",
+    fontSize: "0.9rem",
+    color: "var(--app-text)",
+    lineHeight: 1.7,
+    margin: "1rem 0",
+  }),
+  signalBox: (c) => ({
+    background: `${c}10`,
+    border: `1px solid ${c}30`,
+    borderRadius: "0.75rem",
+    padding: "0.75rem",
+    textAlign: "center",
+  }),
+  conceptCard: (c) => ({
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border)",
+    borderTop: `4px solid ${c}`,
+    borderRadius: "1rem",
+    padding: "1.25rem",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  }),
+  analogyCard: (c) => ({
+    background: "var(--app-surface-soft)",
+    border: `1px solid ${c}30`,
+    borderRadius: "0.75rem",
+    padding: "1rem",
+    textAlign: "center",
+  }),
+  analogyBox: {
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border)",
+    borderRadius: "0.75rem",
+    padding: "1rem 1.25rem",
+    margin: "1rem 0",
+  },
+  stepBox: {
+    display: "flex",
+    gap: "1rem",
+    alignItems: "flex-start",
+    margin: "0.75rem 0",
+    padding: "1rem",
+    background: "var(--app-surface-soft)",
+    borderRadius: "0.75rem",
+    border: "1px solid var(--app-border)",
+  },
+  stepNumber: {
+    background: "var(--app-accent)",
+    color: "white",
+    borderRadius: "0.5rem",
+    padding: "0.25rem 0.6rem",
+    fontSize: "0.75rem",
+    fontWeight: 800,
+    whiteSpace: "nowrap",
+    flexShrink: 0,
+  },
+  stepContent: {
+    color: "var(--app-text)",
+    fontSize: "0.9rem",
+    lineHeight: 1.7,
+    opacity: 0.9,
+  },
+  inputGroup: {
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1rem",
+    padding: "1rem 1.25rem",
+  },
+  overflowBadge: {
+    background: "rgba(245, 158, 11, 0.15)",
+    border: "1px solid #f59e0b",
+    borderRadius: "0.4rem",
+    padding: "0.2rem 0.6rem",
+    fontSize: "0.75rem",
+    color: "#f59e0b",
+    fontWeight: 700,
+  },
+  bitBtn: (bit, c) => ({
+    width: "42px",
+    height: "42px",
+    borderRadius: "0.75rem",
+    border: `2px solid ${bit === "1" ? c : "var(--app-border-strong)"}`,
+    background: bit === "1" ? `${c}20` : "var(--app-bg-alt)",
+    color: bit === "1" ? c : "var(--app-muted-strong)",
+    fontWeight: 800,
+    fontSize: "1.1rem",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "'JetBrains Mono', monospace",
+  }),
+  cinBtn: (active) => ({
+    padding: "0.6rem 1.25rem",
+    borderRadius: "0.75rem",
+    border: `2px solid ${active ? "var(--app-accent)" : "var(--app-border)"}`,
+    background: active ? "var(--app-accent-soft)" : "var(--app-surface-soft)",
+    color: active ? "var(--app-accent)" : "var(--app-muted)",
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: "0.85rem",
+    transition: "all 0.2s",
+  }),
+  tabBtn: (active, c) => ({
+    padding: "0.75rem 1.5rem",
+    borderRadius: "0.75rem 0.75rem 0 0",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 700,
+    fontSize: "0.9rem",
+    background: active ? c : "transparent",
+    color: active ? "#ffffff" : "var(--app-muted)",
+    transition: "all 0.2s ease",
+    borderBottom: active ? "none" : "1px solid var(--app-border)",
+  }),
+  tabSectionTitle: (c) => ({
+    fontWeight: 800,
+    color: c,
+    marginBottom: "0.75rem",
+    fontSize: "1.1rem",
+    fontFamily: "'Sora', sans-serif",
+  }),
 };
 
 export default BinaryAdders;

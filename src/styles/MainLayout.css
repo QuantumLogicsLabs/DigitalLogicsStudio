@@ -1,0 +1,386 @@
+/* ═══════════════════════════════════════════════════════════════
+   MainLayout.css  —  Global layout for Digital Logics Studio
+   Strictly following the AFHDL design language.
+═══════════════════════════════════════════════════════════════ */
+
+.app-layout {
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: Inter, system-ui, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-layout * {
+  box-sizing: border-box;
+}
+
+/* ── Decorative background blobs ───────────────────────────── */
+.app-bg-blob {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.28;
+}
+.app-bg-1 {
+  width: clamp(200px, 28vw, 420px);
+  height: clamp(200px, 28vw, 420px);
+  top: -80px;
+  left: -90px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.44), transparent 64%);
+}
+.app-bg-2 {
+  width: clamp(180px, 24vw, 380px);
+  height: clamp(180px, 24vw, 380px);
+  right: -80px;
+  top: 160px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.28), transparent 64%);
+}
+
+/* ── TOPBAR ─────────────────────────────────────────────────── */
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--app-topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--app-border);
+  background: color-mix(in srgb, var(--app-bg) 75%, transparent);
+  backdrop-filter: blur(var(--app-glass-blur));
+}
+
+.app-topbar-left,
+.app-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────────── */
+.app-sidebar {
+  position: fixed;
+  top: var(--app-topbar-height);
+  left: 0;
+  bottom: 0;
+  z-index: 50;
+  width: var(--app-sidebar-width);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--app-bg-alt) 98%, transparent);
+  backdrop-filter: blur(var(--app-glass-blur));
+  border-right: 1px solid var(--app-border);
+}
+.app-sidebar.is-open {
+  transform: translateX(0);
+}
+
+/* ── MAIN CONTENT ───────────────────────────────────────────── */
+.app-main-container {
+  display: flex;
+  min-height: calc(100vh - var(--app-topbar-height));
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.app-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Reusable AFHDL-style components ────────────────────────── */
+.app-section {
+  background: var(--app-surface);
+  backdrop-filter: blur(var(--app-glass-blur));
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.app-card {
+  background: var(--app-surface-soft);
+  backdrop-filter: blur(var(--app-glass-blur));
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.app-card:hover {
+  border-color: var(--app-accent);
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--app-surface-soft) 80%, var(--app-accent-soft));
+}
+
+.app-hero {
+  padding: 2rem;
+  border-radius: 1.35rem;
+  background: 
+    radial-gradient(circle at top right, rgba(79, 70, 229, 0.1), transparent 32%),
+    linear-gradient(180deg, color-mix(in srgb, var(--app-surface-strong) 92%, transparent), var(--app-surface));
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  margin-bottom: 1rem;
+}
+
+.app-hero-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw + 0.75rem, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--app-text);
+}
+
+.app-hero-subtitle {
+  color: var(--app-muted-strong);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+  max-width: 70ch;
+}
+
+/* ── Global Typography ── */
+.app-section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--app-text);
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.app-section-kicker {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--app-accent);
+  margin-bottom: 0.5rem;
+  display: block;
+  opacity: 0.9;
+}
+
+.app-body-text {
+  color: var(--app-muted);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+/* ── Global Controls ── */
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.85rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--app-border-strong);
+  background: var(--app-surface-soft);
+  color: var(--app-text);
+  backdrop-filter: blur(8px);
+}
+
+.app-btn:hover {
+  background: var(--app-accent-soft);
+  border-color: var(--app-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--app-shadow-glow);
+}
+
+.app-btn-primary {
+  background: var(--app-accent);
+  color: white;
+  border-color: var(--app-accent);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.app-btn-primary:hover {
+  background: var(--app-accent-hover);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+}
+
+.app-input {
+  width: 100%;
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--app-text);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-input:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 2px var(--app-accent-soft);
+}
+
+/* ── AFHDL SIDEBAR UTILITIES ───────────────────────────────── */
+.afhdl-sidebar-card {
+  padding: 1.25rem;
+  background: var(--app-surface-soft);
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.afhdl-sidebar-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--app-accent);
+  margin: 0;
+  font-weight: 700;
+}
+
+.afhdl-sidebar-title {
+  color: var(--app-text);
+  font-weight: 800;
+}
+
+.afhdl-sidebar-copy {
+  color: var(--app-muted);
+  line-height: 1.5;
+}
+
+.afhdl-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.afhdl-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  color: var(--app-muted);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.afhdl-nav-item:hover {
+  background: var(--app-accent-soft);
+  color: var(--app-text);
+}
+
+.afhdl-nav-item.is-active {
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+  border-color: var(--app-border-strong);
+  font-weight: 600;
+}
+
+.afhdl-nav-index {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.afhdl-nav-label {
+  font-size: 0.9rem;
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 720px) {
+  .app-main {
+    padding: 1rem 0.75rem 2rem;
+  }
+  .app-hero {
+    padding: 1.5rem;
+  }
+}
+
+/* ── Modals ─────────────────────────────────────────────────── */
+.app-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: appFadeIn 0.3s ease;
+}
+
+.app-modal-content {
+  position: relative;
+  width: min(1400px, 100%);
+  height: min(900px, 95vh);
+  background: var(--app-bg-alt);
+  border: 1px solid var(--app-border-strong);
+  border-radius: 1.5rem;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1010;
+  transition: all 0.2s ease;
+}
+
+.app-modal-close:hover {
+  background: #ef4444;
+  color: white;
+  transform: rotate(90deg);
+}
+
+@keyframes appFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}

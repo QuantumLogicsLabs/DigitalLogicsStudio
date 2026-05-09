@@ -1,14 +1,12 @@
 import React, { useState } from "react";
+import ToolLayout from "../../components/ToolLayout";
 import AFHDLDivider from "./components/AFHDLDivider";
 import AFHDLCopyButton from "./components/AFHDLCopyButton";
-import AFHDLLayout from "./components/AFHDLLayout";
-import { afhdlTheme as S } from "./utils/afhdlTheme";
 import {
   cleanBin,
   binaryAdd,
   binarySubtract,
 } from "../../utils/arithmeticHelpers";
-import CircuitModal from "../../components/CircuitModal";
 
 /* ── HELPERS ──────────────────────────────────────────────── */
 const pad = (a, b) => {
@@ -101,7 +99,6 @@ const BinaryAddSubtractor = () => {
   const [quizScore, setQuizScore] = useState(0);
   const [quizDone, setQuizDone] = useState(false);
   const [showOverflow, setShowOverflow] = useState(false);
-  const [showCircuitModal, setShowCircuitModal] = useState(false);
 
   const cleanA = cleanBin(a) || "0";
   const cleanB = cleanBin(b) || "0";
@@ -182,20 +179,9 @@ const BinaryAddSubtractor = () => {
   const modeColor = mode === "add" ? "#22c55e" : "#f87171";
 
   return (
-    <AFHDLLayout
+    <ToolLayout
       title="Binary Adder / Subtractor"
       subtitle="One circuit, two operations — controlled by a single Mode bit"
-      intro="This lesson shows how a single arithmetic block can switch jobs. Instead of designing two separate circuits, you control one datapath with a mode bit and a clever complement trick."
-      highlights={[
-        {
-          title: "Key hardware idea",
-          text: "Mode = 0 performs A + B. Mode = 1 performs A + (NOT B) + 1, which is A − B.",
-        },
-        {
-          title: "Why students should care",
-          text: "This reuse pattern appears in ALUs and is one of the cleanest examples of efficient digital design.",
-        },
-      ]}
     >
       {/* ══ THE BIG IDEA ══════════════════════════════════════ */}
       <div style={S.sectionTitle}>💡 The Big Idea</div>
@@ -471,8 +457,19 @@ const BinaryAddSubtractor = () => {
             note: "",
           },
         ].map(({ label, val, color, note }) => (
-          <div key={label} style={S.interactiveRow}>
-            <span style={{ color: "var(--afhdl-muted)", fontSize: "0.82rem" }}>
+          <div
+            key={label}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "rgba(30,41,59,0.5)",
+              borderRadius: "6px",
+              padding: "0.4rem 0.7rem",
+              border: "1px solid rgba(148,163,184,0.12)",
+            }}
+          >
+            <span style={{ color: "#94a3b8", fontSize: "0.82rem" }}>
               {label}
             </span>
             <span
@@ -480,9 +477,7 @@ const BinaryAddSubtractor = () => {
             >
               <strong style={{ color, fontFamily: "monospace" }}>{val}</strong>
               {note && (
-                <span
-                  style={{ fontSize: "0.72rem", color: "var(--afhdl-muted)" }}
-                >
+                <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
                   {note}
                 </span>
               )}
@@ -583,8 +578,15 @@ const BinaryAddSubtractor = () => {
           <div style={{ display: "grid", gap: "2px", marginTop: "0.5rem" }}>
             <div
               style={{
-                ...S.tableHeader,
+                display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr 1fr 2fr",
+                background: "rgba(99,102,241,0.2)",
+                borderRadius: "4px",
+                padding: "0.3rem 0.5rem",
+                fontSize: "0.73rem",
+                fontWeight: 700,
+                color: "#a5b4fc",
+                textAlign: "center",
               }}
             >
               <span>Bit #</span>
@@ -600,8 +602,14 @@ const BinaryAddSubtractor = () => {
                 <div
                   key={i}
                   style={{
-                    ...S.tableRow,
+                    display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr 1fr 2fr",
+                    background: "rgba(30,41,59,0.5)",
+                    borderRadius: "3px",
+                    padding: "0.28rem 0.5rem",
+                    fontSize: "0.82rem",
+                    textAlign: "center",
+                    color: "#e2e8f0",
                   }}
                 >
                   <span style={{ color: "#475569" }}>bit {i}</span>
@@ -649,7 +657,13 @@ const BinaryAddSubtractor = () => {
         Side
       </button>
       {showSideBySide && (
-        <div className="afhdl-grid-2">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "0.6rem",
+          }}
+        >
           <div style={{ ...S.card, border: "1px solid rgba(34,197,94,0.3)" }}>
             <div
               style={{
@@ -822,8 +836,7 @@ const BinaryAddSubtractor = () => {
       {showHDL && (
         <div style={S.card}>
           <div style={S.codeBlock}>
-            <AFHDLCopyButton
-              text={`// 4-bit Adder/Subtractor in Verilog
+            <AFHDLCopyButton text={`// 4-bit Adder/Subtractor in Verilog
 // Mode=0 → A + B
 // Mode=1 → A - B  (using 2's complement of B)
 
@@ -844,9 +857,8 @@ module adder_subtractor (
   assign sum         = A + B_modified + Mode;
   assign Result      = sum[3:0];
   assign Carry_Borrow = sum[4];
-endmodule`}
-            />
-            <pre
+endmodule`} />
+          <pre
               style={{
                 margin: 0,
                 color: "#e2e8f0",
@@ -893,8 +905,15 @@ endmodule`}</pre>
           <div style={{ display: "grid", gap: "2px" }}>
             <div
               style={{
-                ...S.tableHeader,
+                display: "grid",
                 gridTemplateColumns: "2fr 1fr 2fr 2fr",
+                background: "rgba(99,102,241,0.2)",
+                borderRadius: "4px",
+                padding: "0.3rem 0.5rem",
+                fontSize: "0.73rem",
+                fontWeight: 700,
+                color: "#a5b4fc",
+                textAlign: "center",
               }}
             >
               <span>Situation</span>
@@ -916,8 +935,14 @@ endmodule`}</pre>
               <div
                 key={sit}
                 style={{
-                  ...S.tableRow,
+                  display: "grid",
                   gridTemplateColumns: "2fr 1fr 2fr 2fr",
+                  background: "rgba(30,41,59,0.5)",
+                  borderRadius: "3px",
+                  padding: "0.3rem 0.5rem",
+                  fontSize: "0.8rem",
+                  textAlign: "center",
+                  color: "#e2e8f0",
                 }}
               >
                 <span style={{ textAlign: "left" }}>{sit}</span>
@@ -1075,53 +1100,126 @@ endmodule`}</pre>
           )}
         </div>
       )}
-
-      {/* ══ VISUALIZE CIRCUIT ═════════════════════════════════ */}
-      <div style={S.card}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            marginBottom: "0.5rem",
-          }}
-        >
-          <span style={{ fontSize: "1.3rem" }}>🔌</span>
-          <div>
-            <div
-              style={{ fontWeight: 700, color: "#f8fafc", fontSize: "0.95rem" }}
-            >
-              Visualize the Adder/Subtractor Circuit
-            </div>
-            <div
-              style={{
-                color: "#94a3b8",
-                fontSize: "0.8rem",
-                marginTop: "0.15rem",
-              }}
-            >
-              Open the interactive logic gate editor showing the XOR-controlled
-              mode circuit.
-            </div>
-          </div>
-        </div>
-        <button
-          className="kmap-btn kmap-btn-primary kmap-btn-full"
-          onClick={() => setShowCircuitModal(true)}
-          style={{ width: "100%", marginTop: "0.25rem" }}
-        >
-          🔌 Visualize Circuit
-        </button>
-      </div>
-
-      <CircuitModal
-        open={showCircuitModal}
-        onClose={() => setShowCircuitModal(false)}
-        expression={"S = A⊕B⊕M"}
-        variables={["A", "B", "M"]}
-      />
-    </AFHDLLayout>
+    </ToolLayout>
   );
+};
+
+/* ── STYLES ──────────────────────────────────────────────── */
+const S = {
+  sectionTitle: {
+    fontSize: "1.25rem",
+    fontWeight: 800,
+    color: "var(--app-text)",
+    margin: "1.5rem 0 1rem",
+    letterSpacing: "-0.02em",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    fontFamily: "'Sora', sans-serif",
+  },
+  body: {
+    color: "var(--app-muted)",
+    fontSize: "1rem",
+    lineHeight: 1.8,
+    margin: "0.5rem 0",
+  },
+  card: {
+    background: "var(--app-surface)",
+    backdropFilter: "blur(var(--app-glass-blur))",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1.25rem",
+    padding: "1.5rem",
+    marginTop: "1rem",
+    boxShadow: "var(--app-shadow)",
+  },
+  formula: {
+    background: "rgba(0, 0, 0, 0.3)",
+    border: "1px solid var(--app-accent-soft)",
+    borderRadius: "0.75rem",
+    padding: "1rem",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: "0.9rem",
+    color: "var(--app-secondary)",
+    margin: "1rem 0",
+    lineHeight: 1.6,
+  },
+  codeBlock: {
+    background: "var(--app-bg-alt)",
+    border: "1px solid var(--app-border)",
+    borderRadius: "1rem",
+    padding: "1.25rem",
+    overflowX: "auto",
+    position: "relative",
+  },
+  resultBanner: {
+    background: "var(--app-accent-soft)",
+    border: "1px solid var(--app-accent)",
+    borderRadius: "1.25rem",
+    padding: "1.25rem 1.5rem",
+    margin: "1.5rem 0",
+  },
+  tabPanel: {
+    background: "var(--app-surface)",
+    backdropFilter: "blur(var(--app-glass-blur))",
+    border: "1px solid var(--app-border)",
+    borderRadius: "0 1.25rem 1.25rem 1.25rem",
+    padding: "1.5rem",
+    minHeight: "220px",
+  },
+  note: (c) => ({
+    background: "var(--app-surface-soft)",
+    borderLeft: `4px solid ${c}`,
+    borderRadius: "0.5rem",
+    padding: "1rem 1.25rem",
+    fontSize: "0.9rem",
+    color: "var(--app-text)",
+    lineHeight: 1.7,
+    margin: "1rem 0",
+  }),
+  signalBox: (c) => ({
+    background: `${c}10`,
+    border: `1px solid ${c}30`,
+    borderRadius: "0.75rem",
+    padding: "0.75rem",
+    textAlign: "center",
+  }),
+  conceptCard: (c) => ({
+    background: "var(--app-surface-soft)",
+    border: "1px solid var(--app-border)",
+    borderTop: `4px solid ${c}`,
+    borderRadius: "1rem",
+    padding: "1.25rem",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  }),
+  bitBtn: (bit, c) => ({
+    width: "42px",
+    height: "42px",
+    borderRadius: "0.75rem",
+    border: `2px solid ${bit === "1" ? c : "var(--app-border-strong)"}`,
+    background: bit === "1" ? `${c}20` : "var(--app-bg-alt)",
+    color: bit === "1" ? c : "var(--app-muted-strong)",
+    fontWeight: 800,
+    fontSize: "1.1rem",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "'JetBrains Mono', monospace",
+  }),
+  tabBtn: (active, c) => ({
+    padding: "0.75rem 1.5rem",
+    borderRadius: "0.75rem 0.75rem 0 0",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 700,
+    fontSize: "0.9rem",
+    background: active ? c : "transparent",
+    color: active ? "#ffffff" : "var(--app-muted)",
+    transition: "all 0.2s ease",
+    borderBottom: active ? "none" : "1px solid var(--app-border)",
+  }),
 };
 
 export default BinaryAddSubtractor;

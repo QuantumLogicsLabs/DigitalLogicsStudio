@@ -1,12 +1,17 @@
 import React from "react";
 
 const AFHDLInput = ({ label, value, onChange }) => (
-  <div className="afhdl-field-group">
-    <label className="afhdl-field-label">{label}</label>
+  <div style={{ marginBottom: "0.85rem" }}>
+    <label
+      style={{ display: "block", color: "#dbeafe", marginBottom: "0.25rem" }}
+    >
+      {label}
+    </label>
     <input
-      className="afhdl-input"
+      className="tool-input"
       value={value}
       onChange={onChange}
+      style={{ width: "100%" }}
       spellCheck={false}
       autoComplete="off"
     />

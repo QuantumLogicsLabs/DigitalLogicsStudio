@@ -1,10 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import ToolLayout from "../../components/ToolLayout";
 import AFHDLDivider from "./components/AFHDLDivider";
 import AFHDLCopyButton from "./components/AFHDLCopyButton";
-import AFHDLLayout from "./components/AFHDLLayout";
-import { afhdlTheme as S } from "./utils/afhdlTheme";
 import { cleanBin, binarySubtract } from "../../utils/arithmeticHelpers";
-import CircuitModal from "../../components/CircuitModal";
 
 /* ── HELPERS ──────────────────────────────────────────────── */
 const pad = (a, b) => {
@@ -963,8 +961,6 @@ const BinarySubtractor = () => {
   const [quizDone, setQuizDone] = useState(false);
   const [twosStep, setTwosStep] = useState(0);
   const [activeTab, setActiveTab] = useState("borrow"); // "borrow" | "twos"
-  const [showCircuitModal, setShowCircuitModal] = useState(false);
-  const [circuitModalTarget, setCircuitModalTarget] = useState("half"); // "half" | "full"
 
   const cleanA = cleanBin(a) || "0";
   const cleanB = cleanBin(b) || "0";
@@ -1070,20 +1066,9 @@ const BinarySubtractor = () => {
   };
 
   return (
-    <AFHDLLayout
+    <ToolLayout
       title="Binary Subtractor"
       subtitle="Borrow Method · Two's Complement · Circuit Diagrams · Interactive Visualizer"
-      intro="This page teaches subtraction in the most direct way possible: first by borrowing column by column, then by connecting that idea to two's complement hardware."
-      highlights={[
-        {
-          title: "First learning target",
-          text: "Recognize when a subtraction column needs a borrow from the next higher bit.",
-        },
-        {
-          title: "Second learning target",
-          text: "See how two's complement lets real hardware reuse addition circuitry for subtraction.",
-        },
-      ]}
     >
       {/* ══ BEGINNER INTRO ══════════════════════════════════════ */}
       <div style={S.sectionTitle}>📖 What is Binary Subtraction?</div>
@@ -2007,20 +1992,6 @@ const BinarySubtractor = () => {
                   : " ← no borrow needed"}
               </div>
             )}
-
-            {/* Visualize Half Subtractor Circuit */}
-            <div style={{ marginTop: "1rem" }}>
-              <button
-                className="kmap-btn kmap-btn-primary kmap-btn-full"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("half");
-                  setShowCircuitModal(true);
-                }}
-              >
-                🔌 Visualize Half Subtractor Circuit
-              </button>
-            </div>
           </>
         )}
 
@@ -2145,20 +2116,6 @@ const BinarySubtractor = () => {
             >
               Step {twosStep + 1} of {TWOS_STEPS.length}
             </p>
-
-            {/* Visualize Full Subtractor Circuit */}
-            <div style={{ marginTop: "1rem" }}>
-              <button
-                className="kmap-btn kmap-btn-primary kmap-btn-full"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("full");
-                  setShowCircuitModal(true);
-                }}
-              >
-                🔌 Visualize Full Subtractor Circuit
-              </button>
-            </div>
           </>
         )}
       </div>
@@ -2590,70 +2547,126 @@ endmodule`}
           )}
         </div>
       )}
-
-      {/* ══ VISUALIZE CIRCUIT ═════════════════════════════════ */}
-      <div style={S.card}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            marginBottom: "0.5rem",
-          }}
-        >
-          <span style={{ fontSize: "1.3rem" }}>🔌</span>
-          <div>
-            <div
-              style={{ fontWeight: 700, color: "#f8fafc", fontSize: "0.95rem" }}
-            >
-              Visualize Subtractor Circuits
-            </div>
-            <div
-              style={{
-                color: "#94a3b8",
-                fontSize: "0.8rem",
-                marginTop: "0.15rem",
-              }}
-            >
-              Open the interactive logic gate editor for Half or Full
-              Subtractor.
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.25rem" }}>
-          <button
-            className="kmap-btn kmap-btn-primary"
-            onClick={() => {
-              setCircuitModalTarget("half");
-              setShowCircuitModal(true);
-            }}
-            style={{ flex: 1 }}
-          >
-            🔌 Half Subtractor
-          </button>
-          <button
-            className="kmap-btn kmap-btn-primary"
-            onClick={() => {
-              setCircuitModalTarget("full");
-              setShowCircuitModal(true);
-            }}
-            style={{ flex: 1 }}
-          >
-            🔌 Full Subtractor
-          </button>
-        </div>
-      </div>
-
-      <CircuitModal
-        open={showCircuitModal}
-        onClose={() => setShowCircuitModal(false)}
-        expression={circuitModalTarget === "half" ? "D = A⊕B" : "D = A⊕B⊕Bin"}
-        variables={
-          circuitModalTarget === "half" ? ["A", "B"] : ["A", "B", "Bin"]
-        }
-      />
-    </AFHDLLayout>
+    </ToolLayout>
   );
+};
+
+/* ── STYLES ──────────────────────────────────────────────────── */
+const S = {
+  sectionTitle: {
+    fontSize: "1.1rem",
+    fontWeight: 700,
+    color: "#f8fafc",
+    margin: "1.5rem 0 0.5rem",
+    letterSpacing: "-0.01em",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  body: {
+    color: "#94a3b8",
+    fontSize: "0.95rem",
+    lineHeight: 1.7,
+    margin: "0.4rem 0",
+  },
+  card: {
+    background: "rgba(30, 41, 59, 0.4)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "16px",
+    padding: "1.25rem",
+    marginTop: "0.75rem",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+  },
+  formula: {
+    background: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(99, 102, 241, 0.2)",
+    borderRadius: "12px",
+    padding: "1rem",
+    fontFamily: "'Fira Code', monospace",
+    fontSize: "0.85rem",
+    color: "#818cf8",
+    margin: "0.75rem 0",
+    lineHeight: 1.8,
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-all",
+  },
+  formulaBox: (c) => ({
+    background: `${c}08`,
+    border: `1px solid ${c}30`,
+    borderRadius: "10px",
+    padding: "0.7rem",
+  }),
+  codeBlock: {
+    background: "#0f172a",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "12px",
+    padding: "1rem",
+    overflowX: "auto",
+    position: "relative",
+  },
+  resultBanner: {
+    background:
+      "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))",
+    border: "1px solid rgba(99, 102, 241, 0.2)",
+    borderRadius: "16px",
+    padding: "1rem 1.5rem",
+    margin: "1rem 0",
+    backdropFilter: "blur(8px)",
+  },
+  tabPanel: {
+    background: "rgba(30, 41, 59, 0.3)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderRadius: "0 16px 16px 16px",
+    padding: "1.5rem",
+    minHeight: "200px",
+  },
+  note: (c) => ({
+    background: `${c}08`,
+    borderLeft: `4px solid ${c}`,
+    borderRadius: "8px",
+    padding: "1rem",
+    fontSize: "0.85rem",
+    color: "#e2e8f0",
+    lineHeight: 1.6,
+    margin: "0.75rem 0",
+  }),
+  conceptCard: (c) => ({
+    background: "rgba(30, 41, 59, 0.4)",
+    border: "1px solid rgba(148, 163, 184, 0.1)",
+    borderTop: `4px solid ${c}`,
+    borderRadius: "12px",
+    padding: "1rem",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  }),
+  bitBtn: (bit, c) => ({
+    width: "40px",
+    height: "40px",
+    borderRadius: "8px",
+    border: `2px solid ${bit === "1" ? c : "rgba(148, 163, 184, 0.1)"}`,
+    background: bit === "1" ? `${c}15` : "rgba(15, 23, 42, 0.4)",
+    color: bit === "1" ? c : "#64748b",
+    fontWeight: 700,
+    fontSize: "1.1rem",
+    cursor: "pointer",
+    transition: "all 0.15s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }),
+  tabBtn: (active, c) => ({
+    padding: "0.6rem 1.25rem",
+    borderRadius: "10px 10px 0 0",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 600,
+    fontSize: "0.875rem",
+    background: active ? c : "transparent",
+    color: active ? "#ffffff" : "#94a3b8",
+    transition: "all 0.2s ease",
+    borderBottom: active ? "none" : "1px solid rgba(148, 163, 184, 0.1)",
+  }),
 };
 
 export default BinarySubtractor;

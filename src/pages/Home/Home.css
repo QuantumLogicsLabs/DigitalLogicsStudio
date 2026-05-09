@@ -3,9 +3,10 @@
 .home-page {
   position: relative;
   overflow-x: hidden;
-  background: var(--bg-color);
+  background: var(--app-bg);
   scroll-behavior: smooth;
   min-height: 100vh;
+  color: var(--app-text);
 }
 
 /* Dynamic background grid */
@@ -13,8 +14,8 @@
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
   pointer-events: none;
@@ -22,17 +23,17 @@
 }
 
 .home-header {
-  background: var(--nav-bg) !important;
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color) !important;
+  background: color-mix(in srgb, var(--app-bg) 80%, transparent) !important;
+  backdrop-filter: blur(var(--app-glass-blur));
+  border-bottom: 1px solid var(--app-border) !important;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .home-logo {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, var(--app-accent), var(--app-secondary)) !important;
+  box-shadow: var(--app-shadow-glow) !important;
 }
 
 /* Logo Circuit Animations */
@@ -115,25 +116,26 @@
 }
 
 .home-hero-content h2 {
-  font-size: 3.5rem !important;
+  font-size: clamp(2.5rem, 5vw, 4.5rem) !important;
   font-weight: 800 !important;
-  color: var(--text-color); /* fallback */
   background: linear-gradient(
     to bottom right,
-    var(--text-color),
-    var(--secondary-text)
+    var(--app-text),
+    var(--app-muted)
   );
   background-clip: text;
   -webkit-background-clip: text;
-  color: transparent; /* standard alternative */
-  letter-spacing: -0.02em;
+  color: transparent;
+  letter-spacing: -0.03em;
   margin-bottom: 1.5rem !important;
+  line-height: 1.1;
 }
 
 .home-hero-content p {
   font-size: 1.15rem !important;
-  color: var(--secondary-text) !important;
+  color: var(--app-muted) !important;
   max-width: 600px;
+  line-height: 1.6;
 }
 
 .search-container {
@@ -152,32 +154,33 @@
 
 .home-search-input {
   width: 100%;
-  padding: 0.9rem 3rem 0.9rem 2.75rem;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 1rem;
-  color: var(--text-color);
-  font-size: 1rem;
+  padding: 0.95rem 3rem 0.95rem 3rem;
+  background: var(--app-surface-soft);
+  border: 1px solid var(--app-border);
+  border-radius: 1.1rem;
+  color: var(--app-text);
+  font-size: 1.05rem;
   outline: none;
-  transition: all 0.3s;
-  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--app-shadow);
 }
 
 .home-search-input:focus {
-  border-color: var(--accent-color) !important;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 20px var(--app-accent-soft);
+  background: var(--app-surface-strong) !important;
 }
 
 [data-theme="light"] .home-search-input:focus {
-  background: rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  background: white !important;
+  box-shadow: 0 0 20px var(--app-accent-soft);
 }
 
 .home-search-button {
-  border: 1px solid var(--accent-color);
+  border: 1px solid var(--app-accent);
   border-radius: 1rem;
-  background: var(--accent-color);
+  background: var(--app-accent);
   color: #fff;
   padding: 0 1.5rem;
   font-size: 1rem;
@@ -247,32 +250,30 @@
 
 .home-section-title {
   margin: 0;
-  max-width: 18ch;
-  font-size: clamp(1.9rem, 2vw + 1rem, 2.75rem);
-  line-height: 1.08;
-  font-weight: 700;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
-  text-wrap: balance;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--app-text);
+  letter-spacing: -0.03em;
+  font-family: 'Sora', sans-serif;
 }
 
 .home-section-description {
-  margin: 0.9rem 0 0;
-  max-width: 68ch;
-  color: var(--secondary-text);
-  font-size: clamp(0.98rem, 0.2vw + 0.95rem, 1.08rem);
-  line-height: 1.75;
-  text-wrap: pretty;
+  margin: 0.75rem 0 0;
+  max-width: 65ch;
+  color: var(--app-muted);
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .home-section-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
 .home-featured-grid {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
 }
 
 .home-resource-grid {
@@ -281,22 +282,27 @@
 
 /* Premium Cards */
 .home-card {
-  background: var(--card-bg) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border-color) !important;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   display: flex;
   flex-direction: column;
-  padding: 1.75rem !important;
-  border-radius: 1.25rem !important;
+  justify-content: space-between;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background: var(--app-surface-soft);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(var(--app-glass-blur));
   opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.55s ease,
-    transform 0.55s ease,
-    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: var(--card-delay, 0ms);
+  transform: translateY(20px);
+}
+
+.home-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-surface-soft) 90%, var(--app-accent-soft));
+  box-shadow: var(--app-shadow-glow), 0 20px 40px -12px rgba(0, 0, 0, 0.5);
 }
 
 .feature-card {
@@ -312,11 +318,10 @@
 }
 
 .home-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: var(--accent-color) !important;
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.2),
-    0 0 20px rgba(59, 130, 246, 0.1);
+  transform: translateY(-8px);
+  border-color: var(--app-border-strong);
+  background: var(--app-surface);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .home-card-copy {
@@ -326,7 +331,7 @@
 .home-card-title {
   margin: 0 0 0.85rem !important;
   font-size: clamp(1.15rem, 0.45vw + 1rem, 1.4rem) !important;
-  color: var(--text-color) !important;
+  color: var(--app-text) !important;
   font-weight: 700 !important;
   line-height: 1.25 !important;
   letter-spacing: -0.015em;

@@ -13,50 +13,27 @@
 import React from "react";
 import { COLORS } from "../theme.js";
 
-const Section = ({ title, children, accent = COLORS.indigo }) => (
-  <div
-    style={{
-      marginBottom: "36px",
-      background: COLORS.glassBg,
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      border: `1px solid ${accent}40`,
-      borderRadius: "20px",
-      boxShadow: COLORS.glassShadow,
-      overflow: "hidden",
-      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    }}
-  >
+const Section = ({ title, children, accent = "var(--app-accent)" }) => (
+  <div className="app-section" style={{ padding: 0 }}>
     {/* ── Section header bar ── */}
     <div
       style={{
-        padding: "18px 24px",
-        borderBottom: `1px solid ${accent}25`,
+        padding: "1rem 1.5rem",
+        borderBottom: `1px solid var(--app-border)`,
         background: `linear-gradient(90deg, ${accent}15, transparent)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
       }}
     >
-      <h3
-        style={{
-          color: COLORS.textPrimary,
-          margin: 0,
-          fontSize: "1.1rem",
-          fontWeight: "800",
-          letterSpacing: "0.02em",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
+      <h3 className="app-section-title" style={{ margin: 0 }}>
         <span style={{ width: "4px", height: "18px", background: accent, borderRadius: "2px" }} />
         {title}
       </h3>
     </div>
 
     {/* ── Section body ── */}
-    <div style={{ padding: "24px" }}>{children}</div>
+    <div style={{ padding: "1.5rem" }}>{children}</div>
   </div>
 );
 

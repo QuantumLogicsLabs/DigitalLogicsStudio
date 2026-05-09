@@ -32,22 +32,25 @@ const SeqLayout = ({ children, title, subtitle }) => {
   const currentIndex = seqPages.findIndex((p) => p.path === location.pathname);
   const prev = seqPages[currentIndex - 1];
   const next = seqPages[currentIndex + 1];
-  const progress = Math.round(((currentIndex + 1) / seqPages.length) * 100);
 
   return (
-    <div className="seq-layout" data-component="sequential-layout">
-      <div className="seq-bg-blob seq-bg-blob-1" />
-      <div className="seq-bg-blob seq-bg-blob-2" />
-      <div className="seq-bg-blob seq-bg-blob-3" />
-
-      <SeqTopbar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
+    <div className="seq-layout-refined" data-component="sequential-layout">
+      {/* 
+          We removed the local blobs and topbar because this component 
+          is now wrapped in MainLayout/ModuleLayout.
+      */}
       <div className="seq-body">
         {sidebarOpen && <div className="seq-overlay" onClick={() => setSidebarOpen(false)} />}
-
-        <SeqSidebar seqPages={seqPages} currentIndex={currentIndex} progress={progress} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-        <SeqMain seqPages={seqPages} currentIndex={currentIndex} prev={prev} next={next} title={title} subtitle={subtitle} children={children} />
+        <SeqMain 
+          seqPages={seqPages} 
+          currentIndex={currentIndex} 
+          prev={prev} 
+          next={next} 
+          title={title} 
+          subtitle={subtitle} 
+        >
+          {children}
+        </SeqMain>
       </div>
     </div>
   );

@@ -15,8 +15,7 @@ const FOOTER_COLS = [
     links: [
       { label: "Sequential Circuits", to: "/sequential/intro" },
       { label: "Registers & Transfers", to: "/registers/intro" }, // ← NEW
-      { label: "Multiplexers", to: "/mux" },
-      { label: "Demultiplexers", to: "/demux" },
+      { label: "Logic Gates", to: "/gates" },
       { label: "Arithmetic", to: "/arithmetic/binary-adders" },
       { label: "Timing Diagrams", to: "/timing-diagrams" },
     ],

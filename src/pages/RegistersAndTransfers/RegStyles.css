@@ -29,30 +29,29 @@
   --emerald-glow: rgba(16, 185, 129, 0.1);
   --rose: #fb7185;
 
-  --bg-base: #060b18;
-  --bg-surface: #0d1425;
-  --bg-elevated: #121d35;
-  --bg-card: #16233e;
+  --bg-base: var(--app-bg);
+  --bg-surface: var(--app-surface);
+  --bg-elevated: var(--app-surface-strong);
+  --bg-card: var(--app-surface-soft);
 
-  --text-primary: #f0f4ff;
-  --text-secondary: #b8c4d8;
-  --text-muted: #6b7a9a;
-  --text-code: #93c5fd;
+  --text-primary: var(--app-text);
+  --text-secondary: var(--app-muted-strong);
+  --text-muted: var(--app-muted);
+  --text-code: var(--app-accent);
 
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 18px;
   --radius-xl: 24px;
 
-  --shadow-glow:
-    0 0 40px rgba(251, 191, 36, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 40px rgba(251, 191, 36, 0.08), var(--app-shadow);
+  --shadow-card: var(--app-shadow);
 
   --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
   --font-display: "Sora", system-ui, sans-serif;
-  --font-body: "Source Serif 4", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 

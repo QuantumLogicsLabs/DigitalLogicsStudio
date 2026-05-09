@@ -5,7 +5,7 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     try {
-      return localStorage.getItem('theme') || 'dark';
+      return localStorage.getItem('dls_theme') || 'dark';
     } catch (e) {
       return 'dark';
     }
@@ -13,18 +13,22 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem('dls_theme', theme);
     } catch (e) {}
-    document.documentElement.setAttribute('data-theme', theme);
+    const root = document.documentElement;
+    if (theme === 'light') root.setAttribute('data-theme', 'light');
+    else root.setAttribute('data-theme', 'dark');
   }, [theme]);
 
   const toggle = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggle }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  return useContext(ThemeContext);
+};

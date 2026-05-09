@@ -1,17 +1,18 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useTheme } from "./context/ThemeContext";
 
 // PAGES:
 import Home from "./pages/Home/Home";
 import Boolforge from "./pages/Boolforge";
-
-// REGISTER AND TRANSFERS:
+import SignificantDigits from "./pages/SignificantDigits";
+import BCDNotation from "./pages/NumberSystems/BCDNotation";
+import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
+import BitExtension from "./pages/BitExtension";
+import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
 import RegCounters from "./pages/RegistersAndTransfers/RegCounters";
 import RegSyncAsync from "./pages/RegistersAndTransfers/RegSyncAsync";
 import RegShiftRegisters from "./pages/RegistersAndTransfers/RegShiftRegisters";
-import RegIntro from "./pages/RegistersAndTransfers/RegIntro";
 import RegSerialShift from "./pages/RegistersAndTransfers/RegSerialShift";
 import RegLoading from "./pages/RegistersAndTransfers/RegLoading";
 import RegParallel from "./pages/RegistersAndTransfers/RegParallel";
@@ -20,30 +21,30 @@ import RegSyncBinaryCounters from "./pages/RegistersAndTransfers/RegSyncBinaryCo
 
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
+import NumberConverter from "./pages/NumberSystems/NumberConversation";
+import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator";
+import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
 import ProblemSolver from "./pages/Book/Ch1";
 import Ch2ProblemSolver from "./pages/Book/Ch2";
+import BitConverter from "./pages/Bitconverter";
 import ParityBitCalculator from "./pages/ParityBitCalculator";
 import KMapGenerator from "./pages/KmapGenerator";
 import GateExplanation from "./pages/GateExplanation";
 import TimeDiagrams from "./pages/TimeDiagrams";
 import BooleanAlgebraOverview from "./pages/BooleanAlgebra/BooleanAlgebraOverview";
+import BooleanIdentities from "./pages/BooleanIdentities";
+import DualityPrinciple from "./pages/DualityPrinciple";
+import BooleanLaws from "./pages/BooleanLaws";
+import ConsensusTheorem from "./pages/ConsensusTheorem";
+import ComplementPage from "./pages/ComplementPage";
 import StandardForms from "./pages/StandardForms";
+import MintermsPage from "./pages/MintermsPage";
+import MaxtermsPage from "./pages/MaxtermsPage";
+import MintermsMaxtermsRelation from "./pages/MintermsMaxtermsRelation";
 import CircuitCost from "./pages/CircuitCost";
 import UniversalGates from "./pages/UniversalGates";
 import OddFunction from "./pages/OddFunction";
 
-// BOOLEAN ALGEBRA:
-import BooleanLaws from "./pages/BooleanAlgebra/BooleanLaws";
-import BooleanIdentities from "./pages/BooleanAlgebra/BooleanIdentities";
-import MintermsPage from "./pages/BooleanAlgebra/MintermsPage";
-import MaxtermsPage from "./pages/BooleanAlgebra/MaxtermsPage";
-import ComplementPage from "./pages/BooleanAlgebra/ComplementPage";
-import ConsensusTheorem from "./pages/BooleanAlgebra/ConsensusTheorem";
-import DualityPrinciple from "./pages/BooleanAlgebra/DualityPrinciple";
-import MintermsMaxtermsRelation from "./pages/BooleanAlgebra/MintermsMaxtermsRelation";
-import SignificantDigits from "./pages/BooleanAlgebra/SignificantDigits";
-
-// ARITHMETIC FUNCTIONS AND HDLs:
 import BinaryAdders from "./pages/ArithmeticFunctionsAndHDLs/BinaryAdders";
 import BinarySubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinarySubtractor";
 import BinaryAddSubtractor from "./pages/ArithmeticFunctionsAndHDLs/BinaryAddSubtractor";
@@ -55,20 +56,9 @@ import DesignApplications from "./pages/ArithmeticFunctionsAndHDLs/DesignApplica
 import Complements from "./pages/ArithmeticFunctionsAndHDLs/Complements";
 import SignedUnsignedArithmetic from "./pages/ArithmeticFunctionsAndHDLs/SignedUnsignedArithmetic";
 
-// NUMBER SYSTEMS:
-import BitConverter from "./pages/NumberSystems/Bitconverter";
-import BitExtension from "./pages/NumberSystems/BitExtension";
-import NumberConverter from "./pages/NumberSystems/NumberConversation";
-import NumberSystemCalculator from "./pages/NumberSystems/NumberSystemCalculator";
-import BinaryRepresentation from "./pages/NumberSystems/BinaryRepresentation";
-import BCDNotation from "./pages/NumberSystems/BCDNotation";
-import ASCIINotation from "./pages/NumberSystems/ASCIINotation";
-
 // COMBINATIONAL CIRCUITS:
-import EncoderPage from "./pages/EncoderAndDecoder/encoder/EncoderPage";
-import DecoderPage from "./pages/EncoderAndDecoder/decoder/DecoderPage";
-import MuxPage from "./pages/MultiplexersAndDemultiplexers/mux/MuxPage";
-import DemuxPage from "./pages/MultiplexersAndDemultiplexers/demux/DemuxPage";
+import EncoderPage from "./pages/EncoderPage";
+import DecoderPage from "./pages/DecoderPage";
 
 // SEQUENTIAL CIRCUITS:
 import SeqIntro from "./pages/SequentialCircuits/SeqIntro";
@@ -80,170 +70,90 @@ import SeqDesignProcedures from "./pages/SequentialCircuits/SeqDesignProcedures"
 import SeqStateDiagram from "./pages/SequentialCircuits/SeqStateDiagram";
 import SeqStateReduction from "./pages/SequentialCircuits/SeqStateReduction";
 
-// MEMORY SYSTEMS:
-import MemoryBasics from "./pages/Memory/MemoryBasics";
-import ReadOnlyMemories from "./pages/Memory/ReadOnlyMemories";
-import ProgrammableLogicArray from "./pages/Memory/ProgrammableLogicArray";
-import RandomAccessMemory from "./pages/Memory/RandomAccessMemory";
-import StaticDynamicRAM from "./pages/Memory/StaticDynamicRAM";
-import ArrayOfRAMICs from "./pages/Memory/ArrayOfRAMICs";
-import MemoryConstructionRAM from "./pages/Memory/MemoryConstructionRAM";
-import DLDTrainerBoard from "./pages/TrainerBoard";
-import { Analytics } from "@vercel/analytics/react";
+import ModuleLayout from "./components/layout/ModuleLayout";
 
 function App() {
-  const { theme } = useTheme();
-
   return (
-    <div className={`app-root ${theme}`}>
+    <div className="app-root">
       <BrowserRouter>
-        <Analytics />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/boolforge" element={<Boolforge />} />
-          <Route path="/significant-digits" element={<SignificantDigits />} />
-          <Route path="/bcd-notation" element={<BCDNotation />} />
-          <Route path="/ascii-notation" element={<ASCIINotation />} />
-          <Route path="/bit-extension" element={<BitExtension />} />
-          <Route path="/book" element={<ProblemSolver />} />
-          <Route path="/book/ch2" element={<Ch2ProblemSolver />} />
-          <Route path="/numberconversation" element={<NumberConverter />} />
-          <Route
-            path="/numbersystemcalculator"
-            element={<NumberSystemCalculator />}
-          />
-          <Route
-            path="/binaryrepresentation"
-            element={<BinaryRepresentation />}
-          />
-          <Route
-            path="/paritybitcalculator"
-            element={<ParityBitCalculator />}
-          />
-          <Route path="/bitconvertor" element={<BitConverter />} />
-          <Route path="/kmapgenerator" element={<KMapGenerator />} />
-          <Route path="/gates" element={<GateExplanation />} />
-          <Route path="/timing-diagrams" element={<TimeDiagrams />} />
-          <Route path="/boolean-algebra" element={<BooleanAlgebraOverview />} />
-          <Route path="/boolean-identities" element={<BooleanIdentities />} />
-          <Route path="/duality-principle" element={<DualityPrinciple />} />
-          <Route path="/boolean-laws" element={<BooleanLaws />} />
-          <Route path="/consensus-theorem" element={<ConsensusTheorem />} />
-          <Route path="/complement" element={<ComplementPage />} />
-          <Route path="/standard-forms" element={<StandardForms />} />
-          <Route path="/minterms" element={<MintermsPage />} />
-          <Route path="/maxterms" element={<MaxtermsPage />} />
-          <Route
-            path="/minterms-maxterms"
-            element={<MintermsMaxtermsRelation />}
-          />
-          <Route path="/circuit-cost" element={<CircuitCost />} />
-          <Route path="/universal-gates" element={<UniversalGates />} />
-          <Route path="/odd-function" element={<OddFunction />} />
-          <Route path="/arithmetic/binary-adders" element={<BinaryAdders />} />
-          <Route
-            path="/arithmetic/binary-subtractor"
-            element={<BinarySubtractor />}
-          />
-          <Route
-            path="/arithmetic/binary-add-subtractor"
-            element={<BinaryAddSubtractor />}
-          />
-          <Route
-            path="/arithmetic/binary-multipliers"
-            element={<BinaryMultipliers />}
-          />
-          <Route
-            path="/arithmetic/code-conversion"
-            element={<CodeConversion />}
-          />
-          <Route
-            path="/arithmetic/magnitude-comparator"
-            element={<MagnitudeComparator />}
-          />
-          <Route
-            path="/arithmetic/parity-generators"
-            element={<ParityGenerators />}
-          />
-          <Route
-            path="/arithmetic/design-applications"
-            element={<DesignApplications />}
-          />
-          <Route path="/arithmetic/complements" element={<Complements />} />
-          <Route
-            path="/arithmetic/signed-unsigned"
-            element={<SignedUnsignedArithmetic />}
-          />
-          {/* Combinational Circuits */}
-          <Route path="/encoder" element={<EncoderPage />} />
-          <Route path="/decoder" element={<DecoderPage />} />
-          <Route path="/mux" element={<MuxPage />} />
-          <Route path="/demux" element={<DemuxPage />} />
+          
+          {/* Grouped Routes with ModuleLayout */}
+          <Route path="/boolforge" element={<ModuleLayout title="Circuit Forge" subtitle="Drag-and-drop logic builder"><Boolforge /></ModuleLayout>} />
+          
+          {/* Number Systems */}
+          <Route path="/numbersystemcalculator" element={<ModuleLayout title="Number System Calculator"><NumberSystemCalculator /></ModuleLayout>} />
+          <Route path="/numberconversation" element={<ModuleLayout title="Base Converter"><NumberConverter /></ModuleLayout>} />
+          <Route path="/binaryrepresentation" element={<ModuleLayout title="Binary Visualizer"><BinaryRepresentation /></ModuleLayout>} />
+          <Route path="/bcd-notation" element={<ModuleLayout title="BCD Notation"><BCDNotation /></ModuleLayout>} />
+          <Route path="/ascii-notation" element={<ModuleLayout title="ASCII Codes"><ASCIINotation /></ModuleLayout>} />
+          <Route path="/bit-extension" element={<ModuleLayout title="Bit Extension"><BitExtension /></ModuleLayout>} />
+          <Route path="/bitconvertor" element={<ModuleLayout title="Bit Converter"><BitConverter /></ModuleLayout>} />
+          
+          {/* Boolean Algebra */}
+          <Route path="/boolean-algebra" element={<ModuleLayout title="Boolean Algebra Overview"><BooleanAlgebraOverview /></ModuleLayout>} />
+          <Route path="/boolean-identities" element={<ModuleLayout title="Boolean Identities"><BooleanIdentities /></ModuleLayout>} />
+          <Route path="/boolean-laws" element={<ModuleLayout title="Boolean Laws"><BooleanLaws /></ModuleLayout>} />
+          <Route path="/duality-principle" element={<ModuleLayout title="Duality Principle"><DualityPrinciple /></ModuleLayout>} />
+          <Route path="/consensus-theorem" element={<ModuleLayout title="Consensus Theorem"><ConsensusTheorem /></ModuleLayout>} />
+          <Route path="/complement" element={<ModuleLayout title="Complement"><ComplementPage /></ModuleLayout>} />
+          <Route path="/standard-forms" element={<ModuleLayout title="SOP & POS Forms"><StandardForms /></ModuleLayout>} />
+          <Route path="/minterms" element={<ModuleLayout title="Minterms"><MintermsPage /></ModuleLayout>} />
+          <Route path="/maxterms" element={<ModuleLayout title="Maxterms"><MaxtermsPage /></ModuleLayout>} />
+          <Route path="/minterms-maxterms" element={<ModuleLayout title="Minterms-Maxterms Relation"><MintermsMaxtermsRelation /></ModuleLayout>} />
+          
+          {/* Advanced Logic */}
+          <Route path="/circuit-cost" element={<ModuleLayout title="Circuit Cost"><CircuitCost /></ModuleLayout>} />
+          <Route path="/universal-gates" element={<ModuleLayout title="Universal Gates"><UniversalGates /></ModuleLayout>} />
+          <Route path="/odd-function" element={<ModuleLayout title="Odd Function"><OddFunction /></ModuleLayout>} />
+          <Route path="/gates" element={<ModuleLayout title="Gate Explanations"><GateExplanation /></ModuleLayout>} />
+          <Route path="/kmapgenerator" element={<ModuleLayout title="K-Map Generator"><KMapGenerator /></ModuleLayout>} />
+          <Route path="/timing-diagrams" element={<ModuleLayout title="Timing Diagrams"><TimeDiagrams /></ModuleLayout>} />
 
-          {/* Sequential Circuits */}
-          <Route path="/sequential/intro" element={<SeqIntro />} />
-          <Route path="/sequential/latches" element={<SeqLatches />} />
-          <Route path="/sequential/flip-flops" element={<SeqFlipFlops />} />
-          <Route
-            path="/sequential/flip-flop-types"
-            element={<SeqFlipFlopTypes />}
-          />
-          <Route path="/sequential/analysis" element={<SeqAnalysis />} />
-          <Route
-            path="/sequential/design-procedures"
-            element={<SeqDesignProcedures />}
-          />
-          <Route
-            path="/sequential/state-diagram"
-            element={<SeqStateDiagram />}
-          />
-          <Route
-            path="/sequential/state-reduction"
-            element={<SeqStateReduction />}
-          />
+          {/* Combinational */}
+          <Route path="/encoder" element={<ModuleLayout title="Encoder"><EncoderPage /></ModuleLayout>} />
+          <Route path="/decoder" element={<ModuleLayout title="Decoder"><DecoderPage /></ModuleLayout>} />
 
-          <Route path="/registers/intro" element={<RegIntro />} />
-          <Route path="/registers/counters" element={<RegCounters />} />
-          <Route path="/registers/sync-async" element={<RegSyncAsync />} />
-          <Route
-            path="/registers/shift-registers"
-            element={<RegShiftRegisters />}
-          />
-          <Route path="/registers/serial-shift" element={<RegSerialShift />} />
-          <Route path="/registers/loading" element={<RegLoading />} />
-          <Route path="/registers/parallel" element={<RegParallel />} />
-          <Route
-            path="/registers/ripple-counters"
-            element={<RegRippleCounters />}
-          />
-          <Route
-            path="/registers/sync-binary-counters"
-            element={<RegSyncBinaryCounters />}
-          />
-          <Route path="/memory/basics" element={<MemoryBasics />} />
-          <Route
-            path="/memory/read-only-memories"
-            element={<ReadOnlyMemories />}
-          />
-          <Route
-            path="/memory/programmable-logic-array"
-            element={<ProgrammableLogicArray />}
-          />
-          <Route
-            path="/memory/random-access-memory"
-            element={<RandomAccessMemory />}
-          />
-          <Route path="/trainer-board" element={<DLDTrainerBoard />} />
-          <Route
-            path="/memory/static-dynamic-ram"
-            element={<StaticDynamicRAM />}
-          />
-          <Route path="/memory/array-of-ram-ics" element={<ArrayOfRAMICs />} />
-          <Route
-            path="/memory/memory-construction-ram"
-            element={<MemoryConstructionRAM />}
-          />
+          {/* Arithmetic */}
+          <Route path="/arithmetic/binary-adders" element={<ModuleLayout title="Binary Adders"><BinaryAdders /></ModuleLayout>} />
+          <Route path="/arithmetic/binary-subtractor" element={<ModuleLayout title="Binary Subtractor"><BinarySubtractor /></ModuleLayout>} />
+          <Route path="/arithmetic/binary-add-subtractor" element={<ModuleLayout title="Adder/Subtractor"><BinaryAddSubtractor /></ModuleLayout>} />
+          <Route path="/arithmetic/binary-multipliers" element={<ModuleLayout title="Binary Multipliers"><BinaryMultipliers /></ModuleLayout>} />
+          <Route path="/arithmetic/code-conversion" element={<ModuleLayout title="Code Conversion"><CodeConversion /></ModuleLayout>} />
+          <Route path="/arithmetic/magnitude-comparator" element={<ModuleLayout title="Magnitude Comparator"><MagnitudeComparator /></ModuleLayout>} />
+          <Route path="/arithmetic/parity-generators" element={<ModuleLayout title="Parity Generators"><ParityGenerators /></ModuleLayout>} />
+          <Route path="/arithmetic/design-applications" element={<ModuleLayout title="Design Applications"><DesignApplications /></ModuleLayout>} />
+          <Route path="/arithmetic/complements" element={<ModuleLayout title="1's and 2's Complements"><Complements /></ModuleLayout>} />
+          <Route path="/arithmetic/signed-unsigned" element={<ModuleLayout title="Signed/Unsigned Arithmetic"><SignedUnsignedArithmetic /></ModuleLayout>} />
+
+          {/* Sequential */}
+          <Route path="/sequential/intro" element={<ModuleLayout title="Sequential Intro"><SeqIntro /></ModuleLayout>} />
+          <Route path="/sequential/latches" element={<ModuleLayout title="Latches"><SeqLatches /></ModuleLayout>} />
+          <Route path="/sequential/flip-flops" element={<ModuleLayout title="Flip-Flops"><SeqFlipFlops /></ModuleLayout>} />
+          <Route path="/sequential/flip-flop-types" element={<ModuleLayout title="Flip-Flop Types"><SeqFlipFlopTypes /></ModuleLayout>} />
+          <Route path="/sequential/analysis" element={<ModuleLayout title="Sequential Analysis"><SeqAnalysis /></ModuleLayout>} />
+          <Route path="/sequential/design-procedures" element={<ModuleLayout title="Design Procedures"><SeqDesignProcedures /></ModuleLayout>} />
+          <Route path="/sequential/state-diagram" element={<ModuleLayout title="State Diagrams"><SeqStateDiagram /></ModuleLayout>} />
+          <Route path="/sequential/state-reduction" element={<ModuleLayout title="State Reduction"><SeqStateReduction /></ModuleLayout>} />
+
+          {/* Registers */}
+          <Route path="/registers/intro" element={<ModuleLayout title="Registers Intro"><RegIntro /></ModuleLayout>} />
+          <Route path="/registers/counters" element={<ModuleLayout title="Counters"><RegCounters /></ModuleLayout>} />
+          <Route path="/registers/sync-async" element={<ModuleLayout title="Sync / Async"><RegSyncAsync /></ModuleLayout>} />
+          <Route path="/registers/shift-registers" element={<ModuleLayout title="Shift Registers"><RegShiftRegisters /></ModuleLayout>} />
+          <Route path="/registers/serial-shift" element={<ModuleLayout title="Serial Shift"><RegSerialShift /></ModuleLayout>} />
+          <Route path="/registers/loading" element={<ModuleLayout title="Loading Registers"><RegLoading /></ModuleLayout>} />
+          <Route path="/registers/parallel" element={<ModuleLayout title="Parallel Registers"><RegParallel /></ModuleLayout>} />
+          <Route path="/registers/ripple-counters" element={<ModuleLayout title="Ripple Counters"><RegRippleCounters /></ModuleLayout>} />
+          <Route path="/registers/sync-binary-counters" element={<ModuleLayout title="Sync Binary Counters"><RegSyncBinaryCounters /></ModuleLayout>} />
+          
+          {/* Miscellaneous */}
+          <Route path="/significant-digits" element={<ModuleLayout title="Significant Digits"><SignificantDigits /></ModuleLayout>} />
+          <Route path="/book" element={<ModuleLayout title="Book Ch1 Problems"><ProblemSolver /></ModuleLayout>} />
+          <Route path="/book/ch2" element={<ModuleLayout title="Book Ch2 Problems"><Ch2ProblemSolver /></ModuleLayout>} />
+          <Route path="/paritybitcalculator" element={<ModuleLayout title="Parity Bit Calculator"><ParityBitCalculator /></ModuleLayout>} />
         </Routes>
       </BrowserRouter>
     </div>

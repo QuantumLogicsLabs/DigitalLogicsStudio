@@ -1,0 +1,2 @@
+"import React, { useEffect, useRef } from 'react';\n\nconst FiberOpticBackground = () => {\n  const canvasRef = useRef(null);\n\n  useEffect(() => {\n    const canvas = canvasRef.current;\n    const ctx = canvas.getContext('2d');\n    let animationFrameId;
+<truncated 3518 bytes>

@@ -1,0 +1,424 @@
+/* ============================================================
+   Premium Boolean Algebra Aesthetics
+   Digital Logics Studio
+   ============================================================ */
+
+.boolean-algebra-container {
+    position: relative;
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ── Premium Glassmorphism Evaluator Card ── */
+.evaluator-card {
+    background: var(--app-surface);
+    backdrop-filter: blur(var(--app-glass-blur));
+    -webkit-backdrop-filter: blur(var(--app-glass-blur));
+    border: 1px solid var(--app-border-strong);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--app-shadow);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="light"] .evaluator-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6));
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    box-shadow: 
+        0 20px 40px rgba(15, 23, 42, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.evaluator-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--app-accent), transparent);
+    opacity: 0.3;
+}
+
+/* ── Neon Expression Input ── */
+.expression-input-wrapper {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.expression-input {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: var(--app-surface-strong);
+    border: 2px solid var(--app-border);
+    border-radius: 1rem;
+    color: var(--app-text);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--app-shadow);
+    letter-spacing: 0.05em;
+    box-sizing: border-box;
+}
+
+.expression-input:focus {
+    outline: none;
+    border-color: var(--app-accent);
+    box-shadow: 
+        0 0 25px var(--app-accent-soft),
+        inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* ── Vibrant Controls ── */
+.controls-row {
+    display: flex;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+}
+
+.glass-btn {
+    padding: 0.85rem 1.4rem;
+    border-radius: 0.85rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--app-border);
+    background: var(--app-surface-soft);
+    color: var(--app-text);
+    box-shadow: var(--app-shadow);
+}
+
+.glass-btn:hover {
+    background: var(--app-accent-soft);
+    border-color: var(--app-border-strong);
+    color: var(--app-accent);
+    transform: translateY(-3px);
+}
+
+.glass-btn.primary {
+    background: var(--app-accent);
+    border: 1px solid var(--app-accent);
+    color: white;
+    box-shadow: 0 6px 15px var(--app-accent-soft);
+}
+
+.glass-btn.primary:hover {
+    background: color-mix(in srgb, var(--app-accent) 85%, white);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 25px var(--app-accent-soft);
+}
+
+/* ── Premium Glowing Truth Table ── */
+.truth-table-wrapper {
+    overflow-x: auto;
+    border-radius: 1.25rem;
+    background: var(--app-surface-strong);
+    border: 1px solid var(--app-border);
+    box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.5rem;
+}
+
+.premium-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 450px;
+}
+
+.premium-table th {
+    background: var(--app-accent-soft);
+    color: var(--app-text);
+    font-weight: 700;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--app-border-strong);
+}
+
+.premium-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--app-border);
+    color: var(--app-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+}
+
+.premium-table tr:last-child td {
+    border-bottom: none;
+}
+
+.premium-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .cell-1 {
+    color: #2563eb;
+    text-shadow: none;
+}
+
+/* Glowing Badges */
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.badge-0 { 
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(153, 27, 27, 0.3)); 
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5; 
+}
+[data-theme="light"] .badge-0 {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(254, 226, 226, 0.5)); 
+    color: #ef4444;
+}
+
+.badge-1 { 
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.3)); 
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #86efac; 
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+}
+[data-theme="light"] .badge-1 {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(220, 252, 231, 0.5)); 
+    color: #16a34a;
+    box-shadow: none;
+}
+
+/* ── 3D Canonical Form Cards ── */
+.canonical-forms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.8rem;
+    margin-top: 2rem;
+}
+
+.canonical-card {
+    background: var(--app-surface-soft);
+    padding: 1.8rem;
+    border-radius: 1.25rem;
+    border: 1px solid var(--app-border);
+    border-left: 4px solid var(--app-accent);
+    box-shadow: var(--app-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.canonical-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.canonical-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(59, 130, 246, 0.2);
+    border-left-color: #06b6d4;
+}
+
+[data-theme="light"] .canonical-card:hover {
+    box-shadow: 
+        0 20px 40px rgba(15, 23, 42, 0.1),
+        0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.canonical-card h4 {
+    margin-top: 0;
+    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+[data-theme="light"] .canonical-card h4 {
+    color: #475569;
+}
+
+.canonical-expr {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f8fafc;
+    word-break: break-all;
+    line-height: 1.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .canonical-expr {
+    color: #0f172a;
+    text-shadow: none;
+}
+
+/* Responsive Design Overrides */
+@media (max-width: 768px) {
+    .evaluator-card {
+        padding: 1.5rem;
+    }
+    
+    .expression-input {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+    
+    .canonical-forms {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Beginner UX Enhancements ── */
+.btn-icon {
+    margin-right: 8px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.glass-btn:hover .btn-icon {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+    transform: scale(1.1);
+}
+
+.symbol-guide {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 0.75rem;
+    backdrop-filter: blur(5px);
+}
+
+.guide-item {
+    font-size: 0.85rem;
+    color: var(--secondary-text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.2s ease;
+}
+
+.guide-item:hover {
+    color: var(--text-color);
+}
+
+.guide-item svg {
+    color: #38bdf8;
+    filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.3));
+}
+
+.guide-item code {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.beginner-hint {
+    font-size: 0.75rem;
+    color: #34d399;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(52, 211, 153, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.beginner-hint svg {
+    filter: drop-shadow(0 0 2px rgba(52, 211, 153, 0.4));
+}
+
+.summary-icon {
+    color: #3b82f6;
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
+}
+
+[data-theme="light"] .table-summary {
+    background: rgba(255, 255, 255, 0.8);
+    color: #475569;
+    border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+/* ── Neon Logic Diagrams ── */
+.logic-diagram-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.neon-logic-svg {
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+}
+
+.logic-gate {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px #3b82f6);
+}
+
+.wire {
+    stroke: rgba(148, 163, 184, 0.4);
+    stroke-width: 1.5;
+}
+
+.output-node {
+    fill: #3b82f6;
+    filter: drop-shadow(0 0 8px #3b82f6);
+    animation: pulseOutput 2s infinite ease-in-out;
+}
+
+@keyframes pulseOutput {
+    0% { opacity: 0.6; r: 3; }
+    50% { opacity: 1; r: 4; }
+    100% { opacity: 0.6; r: 3; }
+}
+
+.sop-circuit .logic-gate { stroke: #38bdf8; filter: drop-shadow(0 0 5px #38bdf8); }
+.sop-circuit .output-node { fill: #38bdf8; filter: drop-shadow(0 0 8px #38bdf8); }
+
+.pos-circuit .logic-gate { stroke: #8b5cf6; filter: drop-shadow(0 0 5px #8b5cf6); }
+.pos-circuit .output-node { fill: #8b5cf6; filter: drop-shadow(0 0 8px #8b5cf6); }
+
+[data-theme="light"] .logic-diagram-wrapper {
+    background: rgba(241, 245, 249, 0.5);
+    border-color: rgba(15, 23, 42, 0.05);
+}
