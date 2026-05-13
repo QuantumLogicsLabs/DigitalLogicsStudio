@@ -6,18 +6,14 @@ import React, {
   useCallback,
 } from "react";
 import authService from "../services/authService";
-
-// FIX 5: AuthContext.jsx was not present in the uploaded codebase but is
-//         imported by index.js (<AuthProvider>) and indirectly used across
-//         auth pages and ProtectedRoute.  Without it every page that touches
-//         auth crashes at runtime.  This is the canonical implementation that
-//         matches all the authService calls already in the codebase.
+import progressService from "../services/progressService";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // true = still checking session
+  const [loading, setLoading] = useState(true);
+  const [solvedProblems, setSolvedProblems] = useState(new Set());
 
   // ── Bootstrap: check if there is an existing session cookie ──────────────
   useEffect(() => {
@@ -25,8 +21,11 @@ export function AuthProvider({ children }) {
       try {
         const data = await authService.getCurrentUser();
         setUser(data.user);
+        // If backend embeds solvedProblems on the user object, use that
+        if (data.user?.solvedProblems?.length) {
+          setSolvedProblems(new Set(data.user.solvedProblems));
+        }
       } catch {
-        // 401 → no active session, that is fine
         setUser(null);
       } finally {
         setLoading(false);
@@ -40,6 +39,9 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const data = await authService.login({ email, password });
     setUser(data.user);
+    if (data.user?.solvedProblems?.length) {
+      setSolvedProblems(new Set(data.user.solvedProblems));
+    }
     return data;
   }, []);
 
@@ -54,7 +56,30 @@ export function AuthProvider({ children }) {
       await authService.logout();
     } finally {
       setUser(null);
+      setSolvedProblems(new Set());
     }
+  }, []);
+
+  // ── Problem progress ──────────────────────────────────────────────────────
+
+  const hasSolvedProblem = useCallback(
+    (problemId) => solvedProblems.has(problemId),
+    [solvedProblems],
+  );
+
+  const markProblemSolved = useCallback(async (problemId) => {
+    if (!problemId) return;
+
+    // Optimistic update so UI reflects "Completed" immediately
+    setSolvedProblems((prev) => {
+      if (prev.has(problemId)) return prev;
+      const next = new Set(prev);
+      next.add(problemId);
+      return next;
+    });
+
+    // Persist via the existing progress route
+    await progressService.completeProblem(problemId);
   }, []);
 
   const value = {
@@ -64,6 +89,9 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    solvedProblems,
+    hasSolvedProblem,
+    markProblemSolved,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

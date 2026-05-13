@@ -20,6 +20,14 @@ const authService = {
     const { data } = await apiClient.get("/auth/me");
     return data;
   },
+
+  // Uses the existing /progress route (progressService pattern)
+  markProblemSolved: async (problemId) => {
+    const { data } = await apiClient.post(
+      `/progress/problems/${problemId}/complete`,
+    );
+    return data;
+  },
 };
 
 export default authService;
