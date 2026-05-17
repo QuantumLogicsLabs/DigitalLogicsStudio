@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import authService from "../services/authService";
+import { isPrerendering } from "../utils/prerender";
 
 const AuthContext = createContext(null);
 
@@ -29,6 +30,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (isPrerendering()) {
+      applyUserState(null);
+      setLoading(false);
+      return;
+    }
+
     const checkSession = async () => {
       try {
         const data = await authService.getCurrentUser();

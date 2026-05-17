@@ -3,6 +3,7 @@ import { gateSymbols } from "../data/gates";
 import { TruthTableGenerator } from "../components/TruthTable";
 import { SaveAndLoad } from "../components/SaveAndLoad";
 import { parseExpressionToCircuit } from "../utils/expressionParser";
+import RelatedSeoLinks from "../components/seo/RelatedSeoLinks";
 import "./../assets/css/Boolforge.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -1209,6 +1210,7 @@ const Boolforge = ({
           </div>
         </div>
       )}
+      <RelatedSeoLinks />
     </div>
   );
 };

@@ -24,17 +24,27 @@
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet-async": "^3.0.0",
     "react-icons": "^5.5.0",
-    "react-scripts": "5.0.1",
     "react-router-dom": "^6.20.1",
+    "react-scripts": "5.0.1",
+    "react-snap": "^1.23.0",
     "web-vitals": "^2.1.4",
     "ws": "^8.15.0"
   },
   "scripts": {
+    "prebuild": "node scripts/generateSeoAssets.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node scripts/runReactSnap.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "reactSnap": {
+    "source": "build",
+    "crawl": false,
+    "skipThirdPartyRequests": true,
+    "inlineCss": false
   },
   "eslintConfig": {
     "extends": [

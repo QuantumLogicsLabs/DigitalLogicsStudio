@@ -6,6 +6,8 @@ import { GroupingGuide } from '../components/GroupingGuide';
 import { TruthTableDisplay } from '../components/TruthTableDisplay';
 import { useKMapLogic } from '../hooks/useKMapLogic';
 import Boolforge from './Boolforge';
+import RelatedSeoLinks from '../components/seo/RelatedSeoLinks';
+import { trackToolInteraction } from '../utils/analytics';
 
 const KMapGenerator = () => {
     const [numVariables, setNumVariables] = useState(3);
@@ -34,6 +36,9 @@ const KMapGenerator = () => {
     };
 
     const handleExample = () => {
+        trackToolInteraction('kmap_generator', 'load_example', {
+            variable_count: numVariables,
+        });
         if (numVariables === 3) {
             setMinterms('0,1,2,5,6,7');
             setDontCares('3,4');
@@ -48,6 +53,9 @@ const KMapGenerator = () => {
     };
 
     const handleReset = () => {
+        trackToolInteraction('kmap_generator', 'reset', {
+            variable_count: numVariables,
+        });
         setMinterms('');
         setDontCares('');
         setShowSolution(false);
@@ -73,7 +81,13 @@ const KMapGenerator = () => {
                     onMintermsChange={setMinterms}
                     onDontCaresChange={setDontCares}
                     onOptimizationTypeChange={setOptimizationType}
-                    onGenerate={() => setShowSolution(true)}
+                    onGenerate={() => {
+                        trackToolInteraction('kmap_generator', 'generate_solution', {
+                            variable_count: numVariables,
+                            optimization_type: optimizationType,
+                        });
+                        setShowSolution(true);
+                    }}
                     onExample={handleExample}
                     onReset={handleReset}
                 />
@@ -232,6 +246,7 @@ const KMapGenerator = () => {
                     }
                 }
             `}</style>
+            <RelatedSeoLinks />
         </div>
     );
 };

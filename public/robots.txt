@@ -1,18 +1,9 @@
-# https://www.robotstxt.org/robotstxt.html
-
-# Allow all crawlers to index public content
 User-agent: *
 Allow: /
 
-# Block auth and private API paths from indexing
 Disallow: /login
 Disallow: /signup
 Disallow: /profile
 Disallow: /api/
 
-# Block build artifacts and source maps
-Disallow: /static/js/*.map
-Disallow: /static/css/*.map
-
-# Sitemap location
 Sitemap: https://circuits.quantumlogicslimited.com/sitemap.xml

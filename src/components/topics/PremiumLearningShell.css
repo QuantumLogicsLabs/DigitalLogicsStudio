@@ -22,6 +22,21 @@
   width: min(100%, 100%);
 }
 
+.premium-related-links .premium-related-link-card {
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.premium-related-links .premium-related-link-card:hover,
+.premium-related-links .premium-related-link-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--afhdl-border-strong);
+  background: var(--afhdl-surface-strong);
+}
+
 .premium-topic-shell.ba-layout,
 .premium-topic-shell.ns-layout,
 .premium-topic-shell.seq-layout,

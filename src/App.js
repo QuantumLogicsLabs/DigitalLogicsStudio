@@ -2,6 +2,9 @@ import React, { Suspense, lazy } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useTheme } from "./context/ThemeContext";
+import RouteSeoManager from "./components/seo/RouteSeoManager";
+import RouteNormalizer from "./components/seo/RouteNormalizer";
+import AnalyticsTracker from "./components/seo/AnalyticsTracker";
 
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
@@ -161,6 +164,7 @@ const DLDTrainerBoard = lazy(() => import("./pages/TrainerBoard"));
 const LoginPage = lazy(() => import("./pages/Auth/LoginPage"));
 const SignupPage = lazy(() => import("./pages/Auth/SignupPage"));
 const ProfilePage = lazy(() => import("./pages/Auth/ProfilePage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
   const { theme } = useTheme();
@@ -171,6 +175,9 @@ function App() {
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <ScrollToTop />
+        <RouteNormalizer />
+        <RouteSeoManager />
+        <AnalyticsTracker />
         <Suspense
           fallback={
             <div className="app-route-loading">Loading workspace...</div>
@@ -189,6 +196,7 @@ function App() {
               }
             />
             <Route path="/problems" element={<ProblemsPage />} />
+            <Route path="/problems/:topicSlug" element={<ProblemsPage />} />
             <Route path="/boolforge" element={<Boolforge />} />
 
             {/* ── Boolean Algebra (/boolean/* matches baConfig.js) ── */}
@@ -369,6 +377,7 @@ function App() {
 
             {/* ── Misc ──────────────────────────────────────────── */}
             <Route path="/trainer-board" element={<DLDTrainerBoard />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
@@ -377,4 +386,3 @@ function App() {
 }
 
 export default App;
-

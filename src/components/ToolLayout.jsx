@@ -1,4 +1,5 @@
 import React from 'react';
+import RelatedSeoLinks from './seo/RelatedSeoLinks';
 
 const ToolLayout = ({ title, subtitle, children }) => {
   return (
@@ -14,10 +15,10 @@ const ToolLayout = ({ title, subtitle, children }) => {
 
       <div className="main-content">
         {children}
+        <RelatedSeoLinks />
       </div>
     </div>
   );
 };
 
 export default ToolLayout;
-

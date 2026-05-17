@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import progressService from "../../services/progressService";
 import "../../pages/ArithmeticFunctionsAndHDLs/AFHDLLayout.css";
 import "./PremiumLearningShell.css";
+import RelatedSeoLinks from "../seo/RelatedSeoLinks";
 
 function SunIcon() {
   return (
@@ -357,6 +358,8 @@ const PremiumLearningShell = ({
           </section>
 
           <div className="afhdl-content premium-topic-content">{children}</div>
+
+          <RelatedSeoLinks />
 
           <footer className="afhdl-footer-nav">
             {prev ? (
