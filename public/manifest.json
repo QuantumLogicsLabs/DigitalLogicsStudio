@@ -1,23 +1,12 @@
 {
   "short_name": "Boolforge",
-  "name": "Boolforge",
-  "description": "Interactive digital logic design learning platform — Boolean algebra, K-maps, number systems, sequential circuits, and more.",
+  "name": "Boolforge - Computer Engineering and Digital Logic Learning Platform",
+  "description": "Boolforge is an interactive digital logic design learning platform for Boolean algebra, K-maps, logic gates, number systems, computer architecture, FPGA, embedded systems, and complete computer engineering learning resources.",
   "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
     {
       "src": "favicon.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "favicon-512.png",
-      "type": "image/png",
-      "sizes": "512x512",
       "purpose": "any maskable"
     }
   ],
@@ -34,14 +23,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Boolean Algebra interactive solver"
+      "label": "Boolforge Boolean Algebra Learning Platform"
     },
     {
       "src": "screenshot-mobile.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "K-Map generator on mobile"
+      "label": "Boolforge Digital Logic Tool"
     }
   ]
 }

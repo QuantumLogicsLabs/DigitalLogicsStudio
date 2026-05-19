@@ -22,6 +22,7 @@ const SeoHead = ({ pathname, meta }) => {
   const imageAlt = `${meta.title || SITE_NAME} preview image`;
   const googleSiteVerification = process.env.REACT_APP_GOOGLE_SITE_VERIFICATION;
   const bingSiteVerification = process.env.REACT_APP_BING_SITE_VERIFICATION;
+  const facebookAppId = process.env.REACT_APP_FACEBOOK_APP_ID;
 
   return (
     <Helmet prioritizeSeoTags>
@@ -33,8 +34,16 @@ const SeoHead = ({ pathname, meta }) => {
       <meta name="application-name" content={SITE_NAME} />
       <meta name="robots" content={robots} />
       <meta name="googlebot" content={robots} />
+      <meta name="bingbot" content={robots} />
+      <meta name="referrer" content="strict-origin-when-cross-origin" />
       <meta name="theme-color" content="#020617" />
       <link rel="canonical" href={canonicalUrl} />
+      <link rel="home" href={SITE_URL} />
+      <link
+        rel="sitemap"
+        type="application/xml"
+        href={`${SITE_URL}/sitemap.xml`}
+      />
       {googleSiteVerification ? (
         <meta
           name="google-site-verification"
@@ -48,6 +57,9 @@ const SeoHead = ({ pathname, meta }) => {
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:locale" content="en_US" />
       <meta property="og:type" content={ogType} />
+      {facebookAppId ? (
+        <meta property="fb:app_id" content={facebookAppId} />
+      ) : null}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonicalUrl} />
@@ -56,6 +68,7 @@ const SeoHead = ({ pathname, meta }) => {
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={imageAlt} />
+      <meta property="og:logo" content={`${SITE_URL}/favicon.png`} />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content={TWITTER_HANDLE} />

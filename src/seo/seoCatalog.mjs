@@ -1,8 +1,30 @@
 export const SITE_NAME = "Boolforge";
-export const SITE_URL = "https://circuits.quantumlogicslimited.com";
+export const SITE_URL = (
+  process.env.REACT_APP_SITE_URL ||
+  process.env.SITE_URL ||
+  "https://boolforge.com"
+).replace(/\/+$/, "");
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const TWITTER_HANDLE = "@Boolforge";
-export const DEFAULT_AUTHOR = "Boolforge";
+export const BRAND_ALTERNATE_NAMES = [
+  "Boolforge Boolean Algebra",
+  "Boolforge Digital Logic",
+  "Boolforge Computer Engineering",
+  "Boolforge K-Map Solver",
+];
+export const BRAND_TOPICS = [
+  "Boolforge",
+  "Boolean Algebra",
+  "Digital Logic Design",
+  "Logic Gates",
+  "Karnaugh Maps",
+  "K-Maps",
+  "Number Systems",
+  "Computer Architecture",
+  "Computer Engineering",
+  "FPGA",
+  "Embedded Systems",
+];
 
 const buildRoute = ({
   path,
@@ -19,7 +41,7 @@ const buildRoute = ({
   ogImage = DEFAULT_OG_IMAGE,
 }) => ({
   path,
-  title,
+  title: title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`,
   description,
   keywords,
   type,
@@ -514,6 +536,10 @@ export const SEO_ROUTES = [
     description:
       "Master Boolean algebra, Karnaugh maps, number systems, flip-flops, arithmetic circuits, and digital logic exam preparation with interactive tools and tutorials.",
     keywords: [
+      "Boolforge",
+      "Boolforge digital logic",
+      "Boolforge boolean algebra",
+      "Boolforge computer engineering",
       "digital logic design tutorial",
       "boolean algebra calculator",
       "karnaugh map solver",
@@ -532,8 +558,11 @@ export const SEO_ROUTES = [
     path: "/boolforge",
     title: "Boolean Algebra Calculator and Circuit Builder | Boolforge",
     description:
-      "Use Boolforge as a Boolean algebra calculator and circuit builder to simplify expressions, test logic gates, and study digital design interactively.",
+      "Use Boolforge as a Boolean algebra calculator and circuit builder to simplify expressions, test logic gates, and study digital logic design interactively.",
     keywords: [
+      "Boolforge",
+      "Boolforge Boolean Algebra",
+      "Boolforge Digital Logic",
       "boolean algebra calculator",
       "boolean algebra simplification",
       "logic gate simulator",

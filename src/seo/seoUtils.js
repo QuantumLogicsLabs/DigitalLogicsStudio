@@ -1,6 +1,7 @@
 import {
-  DEFAULT_AUTHOR,
   DEFAULT_OG_IMAGE,
+  BRAND_ALTERNATE_NAMES,
+  BRAND_TOPICS,
   SEO_ROUTES,
   SEO_ROUTE_MAP,
   SITE_NAME,
@@ -74,8 +75,14 @@ export const buildDefaultSeo = (pathname = "/") => {
     path: normalized,
     title: `${slugLabel} | ${SITE_NAME}`,
     description:
-      "Explore interactive digital logic learning resources, circuit tools, and guided practice on Boolforge.",
-    keywords: ["digital logic", "boolean algebra", "computer engineering"],
+      "Explore Boolforge interactive digital logic learning resources, circuit tools, and guided computer engineering practice.",
+    keywords: [
+      "Boolforge",
+      "Boolforge digital logic",
+      "digital logic",
+      "boolean algebra",
+      "computer engineering",
+    ],
     type: authPaths.has(normalized) ? "WebPage" : "LearningResource",
     section: authPaths.has(normalized) ? "Account" : "Learn",
     category: authPaths.has(normalized) ? "Authentication" : "Digital Logic",
@@ -142,13 +149,20 @@ export const buildBreadcrumbSchema = (pathname, meta) => ({
   })),
 });
 
+const schemaId = (suffix) => `${SITE_URL}/#${suffix}`;
+
 const buildWebsiteSchema = (meta) => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": schemaId("website"),
   name: SITE_NAME,
+  alternateName: BRAND_ALTERNATE_NAMES,
   url: SITE_URL,
   description: meta.description,
   inLanguage: "en-US",
+  publisher: {
+    "@id": schemaId("organization"),
+  },
   potentialAction: {
     "@type": "SearchAction",
     target: `${SITE_URL}/?q={search_term_string}`,
@@ -159,21 +173,20 @@ const buildWebsiteSchema = (meta) => ({
 const buildOrganizationSchema = () => ({
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
+  "@id": schemaId("organization"),
   name: SITE_NAME,
+  legalName: SITE_NAME,
+  alternateName: BRAND_ALTERNATE_NAMES,
   url: SITE_URL,
   logo: `${SITE_URL}/favicon.png`,
+  image: DEFAULT_OG_IMAGE,
   description:
-    "Interactive educational platform for Boolean algebra, digital logic design, number systems, and exam-oriented practice.",
-  sameAs: [],
-  knowsAbout: [
-    "Boolean Algebra",
-    "Digital Logic Design",
-    "Karnaugh Maps",
-    "Combinational Circuits",
-    "Sequential Circuits",
-    "Number Systems",
-    "Memory Systems",
+    "Boolforge is an interactive educational platform for Boolean algebra, digital logic design, logic gates, Karnaugh maps, number systems, computer architecture, and computer engineering practice.",
+  sameAs: [
+    SITE_URL,
   ],
+  knowsAbout: BRAND_TOPICS,
+  slogan: "Forge digital logic mastery with interactive computer engineering tools.",
 });
 
 const buildSoftwareApplicationSchema = (pathname, meta) => ({
@@ -193,8 +206,10 @@ const buildSoftwareApplicationSchema = (pathname, meta) => ({
   image: meta.ogImage || DEFAULT_OG_IMAGE,
   url: buildAbsoluteUrl(pathname),
   author: {
-    "@type": "Organization",
-    name: DEFAULT_AUTHOR,
+    "@id": schemaId("organization"),
+  },
+  publisher: {
+    "@id": schemaId("organization"),
   },
 });
 
@@ -209,11 +224,9 @@ const buildLearningResourceSchema = (pathname, meta) => ({
   inLanguage: "en-US",
   isAccessibleForFree: true,
   provider: {
-    "@type": "EducationalOrganization",
-    name: SITE_NAME,
-    url: SITE_URL,
+    "@id": schemaId("organization"),
   },
-  about: meta.category,
+  about: [meta.category, ...BRAND_TOPICS.slice(1, 6)].filter(Boolean),
 });
 
 const buildFaqSchema = (meta) => ({
@@ -230,12 +243,11 @@ const buildFaqSchema = (meta) => ({
 });
 
 export const buildStructuredData = (pathname, meta) => {
-  const graph = [buildBreadcrumbSchema(pathname, meta)];
-
-  if (pathname === "/") {
-    graph.push(buildWebsiteSchema(meta));
-    graph.push(buildOrganizationSchema());
-  }
+  const graph = [
+    buildOrganizationSchema(),
+    buildWebsiteSchema(meta),
+    buildBreadcrumbSchema(pathname, meta),
+  ];
 
   if (meta.type === "SoftwareApplication") {
     graph.push(buildSoftwareApplicationSchema(pathname, meta));

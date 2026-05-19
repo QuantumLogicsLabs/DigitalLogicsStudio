@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import { useTheme } from "./context/ThemeContext";
 import RouteSeoManager from "./components/seo/RouteSeoManager";
 import RouteNormalizer from "./components/seo/RouteNormalizer";
@@ -381,6 +382,7 @@ function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      <Analytics />
     </div>
   );
 }

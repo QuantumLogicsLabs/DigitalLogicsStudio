@@ -24,10 +24,15 @@ async function main() {
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ...routes.map((route) => {
       const loc = `${catalog.SITE_URL}${route.path}`;
+      const priority = route.path === "/" ? "1.0" : route.path === "/boolforge" ? "0.95" : "0.80";
+      const changefreq =
+        route.path === "/" || route.path === "/boolforge" ? "weekly" : "monthly";
       return [
         "  <url>",
         `    <loc>${escapeXml(loc)}</loc>`,
         `    <lastmod>${lastmod}</lastmod>`,
+        `    <changefreq>${changefreq}</changefreq>`,
+        `    <priority>${priority}</priority>`,
         "  </url>",
       ].join("\n");
     }),
@@ -44,7 +49,7 @@ async function main() {
     "Disallow: /profile",
     "Disallow: /api/",
     "",
-    "Sitemap: https://circuits.quantumlogicslimited.com/sitemap.xml",
+    `Sitemap: ${catalog.SITE_URL}/sitemap.xml`,
     "",
   ].join("\n");
 
