@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import FiberOpticBackground from "../../components/animations/FiberOpticBackground";
 import { useAuth } from "../../context/AuthContext";
 
