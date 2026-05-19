@@ -6,4 +6,4 @@ Disallow: /signup
 Disallow: /profile
 Disallow: /api/
 
-Sitemap: https://circuits.quantumlogicslimited.com/sitemap.xml
+Sitemap: https://boolforge.com/sitemap.xml
