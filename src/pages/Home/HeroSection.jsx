@@ -51,7 +51,7 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
           {user ? `Welcome back, ${user.name}` : "Free interactive digital logic platform"}
         </div>
 
-        <h2>Explore, visualize and<br /> master digital logic.</h2>
+        <h1>Boolforge interactive digital logic learning platform</h1>
         <p>
           {user
             ? "Your account is active. Keep building with circuits, Karnaugh maps, number systems, and binary arithmetic in one smooth workspace."

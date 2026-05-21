@@ -9,7 +9,7 @@ const routesPath = path.resolve(__dirname, "..", "react-snap-routes.json");
 const buildDir = path.resolve(__dirname, "..", "build");
 const defaultPort = Number.parseInt(process.env.PRERENDER_PORT || "45678", 10);
 const isVercel = Boolean(process.env.VERCEL);
-const requirePrerender = process.env.PRERENDER_REQUIRED === "true";
+const requirePrerender = process.env.PRERENDER_REQUIRED !== "false";
 
 const loadIncludeRoutes = () => {
   if (!fs.existsSync(routesPath)) {

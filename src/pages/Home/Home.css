@@ -126,7 +126,7 @@
   opacity: calc(var(--ghost-opacity) * 0.05);
 }
 
-.home-hero-content h2 {
+.home-hero-content h1 {
   font-size: 3.5rem !important;
   font-weight: 800 !important;
   color: var(--text-color); /* fallback */
@@ -138,7 +138,7 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent; /* standard alternative */
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   margin-bottom: 1.5rem !important;
 }
 
@@ -515,8 +515,8 @@
     padding: 4.5rem 1rem !important;
   }
 
-  .home-hero-content h2 {
-    font-size: clamp(2.2rem, 10vw, 3rem) !important;
+  .home-hero-content h1 {
+    font-size: 2.4rem !important;
   }
 
   .search-container {

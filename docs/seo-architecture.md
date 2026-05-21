@@ -25,6 +25,8 @@ Boolforge now uses a shared SEO architecture that keeps the existing CRA + React
 
 The build uses a deterministic `postbuild` prerender step driven by `react-snap-routes.json` and `scripts/runReactSnap.js`. The runner serves the CRA build locally, renders each canonical route with Puppeteer using a `ReactSnap` user agent, and writes static HTML snapshots back into `build/`.
 
+Prerendering is required by default, including on Vercel. Set `PRERENDER_REQUIRED=false` only for an intentional emergency deploy where serving the JavaScript shell is acceptable.
+
 The app uses hydration-safe bootstrapping in `src/index.js`:
 
 - `hydrateRoot()` when pre-rendered HTML already exists
@@ -48,6 +50,8 @@ Frontend:
 - `REACT_APP_GA_MEASUREMENT_ID`
 - `REACT_APP_GOOGLE_SITE_VERIFICATION`
 - `REACT_APP_BING_SITE_VERIFICATION`
+
+If `REACT_APP_SITE_URL` is not provided, canonical URLs default to `https://circuits.quantumlogicslimited.com`.
 
 ## Search Console rollout
 

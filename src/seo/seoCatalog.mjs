@@ -2,7 +2,7 @@ export const SITE_NAME = "Boolforge";
 export const SITE_URL = (
   process.env.REACT_APP_SITE_URL ||
   process.env.SITE_URL ||
-  "https://boolforge.com"
+  "https://circuits.quantumlogicslimited.com"
 ).replace(/\/+$/, "");
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const TWITTER_HANDLE = "@Boolforge";
