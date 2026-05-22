@@ -323,6 +323,26 @@ export default function NumberConverter() {
 
     const handleConversionClick = (conversion) => { setSelectedConversion(conversion); setShowExplanation(true); };
 
+    const getStepKind = (step, index, totalSteps) => {
+        if (index === 0) return 'start';
+        if (index === totalSteps - 1) return 'result';
+        if (/Expand|Pad and group|Convert each|Read remainders|remainder|take/i.test(step)) return 'work';
+        return 'note';
+    };
+
+    const stepLabels = {
+        start: 'Given',
+        work: 'Work',
+        note: 'Note',
+        result: 'Answer',
+    };
+
+    const formatStepText = (step) => (
+        step
+            .replaceAll(' x ', ' × ')
+            .replaceAll(' -> ', ' → ')
+    );
+
     const clearAll = () => {
         setDecimal('');
         setBinary('');
@@ -451,25 +471,57 @@ export default function NumberConverter() {
                     ))}
                 </div>
 
-                {showExplanation && selectedConversion && (
-                    <div className="modal-overlay" onClick={() => setShowExplanation(false)}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <button className="modal-close" onClick={() => setShowExplanation(false)}>×</button>
-                            <h3 className="modal-title">{getExplanation(selectedConversion).title}</h3>
-                            <div className="steps-container">
-                                {getExplanation(selectedConversion).steps.map((step, index) => (
-                                    <div key={index} className={`step-item ${index % 2 === 0 ? 'even' : 'odd'}`}>{step}</div>
-                                ))}
-                            </div>
-                            <div className="pro-tip">
-                                <p className="pro-tip-label">Pro Tip</p>
-                                <p className="pro-tip-text">
-                                    Try entering different values in the converter boxes above to see how numbers change across different bases in real-time!
-                                </p>
+                {showExplanation && selectedConversion && (() => {
+                    const explanation = getExplanation(selectedConversion);
+
+                    return (
+                        <div className="modal-overlay" onClick={() => setShowExplanation(false)}>
+                            <div className="modal-content conversion-explainer" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    className="modal-close"
+                                    type="button"
+                                    aria-label="Close conversion explanation"
+                                    onClick={() => setShowExplanation(false)}
+                                >
+                                    ×
+                                </button>
+
+                                <div className="modal-heading">
+                                    <p className="modal-kicker">Step-by-step conversion</p>
+                                    <h3 className="modal-title">{explanation.title}</h3>
+                                </div>
+
+                                <div className="steps-container">
+                                    {explanation.steps.map((step, index) => {
+                                        const kind = getStepKind(step, index, explanation.steps.length);
+
+                                        return (
+                                            <div
+                                                key={`${kind}-${index}`}
+                                                className={`step-item step-${kind} ${index % 2 === 0 ? 'even' : 'odd'}`}
+                                            >
+                                                <div className="step-marker" aria-hidden="true">
+                                                    {String(index + 1).padStart(2, '0')}
+                                                </div>
+                                                <div className="step-copy">
+                                                    <span className="step-label">{stepLabels[kind]}</span>
+                                                    <p className="step-text">{formatStepText(step)}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="pro-tip">
+                                    <p className="pro-tip-label">Pro Tip</p>
+                                    <p className="pro-tip-text">
+                                        Change any converter value above, then reopen this guide to compare the same method with a new number.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
             </div>
 
             <QuaternarySection />

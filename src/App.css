@@ -35,7 +35,11 @@
   padding: 2rem;
   color: var(--text-color);
   background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 24%),
+    radial-gradient(
+      circle at top left,
+      rgba(59, 130, 246, 0.12),
+      transparent 24%
+    ),
     linear-gradient(180deg, var(--bg-color) 0%, rgba(15, 23, 42, 0.92) 100%);
   font-size: 1rem;
   letter-spacing: 0.02em;
@@ -203,7 +207,6 @@
 .home-auth-btn:hover,
 .home-user-badge:hover {
   transform: translateY(-1px);
-
 }
 
 .home-auth-btn--ghost,
@@ -251,7 +254,10 @@
   border: 1px solid var(--border-color);
   color: var(--secondary-text);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .home-theme-btn:hover {
@@ -274,7 +280,9 @@
   border: 1px solid var(--border-color);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .home-hamburger:hover {
@@ -289,7 +297,9 @@
   height: 1.5px;
   background: var(--text-color);
   border-radius: 2px;
-  transition: transform 0.22s ease, opacity 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    opacity 0.22s ease;
   transform-origin: center;
 }
 
@@ -325,7 +335,9 @@
   transition: max-height 0.3s ease;
   background: var(--nav-bg);
   border-top: 1px solid transparent;
-  transition: max-height 0.3s ease, border-color 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .home-mobile-nav.is-open {
@@ -358,7 +370,9 @@
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .home-mobile-link:hover {
@@ -743,11 +757,12 @@ summary:hover {
 /* Global Responsive Overrides for all pages */
 @media (max-width: 768px) {
   /* Ensure all SVGs and Canvas elements scale down */
-  svg, canvas {
+  svg,
+  canvas {
     max-width: 100%;
     height: auto;
   }
-  
+
   /* Make all tables scrollable horizontally to prevent breaking layouts */
   .table-container,
   .truth-table-wrapper,
@@ -760,17 +775,19 @@ summary:hover {
   }
 
   /* Ensure inputs and buttons don't overflow */
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     max-width: 100%;
   }
-  
+
   /* Stack flex rows that are acting as columns on mobile */
   .flex-row,
   .controls-row,
   .button-group {
     flex-wrap: wrap;
   }
-  
+
   /* Make control buttons take up appropriate space on mobile */
   .glass-btn {
     flex: 1 1 calc(50% - 0.5rem);
@@ -778,7 +795,7 @@ summary:hover {
     padding: 0.6rem 0.5rem;
     font-size: 0.85rem;
   }
-  
+
   .glass-btn.primary {
     flex: 1 1 100%;
   }
@@ -790,7 +807,7 @@ summary:hover {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
-  
+
   .evaluator-card,
   .info-card,
   .example-box,
@@ -804,12 +821,17 @@ summary:hover {
   .glass-btn {
     flex: 1 1 100%;
   }
-  
-  h1, .page-title {
+
+  h1,
+  .page-title {
     font-size: 1.5rem !important;
   }
-  
-  h2, .section-title {
+
+  h2,
+  .section-title {
     font-size: 1.2rem !important;
   }
+}
+.afhdl-section.premium-related-links {
+  display: none;
 }
