@@ -3,7 +3,6 @@ import AFHDLDivider from "./components/AFHDLDivider";
 import AFHDLCopyButton from "./components/AFHDLCopyButton";
 import AFHDLLayout from "./components/AFHDLLayout";
 import { afhdlTheme as S } from "./utils/afhdlTheme";
-import CircuitModal from "../../components/CircuitModal";
 import {
   cleanBin,
   halfAdder,
@@ -39,6 +38,308 @@ const toggleBit = (bin, idx) => {
   const arr = bin.split("");
   arr[idx] = arr[idx] === "0" ? "1" : "0";
   return arr.join("");
+};
+
+const CIRCUIT_META = {
+  half: {
+    title: "Half Adder Circuit",
+    description: "Two gates share the same A and B inputs: XOR makes Sum, AND makes Carry.",
+    color: "#3b82f6",
+  },
+  full: {
+    title: "Full Adder Circuit",
+    description: "Two half-adder ideas plus an OR gate: XOR chain makes Sum, AND/OR logic makes Cout.",
+    color: "#8b5cf6",
+  },
+  ripple: {
+    title: "Ripple Carry Adder Circuit",
+    description: "One Full Adder per bit. Each Cout wire becomes the next stage's Cin.",
+    color: "#10b981",
+  },
+  cla: {
+    title: "Carry Look-Ahead Adder Circuit",
+    description: "Generate and Propagate logic predicts carries in parallel before the Sum XOR gates finish.",
+    color: "#f59e0b",
+  },
+};
+
+const DiagramText = ({ x, y, children, color = "#e2e8f0", size = 13, anchor = "middle" }) => (
+  <text
+    x={x}
+    y={y}
+    fill={color}
+    fontSize={size}
+    fontWeight="700"
+    textAnchor={anchor}
+    fontFamily="Inter, system-ui, sans-serif"
+  >
+    {children}
+  </text>
+);
+
+const Wire = ({ x1, y1, x2, y2, color = "#64748b", dash = "" }) => (
+  <line
+    x1={x1}
+    y1={y1}
+    x2={x2}
+    y2={y2}
+    stroke={color}
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeDasharray={dash}
+  />
+);
+
+const GateBox = ({ x, y, w, h, label, color }) => (
+  <g>
+    <rect
+      x={x}
+      y={y}
+      width={w}
+      height={h}
+      rx="14"
+      fill="rgba(15, 23, 42, 0.92)"
+      stroke={color}
+      strokeWidth="2"
+    />
+    <DiagramText x={x + w / 2} y={y + h / 2 + 5} color={color} size={15}>
+      {label}
+    </DiagramText>
+  </g>
+);
+
+const HalfAdderDiagram = () => (
+  <svg viewBox="0 0 720 340" role="img" aria-label="Half adder circuit diagram">
+    <DiagramText x={58} y={80} color="#60a5fa" anchor="start">A</DiagramText>
+    <DiagramText x={58} y={142} color="#c084fc" anchor="start">B</DiagramText>
+
+    <Wire x1={92} y1={76} x2={280} y2={76} color="#60a5fa" />
+    <Wire x1={92} y1={138} x2={280} y2={138} color="#c084fc" />
+    <circle cx="172" cy="76" r="5" fill="#60a5fa" />
+    <circle cx="214" cy="138" r="5" fill="#c084fc" />
+
+    <Wire x1={172} y1={76} x2={172} y2={238} color="#60a5fa" />
+    <Wire x1={172} y1={238} x2={280} y2={238} color="#60a5fa" />
+    <Wire x1={214} y1={138} x2={214} y2={270} color="#c084fc" />
+    <Wire x1={214} y1={270} x2={280} y2={270} color="#c084fc" />
+
+    <GateBox x={280} y={50} w={142} h={108} label="XOR" color="#4ade80" />
+    <GateBox x={280} y={212} w={142} h={108} label="AND" color="#fbbf24" />
+    <Wire x1={422} y1={104} x2={592} y2={104} color="#4ade80" />
+    <Wire x1={422} y1={266} x2={592} y2={266} color="#fbbf24" />
+    <DiagramText x={612} y={109} color="#4ade80" anchor="start">Sum = A ⊕ B</DiagramText>
+    <DiagramText x={612} y={271} color="#fbbf24" anchor="start">Carry = A · B</DiagramText>
+    <DiagramText x={350} y={326} color="#94a3b8" size={12}>
+      Correct half adder: one XOR gate for Sum and one AND gate for Carry.
+    </DiagramText>
+  </svg>
+);
+
+const FullAdderDiagram = () => (
+  <svg viewBox="0 0 860 420" role="img" aria-label="Full adder circuit diagram">
+    <DiagramText x={48} y={76} color="#60a5fa" anchor="start">A</DiagramText>
+    <DiagramText x={48} y={142} color="#c084fc" anchor="start">B</DiagramText>
+    <DiagramText x={48} y={254} color="#fbbf24" anchor="start">Cin</DiagramText>
+    <Wire x1={88} y1={72} x2={202} y2={72} color="#60a5fa" />
+    <Wire x1={88} y1={138} x2={202} y2={138} color="#c084fc" />
+    <GateBox x={220} y={44} w={122} h={86} label="XOR" color="#4ade80" />
+    <DiagramText x={281} y={150} color="#94a3b8" size={11}>P = A ⊕ B</DiagramText>
+    <Wire x1={342} y1={87} x2={432} y2={87} color="#4ade80" />
+    <Wire x1={88} y1={250} x2={432} y2={250} color="#fbbf24" />
+    <GateBox x={450} y={70} w={122} h={86} label="XOR" color="#4ade80" />
+    <Wire x1={572} y1={113} x2={782} y2={113} color="#4ade80" />
+    <DiagramText x={800} y={118} color="#4ade80" anchor="start">Sum</DiagramText>
+
+    <Wire x1={150} y1={72} x2={150} y2={304} color="#60a5fa" />
+    <Wire x1={182} y1={138} x2={182} y2={330} color="#c084fc" />
+    <GateBox x={250} y={290} w={116} h={70} label="AND" color="#f87171" />
+    <DiagramText x={308} y={382} color="#94a3b8" size={11}>A · B</DiagramText>
+    <Wire x1={366} y1={325} x2={612} y2={325} color="#f87171" />
+
+    <Wire x1={394} y1={87} x2={394} y2={204} color="#4ade80" />
+    <Wire x1={394} y1={204} x2={450} y2={204} color="#4ade80" />
+    <Wire x1={190} y1={250} x2={450} y2={250} color="#fbbf24" />
+    <GateBox x={468} y={184} w={116} h={70} label="AND" color="#38bdf8" />
+    <DiagramText x={526} y={276} color="#94a3b8" size={11}>Cin · (A ⊕ B)</DiagramText>
+    <Wire x1={584} y1={219} x2={612} y2={219} color="#38bdf8" />
+
+    <GateBox x={632} y={242} w={116} h={86} label="OR" color="#fbbf24" />
+    <Wire x1={748} y1={285} x2={782} y2={285} color="#fbbf24" />
+    <DiagramText x={800} y={290} color="#fbbf24" anchor="start">Cout</DiagramText>
+  </svg>
+);
+
+const RippleAdderDiagram = ({ bits }) => {
+  const stages = Math.min(Math.max(bits || 4, 2), 4);
+  const xs = Array.from({ length: stages }, (_, i) => 115 + i * 160);
+  return (
+    <svg viewBox="0 0 820 390" role="img" aria-label="Ripple carry adder circuit diagram">
+      <DiagramText x={410} y={32} color="#10b981" size={16}>
+        {bits}-bit Ripple Carry Adder: Full Adders chained by carry wires
+      </DiagramText>
+      {xs.map((x, i) => {
+        const bit = i;
+        return (
+          <g key={bit}>
+            <GateBox x={x} y={128} w={108} h={96} label={`FA${bit}`} color="#10b981" />
+            <DiagramText x={x + 25} y={96} color="#60a5fa" size={12}>A{bit}</DiagramText>
+            <DiagramText x={x + 82} y={96} color="#c084fc" size={12}>B{bit}</DiagramText>
+            <Wire x1={x + 25} y1={102} x2={x + 25} y2={128} color="#60a5fa" />
+            <Wire x1={x + 82} y1={102} x2={x + 82} y2={128} color="#c084fc" />
+            <Wire x1={x + 54} y1={224} x2={x + 54} y2={288} color="#4ade80" />
+            <DiagramText x={x + 54} y={312} color="#4ade80" size={12}>S{bit}</DiagramText>
+            {i < xs.length - 1 && (
+              <>
+                <Wire x1={x + 108} y1={176} x2={xs[i + 1]} y2={176} color="#fbbf24" />
+                <DiagramText x={x + 134} y={164} color="#fbbf24" size={11}>C{bit + 1}</DiagramText>
+              </>
+            )}
+          </g>
+        );
+      })}
+      <Wire x1={58} y1={176} x2={xs[0]} y2={176} color="#fbbf24" />
+      <DiagramText x={38} y={181} color="#fbbf24" anchor="start">Cin</DiagramText>
+      <Wire x1={xs[xs.length - 1] + 108} y1={176} x2={760} y2={176} color="#f87171" />
+      <DiagramText x={770} y={181} color="#f87171" anchor="start">Cout</DiagramText>
+      {bits > 4 && (
+        <DiagramText x={410} y={360} color="#94a3b8" size={12}>
+          Showing first 4 stages; the same Full Adder block repeats for every extra bit.
+        </DiagramText>
+      )}
+    </svg>
+  );
+};
+
+const CLADiagram = () => (
+  <svg viewBox="0 0 860 430" role="img" aria-label="Carry look-ahead adder circuit diagram">
+    <DiagramText x={430} y={34} color="#f59e0b" size={16}>
+      Carry Look-Ahead Adder: generate carries in parallel
+    </DiagramText>
+    {[0, 1, 2, 3].map((bit, i) => {
+      const x = 84 + i * 150;
+      return (
+        <g key={bit}>
+          <DiagramText x={x + 34} y={84} color="#60a5fa" size={12}>A{bit}</DiagramText>
+          <DiagramText x={x + 82} y={84} color="#c084fc" size={12}>B{bit}</DiagramText>
+          <Wire x1={x + 34} y1={90} x2={x + 34} y2={112} color="#60a5fa" />
+          <Wire x1={x + 82} y1={90} x2={x + 82} y2={112} color="#c084fc" />
+          <GateBox x={x} y={112} w={116} h={54} label="XOR" color="#38bdf8" />
+          <GateBox x={x} y={184} w={116} h={54} label="AND" color="#f87171" />
+          <DiagramText x={x + 58} y={179} color="#38bdf8" size={11}>P{bit}</DiagramText>
+          <DiagramText x={x + 58} y={251} color="#f87171" size={11}>G{bit}</DiagramText>
+          <Wire x1={x + 58} y1={166} x2={x + 58} y2={282} color="#38bdf8" />
+          <Wire x1={x + 88} y1={238} x2={x + 88} y2={282} color="#f87171" />
+        </g>
+      );
+    })}
+    <GateBox x={210} y={286} w={440} h={78} label="Carry Look-Ahead Logic" color="#f59e0b" />
+    <DiagramText x={430} y={388} color="#94a3b8" size={12}>
+      C1 = G0 + P0C0,  C2 = G1 + P1G0 + P1P0C0, and so on
+    </DiagramText>
+    <Wire x1={68} y1={326} x2={210} y2={326} color="#fbbf24" />
+    <DiagramText x={40} y={331} color="#fbbf24" anchor="start">C0</DiagramText>
+    <Wire x1={650} y1={326} x2={798} y2={326} color="#fbbf24" />
+    <DiagramText x={808} y={331} color="#fbbf24" anchor="start">C1..C4</DiagramText>
+  </svg>
+);
+
+const AdderCircuitDiagram = ({ target, bits }) => {
+  if (target === "half") return <HalfAdderDiagram />;
+  if (target === "full") return <FullAdderDiagram />;
+  if (target === "ripple") return <RippleAdderDiagram bits={bits} />;
+  return <CLADiagram />;
+};
+
+const AdderCircuitModal = ({ open, target, bits, onClose }) => {
+  if (!open) return null;
+  const meta = CIRCUIT_META[target] || CIRCUIT_META.full;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={meta.title}
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        display: "grid",
+        placeItems: "center",
+        padding: "1rem",
+        background: "rgba(2, 6, 23, 0.78)",
+        backdropFilter: "blur(14px)",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "min(980px, 100%)",
+          maxHeight: "90vh",
+          overflow: "auto",
+          borderRadius: "18px",
+          border: `1px solid ${meta.color}66`,
+          background:
+            "linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98))",
+          boxShadow: `0 24px 80px rgba(0,0,0,0.55), 0 0 32px ${meta.color}22`,
+          padding: "1rem",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: "1rem",
+            marginBottom: "0.8rem",
+          }}
+        >
+          <div>
+            <div style={{ color: meta.color, fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              Circuit Diagram
+            </div>
+            <h2 style={{ margin: "0.2rem 0", color: "#f8fafc", fontSize: "1.25rem" }}>
+              {meta.title}
+            </h2>
+            <p style={{ margin: 0, color: "#94a3b8", lineHeight: 1.55, fontSize: "0.9rem" }}>
+              {meta.description}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close circuit diagram"
+            style={{
+              width: "2.35rem",
+              height: "2.35rem",
+              borderRadius: "10px",
+              border: "1px solid rgba(148,163,184,0.22)",
+              background: "rgba(15,23,42,0.9)",
+              color: "#e2e8f0",
+              cursor: "pointer",
+              fontSize: "1.2rem",
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <div
+          style={{
+            borderRadius: "14px",
+            border: "1px solid rgba(148,163,184,0.16)",
+            background:
+              "radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 34%), rgba(15,23,42,0.62)",
+            padding: "0.75rem",
+            overflowX: "auto",
+          }}
+        >
+          <div style={{ minWidth: "720px" }}>
+            <AdderCircuitDiagram target={target} bits={bits} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 /* ── Teacher callout messages ──────────────────────────── */
@@ -177,8 +478,8 @@ const BinaryAdders = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [teacherNoteIdx, setTeacherNoteIdx] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const [showCircuitModal, setShowCircuitModal] = useState(false);
-  const [circuitModalTarget, setCircuitModalTarget] = useState("half"); // "half" | "full"
+  const [showCircuitDiagram, setShowCircuitDiagram] = useState(false);
+  const [circuitDiagramTarget, setCircuitDiagramTarget] = useState("half");
 
   const cleanA = cleanBin(a) || "0";
   const cleanB = cleanBin(b) || "0";
@@ -266,6 +567,10 @@ const BinaryAdders = () => {
   const currentNotes =
     TEACHER_NOTES[tabNoteKey[activeTab]] || TEACHER_NOTES.intro;
   const currentNote = currentNotes[teacherNoteIdx % currentNotes.length];
+  const openCircuitDiagram = (target = activeTab) => {
+    setCircuitDiagramTarget(target);
+    setShowCircuitDiagram(true);
+  };
 
   return (
     <AFHDLLayout
@@ -918,10 +1223,7 @@ const BinaryAdders = () => {
               <button
                 className="kmap-btn kmap-btn-primary kmap-btn-full"
                 style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("half");
-                  setShowCircuitModal(true);
-                }}
+                onClick={() => openCircuitDiagram("half")}
               >
                 🔌 Visualize Half Adder Circuit
               </button>
@@ -1081,10 +1383,7 @@ const BinaryAdders = () => {
               <button
                 className="kmap-btn kmap-btn-primary kmap-btn-full"
                 style={{ width: "100%" }}
-                onClick={() => {
-                  setCircuitModalTarget("full");
-                  setShowCircuitModal(true);
-                }}
+                onClick={() => openCircuitDiagram("full")}
               >
                 🔌 Visualize Full Adder Circuit
               </button>
@@ -1309,6 +1608,16 @@ const BinaryAdders = () => {
               64 steps in a row! That's why engineers invented{" "}
               <strong>CLA (Carry Look-Ahead)</strong> — see the next tab!
             </div>
+
+            <div style={{ marginTop: "1rem" }}>
+              <button
+                className="kmap-btn kmap-btn-primary kmap-btn-full"
+                style={{ width: "100%" }}
+                onClick={() => openCircuitDiagram("ripple")}
+              >
+                🔌 Visualize Ripple Carry Adder Circuit
+              </button>
+            </div>
           </div>
         )}
 
@@ -1436,6 +1745,16 @@ const BinaryAdders = () => {
               carries one-by-one (slow). CLA calculates ALL carries at the same
               time (fast). For 8-bit numbers, CLA can be 3–4× faster. For 64-bit
               numbers used in modern CPUs, the difference is enormous!
+            </div>
+
+            <div style={{ marginTop: "1rem" }}>
+              <button
+                className="kmap-btn kmap-btn-primary kmap-btn-full"
+                style={{ width: "100%" }}
+                onClick={() => openCircuitDiagram("cla")}
+              >
+                🔌 Visualize CLA Circuit
+              </button>
             </div>
           </div>
         )}
@@ -1847,30 +2166,25 @@ endmodule`}</pre>
                 marginTop: "0.15rem",
               }}
             >
-              Open the interactive logic gate editor with the Full Adder
-              expression pre-loaded.
+              Open the correct diagram for the currently selected adder type:
+              Sum/Carry gates, chained Full Adders, or CLA look-ahead logic.
             </div>
           </div>
         </div>
         <button
           className="kmap-btn kmap-btn-primary kmap-btn-full"
-          onClick={() => {
-            setCircuitModalTarget("full");
-            setShowCircuitModal(true);
-          }}
+          onClick={() => openCircuitDiagram(activeTab)}
           style={{ width: "100%", marginTop: "0.25rem" }}
         >
-          🔌 Visualize Full Adder Circuit
+          🔌 Visualize {CIRCUIT_META[activeTab]?.title || "Adder Circuit"}
         </button>
       </div>
 
-      <CircuitModal
-        open={showCircuitModal}
-        onClose={() => setShowCircuitModal(false)}
-        expression={circuitModalTarget === "half" ? "S = A⊕B" : "S = A⊕B⊕Cin"}
-        variables={
-          circuitModalTarget === "half" ? ["A", "B"] : ["A", "B", "Cin"]
-        }
+      <AdderCircuitModal
+        open={showCircuitDiagram}
+        target={circuitDiagramTarget}
+        bits={paddedA.length}
+        onClose={() => setShowCircuitDiagram(false)}
       />
     </AFHDLLayout>
   );

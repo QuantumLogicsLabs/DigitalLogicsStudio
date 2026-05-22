@@ -8,7 +8,7 @@ const difficultyColor = {
   Hard: "var(--accent-danger, #ff3366)",
 };
 
-const ProblemModal = ({ problem, onClose }) => {
+const ProblemModal = ({ problem, onClose, onSolved }) => {
   const [circuitOpen, setCircuitOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [circuitGates, setCircuitGates] = useState([]);
@@ -152,6 +152,7 @@ const ProblemModal = ({ problem, onClose }) => {
         open={true}
         onClose={() => setCircuitOpen(false)}
         problem={problem}
+        onSolved={onSolved}
         onCircuitChange={(gates, wires) => {
           setCircuitGates(gates);
           setCircuitWires(wires);

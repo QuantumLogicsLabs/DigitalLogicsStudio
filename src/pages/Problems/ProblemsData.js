@@ -55,6 +55,58 @@ const problemsData = [
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 17 — Half Subtractor
+  // Inputs: A, B  |  Outputs: D, Bout
+  // D = A⊕B,  Bout = A'·B
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 17,
+    title: "Half Subtractor",
+    difficulty: "Easy",
+    tags: ["Combinational", "Arithmetic", "Subtractor"],
+    description:
+      "Design a Half Subtractor circuit that subtracts one 1-bit input B from A, producing Difference (D) and Borrow-Out (Bout).",
+    truthTable: [
+      { A: 0, B: 0, D: 0, Bout: 0 },
+      { A: 0, B: 1, D: 1, Bout: 1 },
+      { A: 1, B: 0, D: 1, Bout: 0 },
+      { A: 1, B: 1, D: 0, Bout: 0 },
+    ],
+    equations: ["D = A ⊕ B", "Bout = A' · B"],
+    hint: "Difference uses XOR. Borrow happens only when A=0 and B=1, so use NOT A AND B.",
+    inputs: ["A", "B"],
+    outputs: ["D", "Bout"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 18 — Full Subtractor
+  // Inputs: A, B, Bin  |  Outputs: D, Bout
+  // D = A⊕B⊕Bin,  Bout = A'B + A'Bin + BBin
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 18,
+    title: "Full Subtractor",
+    difficulty: "Medium",
+    tags: ["Combinational", "Arithmetic", "Subtractor"],
+    description:
+      "Design a Full Subtractor with inputs A, B, and Borrow-In (Bin), producing Difference (D) and Borrow-Out (Bout).",
+    truthTable: [
+      { A: 0, B: 0, Bin: 0, D: 0, Bout: 0 },
+      { A: 0, B: 0, Bin: 1, D: 1, Bout: 1 },
+      { A: 0, B: 1, Bin: 0, D: 1, Bout: 1 },
+      { A: 0, B: 1, Bin: 1, D: 0, Bout: 1 },
+      { A: 1, B: 0, Bin: 0, D: 1, Bout: 0 },
+      { A: 1, B: 0, Bin: 1, D: 0, Bout: 0 },
+      { A: 1, B: 1, Bin: 0, D: 0, Bout: 0 },
+      { A: 1, B: 1, Bin: 1, D: 1, Bout: 1 },
+    ],
+    equations: ["D = A ⊕ B ⊕ Bin", "Bout = A'B + A'Bin + B·Bin"],
+    hint: "Use XOR for Difference. Borrow-Out is 1 when B + Bin is greater than A.",
+    inputs: ["A", "B", "Bin"],
+    outputs: ["D", "Bout"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Problem 3 — 2-to-1 Multiplexer
   // Inputs: S, I0, I1  |  Output: Y
   // Y = S'·I0 + S·I1

@@ -400,6 +400,7 @@ const CircuitModal = ({
   problem: problemProp,
   expression,
   variables,
+  onSolved,
 }) => {
   // Experiment mode: BA pages pass expression + variables instead of a problem object.
   // useMemo keeps these stable so they're safe in useEffect dependency arrays.
@@ -434,6 +435,7 @@ const CircuitModal = ({
   const [isSavingCompletion, setIsSavingCompletion] = useState(false);
   const isSavingRef = React.useRef(false);
   const [assignment, setAssignment] = useState({ inputMap: {}, outputMap: {} });
+  const solvedNotifiedRef = React.useRef(false);
 
   const {
     isAuthenticated = false,
@@ -447,6 +449,10 @@ const CircuitModal = ({
     Object.keys(assignment.inputMap).length > 0 ||
     Object.keys(assignment.outputMap).length > 0;
 
+  useEffect(() => {
+    solvedNotifiedRef.current = false;
+  }, [open, problemId]);
+
   // Never call hasSolvedProblem(null): Number(null) === 0 which is a valid
   // integer and would accidentally match problem id 0 in the solved set.
   const isSolvedForUser =
@@ -458,13 +464,25 @@ const CircuitModal = ({
     setGates(g);
     setWires(w);
     setResult(null);
+    solvedNotifiedRef.current = false;
   }, []);
+
+  const handleSolvedLocally = useCallback(() => {
+    if (isExperimentMode || !problem) return;
+    if (solvedNotifiedRef.current) return;
+    solvedNotifiedRef.current = true;
+    onSolved?.(problem);
+  }, [isExperimentMode, onSolved, problem]);
 
   const handleSubmit = () => {
     if (!problem) return;
     const useAssignment = isAssigned ? assignment : null;
     const res = validateCircuit(gates, wires, problem, useAssignment);
     setResult(res);
+    if (res.pass) {
+      handleSolvedLocally();
+      persistSolvedState();
+    }
   };
 
   const inputGates = gates.filter((g) => g.type === "INPUT");
@@ -515,10 +533,12 @@ const CircuitModal = ({
       if (prev?.pass) return prev;
       return validationResult;
     });
+    handleSolvedLocally();
     persistSolvedState();
   }, [
     assignment,
     gates,
+    handleSolvedLocally,
     hasRight,
     isAssigned,
     isExperimentMode,

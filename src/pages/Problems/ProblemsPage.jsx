@@ -927,6 +927,7 @@ export default function ProblemsPage() {
         <ProblemModal
           problem={activeProblem}
           onClose={() => setActiveProblem(null)}
+          onSolved={(problem) => handleSetProblemSolved(problem, true)}
         />
       )}
     </div>
