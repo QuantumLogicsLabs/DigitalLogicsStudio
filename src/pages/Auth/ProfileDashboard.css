@@ -1,0 +1,870 @@
+/* ═══════════════════════════════════════════════════════════════
+   ProfileDashboard.css  –  Boolforge Profile Dashboard
+   Follows the app's CSS variable system (index.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Layout ──────────────────────────────────────────────────── */
+
+/* Ensure the shell stretches so the footer is always pushed to the bottom */
+.auth-page-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Give the footer a solid background so the fixed grid doesn't bleed through */
+.auth-page-shell .home-footer {
+  position: relative;
+  z-index: 2;
+  background: var(--bg-color);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.pd-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.5rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.pd-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border-radius: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  box-shadow: 0 24px 70px rgba(2, 6, 23, 0.2);
+}
+
+.pd-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.pd-avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.pd-hero-info {
+  min-width: 0;
+}
+
+.pd-hero-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.pd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.pd-status-badge--ok {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.pd-status-badge--warn {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+
+.pd-hero-name {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--text-color);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pd-hero-email {
+  margin: 0 0 0.5rem;
+  color: var(--secondary-text);
+  font-size: 0.95rem;
+}
+
+.pd-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+}
+
+.pd-dot { opacity: 0.4; }
+
+.pd-role-chip {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: var(--accent-color);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.pd-hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.85rem;
+  padding: 0.75rem 1.4rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pd-btn--primary {
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+}
+
+.pd-btn--ghost {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+}
+
+.pd-btn--sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  border-radius: 0.65rem;
+}
+
+.pd-btn:hover { transform: translateY(-1px); }
+.pd-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+.pd-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pd-tabs::-webkit-scrollbar { display: none; }
+
+.pd-tab {
+  padding: 0.65rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: var(--secondary-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.pd-tab:hover { color: var(--text-color); }
+
+.pd-tab--active {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+}
+
+/* ── Section wrapper ─────────────────────────────────────────── */
+.pd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.pd-card {
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: 0 8px 32px rgba(2, 6, 23, 0.15);
+}
+
+.pd-card-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pd-card-sub {
+  margin: 0 0 1.25rem;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+}
+
+/* ── Stat cards grid ─────────────────────────────────────────── */
+.pd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.pd-stat-card {
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  box-shadow: 0 4px 16px rgba(2, 6, 23, 0.12);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 3px solid var(--accent, #3b82f6);
+}
+
+.pd-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.2);
+}
+
+.pd-stat-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pd-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.pd-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-color);
+  line-height: 1;
+}
+
+.pd-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--secondary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pd-stat-sub {
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  opacity: 0.7;
+}
+
+/* ── Two-column layout ───────────────────────────────────────── */
+.pd-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Performance Insights ────────────────────────────────────── */
+.pd-insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pd-insight-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pd-insight-row:last-child { border-bottom: none; }
+
+.pd-insight-label {
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+}
+
+.pd-insight-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.pd-insight-val--blue   { color: #3b82f6; }
+.pd-insight-val--green  { color: #10b981; }
+.pd-insight-val--purple { color: #8b5cf6; }
+.pd-insight-val--amber  { color: #f59e0b; }
+
+/* ── Activity Feed ───────────────────────────────────────────── */
+.pd-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pd-feed--full { max-height: 480px; overflow-y: auto; }
+
+.pd-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pd-feed-item:last-child { border-bottom: none; }
+
+.pd-feed-dot {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #fff;
+  margin-top: 1px;
+}
+
+.pd-feed-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.pd-feed-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.pd-feed-title {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pd-feed-time {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ── Recommendations ─────────────────────────────────────────── */
+.pd-recs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pd-rec-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--rec-color, #3b82f6);
+  border-radius: 0.85rem;
+  background: var(--card-bg);
+  text-decoration: none;
+  transition: transform 0.18s, box-shadow 0.18s;
+  position: relative;
+}
+
+.pd-rec-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
+}
+
+.pd-rec-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pd-rec-reason {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  line-height: 1.4;
+}
+
+.pd-rec-arrow {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: var(--rec-color, #3b82f6);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ── Skill bars ──────────────────────────────────────────────── */
+.pd-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.pd-skill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pd-skill-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pd-skill-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.pd-skill-pct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--secondary-text);
+}
+
+.pd-skill-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+  overflow: hidden;
+}
+
+.pd-skill-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Topic list ──────────────────────────────────────────────── */
+.pd-topic-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.pd-topic-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pd-topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pd-topic-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-transform: capitalize;
+}
+
+.pd-topic-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  text-transform: capitalize;
+}
+
+.pd-topic-status--completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.pd-topic-status--in_progress {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.pd-topic-status--not_started {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--secondary-text);
+}
+
+.pd-topic-pct {
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  align-self: flex-end;
+}
+
+/* ── Activity Calendar ───────────────────────────────────────── */
+.pd-cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--secondary-text);
+}
+
+.pd-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 14px);
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.pd-cal-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  transition: transform 0.15s;
+}
+
+.pd-cal-dot:hover { transform: scale(1.3); }
+
+.pd-cal-dot--0 { background: rgba(148, 163, 184, 0.1); }
+.pd-cal-dot--1 { background: rgba(59, 130, 246, 0.25); }
+.pd-cal-dot--2 { background: rgba(59, 130, 246, 0.5); }
+.pd-cal-dot--3 { background: rgba(59, 130, 246, 0.75); }
+.pd-cal-dot--4 { background: #3b82f6; }
+
+.pd-cal-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.pd-cal-stats strong { color: var(--text-color); }
+
+/* ── Badges ──────────────────────────────────────────────────── */
+.pd-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pd-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  background: var(--card-bg);
+  opacity: 0.55;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.pd-badge--earned {
+  opacity: 1;
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15), 0 4px 16px rgba(59, 130, 246, 0.1);
+}
+
+.pd-badge--earned:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25), 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+.pd-badge-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pd-badge-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.pd-badge-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pd-badge-desc {
+  font-size: 0.78rem;
+  color: var(--secondary-text);
+}
+
+.pd-badge-bar-track {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+  overflow: hidden;
+  margin-top: 0.35rem;
+}
+
+.pd-badge-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #8b5cf6);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pd-badge-pct {
+  font-size: 0.72rem;
+  color: var(--secondary-text);
+  align-self: flex-end;
+}
+
+/* ── Saved Work ──────────────────────────────────────────────── */
+.pd-saved-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.pd-saved-header .pd-card-title { margin: 0; }
+
+.pd-saved-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pd-saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.pd-saved-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.pd-saved-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
+}
+
+.pd-saved-thumb {
+  height: 80px;
+  border-radius: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.pd-saved-thumb--circuit { background: rgba(59, 130, 246, 0.12); }
+.pd-saved-thumb--kmap    { background: rgba(139, 92, 246, 0.12); }
+.pd-saved-thumb--problems{ background: rgba(16, 185, 129, 0.12); }
+
+.pd-saved-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.pd-saved-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pd-saved-type {
+  font-size: 0.78rem;
+  color: var(--secondary-text);
+}
+
+/* ── System Status ───────────────────────────────────────────── */
+.pd-sys-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 0.5rem;
+}
+
+.pd-sys-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+.pd-sys-row:last-child { border-bottom: none; }
+
+.pd-sys-label {
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+  flex-shrink: 0;
+  min-width: 160px;
+}
+
+.pd-sys-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: right;
+  word-break: break-all;
+}
+
+.pd-sys-val--ok   { color: #10b981; }
+.pd-sys-val--warn { color: #f59e0b; }
+
+/* ── Misc ────────────────────────────────────────────────────── */
+.pd-loading {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+.pd-empty {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.pd-error {
+  margin: 0;
+  width: 100%;
+}
+
+/* ── Light mode overrides ────────────────────────────────────── */
+[data-theme='light'] .pd-stat-card,
+[data-theme='light'] .pd-card,
+[data-theme='light'] .pd-hero,
+[data-theme='light'] .pd-rec-card,
+[data-theme='light'] .pd-badge,
+[data-theme='light'] .pd-saved-card {
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme='light'] .pd-cal-dot--0 { background: rgba(15, 23, 42, 0.06); }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .pd-two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pd-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pd-hero-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .pd-hero-actions .pd-btn {
+    flex: 1;
+  }
+
+  .pd-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pd-main {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .pd-card {
+    padding: 1.25rem;
+  }
+
+  .pd-hero-name {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 400px) {
+  .pd-stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
