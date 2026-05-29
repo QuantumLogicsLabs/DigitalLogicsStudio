@@ -421,11 +421,10 @@ function getWeekComparison(calendar) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function ProfilePage() {
   const { theme, toggle: toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [logoutError, setLogoutError] = useState("");
+  const [logoutError] = useState("");
   const [progressData, setProgressData] = useState(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
   const [backendOk, setBackendOk] = useState(null);
@@ -470,21 +469,6 @@ export default function ProfilePage() {
     };
     check();
   }, []);
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    setLogoutError("");
-    try {
-      await logout();
-      navigate("/", { replace: true });
-    } catch (error) {
-      setLogoutError(
-        error.response?.data?.message || "Unable to log out right now.",
-      );
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
 
   // ── Derived stats ───────────────────────────────────────────────────────────
   const summary = progressData?.summary || {};
@@ -693,14 +677,6 @@ export default function ProfilePage() {
               onClick={() => navigate("/boolforge")}
             >
               Circuit Forge
-            </button>
-            <button
-              type="button"
-              className="pd-btn pd-btn--ghost"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? "Logging out…" : "Logout"}
             </button>
           </div>
         </section>

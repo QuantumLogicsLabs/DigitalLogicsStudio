@@ -147,40 +147,72 @@ const Home = () => {
             <>
               <ArticleSection
                 title="Featured Tools"
-                description="Start with the most-used interactive tools for building, visualizing, and simplifying logic quickly."
+                description="Hands-on interactive tools to build circuits, simplify logic, and visualize boolean expressions."
                 data={featuredTools}
                 sectionClassName="home-featured-section"
-                gridClassName="home-featured-grid"
+                gridClassName="home-featured-grid home-featured-box"
               />
               {filteredTopics.length > 0 ? <CoreTopicsSection topics={filteredTopics} /> : null}
-              <ArticleSection
-                title="Learning Resources"
-                description="Use these supporting resources for practice, reference, and timing-based visualization."
-                data={learningResources}
-                sectionClassName="home-resource-section"
-                gridClassName="home-resource-grid"
-              />
-              <section className="home-section home-problems-cta">
-                <div className="home-problems-cta-copy">
-                  <span className="home-problems-cta-badge">Dedicated Practice Arena</span>
-                  <h2 className="home-section-title">
-                    Solve digital logic problems in a real practice workspace.
-                  </h2>
-                  <p className="home-section-description">
-                    Move into the new three-column Problems experience with topic filters,
-                    search, solved tracking, calendar activity, and learner stats inspired by
-                    premium competitive-learning platforms.
-                  </p>
-                </div>
-                <div className="home-problems-cta-actions">
-                  <Link to="/problems" className="home-problems-cta-link primary">
-                    Open Problems
-                  </Link>
-                  <Link to="/boolforge" className="home-problems-cta-link">
-                    Open Circuit Forge
-                  </Link>
-                </div>
-              </section>
+
+              {/* ── Learning Resources ── */}
+              {learningResources.length > 0 && (
+                <section className="home-section home-resources-section is-visible">
+                  <div className="home-section-header">
+                    <h2 className="home-section-title">Learning Resources</h2>
+                    <p className="home-section-description">
+                      Structured practice sets and visual aids to reinforce your understanding of digital logic concepts.
+                    </p>
+                  </div>
+                  <div className="home-resources-grid home-featured-box">
+                    {[
+                      {
+                        icon: "📖",
+                        label: "Chapter 1",
+                        title: "Book Ch1 Problems",
+                        desc: "Foundational problems covering number systems, Boolean algebra, and logic gates.",
+                        to: "/book",
+                        accent: "#3b82f6",
+                        tag: "Beginner",
+                      },
+                      {
+                        icon: "📗",
+                        label: "Chapter 2",
+                        title: "Book Ch2 Problems",
+                        desc: "Intermediate problems on combinational circuits, K-maps, and simplification.",
+                        to: "/book/ch2",
+                        accent: "#8b5cf6",
+                        tag: "Intermediate",
+                      },
+                      {
+                        icon: "⏱️",
+                        label: "Visualization",
+                        title: "Timing Diagrams",
+                        desc: "Visualize signal transitions and clock-driven behavior in sequential circuits.",
+                        to: "/timing-diagrams",
+                        accent: "#10b981",
+                        tag: "Visual Tool",
+                      },
+                    ].map((res) => (
+                      <Link key={res.to} to={res.to} className="home-res-card">
+                        <div className="home-res-card-glow" style={{ background: res.accent }} />
+                        <div className="home-res-card-top">
+                          <span className="home-res-card-icon">{res.icon}</span>
+                          <span className="home-res-card-tag" style={{ color: res.accent, borderColor: `${res.accent}40`, background: `${res.accent}12` }}>
+                            {res.tag}
+                          </span>
+                        </div>
+                        <div className="home-res-card-label">{res.label}</div>
+                        <h3 className="home-res-card-title">{res.title}</h3>
+                        <p className="home-res-card-desc">{res.desc}</p>
+                        <div className="home-res-card-cta" style={{ color: res.accent }}>
+                          Open resource <span className="home-res-card-arrow">→</span>
+                        </div>
+                        <div className="home-res-card-bar" style={{ background: res.accent }} />
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
             </>
           ) : (
             <div
