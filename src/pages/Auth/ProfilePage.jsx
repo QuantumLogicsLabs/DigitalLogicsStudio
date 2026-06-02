@@ -181,6 +181,188 @@ function ActivityDot({ intensity, date }) {
   );
 }
 
+// ─── GitHub-style full-year activity calendar ─────────────────────────────────
+function buildYearGrid(activityMap) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Start from 52 weeks ago, on the most recent Sunday
+  const start = new Date(today);
+  start.setDate(start.getDate() - 52 * 7);
+  // Roll back to Sunday
+  start.setDate(start.getDate() - start.getDay());
+
+  const toKey = (d) => d.toISOString().slice(0, 10);
+
+  // Build flat list of all days from start → today
+  const days = [];
+  const cursor = new Date(start);
+  while (cursor <= today) {
+    const key = toKey(cursor);
+    const data = activityMap[key] || { solved: 0, attempts: 0, topicsCompleted: 0, topicsOpened: 0 };
+    const total = (data.solved || 0) + (data.attempts || 0) + (data.topicsCompleted || 0);
+    const intensity = total === 0 ? 0 : total === 1 ? 1 : total <= 3 ? 2 : total <= 6 ? 3 : 4;
+    days.push({ date: key, intensity, ...data, total, isFuture: false });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  // Pad to fill last week (so grid is always full columns)
+  while (days.length % 7 !== 0) {
+    const padDate = new Date(cursor);
+    days.push({ date: toKey(padDate), intensity: -1, total: 0, isFuture: true });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  // Group into weeks (columns of 7)
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+
+  // Build month label positions
+  const monthLabels = [];
+  let lastMonth = -1;
+  weeks.forEach((week, wi) => {
+    const firstReal = week.find((d) => !d.isFuture);
+    if (!firstReal) return;
+    const m = new Date(firstReal.date).getMonth();
+    if (m !== lastMonth) {
+      monthLabels.push({
+        col: wi,
+        label: new Date(firstReal.date).toLocaleDateString("en-US", { month: "short" }),
+      });
+      lastMonth = m;
+    }
+  });
+
+  return { weeks, monthLabels };
+}
+
+function GithubCalendar({ activityMap, streakCurrent, streakLongest, activeDays, totalContributions }) {
+  const [tooltip, setTooltip] = React.useState(null);
+  const { weeks, monthLabels } = React.useMemo(() => buildYearGrid(activityMap), [activityMap]);
+
+  const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const CELL = 13; // px per cell
+  const GAP = 3;   // px gap
+
+  return (
+    <div className="ghcal-wrap">
+      {/* ── Stats row ── */}
+      <div className="ghcal-stats">
+        <div className="ghcal-stat">
+          <strong>{totalContributions}</strong>
+          <span>contributions this year</span>
+        </div>
+        <div className="ghcal-stat">
+          <strong>{streakCurrent}d</strong>
+          <span>current streak</span>
+        </div>
+        <div className="ghcal-stat">
+          <strong>{streakLongest}d</strong>
+          <span>longest streak</span>
+        </div>
+        <div className="ghcal-stat">
+          <strong>{activeDays}</strong>
+          <span>active days</span>
+        </div>
+      </div>
+
+      {/* ── Calendar grid ── */}
+      <div className="ghcal-scroll">
+        <div className="ghcal-inner" style={{ "--cell": `${CELL}px`, "--gap": `${GAP}px` }}>
+
+          {/* Month labels row */}
+          <div className="ghcal-month-row">
+            <div className="ghcal-day-spacer" /> {/* spacer for day labels */}
+            <div className="ghcal-months">
+              {monthLabels.map((m) => (
+                <span
+                  key={`${m.label}-${m.col}`}
+                  className="ghcal-month-label"
+                  style={{ gridColumn: m.col + 1 }}
+                >
+                  {m.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Day labels + grid */}
+          <div className="ghcal-body">
+            {/* Day-of-week labels */}
+            <div className="ghcal-day-labels">
+              {DAY_LABELS.map((d, i) => (
+                <span key={d} className="ghcal-day-label" style={{ gridRow: i + 1 }}>
+                  {i % 2 === 1 ? d : ""}
+                </span>
+              ))}
+            </div>
+
+            {/* Weeks grid */}
+            <div className="ghcal-grid">
+              {weeks.map((week, wi) =>
+                week.map((day, di) => {
+                  if (day.isFuture) {
+                    return (
+                      <div
+                        key={`${wi}-${di}`}
+                        className="ghcal-cell ghcal-cell--future"
+                        style={{ gridColumn: wi + 1, gridRow: di + 1 }}
+                      />
+                    );
+                  }
+                  return (
+                    <div
+                      key={day.date}
+                      className={`ghcal-cell ghcal-cell--${day.intensity}`}
+                      style={{ gridColumn: wi + 1, gridRow: di + 1 }}
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setTooltip({ day, x: rect.left + rect.width / 2, y: rect.top - 8 });
+                      }}
+                      onMouseLeave={() => setTooltip(null)}
+                    />
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Legend ── */}
+      <div className="ghcal-legend">
+        <span>Less</span>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className={`ghcal-cell ghcal-cell--${i} ghcal-legend-cell`} />
+        ))}
+        <span>More</span>
+      </div>
+
+      {/* ── Tooltip ── */}
+      {tooltip && (
+        <div
+          className="ghcal-tooltip"
+          style={{ left: tooltip.x, top: tooltip.y }}
+        >
+          <strong>{tooltip.day.date}</strong>
+          {tooltip.day.total === 0 ? (
+            <span>No activity</span>
+          ) : (
+            <>
+              {tooltip.day.solved > 0 && <span>✅ {tooltip.day.solved} solved</span>}
+              {tooltip.day.attempts > 0 && <span>⚡ {tooltip.day.attempts} attempts</span>}
+              {tooltip.day.topicsCompleted > 0 && <span>📚 {tooltip.day.topicsCompleted} topics done</span>}
+              {tooltip.day.topicsOpened > 0 && <span>📖 {tooltip.day.topicsOpened} topics opened</span>}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TrackCard({
   trackType,
   title,
@@ -623,7 +805,6 @@ export default function ProfilePage() {
     "activity",
     "achievements",
     "engagement",
-    "saved",
   ];
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -861,157 +1042,167 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="pd-two-col">
-              {/* Performance Insights */}
-              <div className="pd-card">
-                <h2 className="pd-card-title">Performance Insights</h2>
-                {loadingProgress ? (
-                  <div className="pd-loading">Loading insights…</div>
-                ) : (
-                  <div className="pd-insight-list">
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Solve Rate</span>
-                      <span className="pd-insight-val pd-insight-val--blue">
-                        {attemptedCount > 0
-                          ? `${Math.round((solvedCount / attemptedCount) * 100)}%`
-                          : "—"}
-                      </span>
+            <div className="pd-insights-full">
+              {/* Performance Insights — full width, rich layout */}
+              {loadingProgress ? (
+                <div className="pd-card pd-loading">Loading insights…</div>
+              ) : (
+                <div className="pd-card pd-perf-card">
+                  <div className="pd-perf-header">
+                    <div>
+                      <h2 className="pd-card-title">Performance Insights</h2>
+                      <p className="pd-card-sub">A deep look at your learning health</p>
                     </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Accuracy Trend</span>
-                      <span
-                        className={`pd-insight-val ${weekComp.delta >= 0 ? "pd-insight-val--green" : "pd-insight-val--amber"}`}
-                      >
-                        {weekComp.thisWeek === 0 && weekComp.lastWeek === 0
-                          ? "—"
-                          : weekComp.delta > 0
-                            ? `↑ +${weekComp.delta}% vs last week`
-                            : weekComp.delta < 0
-                              ? `↓ ${weekComp.delta}% vs last week`
-                              : "→ Same as last week"}
-                      </span>
+                    <span className={`pd-perf-status ${backendOk ? "pd-perf-status--ok" : "pd-perf-status--warn"}`}>
+                      {backendOk === null ? "Checking…" : backendOk ? "● Synced" : "⚠ Offline"}
+                    </span>
+                  </div>
+
+                  {/* ── Metric rows with bar indicators ── */}
+                  <div className="pd-perf-metrics">
+
+                    {/* Accuracy Trend */}
+                    <div className="pd-perf-metric">
+                      <div className="pd-perf-metric-head">
+                        <span className="pd-perf-metric-label">Accuracy Trend</span>
+                        <span className={`pd-perf-metric-val ${weekComp.delta >= 0 ? "pd-perf-metric-val--green" : "pd-perf-metric-val--red"}`}>
+                          {weekComp.thisWeek === 0 && weekComp.lastWeek === 0
+                            ? "No data yet"
+                            : weekComp.delta > 0 ? `↑ +${weekComp.delta}% this week`
+                            : weekComp.delta < 0 ? `↓ ${weekComp.delta}% this week`
+                            : "→ Steady"}
+                        </span>
+                      </div>
+                      <div className="pd-perf-bar-track">
+                        <div className="pd-perf-bar-fill" style={{
+                          width: `${Math.min(Math.max(50 + weekComp.delta / 2, 5), 100)}%`,
+                          background: weekComp.delta >= 0 ? "linear-gradient(90deg,#10b981,#34d399)" : "linear-gradient(90deg,#ef4444,#f87171)"
+                        }}/>
+                      </div>
                     </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Strongest Area</span>
-                      <span className="pd-insight-val pd-insight-val--purple">
-                        {Object.entries(topicStats)
-                          .filter(([, v]) => v > 0)
-                          .sort((a, b) => b[1] - a[1])[0]
-                          ? Object.entries(topicStats)
-                              .filter(([, v]) => v > 0)
-                              .sort((a, b) => b[1] - a[1])[0][0]
-                              .replace(/([A-Z])/g, " $1")
-                              .trim()
-                          : "—"}
-                      </span>
-                    </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Needs Attention</span>
-                      <span className="pd-insight-val pd-insight-val--amber">
-                        {Object.entries(topicStats)
-                          .filter(([, v]) => v < 100)
-                          .sort((a, b) => a[1] - b[1])[0]
-                          ? Object.entries(topicStats)
-                              .filter(([, v]) => v < 100)
-                              .sort((a, b) => a[1] - b[1])[0][0]
-                              .replace(/([A-Z])/g, " $1")
-                              .trim()
-                          : "All areas strong 🎉"}
-                      </span>
-                    </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">
-                        Topics In Progress
-                      </span>
-                      <span className="pd-insight-val pd-insight-val--blue">
-                        {
-                          topicEntries.filter(
-                            ([, t]) => t.status === "in_progress",
-                          ).length
-                        }
-                      </span>
-                    </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Longest Streak</span>
-                      <span className="pd-insight-val pd-insight-val--green">
-                        {streakLongest > 0 ? `${streakLongest} days` : "—"}
-                      </span>
-                    </div>
-                    <div className="pd-insight-row">
-                      <span className="pd-insight-label">Backend</span>
-                      <span
-                        className={`pd-insight-val ${backendOk ? "pd-insight-val--green" : "pd-insight-val--amber"}`}
-                      >
-                        {backendOk === null
-                          ? "Checking…"
-                          : backendOk
-                            ? "● Connected"
-                            : "⚠ Offline"}
-                      </span>
+
+                    {/* Strongest Area */}
+                    {(() => {
+                      const best = Object.entries(topicStats).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
+                      return (
+                        <div className="pd-perf-metric">
+                          <div className="pd-perf-metric-head">
+                            <span className="pd-perf-metric-label">Strongest Area</span>
+                            <span className="pd-perf-metric-val pd-perf-metric-val--purple">
+                              {best ? best[0].replace(/([A-Z])/g," $1").trim() : "—"}{best ? ` · ${best[1]}%` : ""}
+                            </span>
+                          </div>
+                          <div className="pd-perf-bar-track">
+                            <div className="pd-perf-bar-fill" style={{ width: `${best?.[1] || 0}%`, background: "linear-gradient(90deg,#8b5cf6,#a78bfa)" }}/>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Needs Attention */}
+                    {(() => {
+                      const weak = Object.entries(topicStats).filter(([,v]) => v < 100).sort((a,b) => a[1]-b[1])[0];
+                      return (
+                        <div className="pd-perf-metric">
+                          <div className="pd-perf-metric-head">
+                            <span className="pd-perf-metric-label">Needs Attention</span>
+                            <span className="pd-perf-metric-val pd-perf-metric-val--amber">
+                              {weak ? `${weak[0].replace(/([A-Z])/g," $1").trim()} · ${weak[1]}%` : "All strong 🎉"}
+                            </span>
+                          </div>
+                          <div className="pd-perf-bar-track">
+                            <div className="pd-perf-bar-fill" style={{ width: `${weak?.[1] || 100}%`, background: "linear-gradient(90deg,#f59e0b,#fbbf24)" }}/>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Topics In Progress */}
+                    <div className="pd-perf-metric">
+                      <div className="pd-perf-metric-head">
+                        <span className="pd-perf-metric-label">Topics In Progress</span>
+                        <span className="pd-perf-metric-val pd-perf-metric-val--blue">
+                          {topicEntries.filter(([,t]) => t.status === "in_progress").length} active
+                        </span>
+                      </div>
+                      <div className="pd-perf-bar-track">
+                        <div className="pd-perf-bar-fill" style={{
+                          width: `${Math.min((topicEntries.filter(([,t]) => t.status === "in_progress").length / Math.max(summary.totalTopics || 8, 1)) * 100, 100)}%`,
+                          background: "linear-gradient(90deg,#3b82f6,#60a5fa)"
+                        }}/>
+                      </div>
                     </div>
                   </div>
-                )}
+
+                </div>
+              )}
+            </div>
+
+            {/* ── Account & System Status ── */}
+            <div className="pd-card pd-status-card">
+              <div className="pd-status-header">
+                <div>
+                  <h2 className="pd-card-title">Account & System Status</h2>
+                  <p className="pd-card-sub">Your session details and connection health</p>
+                </div>
+                <span className={`pd-status-pill ${backendOk ? "pd-status-pill--ok" : "pd-status-pill--warn"}`}>
+                  {backendOk === null ? "⏳ Checking" : backendOk ? "● All Systems Go" : "⚠ Degraded"}
+                </span>
               </div>
 
-              {/* Recent Activity Feed */}
-              <div className="pd-card">
-                <h2 className="pd-card-title">Recent Activity</h2>
-                {loadingProgress ? (
-                  <div className="pd-loading">Loading activity…</div>
-                ) : recentEvents.length === 0 ? (
-                  <div className="pd-overview-empty">
-                    <span className="pd-overview-empty-icon">🚀</span>
-                    <span className="pd-overview-empty-msg">
-                      No activity yet
-                    </span>
-                    <span className="pd-overview-empty-sub">
-                      Start solving problems to see your activity here.
-                    </span>
-                    <Link
-                      to="/problems"
-                      className="pd-btn pd-btn--primary pd-btn--sm"
-                      style={{ marginTop: "0.5rem" }}
-                    >
-                      Go to Problems →
-                    </Link>
+              <div className="pd-status-grid">
+                <div className="pd-status-item">
+                  <span className="pd-status-icon pd-status-icon--ok">🔐</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Session</span>
+                    <span className="pd-status-val pd-status-val--ok">JWT Active</span>
                   </div>
-                ) : (
-                  <ul className="pd-feed">
-                    {recentEvents.slice(0, 8).map((ev) => {
-                      const meta = EVENT_META[ev.type] || {
-                        label: ev.type,
-                        color: "#94a3b8",
-                        icon: "•",
-                      };
-                      return (
-                        <li
-                          key={ev.id || ev.createdAt}
-                          className="pd-feed-item"
-                        >
-                          <span
-                            className="pd-feed-dot"
-                            style={{ background: meta.color }}
-                          >
-                            {meta.icon}
-                          </span>
-                          <div className="pd-feed-body">
-                            <span className="pd-feed-label">{meta.label}</span>
-                            {ev.title && (
-                              <span className="pd-feed-title">
-                                "{ev.title}"
-                              </span>
-                            )}
-                          </div>
-                          <span className="pd-feed-time">
-                            {timeAgo(ev.createdAt)}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+                </div>
+
+                <div className="pd-status-item">
+                  <span className={`pd-status-icon ${backendOk ? "pd-status-icon--ok" : "pd-status-icon--warn"}`}>🌐</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Backend</span>
+                    <span className={`pd-status-val ${backendOk ? "pd-status-val--ok" : "pd-status-val--warn"}`}>
+                      {backendOk === null ? "Checking…" : backendOk ? "Connected" : "Offline"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pd-status-item">
+                  <span className="pd-status-icon pd-status-icon--blue">⏱️</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Last Activity</span>
+                    <span className="pd-status-val">{lastLogin}</span>
+                  </div>
+                </div>
+
+                <div className="pd-status-item">
+                  <span className="pd-status-icon pd-status-icon--blue">📅</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Member Since</span>
+                    <span className="pd-status-val">{joinDate}</span>
+                  </div>
+                </div>
+
+                <div className="pd-status-item">
+                  <span className="pd-status-icon pd-status-icon--purple">✉️</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Email</span>
+                    <span className="pd-status-val pd-status-val--mono">{user?.email}</span>
+                  </div>
+                </div>
+
+                <div className="pd-status-item">
+                  <span className="pd-status-icon pd-status-icon--purple">🎓</span>
+                  <div className="pd-status-body">
+                    <span className="pd-status-label">Role</span>
+                    <span className="pd-status-val pd-status-val--purple">Student</span>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         )}
 
@@ -1370,94 +1561,105 @@ export default function ProfilePage() {
             <div className="pd-card">
               <h2 className="pd-card-title">Activity Calendar</h2>
               <p className="pd-card-sub">
-                Your learning activity over the past month
+                Your learning contributions over the past year
               </p>
-              <div className="pd-cal-legend">
-                <span>Less</span>
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <div key={i} className={`pd-cal-dot pd-cal-dot--${i}`} />
-                ))}
-                <span>More</span>
-              </div>
-              <div className="pd-cal-grid">
-                {calendarDots.map((day) => (
-                  <ActivityDot
-                    key={day.date}
-                    intensity={day.intensity}
-                    date={day.date}
-                  />
-                ))}
-              </div>
-              <div className="pd-cal-stats">
-                <span>
-                  🔥 Current streak: <strong>{streakCurrent} days</strong>
-                </span>
-                <span>
-                  🏆 Longest streak: <strong>{streakLongest} days</strong>
-                </span>
-                <span>
-                  📅 Active days: <strong>{activeDays}</strong>
-                </span>
-                <span>
-                  📆 Most active: <strong>{mostActiveDay}</strong>
-                </span>
-              </div>
+              <GithubCalendar
+                activityMap={state.activity || {}}
+                streakCurrent={streakCurrent}
+                streakLongest={streakLongest}
+                activeDays={activeDays}
+                totalContributions={Object.values(state.activity || {}).reduce(
+                  (sum, d) => sum + (d.solved || 0) + (d.attempts || 0) + (d.topicsCompleted || 0),
+                  0,
+                )}
+              />
             </div>
 
             {/* Timeline view */}
             <div className="pd-card">
               <h2 className="pd-card-title">Learning Timeline</h2>
-              <p className="pd-card-sub">
-                Your activity history in chronological order
-              </p>
+              <p className="pd-card-sub">Your recent activity, grouped by day</p>
               {loadingProgress ? (
                 <div className="pd-loading">Loading…</div>
               ) : recentEvents.length === 0 ? (
-                <p className="pd-empty">No activity recorded yet.</p>
+                <div className="pd-tl-empty">
+                  <span className="pd-tl-empty-icon">🚀</span>
+                  <span className="pd-tl-empty-msg">No activity yet</span>
+                  <span className="pd-tl-empty-sub">Start solving problems — your history will appear here.</span>
+                </div>
               ) : (
-                <div className="pd-timeline">
-                  {recentEvents.map((ev, idx) => {
-                    const meta = EVENT_META[ev.type] || {
-                      label: ev.type,
-                      color: "#94a3b8",
-                      icon: "•",
+                <div className="pd-tl-feed">
+                  {(() => {
+                    // ── Group by date, deduplicate consecutive identical events ──
+                    const grouped = {};
+                    recentEvents.forEach((ev) => {
+                      const date = ev.createdAt
+                        ? new Date(ev.createdAt).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })
+                        : "Unknown date";
+                      if (!grouped[date]) grouped[date] = [];
+                      grouped[date].push(ev);
+                    });
+
+                    const TYPE_CONFIG = {
+                      problem_solved:   { label: "Solved",         icon: "✅", accent: "#10b981", bg: "rgba(16,185,129,0.12)",  border: "rgba(16,185,129,0.25)" },
+                      problem_attempted:{ label: "Attempted",      icon: "⚡", accent: "#3b82f6", bg: "rgba(59,130,246,0.10)",  border: "rgba(59,130,246,0.22)" },
+                      topic_opened:     { label: "Started topic",  icon: "📖", accent: "#8b5cf6", bg: "rgba(139,92,246,0.10)",  border: "rgba(139,92,246,0.22)" },
+                      topic_completed:  { label: "Completed topic", icon: "🏆", accent: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
                     };
-                    return (
-                      <div
-                        key={ev.id || ev.createdAt}
-                        className="pd-timeline-item"
-                      >
-                        <div
-                          className="pd-timeline-line"
-                          style={{
-                            background:
-                              idx === recentEvents.length - 1
-                                ? "transparent"
-                                : "var(--border-color)",
-                          }}
-                        />
-                        <div
-                          className="pd-timeline-dot"
-                          style={{ background: meta.color }}
-                        >
-                          {meta.icon}
+
+                    return Object.entries(grouped).map(([date, evs]) => {
+                      // Collapse consecutive identical (type + title) into one with a count
+                      const collapsed = [];
+                      evs.forEach((ev) => {
+                        const last = collapsed[collapsed.length - 1];
+                        if (last && last.type === ev.type && last.title === ev.title) {
+                          last.count += 1;
+                        } else {
+                          collapsed.push({ ...ev, count: 1 });
+                        }
+                      });
+
+                      return (
+                        <div key={date} className="pd-tl-day">
+                          <div className="pd-tl-day-label">
+                            <span className="pd-tl-day-dot" />
+                            {date}
+                          </div>
+                          <div className="pd-tl-events">
+                            {collapsed.map((ev, i) => {
+                              const cfg = TYPE_CONFIG[ev.type] || {
+                                label: ev.type, icon: "•", accent: "#94a3b8",
+                                bg: "rgba(148,163,184,0.08)", border: "rgba(148,163,184,0.18)"
+                              };
+                              return (
+                                <div
+                                  key={ev.id || `${ev.type}-${i}`}
+                                  className="pd-tl-event"
+                                  style={{ "--ev-accent": cfg.accent, "--ev-bg": cfg.bg, "--ev-border": cfg.border }}
+                                >
+                                  <span className="pd-tl-event-icon">{cfg.icon}</span>
+                                  <div className="pd-tl-event-body">
+                                    <span className="pd-tl-event-label">{cfg.label}</span>
+                                    {ev.title && (
+                                      <span className="pd-tl-event-title">{ev.title}</span>
+                                    )}
+                                  </div>
+                                  <div className="pd-tl-event-right">
+                                    {ev.count > 1 && (
+                                      <span className="pd-tl-event-count">×{ev.count}</span>
+                                    )}
+                                    <span className="pd-tl-event-time">
+                                      {ev.createdAt ? timeAgo(ev.createdAt) : ""}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="pd-timeline-content">
-                          <span className="pd-timeline-label">
-                            {meta.label}
-                          </span>
-                          {ev.title && (
-                            <span className="pd-timeline-title">
-                              "{ev.title}"
-                            </span>
-                          )}
-                          <span className="pd-timeline-time">
-                            {timeAgo(ev.createdAt)}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    });
+                  })()}
                 </div>
               )}
             </div>
@@ -1559,7 +1761,92 @@ export default function ProfilePage() {
               />
             </div>
 
-            {/* ── Notifications + Feedback side by side ── */}
+            {/* ── Learning Tips — expressive bullet list (first) ── */}
+            <div className="pd-card pd-tips-card">
+              <div className="pd-tips-header">
+                <div>
+                  <h2 className="pd-card-title">Learning Tips</h2>
+                  <p className="pd-card-sub">Personalised suggestions based on your progress</p>
+                </div>
+                <span className="pd-tips-badge">✨ For You</span>
+              </div>
+
+              <div className="pd-tips-list">
+                {[
+                  {
+                    icon: "💡",
+                    color: COLORS.amber,
+                    number: "01",
+                    title: "Spaced Repetition",
+                    tip: "Review topics you completed more than 3 days ago. Your brain retains information far better when you revisit it at increasing intervals.",
+                    action: "Go to Problems",
+                    path: "/problems",
+                    tag: "Memory",
+                  },
+                  {
+                    icon: "🔥",
+                    color: COLORS.blue,
+                    number: "02",
+                    title: streakCurrent > 0 ? `Keep your ${streakCurrent}-day streak alive` : "Build a daily habit",
+                    tip: streakCurrent > 0
+                      ? `You're ${streakCurrent} days in. Even one problem today locks in your streak and compounds your progress over time.`
+                      : "Study every day — even 10 minutes. Consistency compounds. The first week is the hardest.",
+                    action: "Study Now",
+                    path: "/problems",
+                    tag: "Habit",
+                  },
+                  {
+                    icon: "🎯",
+                    color: COLORS.purple,
+                    number: "03",
+                    title: "Strengthen Your Weakest Area",
+                    tip: `Your least-explored topic is ${
+                      Object.entries(topicStats).sort((a,b) => a[1]-b[1])[0]?.[0]?.replace(/([A-Z])/g," $1").trim() || "unknown"
+                    }. Closing that gap will round out your digital logic foundation and boost your overall score.`,
+                    action: "Explore Topics",
+                    path: "/problems",
+                    tag: "Weakness",
+                  },
+                  {
+                    icon: "⚡",
+                    color: COLORS.green,
+                    number: "04",
+                    title: "Chase the Next Milestone",
+                    tip: `You've solved ${solvedCount} problem${solvedCount !== 1 ? "s" : ""}. Your next milestone is ${Math.ceil((solvedCount + 1) / 5) * 5}. Each problem you solve increases your acceptance rate and unlocks harder challenges.`,
+                    action: "Solve Problems",
+                    path: "/problems",
+                    tag: "Progress",
+                  },
+                  {
+                    icon: "🧠",
+                    color: COLORS.pink,
+                    number: "05",
+                    title: "Connect Concepts, Don't Memorise",
+                    tip: "Digital logic builds on itself. When you understand why a K-Map works, Boolean simplification becomes intuitive. Focus on the why, not just the how.",
+                    action: "Open K-Map",
+                    path: "/kmapgenerator",
+                    tag: "Mindset",
+                  },
+                ].map((tip, i) => (
+                  <div key={tip.number} className="pd-tip-row" style={{ "--tip-color": tip.color }}>
+                    <div className="pd-tip-number">{tip.number}</div>
+                    <div className="pd-tip-content">
+                      <div className="pd-tip-top">
+                        <span className="pd-tip-icon">{tip.icon}</span>
+                        <span className="pd-tip-title">{tip.title}</span>
+                        <span className="pd-tip-tag" style={{ color: tip.color, background: `${tip.color}18`, border: `1px solid ${tip.color}30` }}>{tip.tag}</span>
+                      </div>
+                      <p className="pd-tip-text">{tip.tip}</p>
+                      <Link to={tip.path} className="pd-tip-cta" style={{ color: tip.color }}>
+                        {tip.action} <span className="pd-tip-arrow">→</span>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Notifications + Feedback side by side (second) ── */}
             <div className="pd-two-col">
               {/* Daily Quests */}
               <div className="pd-card">
@@ -1717,202 +2004,9 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* ── Learning tips ── */}
-            <div className="pd-card">
-              <h2 className="pd-card-title">Learning Tips</h2>
-              <p className="pd-card-sub">
-                Personalised suggestions based on your progress
-              </p>
-              <div className="pd-eng-tips-grid">
-                {[
-                  {
-                    icon: "💡",
-                    color: COLORS.amber,
-                    title: "Spaced Repetition",
-                    tip: "Review topics you completed more than 3 days ago to reinforce memory retention.",
-                    action: "Go to Problems",
-                    path: "/problems",
-                  },
-                  {
-                    icon: "🎯",
-                    color: COLORS.blue,
-                    title:
-                      streakCurrent > 0
-                        ? `Keep your ${streakCurrent}-day streak!`
-                        : "Start a streak",
-                    tip:
-                      streakCurrent > 0
-                        ? "You're on a roll. Study at least one topic today to maintain momentum."
-                        : "Study every day to build a streak. Even 10 minutes counts!",
-                    action: "Study Now",
-                    path: "/problems",
-                  },
-                  {
-                    icon: "🔬",
-                    color: COLORS.purple,
-                    title: "Weakest Area",
-                    tip: `Focus on ${
-                      Object.entries(topicStats)
-                        .sort((a, b) => a[1] - b[1])[0]?.[0]
-                        ?.replace(/([A-Z])/g, " $1")
-                        .trim() || "your weakest topic"
-                    } to balance your skill profile.`,
-                    action: "Explore Topics",
-                    path: "/problems",
-                  },
-                  {
-                    icon: "⚡",
-                    color: COLORS.green,
-                    title: "Practice Makes Perfect",
-                    tip: `You've solved ${solvedCount} problem${solvedCount !== 1 ? "s" : ""}. Aim for ${Math.ceil((solvedCount + 1) / 5) * 5} to unlock the next milestone.`,
-                    action: "Solve Problems",
-                    path: "/problems",
-                  },
-                ].map((tip) => (
-                  <div
-                    key={tip.title}
-                    className="pd-eng-tip-card"
-                    style={{ "--tip-color": tip.color }}
-                  >
-                    <div className="pd-eng-tip-icon">{tip.icon}</div>
-                    <div className="pd-eng-tip-body">
-                      <span className="pd-eng-tip-title">{tip.title}</span>
-                      <span className="pd-eng-tip-text">{tip.tip}</span>
-                    </div>
-                    <Link to={tip.path} className="pd-eng-tip-action">
-                      {tip.action} →
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
-        {/* ══════════════ SAVED TAB ══════════════ */}
-        {activeTab === "saved" && (
-          <div className="pd-section">
-            <div className="pd-card">
-              <div className="pd-saved-header">
-                <h2 className="pd-card-title">Saved Work</h2>
-                <div className="pd-saved-actions">
-                  <button
-                    type="button"
-                    className="pd-btn pd-btn--primary pd-btn--sm"
-                    onClick={() => navigate("/boolforge")}
-                  >
-                    + New Circuit
-                  </button>
-                  <button
-                    type="button"
-                    className="pd-btn pd-btn--ghost pd-btn--sm"
-                    onClick={() => navigate("/kmapgenerator")}
-                  >
-                    + New K-Map
-                  </button>
-                </div>
-              </div>
-              <div className="pd-saved-grid">
-                <div
-                  className="pd-saved-card"
-                  onClick={() => navigate("/boolforge")}
-                >
-                  <div className="pd-saved-thumb pd-saved-thumb--circuit">
-                    <span>⚡</span>
-                  </div>
-                  <div className="pd-saved-info">
-                    <span className="pd-saved-name">Circuit Forge</span>
-                    <span className="pd-saved-type">Logic circuit builder</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="pd-btn pd-btn--ghost pd-btn--sm"
-                  >
-                    Open
-                  </button>
-                </div>
-                <div
-                  className="pd-saved-card"
-                  onClick={() => navigate("/kmapgenerator")}
-                >
-                  <div className="pd-saved-thumb pd-saved-thumb--kmap">
-                    <span>🗺️</span>
-                  </div>
-                  <div className="pd-saved-info">
-                    <span className="pd-saved-name">K-Map Studio</span>
-                    <span className="pd-saved-type">
-                      Karnaugh map simplifier
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="pd-btn pd-btn--ghost pd-btn--sm"
-                  >
-                    Open
-                  </button>
-                </div>
-                <div
-                  className="pd-saved-card"
-                  onClick={() => navigate("/problems")}
-                >
-                  <div className="pd-saved-thumb pd-saved-thumb--problems">
-                    <span>📝</span>
-                  </div>
-                  <div className="pd-saved-info">
-                    <span className="pd-saved-name">Problem Sets</span>
-                    <span className="pd-saved-type">
-                      {solvedCount} solved · {attemptedCount} attempted
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="pd-btn pd-btn--ghost pd-btn--sm"
-                  >
-                    Open
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="pd-card">
-              <h2 className="pd-card-title">System Status</h2>
-              <div className="pd-sys-grid">
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Session</span>
-                  <span className="pd-sys-val pd-sys-val--ok">JWT Active</span>
-                </div>
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Backend Connection</span>
-                  <span
-                    className={`pd-sys-val ${backendOk ? "pd-sys-val--ok" : "pd-sys-val--warn"}`}
-                  >
-                    {backendOk === null
-                      ? "Checking…"
-                      : backendOk
-                        ? "Connected"
-                        : "Offline"}
-                  </span>
-                </div>
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Last Activity</span>
-                  <span className="pd-sys-val">{lastLogin}</span>
-                </div>
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Account Created</span>
-                  <span className="pd-sys-val">{joinDate}</span>
-                </div>
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Email</span>
-                  <span className="pd-sys-val">{user?.email}</span>
-                </div>
-                <div className="pd-sys-row">
-                  <span className="pd-sys-label">Role</span>
-                  <span className="pd-sys-val">Student</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
       <Footer />
     </div>
