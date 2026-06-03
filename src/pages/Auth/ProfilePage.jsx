@@ -171,16 +171,6 @@ function Badge({ icon, title, desc, earned, progress, rarity }) {
   );
 }
 
-function ActivityDot({ intensity, date }) {
-  const labels = ["No activity", "Low", "Medium", "High", "Very high"];
-  return (
-    <div
-      className={`pd-cal-dot pd-cal-dot--${intensity}`}
-      title={`${date}: ${labels[intensity] || "No activity"}`}
-    />
-  );
-}
-
 // ─── GitHub-style full-year activity calendar ─────────────────────────────────
 function buildYearGrid(activityMap) {
   const today = new Date();
@@ -500,22 +490,6 @@ function ChartTooltip({ active, payload, label }) {
     </div>
   );
 }
-
-// ─── Event meta ───────────────────────────────────────────────────────────────
-const EVENT_META = {
-  problem_solved: { label: "Solved a problem", color: COLORS.green, icon: "✓" },
-  problem_attempted: {
-    label: "Attempted a problem",
-    color: COLORS.blue,
-    icon: "⚡",
-  },
-  topic_opened: { label: "Started a topic", color: COLORS.purple, icon: "📖" },
-  topic_completed: {
-    label: "Completed a topic",
-    color: COLORS.amber,
-    icon: "🏆",
-  },
-};
 
 // ─── Build weekly trend data from calendar ────────────────────────────────────
 function buildWeeklyTrend(calendar) {
