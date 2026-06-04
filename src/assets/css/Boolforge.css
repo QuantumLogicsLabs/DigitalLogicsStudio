@@ -227,3 +227,50 @@ body:has(.boolforge-page) {
   background: rgba(5, 150, 105, 0.1);
   border-color: var(--accent-primary);
 }
+
+/* ── Responsive Overrides for Circuit Forge ──────────────────────────────── */
+@media (max-width: 900px) {
+  .boolforge-main .container.circuit-maker {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 450px auto;
+    height: auto;
+  }
+
+  .boolforge-main .sidebar {
+    border-right: none;
+    border-bottom: 2px solid var(--bg-light);
+    height: auto;
+    max-height: none;
+    padding: 16px;
+  }
+
+  .gate-palette {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .gate-btn {
+    flex: 1 1 calc(33.3% - 6px);
+    padding: 8px 12px;
+    font-size: 12px;
+    text-align: center;
+    transform: none !important;
+  }
+
+  .instructions {
+    display: none;
+  }
+
+  .boolforge-main .canvas-container {
+    height: 450px;
+  }
+
+  .boolforge-main .truth-table-panel {
+    border-left: none;
+    border-top: 2px solid var(--bg-light);
+    height: auto;
+    padding: 16px;
+  }
+}
+

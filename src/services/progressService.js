@@ -50,8 +50,13 @@ const normalizeUserKey = (userOrKey) => {
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
-const toDateKey = (value = new Date()) =>
-  new Date(value).toISOString().slice(0, 10);
+const toDateKey = (value = new Date()) => {
+  const d = new Date(value);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 const formatMonthKey = (value = new Date()) => {
   const d = new Date(value);
@@ -338,6 +343,7 @@ const progressService = {
       title: problem.title,
       tags: problem.tags || [],
       topicId: problem.primaryTopicId || null,
+      dateKey,
     });
 
     return snapshotFor(userKey, catalog);
@@ -388,6 +394,7 @@ const progressService = {
     await tryRemotePost(path, {
       title: problem.title,
       tags: problem.tags || [],
+      dateKey,
     });
 
     return snapshotFor(userKey, catalog);
@@ -438,6 +445,7 @@ const progressService = {
     await tryRemotePost(`/progress/topics/${topic.id}/open`, {
       title: topic.title,
       totalSubtopics: topic?.links?.length || 0,
+      dateKey,
     });
 
     return snapshotFor(userKey, catalog);
@@ -493,6 +501,7 @@ const progressService = {
         subtopicId,
         equivalentSubtopicIds: equivalentIds,
         totalSubtopics: topic?.links?.length || 0,
+        dateKey,
       },
     );
 

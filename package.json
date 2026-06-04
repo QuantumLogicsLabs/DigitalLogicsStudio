@@ -14,6 +14,7 @@
     "@vercel/analytics": "^2.0.1",
     "axios": "^1.6.2",
     "dld-books": "^1.0.1",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.563.0",
     "normalize-path": "^3.0.0",
     "react": "^18.2.0",

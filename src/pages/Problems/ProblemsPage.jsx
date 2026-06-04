@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
 import {
   BookOpen,
   ChevronLeft,
@@ -13,6 +14,17 @@ import {
   Search,
   Sparkles,
   Trophy,
+  Cpu,
+  Grid,
+  Binary,
+  Layers,
+  Tv,
+  Activity,
+  Coins,
+  Calculator,
+  Info,
+  Menu,
+  X,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
@@ -33,13 +45,78 @@ import {
   trackTopicEngagement,
 } from "../../utils/analytics";
 
-const leftNavItems = [
-  { label: "Library", icon: LibraryBig, active: true },
-  { label: "Quest", icon: Trophy, badge: "New" },
-  { label: "Explore", icon: Compass },
-  { label: "Study Plan", icon: GraduationCap },
-  { label: "My Lists", icon: BookOpen },
-  { label: "Favorites", icon: FolderHeart },
+const leftNavSections = [
+  {
+    title: "Practice Arenas",
+    items: [
+      { label: "Problems Library", icon: LibraryBig },
+      { label: "K-Map Arena", icon: Layers, topicSlug: "k-map", badge: "Core" },
+      { label: "Sequential Arena", icon: Sparkles, topicSlug: "sequential-circuits" },
+      { label: "Number Arena", icon: Binary, topicSlug: "number-systems" },
+    ],
+  },
+  {
+    title: "Interactive Labs",
+    items: [
+      { label: "Circuit Forge", icon: Cpu, path: "/boolforge" },
+      { label: "K-Map Studio", icon: Grid, path: "/kmapgenerator" },
+      { label: "DLD Trainer Board", icon: Tv, path: "/trainer-board", badge: "Live" },
+      { label: "Timing Diagrams", icon: Activity, path: "/timing-diagrams" },
+    ],
+  },
+  {
+    title: "Design Utilities",
+    items: [
+      { label: "Circuit Cost Calc", icon: Coins, path: "/circuit-cost" },
+      { label: "Parity Calculator", icon: Calculator, path: "/paritybitcalculator" },
+      { label: "Universal Gates Lab", icon: FolderHeart, path: "/universal-gates" },
+      { label: "Standard Forms", icon: GraduationCap, path: "/standard-forms" },
+    ],
+  },
+  {
+    title: "Arithmetic Circuits",
+    items: [
+      { label: "Adders & Subtractors", icon: Cpu, path: "/arithmetic/binary-add-subtractor" },
+      { label: "Binary Multipliers", icon: Cpu, path: "/arithmetic/binary-multipliers" },
+      { label: "Magnitude Comparators", icon: Cpu, path: "/arithmetic/magnitude-comparator" },
+      { label: "Signed Numbers", icon: Binary, path: "/arithmetic/signed-unsigned" },
+    ],
+  },
+  {
+    title: "Combinational Logic",
+    items: [
+      { label: "Encoder Studio", icon: Layers, path: "/encoder" },
+      { label: "Decoder Studio", icon: Layers, path: "/decoder" },
+      { label: "Multiplexers (MUX)", icon: Grid, path: "/mux" },
+      { label: "Demultiplexers (DEMUX)", icon: Grid, path: "/demux" },
+    ],
+  },
+  {
+    title: "Sequential & Storage",
+    items: [
+      { label: "Latches & Flip-Flops", icon: Sparkles, path: "/sequential/flip-flops" },
+      { label: "Registers & Loading", icon: Layers, path: "/registers/shift-registers" },
+      { label: "Ripple Counters", icon: Binary, path: "/registers/ripple-counters" },
+      { label: "State Analysis", icon: Compass, path: "/sequential/analysis" },
+    ],
+  },
+  {
+    title: "Memory Systems",
+    items: [
+      { label: "Memory Basics", icon: BookOpen, path: "/memory/basics" },
+      { label: "Programmable PLA", icon: Cpu, path: "/memory/programmable-logic-array" },
+      { label: "Random Access Memory", icon: Lock, path: "/memory/random-access-memory" },
+    ],
+  },
+  {
+    title: "Learning & Reference",
+    items: [
+      { label: "Chapter Solvers", icon: BookOpen, path: "/book" },
+      { label: "Logic Gate Guide", icon: Info, path: "/gates" },
+      { label: "Boolean Identities", icon: GraduationCap, path: "/boolean/identities" },
+      { label: "Boolean Laws", icon: BookOpen, path: "/boolean/laws" },
+    ],
+  },
 ];
 
 const difficultyTone = {
@@ -284,43 +361,122 @@ function SelectedProblemCard({ problem, status, onAttempt, onToggleSolved }) {
 }
 
 export default function ProblemsPage() {
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
   const { topicSlug } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, toggle: toggleTheme } = useTheme();
   const topicLanding = topicSlug ? problemTopicLandingMap[topicSlug] : null;
-  const [activeLibraryItem, setActiveLibraryItem] = React.useState("Library");
+  
   const bannerRef = React.useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(true);
+  const tweenRef = React.useRef(null);
+  const resumeTimeoutRef = React.useRef(null);
 
-  const updateScrollButtons = React.useCallback(() => {
+
+
+  const getActiveItem = () => {
+    if (topicSlug === "k-map") return "K-Map Arena";
+    if (topicSlug === "sequential-circuits") return "Sequential Arena";
+    if (topicSlug === "number-systems") return "Number Arena";
+    if (!topicSlug) return "Problems Library";
+    return "";
+  };
+  const activeItemLabel = getActiveItem();
+
+  const handleSidebarClick = (item) => {
+    setIsMobileSidebarOpen(false); // Close sidebar on mobile drawer click
+    if (item.path) {
+      navigate(item.path);
+    } else if (item.topicSlug) {
+      navigate(`/problems/${item.topicSlug}`);
+    } else {
+      navigate("/problems");
+      setActiveGroup("All Topics");
+      setTopicFilter("All Topics");
+    }
+  };
+
+  const handleBannerCardClick = (card) => {
+    if (card.filterGroup) {
+      setActiveGroup(card.filterGroup);
+      setTopicFilter(card.filterGroup);
+      trackPracticeEngagement("banner_card_click", {
+        card_title: card.title,
+        filter_group: card.filterGroup,
+      });
+    }
+  };
+
+  const startAutoscroll = React.useCallback((fromStart = true) => {
     const el = bannerRef.current;
     if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll <= 0) return;
+
+    if (tweenRef.current) {
+      tweenRef.current.kill();
+    }
+
+    const currentScroll = el.scrollLeft;
+    const targetScroll = fromStart ? maxScroll : 0;
+    const distance = Math.abs(currentScroll - targetScroll);
+    const duration = distance / 30; // 30 pixels per second for slow, smooth move
+
+    tweenRef.current = gsap.to(el, {
+      scrollLeft: targetScroll,
+      duration: duration,
+      ease: "none",
+      onComplete: () => {
+        startAutoscroll(!fromStart);
+      },
+    });
   }, []);
 
   React.useEffect(() => {
     const el = bannerRef.current;
     if (!el) return;
-    updateScrollButtons();
-    el.addEventListener("scroll", updateScrollButtons, { passive: true });
-    const ro = new ResizeObserver(updateScrollButtons);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener("scroll", updateScrollButtons);
-      ro.disconnect();
-    };
-  }, [updateScrollButtons]);
 
-  const scrollBanner = (direction) => {
-    if (!bannerRef.current) return;
-    const scrollAmount = bannerRef.current.offsetWidth * 0.75;
-    bannerRef.current.scrollBy({
-      left: direction * scrollAmount,
-      behavior: "smooth",
-    });
+    const timeoutId = setTimeout(() => {
+      startAutoscroll(el.scrollLeft < (el.scrollWidth - el.clientWidth) / 2);
+    }, 800);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+      }
+      if (resumeTimeoutRef.current) {
+        clearTimeout(resumeTimeoutRef.current);
+      }
+    };
+  }, [startAutoscroll]);
+
+  const handleMouseEnter = () => {
+    if (tweenRef.current) {
+      tweenRef.current.pause();
+    }
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
   };
+
+  const handleMouseLeave = () => {
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
+    // Resume immediately on mouse leave
+    const el = bannerRef.current;
+    if (!el) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll <= 0) return;
+
+    // Check direction based on previous destination
+    const isGoingToZero = tweenRef.current && tweenRef.current.vars.scrollLeft === 0;
+    startAutoscroll(!isGoingToZero);
+  };
+
+
+
   const [activeGroup, setActiveGroup] = React.useState(
     topicLanding?.group || "All Topics",
   );
@@ -363,6 +519,89 @@ export default function ProblemsPage() {
       topics: coreTopics,
       problems: problemsCatalog,
     });
+
+  const solvedCount = snapshot?.summary?.solvedProblems || 0;
+  const attemptedCount = snapshot?.summary?.attemptedProblems || 0;
+
+  // XP & Level calculations
+  const xp = solvedCount * 100 + attemptedCount * 30;
+  const { level, rankName, nextLevelXp } = React.useMemo(() => {
+    if (xp >= 1500) {
+      return { level: 4, rankName: "Karnaugh Commander", nextLevelXp: 3000 };
+    } else if (xp >= 800) {
+      return { level: 3, rankName: "Silicon Architect", nextLevelXp: 1500 };
+    } else if (xp >= 300) {
+      return { level: 2, rankName: "Logic Gatekeeper", nextLevelXp: 800 };
+    }
+    return { level: 1, rankName: "Logic Cadet", nextLevelXp: 300 };
+  }, [xp]);
+
+  const xpPercentage = Math.min(100, Math.round((xp / nextLevelXp) * 100));
+
+  // Daily Challenge problem
+  const dailyProblem = React.useMemo(() => {
+    if (!problemsCatalog || !problemsCatalog.length) return null;
+    const day = new Date().getDate();
+    return problemsCatalog[day % problemsCatalog.length];
+  }, []);
+
+  const handleSolveDaily = () => {
+    if (dailyProblem) {
+      setSelectedProblemId(dailyProblem.id);
+      setActiveProblem(dailyProblem);
+      trackPracticeEngagement("open_daily_challenge", {
+        problem_id: dailyProblem.id,
+        problem_title: dailyProblem.title,
+      });
+    }
+  };
+
+  // DLD Fact of the Day
+  const dailyFact = React.useMemo(() => {
+    const dldFacts = [
+      "NAND and NOR gates are called universal gates because they can construct any other logic gate.",
+      "Karnaugh Maps (K-Maps) were invented in 1953 by Maurice Karnaugh, a telecommunications engineer at Bell Labs.",
+      "A multiplexer (MUX) is also known as a data selector because it chooses one of many inputs to pass to a single output.",
+      "A flip-flop can store 1 bit of data and is the building block of sequential logic circuits and registers.",
+      "De Morgan's Laws state that the complement of a union is the intersection of the complements, and vice versa.",
+      "Gray code is a binary numeral system where two successive values differ in only one bit, preventing transient errors in sensors.",
+      "In a synchronous sequential logic circuit, all state transitions are synchronized by a global clock signal.",
+    ];
+    const dayIndex = new Date().getDay();
+    return dldFacts[dayIndex % dldFacts.length];
+  }, []);
+
+  // Solved problems count in the last 7 days (Weekly Goal tracker)
+  const solvedThisWeek = React.useMemo(() => {
+    let count = 0;
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(today.getTime() - i * 86400000);
+      const year = day.getFullYear();
+      const month = String(day.getMonth() + 1).padStart(2, "0");
+      const date = String(day.getDate()).padStart(2, "0");
+      const key = `${year}-${month}-${date}`;
+      const dayData = snapshot.state.activity[key];
+      if (dayData && dayData.solved) {
+        count += dayData.solved;
+      }
+    }
+    return count;
+  }, [snapshot.state.activity]);
+
+  // Rotating quick reference formula cheat-sheet card
+  const cheatSheetFormula = React.useMemo(() => {
+    const formulas = [
+      { name: "De Morgan's Theorem", formula: "(A · B)' = A' + B'", description: "Negated product equals sum of negations." },
+      { name: "De Morgan's Theorem 2", formula: "(A + B)' = A' · B'", description: "Negated sum equals product of negations." },
+      { name: "Absorption Law", formula: "A + A · B = A", description: "The term A absorbs A · B." },
+      { name: "Consensus Theorem", formula: "A·B + A'·C + B·C = A·B + A'·C", description: "B·C is redundant and can be removed." },
+      { name: "Distributive Law", formula: "A + (B · C) = (A + B) · (A + C)", description: "OR distributes over AND." },
+      { name: "Shannon's Expansion", formula: "F(A, B) = A · F(1, B) + A' · F(0, B)", description: "Used to expand boolean functions." }
+    ];
+    const day = new Date().getDate();
+    return formulas[day % formulas.length];
+  }, []);
 
   const filteredProblems = React.useMemo(() => {
     const normalizedSearch = deferredSearch.trim().toLowerCase();
@@ -481,10 +720,28 @@ export default function ProblemsPage() {
       <div className="problems-backdrop problems-backdrop-left" />
       <div className="problems-backdrop problems-backdrop-right" />
 
+      {/* Floating Toggle Button for Mobile Sidebar Drawer */}
+      <button
+        type="button"
+        className={`mobile-sidebar-toggle ${isMobileSidebarOpen ? "is-active" : ""}`}
+        onClick={() => setIsMobileSidebarOpen(prev => !prev)}
+        aria-label="Toggle navigation drawer"
+      >
+        {isMobileSidebarOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      {/* Sidebar Backdrop Overlay on Mobile */}
+      {isMobileSidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
       <Navbar toggleTheme={toggleTheme} theme={theme} />
 
       <main className="problems-shell">
-        <aside className="problems-sidebar">
+        <aside className={`problems-sidebar ${isMobileSidebarOpen ? "is-open" : ""}`}>
           <div className="problems-sidebar-brand">
             <span className="problems-sidebar-badge">Practice Arena</span>
             <h1>{topicLanding?.title || "Problems"}</h1>
@@ -498,66 +755,78 @@ export default function ProblemsPage() {
             className="problems-sidebar-nav"
             aria-label="Problems navigation"
           >
-            {leftNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeLibraryItem === item.label;
+            {leftNavSections.map((section) => (
+              <div key={section.title} className="sidebar-nav-section">
+                <h4 className="sidebar-section-title">{section.title}</h4>
+                <div className="sidebar-section-items">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeItemLabel === item.label;
 
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  className={`problems-sidebar-link ${isActive ? "is-active" : ""}`}
-                  onClick={() => setActiveLibraryItem(item.label)}
-                >
-                  <span className="problems-sidebar-link-main">
-                    <Icon size={17} />
-                    <span>{item.label}</span>
-                  </span>
-                  {item.badge ? (
-                    <span className="problems-sidebar-link-badge">
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        className={`problems-sidebar-link ${isActive ? "is-active" : ""}`}
+                        onClick={() => handleSidebarClick(item)}
+                      >
+                        <span className="problems-sidebar-link-main">
+                          <Icon size={16} />
+                          <span>{item.label}</span>
+                        </span>
+                        {item.badge ? (
+                          <span className={`problems-sidebar-link-badge badge-${item.badge.toLowerCase()}`}>
+                            {item.badge}
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <section className="problems-sidebar-foot">
-            <div>
+            <h3 className="sidebar-foot-title">Progress Stats</h3>
+            <div className="sidebar-stat-item solved">
+              <div className="stat-label-wrap">
+                <Trophy size={16} className="stat-icon" />
+                <span>Solved</span>
+              </div>
               <strong>{snapshot.summary.solvedProblems}</strong>
-              <span>Solved</span>
             </div>
-            <div>
+            <div className="sidebar-stat-item attempted">
+              <div className="stat-label-wrap">
+                <Compass size={16} className="stat-icon" />
+                <span>Attempted</span>
+              </div>
               <strong>{snapshot.summary.attemptedProblems}</strong>
-              <span>Attempted</span>
             </div>
-            <div>
-              <strong>{snapshot.summary.streaks.current}</strong>
-              <span>Streak</span>
+            <div className="sidebar-stat-item streak">
+              <div className="stat-label-wrap">
+                <Flame size={16} className="stat-icon" />
+                <span>Streak</span>
+              </div>
+              <strong>{snapshot.summary.streaks.current} d</strong>
             </div>
           </section>
         </aside>
 
         <section className="problems-center">
           <div className="problems-banner-slider">
-            {canScrollLeft && (
-              <button
-                type="button"
-                className="banner-slider-arrow banner-slider-arrow-left"
-                onClick={() => scrollBanner(-1)}
-                aria-label="Scroll left"
-              >
-                <ChevronLeft size={20} />
-              </button>
-            )}
-
-            <div className="problems-banner-row" ref={bannerRef}>
+            <div 
+              className="problems-banner-row" 
+              ref={bannerRef}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               {problemBannerCards.map((card) => (
                 <article
                   key={card.title}
                   className="problems-banner-card"
-                  style={{ background: card.gradient }}
+                  style={{ background: card.gradient, cursor: "pointer" }}
+                  onClick={() => handleBannerCardClick(card)}
                 >
                   <span>{card.eyebrow}</span>
                   <h2>{card.title}</h2>
@@ -565,17 +834,6 @@ export default function ProblemsPage() {
                 </article>
               ))}
             </div>
-
-            {canScrollRight && (
-              <button
-                type="button"
-                className="banner-slider-arrow banner-slider-arrow-right"
-                onClick={() => scrollBanner(1)}
-                aria-label="Scroll right"
-              >
-                <ChevronRight size={20} />
-              </button>
-            )}
           </div>
 
           <div className="problems-filter-chip-row">
@@ -806,6 +1064,75 @@ export default function ProblemsPage() {
         </section>
 
         <aside className="problems-right-rail">
+          {/* Level Progress Widget */}
+          <div className="problems-widget level-progress-widget">
+            <div className="level-header">
+              <span className="level-badge">LVL {level}</span>
+              <div className="rank-name">{rankName}</div>
+            </div>
+            <div className="xp-bar-container">
+              <div className="xp-bar-progress" style={{ width: `${xpPercentage}%` }}></div>
+            </div>
+            <div className="xp-details">
+              <span>{xp} XP</span>
+              <span>{nextLevelXp - xp > 0 ? `${nextLevelXp - xp} XP to next lvl` : "Max Lvl"}</span>
+            </div>
+          </div>
+
+          {/* Weekly Practice Goal Widget */}
+          <div className="problems-widget weekly-goal-widget">
+            <div className="weekly-goal-header">
+              <Flame size={15} className="goal-fire-icon" />
+              <h4>Weekly Goal</h4>
+            </div>
+            <div className="weekly-goal-body">
+              <div className="goal-text">Solve 5 problems this week</div>
+              <div className="goal-progress-wrap">
+                <div className="goal-progress-bar">
+                  <div className="goal-progress-fill" style={{ width: `${Math.min(100, (solvedThisWeek / 5) * 100)}%` }}></div>
+                </div>
+                <span className="goal-ratio">{solvedThisWeek}/5</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Challenge Widget */}
+          {dailyProblem && (
+            <div className="problems-widget daily-challenge-widget">
+              <div className="daily-head">
+                <Sparkles size={16} className="daily-glow-icon" />
+                <span className="daily-label">Daily Challenge</span>
+              </div>
+              <div className="daily-body">
+                <h4>{dailyProblem.title}</h4>
+                <div className="daily-meta">
+                  <span className={`difficulty-pill ${difficultyTone[dailyProblem.difficulty]}`}>
+                    {dailyProblem.difficulty}
+                  </span>
+                  <span className="xp-bonus">+100 XP</span>
+                </div>
+              </div>
+              <button type="button" className="solve-daily-btn" onClick={handleSolveDaily}>
+                Solve Challenge
+              </button>
+            </div>
+          )}
+
+          {/* Cheat-Sheet Formula Widget */}
+          <div className="problems-widget cheat-sheet-widget">
+            <div className="cheat-sheet-header">
+              <GraduationCap size={15} />
+              <h4>Quick Formula</h4>
+            </div>
+            <div className="cheat-sheet-body">
+              <div className="cheat-formula-name">{cheatSheetFormula.name}</div>
+              <div className="cheat-formula-display">
+                <code>{cheatSheetFormula.formula}</code>
+              </div>
+              <p className="cheat-formula-desc">{cheatSheetFormula.description}</p>
+            </div>
+          </div>
+
           <div className="problems-widget stats-widget">
             <div className="problems-widget-head">
               <div>
@@ -920,6 +1247,15 @@ export default function ProblemsPage() {
               )}
             </div>
           </section>
+
+          {/* DLD Fact of the Day */}
+          <div className="problems-widget fact-widget">
+            <div className="fact-head">
+              <Info size={15} />
+              <h4>Fact of the Day</h4>
+            </div>
+            <p className="fact-content">{dailyFact}</p>
+          </div>
         </aside>
       </main>
 

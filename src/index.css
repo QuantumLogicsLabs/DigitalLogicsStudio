@@ -119,9 +119,16 @@ html {
 }
 
 * {
+  box-sizing: border-box;
   scrollbar-color: rgba(96, 165, 250, 0.46) transparent;
   scrollbar-width: thin;
 }
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
 
 *::-webkit-scrollbar {
   width: 10px;
