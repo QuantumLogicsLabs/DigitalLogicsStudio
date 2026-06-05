@@ -34,6 +34,7 @@ const Boolforge = ({
   embedded = false, // true when used inside a modal/host page — skips Navbar + Footer
 }) => {
   const { theme, toggle: toggleTheme } = useTheme();
+  const [navbarVisible, setNavbarVisible] = useState(true);
   const [gates, setGates] = useState([]);
   const [wires, setWires] = useState([]);
   const [selectedGate, setSelectedGate] = useState(null);
@@ -1228,8 +1229,28 @@ const Boolforge = ({
   return (
     <div className={`boolforge-page theme-${theme}`}>
       <div className="grid-background" />
-      <Navbar toggleTheme={toggleTheme} theme={theme} />
-      <main className="boolforge-main">
+      {navbarVisible && (
+        <Navbar
+          toggleTheme={toggleTheme}
+          theme={theme}
+          onToggleNavbar={() => setNavbarVisible(false)}
+          navbarVisible={navbarVisible}
+        />
+      )}
+      {!navbarVisible && (
+        <button
+          className="navbar-restore-btn"
+          onClick={() => setNavbarVisible(true)}
+          aria-label="Show navbar"
+          title="Show navbar"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <line x1="3" y1="9" x2="21" y2="9" />
+          </svg>
+        </button>
+      )}
+      <main className={`boolforge-main${navbarVisible ? "" : " boolforge-main--fullscreen"}`}>
         {circuitTool}
       </main>
       <Footer />

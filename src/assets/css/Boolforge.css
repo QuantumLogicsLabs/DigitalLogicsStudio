@@ -274,3 +274,55 @@ body:has(.boolforge-page) {
   }
 }
 
+
+/* ── Fullscreen mode (navbar hidden) ──────────────────────────────────────── */
+.boolforge-main--fullscreen .container.circuit-maker {
+  height: 100vh;
+}
+
+/* ── Navbar toggle button — inside navbar right side ─────────────────────── */
+.home-navbar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-light, #1e2842);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 8px;
+  color: var(--secondary-text, #8899aa);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.home-navbar-toggle-btn:hover {
+  color: var(--accent-secondary, #00d4ff);
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent-secondary, #00d4ff);
+}
+
+/* ── Restore navbar button (shown when navbar is hidden) ─────────────────── */
+.navbar-restore-btn {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-medium, #1a2540);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 8px;
+  color: var(--secondary-text, #8899aa);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.navbar-restore-btn:hover {
+  color: var(--accent-secondary, #00d4ff);
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent-secondary, #00d4ff);
+}

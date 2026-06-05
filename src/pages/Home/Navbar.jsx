@@ -56,7 +56,7 @@ function MoonIcon() {
   );
 }
 
-export function Navbar({ toggleTheme, theme, onHomeClick }) {
+export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbarVisible }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
@@ -224,6 +224,19 @@ export function Navbar({ toggleTheme, theme, onHomeClick }) {
           >
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
+          {onToggleNavbar && (
+            <button
+              onClick={onToggleNavbar}
+              className="home-navbar-toggle-btn"
+              aria-label={navbarVisible ? "Hide navbar" : "Show navbar"}
+              title={navbarVisible ? "Hide navbar" : "Show navbar"}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+              </svg>
+            </button>
+          )}
           <button
             className={`home-hamburger${menuOpen ? " is-open" : ""}`}
             onClick={() => setMenuOpen((p) => !p)}
