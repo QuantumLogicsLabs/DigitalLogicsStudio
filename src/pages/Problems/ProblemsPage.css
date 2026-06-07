@@ -736,15 +736,22 @@
 }
 
 .problems-search {
-  flex: 1 1 300px;
+  flex: 1 1 220px;
+  max-width: 480px;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-height: 50px;
-  padding: 0 0.95rem;
-  border-radius: 1rem;
+  gap: 0.5rem;
+  height: 40px;
+  padding: 0 0.85rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--problems-border);
   background: var(--problems-surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.problems-search:focus-within {
+  border-color: var(--accent-color, #818cf8);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
 }
 
 .problems-search input,
@@ -767,9 +774,9 @@
 }
 
 .problems-toolbar-selects select {
-  min-height: 50px;
-  border-radius: 1rem;
-  padding: 0 0.9rem;
+  height: 40px;
+  border-radius: 0.75rem;
+  padding: 0 0.85rem;
   border: 1px solid var(--problems-border);
   background: var(--problems-surface);
 }
@@ -1325,11 +1332,29 @@
   .problems-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .problems-search {
+    max-width: 100%;
+    height: 44px;
+    border-radius: 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  .problems-search input::placeholder {
+    font-size: 0.85rem;
   }
 
   .problems-toolbar-selects {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .problems-toolbar-selects select {
+    height: 44px;
+    border-radius: 0.875rem;
+    font-size: 0.875rem;
   }
 
   /* Ensure the problems table wrapper actually clips properly */
