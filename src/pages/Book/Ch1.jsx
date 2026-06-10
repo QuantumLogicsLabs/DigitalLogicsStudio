@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { ChevronDown, Cpu, Binary, Calculator, BookOpen, Lightbulb, CheckCircle } from 'lucide-react';
 import {logic_and_computer_design_fundamental} from 'dld-books'
+import { Navbar } from '../Home/Navbar';
+import Footer from '../Home/Footer';
+import { useTheme } from '../../context/ThemeContext';
 
 const ProblemSolver = () => {
+    const { theme, toggle: toggleTheme } = useTheme();
     const [expandedProblems, setExpandedProblems] = useState(new Set());
     const [showDetailedExplanation, setShowDetailedExplanation] = useState({});
 
@@ -26,6 +30,10 @@ const ProblemSolver = () => {
     const problems =logic_and_computer_design_fundamental.Ch1;
 
     return (
+        <div className={`boolforge-page theme-${theme}`}>
+            <div className="grid-background" />
+            <Navbar toggleTheme={toggleTheme} theme={theme} />
+            <main className="boolforge-main">
         <div className="solver-container">
             <div className="solver-header">
                 <div className="header-content">
@@ -127,6 +135,9 @@ const ProblemSolver = () => {
                     </div>
                 ))}
             </div>
+        </div>
+            </main>
+            <Footer />
         </div>
     );
 

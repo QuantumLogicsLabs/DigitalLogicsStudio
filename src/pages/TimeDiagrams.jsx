@@ -2,8 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import ToolLayout from '../components/ToolLayout';
 import ExplanationBlock from '../components/ExplanationBlock';
 import CircuitModal from '../components/CircuitModal';
+import { Navbar } from './Home/Navbar';
+import Footer from './Home/Footer';
+import { useTheme } from '../context/ThemeContext';
 
 const TimeDiagrams = () => {
+  const { theme, toggle: toggleTheme } = useTheme();
   const [delay, setDelay] = useState(2);
   const signal = useMemo(() => [0, 1, 1, 0, 1, 0, 0, 1], []);
   const [output, setOutput] = useState([]);
@@ -15,6 +19,10 @@ const TimeDiagrams = () => {
   }, [signal, delay]);
 
   return (
+    <div className={`boolforge-page theme-${theme}`}>
+      <div className="grid-background" />
+      <Navbar toggleTheme={toggleTheme} theme={theme} />
+      <main className="boolforge-main">
     <ToolLayout title="Timing Diagrams & Gate Delay" subtitle="Visualizing propagation effects">
       <div className="kmap-card" style={{ marginBottom: '1rem' }}>
         <button
@@ -102,6 +110,9 @@ const TimeDiagrams = () => {
         }
       `}</style>
     </ToolLayout>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

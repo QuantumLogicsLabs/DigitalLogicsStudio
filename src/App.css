@@ -1538,6 +1538,57 @@ body {
   border-color: var(--accent-secondary, #00d4ff);
 }
 
+/* ── Footer hide toggle button — top-left corner inside footer (Circuit Forge only) ── */
+.home-footer-toggle-btn {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-light, #1e2842);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 8px;
+  color: var(--secondary-text, #8899aa);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.home-footer-toggle-btn:hover {
+  color: var(--accent-secondary, #00d4ff);
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent-secondary, #00d4ff);
+}
+
+/* ── Footer restore button — bottom-right when footer is hidden ───────────────── */
+.footer-restore-btn {
+  position: fixed;
+  bottom: 10px;
+  right: 16px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-medium, #1a2540);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 8px;
+  color: var(--secondary-text, #8899aa);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.footer-restore-btn:hover {
+  color: var(--accent-secondary, #00d4ff);
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent-secondary, #00d4ff);
+}
+
 /* ── Trainer Board Responsive Layouts ── */
 .trainer-grid {
   display: grid;
@@ -1591,4 +1642,3 @@ body {
     display: none !important;
   }
 }
-

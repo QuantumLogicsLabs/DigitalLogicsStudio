@@ -38,6 +38,7 @@ const Boolforge = ({
 }) => {
   const { theme, toggle: toggleTheme } = useTheme();
   const [navbarVisible, setNavbarVisible] = useState(true);
+  const [footerVisible, setFooterVisible] = useState(true);
   const [gates, setGates] = useState([]);
   const [wires, setWires] = useState([]);
   const [selectedGate, setSelectedGate] = useState(null);
@@ -1470,7 +1471,22 @@ const Boolforge = ({
       <main className={`boolforge-main${navbarVisible ? "" : " boolforge-main--fullscreen"}`}>
         {circuitTool}
       </main>
-      <Footer />
+      {footerVisible && (
+        <Footer onToggleFooter={() => setFooterVisible(false)} />
+      )}
+      {!footerVisible && (
+        <button
+          className="footer-restore-btn"
+          onClick={() => setFooterVisible(true)}
+          aria-label="Show footer"
+          title="Show footer"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <line x1="3" y1="15" x2="21" y2="15" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };

@@ -1,5 +1,25 @@
 import { Link } from "react-router-dom";
 
+// SVG icon reused from the navbar toggle pattern
+function LayoutBottomIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+    </svg>
+  );
+}
+
 const FOOTER_COLS = [
   {
     heading: "Tools",
@@ -31,9 +51,19 @@ const FOOTER_COLS = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({ onToggleFooter }) {
   return (
     <footer className="home-footer">
+      {onToggleFooter && (
+        <button
+          onClick={onToggleFooter}
+          className="home-footer-toggle-btn"
+          aria-label="Hide footer"
+          title="Hide footer"
+        >
+          <LayoutBottomIcon />
+        </button>
+      )}
       <div className="home-footer-inner">
         <div className="home-footer-brand">
           <span className="home-footer-logo">Boolforge</span>

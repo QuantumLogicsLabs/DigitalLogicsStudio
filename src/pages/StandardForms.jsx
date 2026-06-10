@@ -5,6 +5,9 @@ import ControlPanel from '../components/ControlPanel';
 import ControlGroup from '../components/ControlGroup';
 import CircuitModal from '../components/CircuitModal';
 import { parseSOP, generateTruthTable } from '../utils/boolMath';
+import { Navbar } from './Home/Navbar';
+import Footer from './Home/Footer';
+import { useTheme } from '../context/ThemeContext';
 
 const toPOS = (variables, expression) => {
   const tt = generateTruthTable(variables, expression);
@@ -20,6 +23,7 @@ const toPOS = (variables, expression) => {
 };
 
 const StandardForms = () => {
+  const { theme, toggle: toggleTheme } = useTheme();
   const variables = useMemo(() => ['A', 'B', 'C'], []);
   const [expr, setExpr] = useState("F = AB' + C");
   const [open, setOpen] = useState(false);
@@ -28,6 +32,10 @@ const StandardForms = () => {
   const pos = useMemo(() => toPOS(variables, expr), [variables, expr]);
 
   return (
+    <div className={`boolforge-page theme-${theme}`}>
+      <div className="grid-background" />
+      <Navbar toggleTheme={toggleTheme} theme={theme} />
+      <main className="boolforge-main">
     <ToolLayout title="Standard Forms (SOP & POS)" subtitle="Convert expressions and verify with truth tables">
       <ExplanationBlock title="Understanding Standard Forms">
         <p className="explanation-intro">
@@ -191,6 +199,9 @@ const StandardForms = () => {
 
       <CircuitModal open={open} onClose={() => setOpen(false)} expression={expr} variables={variables} />
     </ToolLayout>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { Navbar } from './Home/Navbar';
+import Footer from './Home/Footer';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ParityBitCalculator() {
+  const { theme, toggle: toggleTheme } = useTheme();
     const [rows, setRows] = useState([
         { id: 1, decimal: '' },
         { id: 2, decimal: '' },
@@ -72,6 +76,10 @@ export default function ParityBitCalculator() {
     ];
 
     return (
+        <div className={`boolforge-page theme-${theme}`}>
+            <div className="grid-background" />
+            <Navbar toggleTheme={toggleTheme} theme={theme} />
+            <main className="boolforge-main">
         <div className="binary-container">
             <div className="binary-wrapper">
                 <h1 className="binary-main-title">Parity Bit Calculator</h1>
@@ -374,6 +382,9 @@ export default function ParityBitCalculator() {
                     </div>
                 </section>
             </div>
+        </div>
+            </main>
+            <Footer />
         </div>
     );
 }

@@ -95,10 +95,40 @@
 /* Hero Section Enhancement */
 .home-hero {
   position: relative;
-  padding: 6rem 1.5rem !important;
+  padding: 6rem 1.5rem 5rem !important;
   z-index: 1;
   --ghost-opacity: 1;
   overflow: hidden;
+}
+
+/* Ambient glow blobs */
+.hero-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-glow--blue {
+  width: 520px;
+  height: 520px;
+  top: -120px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+  animation: heroGlowDrift 8s ease-in-out infinite alternate;
+}
+.hero-glow--purple {
+  width: 400px;
+  height: 400px;
+  bottom: -80px;
+  right: 5%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, transparent 70%);
+  animation: heroGlowDrift 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes heroGlowDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.1); }
 }
 
 .home-hero-content {
@@ -106,48 +136,108 @@
   margin: 0 auto;
   display: grid;
   gap: 1.25rem;
+  position: relative;
+  z-index: 1;
 }
 
-.hero-ghost-logo {
-  position: absolute;
-  right: max(1.5rem, calc(50% - 560px));
-  top: 50%;
-  transform: translateY(-50%);
-  width: clamp(220px, 36vw, 460px);
-  height: auto;
-  opacity: calc(var(--ghost-opacity) * 0.08);
-  pointer-events: none;
-  user-select: none;
-  transition: opacity 0.1s linear;
-  filter: blur(0.5px);
-}
-
-[data-theme="light"] .hero-ghost-logo {
-  opacity: calc(var(--ghost-opacity) * 0.05);
-}
-
+/* ── Heading ── */
 .home-hero-content h1 {
-  font-size: 3.5rem !important;
-  font-weight: 800 !important;
-  color: var(--text-color); /* fallback */
-  background: linear-gradient(
-    to bottom right,
-    var(--text-color),
-    var(--secondary-text)
-  );
+  font-size: clamp(2.6rem, 4vw + 1rem, 4rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem !important;
+  max-width: 18ch;
+}
+
+.hero-title-line {
+  display: block;
+  background: linear-gradient(135deg, var(--text-color) 0%, rgba(241,245,249,0.85) 100%);
   background-clip: text;
   -webkit-background-clip: text;
-  color: transparent; /* standard alternative */
-  letter-spacing: 0;
-  margin-bottom: 1.5rem !important;
+  color: transparent;
+}
+
+.hero-title-accent {
+  display: block;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 60%, #a78bfa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 32px rgba(99, 102, 241, 0.35));
+}
+
+[data-theme="light"] .hero-title-line {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-theme="light"] .hero-title-accent {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  filter: none;
 }
 
 .home-hero-content p {
-  font-size: 1.15rem !important;
+  font-size: 1.1rem !important;
   color: var(--secondary-text) !important;
-  max-width: 600px;
+  max-width: 56ch;
   margin: 0;
+  line-height: 1.75;
 }
+
+/* ── Stats row ── */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid rgba(59, 130, 246, 0.12);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+  width: fit-content;
+  margin: 0.5rem 0;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.hero-stat-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  line-height: 1;
+}
+
+.hero-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--secondary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+[data-theme="light"] .hero-stats {
+  border-color: rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .hero-stat-value {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+
 
 .search-container {
   display: flex;
@@ -155,7 +245,27 @@
   gap: 0.75rem;
   width: 100%;
   max-width: 660px;
-  margin-top: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Ghost logo — kept but made more subtle now that glow blobs are present */
+.hero-ghost-logo {
+  position: absolute;
+  right: max(1.5rem, calc(50% - 560px));
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(220px, 36vw, 460px);
+  height: auto;
+  opacity: calc(var(--ghost-opacity) * 0.07);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.1s linear;
+  filter: blur(0.5px);
+  z-index: 0;
+}
+
+[data-theme="light"] .hero-ghost-logo {
+  opacity: calc(var(--ghost-opacity) * 0.04);
 }
 
 .home-search-field {
@@ -802,11 +912,20 @@
 /* ── Small tablet / large phone (481px – 768px) ── */
 @media (max-width: 768px) {
   .home-hero {
-    padding: 4rem 1.25rem !important;
+    padding: 4rem 1.25rem 3.5rem !important;
   }
 
   .home-hero-content h1 {
-    font-size: 2.6rem !important;
+    font-size: 2.4rem !important;
+    max-width: none;
+  }
+
+  .hero-stats {
+    gap: 1.5rem;
+  }
+
+  .hero-chips {
+    gap: 0.4rem;
   }
 
   .home-section-grid,
@@ -826,18 +945,26 @@
   }
 
   .home-hero-content h1 {
-    font-size: clamp(1.75rem, 7vw, 2.4rem) !important;
-    margin-bottom: 1rem !important;
+    font-size: clamp(1.9rem, 7vw, 2.6rem) !important;
+    margin-bottom: 0.75rem !important;
   }
 
   .home-hero-content p {
     font-size: 1rem !important;
   }
 
+  .hero-stats {
+    gap: 1.25rem;
+  }
+
+  .hero-stat-value {
+    font-size: 1.2rem;
+  }
+
   .search-container {
     flex-direction: column;
     max-width: 100%;
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
   }
 
   .home-search-button {
@@ -886,6 +1013,15 @@
 
   .hero-badge {
     font-size: 0.72rem;
+  }
+
+  .hero-glow--blue {
+    width: 300px;
+    height: 300px;
+  }
+  .hero-glow--purple {
+    width: 250px;
+    height: 250px;
   }
 }
 

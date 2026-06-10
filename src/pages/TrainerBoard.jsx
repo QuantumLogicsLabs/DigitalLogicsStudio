@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Navbar } from "./Home/Navbar";
+import Footer from "./Home/Footer";
+import { useTheme } from "../context/ThemeContext";
 
 /* ================================================================
    IT-300 Digital Logic Training System — Infinit Technologies
@@ -841,6 +844,7 @@ function getBBDimensions() {
 // ROOT
 // ═══════════════════════════════════════════════════════════════════
 export default function IT300() {
+  const { theme, toggle: toggleTheme } = useTheme();
   const [switches, setSwitches] = useState(Array(8).fill(0));
   const [clkHz, setClkHz] = useState(1);
   const [clkOn, setClkOn] = useState(true);
@@ -1012,12 +1016,13 @@ export default function IT300() {
   );
 
   return (
-    <>
+    <div className={`boolforge-page theme-${theme}`} style={{ background: '#1a1a1a' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
         .clk-blink{animation:blink .5s infinite;}
       `}</style>
+      <Navbar toggleTheme={toggleTheme} theme={theme} />
 
       <div
         className="trainer-page-container"
@@ -2126,6 +2131,7 @@ export default function IT300() {
           </div>
         )}
       </div>
-    </>
+      <Footer />
+    </div>
   );
 }

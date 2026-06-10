@@ -110,67 +110,6 @@ function SkillBar({ label, pct, color }) {
   );
 }
 
-function Badge({ icon, title, desc, earned, progress, rarity }) {
-  const getRarityColor = (r) => {
-    switch (r) {
-      case "legendary":
-        return "#f59e0b";
-      case "epic":
-        return "#a855f7";
-      case "rare":
-        return "#3b82f6";
-      default:
-        return "#10b981";
-    }
-  };
-
-  const accent = getRarityColor(rarity);
-
-  return (
-    <div
-      className={`pd-badge-premium ${earned ? "pd-badge-premium--earned" : "pd-badge-premium--locked"}`}
-      style={{ "--badge-accent": accent }}
-    >
-      <div className="pd-badge-premium-glow"></div>
-      <div className="pd-badge-premium-icon-ring">
-        <div className="pd-badge-premium-icon">{icon}</div>
-      </div>
-      <div className="pd-badge-premium-content">
-        <div className="pd-badge-premium-header">
-          <h3 className="pd-badge-premium-title">{title}</h3>
-          {rarity && (
-            <span
-              className="pd-badge-premium-rarity"
-              style={{
-                color: accent,
-                border: `1px solid ${accent}40`,
-                background: `${accent}15`,
-              }}
-            >
-              {rarity}
-            </span>
-          )}
-        </div>
-        <p className="pd-badge-premium-desc">{desc}</p>
-        <div className="pd-badge-premium-progress-wrapper">
-          <div className="pd-badge-premium-progress-bar">
-            <div
-              className="pd-badge-premium-progress-fill"
-              style={{
-                width: `${Math.min(progress, 100)}%`,
-                background: accent,
-              }}
-            ></div>
-          </div>
-          <span className="pd-badge-premium-progress-text">
-            {earned ? "Completed" : `${Math.min(progress, 100)}%`}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── GitHub-style full-year activity calendar ─────────────────────────────────
 function buildYearGrid(activityMap) {
   const today = new Date();
@@ -1408,6 +1347,50 @@ export default function ProfilePage() {
         {/* ══════════════ SKILLS TAB ══════════════ */}
         {activeTab === "skills" && (
           <div className="pd-section">
+            {/* Topic accuracy bar chart — shown first */}
+            <div className="pd-card">
+              <h2 className="pd-card-title">Topic-wise Accuracy</h2>
+              <p className="pd-card-sub">
+                Completion percentage per subject area
+              </p>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart
+                  data={[
+                    { topic: "Boolean", pct: topicStats.booleanAlgebra },
+                    { topic: "K-Map", pct: topicStats.kmap },
+                    { topic: "Sequential", pct: topicStats.sequential },
+                    { topic: "Numbers", pct: topicStats.numberSystems },
+                    { topic: "Arithmetic", pct: topicStats.arithmetic },
+                  ]}
+                  margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(148,163,184,0.15)"
+                  />
+                  <XAxis
+                    dataKey="topic"
+                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
+                    unit="%"
+                  />
+                  <Tooltip
+                    content={<ChartTooltip />}
+                    formatter={(v) => `${v}%`}
+                  />
+                  <Bar dataKey="pct" name="Completion %" radius={[6, 6, 0, 0]}>
+                    {PIE_COLORS.map((c, i) => (
+                      <Cell key={i} fill={c} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Cards below the graph */}
             <div className="pd-two-col">
               <div className="pd-card">
                 <h2 className="pd-card-title">Skill Progress Tracker</h2>
@@ -1482,49 +1465,6 @@ export default function ProfilePage() {
                   </ul>
                 )}
               </div>
-            </div>
-
-            {/* Topic accuracy bar chart */}
-            <div className="pd-card">
-              <h2 className="pd-card-title">Topic-wise Accuracy</h2>
-              <p className="pd-card-sub">
-                Completion percentage per subject area
-              </p>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={[
-                    { topic: "Boolean", pct: topicStats.booleanAlgebra },
-                    { topic: "K-Map", pct: topicStats.kmap },
-                    { topic: "Sequential", pct: topicStats.sequential },
-                    { topic: "Numbers", pct: topicStats.numberSystems },
-                    { topic: "Arithmetic", pct: topicStats.arithmetic },
-                  ]}
-                  margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="rgba(148,163,184,0.15)"
-                  />
-                  <XAxis
-                    dataKey="topic"
-                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
-                    unit="%"
-                  />
-                  <Tooltip
-                    content={<ChartTooltip />}
-                    formatter={(v) => `${v}%`}
-                  />
-                  <Bar dataKey="pct" name="Completion %" radius={[6, 6, 0, 0]}>
-                    {PIE_COLORS.map((c, i) => (
-                      <Cell key={i} fill={c} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
             </div>
           </div>
         )}
@@ -1641,345 +1581,497 @@ export default function ProfilePage() {
         )}
 
         {/* ══════════════ ACHIEVEMENTS TAB ══════════════ */}
-        {activeTab === "achievements" && (
-          <div className="pd-section">
-            {/* Summary row */}
-            <div className="pd-stats-grid">
-              <StatCard
-                icon="🏅"
-                label="Badges Earned"
-                value={badges.filter((b) => b.earned).length}
-                sub={`of ${badges.length} total`}
-                accent={COLORS.amber}
-              />
-              <StatCard
-                icon="🌟"
-                label="Legendary"
-                value={
-                  badges.filter((b) => b.earned && b.rarity === "legendary")
-                    .length
-                }
-                sub="legendary badges"
-                accent={COLORS.purple}
-              />
-              <StatCard
-                icon="💎"
-                label="Epic"
-                value={
-                  badges.filter((b) => b.earned && b.rarity === "epic").length
-                }
-                sub="epic badges"
-                accent={COLORS.blue}
-              />
-              <StatCard
-                icon="🔥"
-                label="Streak Record"
-                value={`${streakLongest}d`}
-                sub="longest streak"
-                accent={COLORS.amber}
-              />
-            </div>
+        {activeTab === "achievements" && (() => {
+          // ── Tier system ──────────────────────────────────────────
+          const totalXP = solvedCount * 15 + completedTopics * 25 + streakLongest * 5 + activeDays * 3;
+          const TIERS = [
+            { name: "Novice",    min: 0,   max: 100,  color: "#94a3b8", icon: "🌱" },
+            { name: "Explorer",  min: 100, max: 250,  color: "#3b82f6", icon: "🔭" },
+            { name: "Builder",   min: 250, max: 500,  color: "#10b981", icon: "⚙️"  },
+            { name: "Architect", min: 500, max: 900,  color: "#f59e0b", icon: "🏛️" },
+            { name: "Master",    min: 900, max: 1500, color: "#8b5cf6", icon: "⚡" },
+            { name: "Legend",    min: 1500,max: 9999, color: "#ec4899", icon: "🏆" },
+          ];
+          const currentTier  = TIERS.findLast((t) => totalXP >= t.min) || TIERS[0];
+          const nextTier      = TIERS[TIERS.indexOf(currentTier) + 1];
+          const tierPct       = nextTier
+            ? Math.round(((totalXP - currentTier.min) / (nextTier.min - currentTier.min)) * 100)
+            : 100;
 
-            <div className="pd-card pd-card--transparent">
-              <div className="pd-achievements-header">
-                <h2 className="pd-card-title">Trophy Cabinet</h2>
-                <p className="pd-card-sub">
-                  Your earned accolades and progress toward new ranks
-                </p>
-              </div>
-              <div className="pd-badges-premium-grid">
-                {badges.map((b) => (
-                  <Badge key={b.title} {...b} />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+          // ── Milestone definitions ────────────────────────────────
+          const MILESTONES = [
+            {
+              id: "first_step",   icon: "👣", label: "First Step",
+              desc: "Attempt your very first problem",
+              xp: 15, category: "Problems",
+              unlocked: attemptedCount >= 1,
+              progress: Math.min(attemptedCount, 1), total: 1,
+            },
+            {
+              id: "problem5",     icon: "✅", label: "Problem Solver",
+              desc: "Solve 5 problems",
+              xp: 75, category: "Problems",
+              unlocked: solvedCount >= 5,
+              progress: Math.min(solvedCount, 5), total: 5,
+            },
+            {
+              id: "problem20",    icon: "🧩", label: "Logic Craftsman",
+              desc: "Solve 20 problems",
+              xp: 300, category: "Problems",
+              unlocked: solvedCount >= 20,
+              progress: Math.min(solvedCount, 20), total: 20,
+            },
+            {
+              id: "problem50",    icon: "🏅", label: "Half-Century",
+              desc: "Solve 50 problems",
+              xp: 750, category: "Problems",
+              unlocked: solvedCount >= 50,
+              progress: Math.min(solvedCount, 50), total: 50,
+            },
+            {
+              id: "topic1",       icon: "📖", label: "Knowledge Seeker",
+              desc: "Complete your first topic",
+              xp: 25, category: "Topics",
+              unlocked: completedTopics >= 1,
+              progress: Math.min(completedTopics, 1), total: 1,
+            },
+            {
+              id: "topic5",       icon: "📚", label: "Curriculum Runner",
+              desc: "Complete 5 topics",
+              xp: 125, category: "Topics",
+              unlocked: completedTopics >= 5,
+              progress: Math.min(completedTopics, 5), total: 5,
+            },
+            {
+              id: "streak3",      icon: "🔥", label: "On Fire",
+              desc: "Maintain a 3-day streak",
+              xp: 45, category: "Streaks",
+              unlocked: streakCurrent >= 3,
+              progress: Math.min(streakCurrent, 3), total: 3,
+            },
+            {
+              id: "streak7",      icon: "⚡", label: "Week Warrior",
+              desc: "Maintain a 7-day streak",
+              xp: 105, category: "Streaks",
+              unlocked: streakCurrent >= 7,
+              progress: Math.min(streakCurrent, 7), total: 7,
+            },
+            {
+              id: "streak30",     icon: "🌟", label: "Ironclad",
+              desc: "Maintain a 30-day streak",
+              xp: 450, category: "Streaks",
+              unlocked: streakLongest >= 30,
+              progress: Math.min(streakLongest, 30), total: 30,
+            },
+            {
+              id: "accuracy100",  icon: "🎯", label: "Perfect Aim",
+              desc: "Achieve 100% accuracy session",
+              xp: 200, category: "Accuracy",
+              unlocked: solvedCount > 0 && solvedCount === attemptedCount,
+              progress: solvedCount > 0 ? Math.round((solvedCount / Math.max(attemptedCount,1))*100) : 0,
+              total: 100, isPercent: true,
+            },
+            {
+              id: "active20",     icon: "📅", label: "Dedicated",
+              desc: "Study on 20 different days",
+              xp: 200, category: "Consistency",
+              unlocked: activeDays >= 20,
+              progress: Math.min(activeDays, 20), total: 20,
+            },
+          ];
 
-        {/* ══════════════ ENGAGEMENT TAB ══════════════ */}
-        {activeTab === "engagement" && (
-          <div className="pd-section">
-            {/* ── Top KPI row ── */}
-            <div className="pd-stats-grid">
-              <StatCard
-                icon="📅"
-                label="Active Days"
-                value={activeDays}
-                sub="total days studied"
-                accent={COLORS.blue}
-              />
-              <StatCard
-                icon="🔥"
-                label="Current Streak"
-                value={`${streakCurrent}d`}
-                sub={`Best: ${streakLongest}d`}
-                accent={COLORS.amber}
-              />
-              <StatCard
-                icon="🏅"
-                label="Badges Earned"
-                value={badges.filter((b) => b.earned).length}
-                sub={`of ${badges.length} total`}
-                accent={COLORS.purple}
-              />
-              <StatCard
-                icon="🎯"
-                label="Accuracy"
-                value={
-                  solvedCount > 0
-                    ? `${Math.round((solvedCount / Math.max(attemptedCount, 1)) * 100)}%`
-                    : "—"
-                }
-                sub="solve rate"
-                accent={COLORS.green}
-              />
-            </div>
+          const earned       = MILESTONES.filter((m) => m.unlocked);
+          const inProgress   = MILESTONES.filter((m) => !m.unlocked && m.progress > 0);
+          const locked       = MILESTONES.filter((m) => !m.unlocked && m.progress === 0);
+          const earnedXP     = earned.reduce((s, m) => s + m.xp, 0);
+          const nextUnlock   = inProgress.sort((a,b) => (b.progress/b.total) - (a.progress/a.total))[0]
+                                || locked[0];
 
-            {/* ── Learning Tips — expressive bullet list (first) ── */}
-            <div className="pd-card pd-tips-card">
-              <div className="pd-tips-header">
-                <div>
-                  <h2 className="pd-card-title">Learning Tips</h2>
-                  <p className="pd-card-sub">Personalised suggestions based on your progress</p>
-                </div>
-                <span className="pd-tips-badge">✨ For You</span>
-              </div>
+          const CAT_COLORS = {
+            Problems: COLORS.blue, Topics: COLORS.purple,
+            Streaks: COLORS.amber, Accuracy: COLORS.green,
+            Consistency: COLORS.cyan,
+          };
 
-              <div className="pd-tips-list">
-                {[
-                  {
-                    icon: "💡",
-                    color: COLORS.amber,
-                    number: "01",
-                    title: "Spaced Repetition",
-                    tip: "Review topics you completed more than 3 days ago. Your brain retains information far better when you revisit it at increasing intervals.",
-                    action: "Go to Problems",
-                    path: "/problems",
-                    tag: "Memory",
-                  },
-                  {
-                    icon: "🔥",
-                    color: COLORS.blue,
-                    number: "02",
-                    title: streakCurrent > 0 ? `Keep your ${streakCurrent}-day streak alive` : "Build a daily habit",
-                    tip: streakCurrent > 0
-                      ? `You're ${streakCurrent} days in. Even one problem today locks in your streak and compounds your progress over time.`
-                      : "Study every day — even 10 minutes. Consistency compounds. The first week is the hardest.",
-                    action: "Study Now",
-                    path: "/problems",
-                    tag: "Habit",
-                  },
-                  {
-                    icon: "🎯",
-                    color: COLORS.purple,
-                    number: "03",
-                    title: "Strengthen Your Weakest Area",
-                    tip: `Your least-explored topic is ${
-                      Object.entries(topicStats).sort((a,b) => a[1]-b[1])[0]?.[0]?.replace(/([A-Z])/g," $1").trim() || "unknown"
-                    }. Closing that gap will round out your digital logic foundation and boost your overall score.`,
-                    action: "Explore Topics",
-                    path: "/problems",
-                    tag: "Weakness",
-                  },
-                  {
-                    icon: "⚡",
-                    color: COLORS.green,
-                    number: "04",
-                    title: "Chase the Next Milestone",
-                    tip: `You've solved ${solvedCount} problem${solvedCount !== 1 ? "s" : ""}. Your next milestone is ${Math.ceil((solvedCount + 1) / 5) * 5}. Each problem you solve increases your acceptance rate and unlocks harder challenges.`,
-                    action: "Solve Problems",
-                    path: "/problems",
-                    tag: "Progress",
-                  },
-                  {
-                    icon: "🧠",
-                    color: COLORS.pink,
-                    number: "05",
-                    title: "Connect Concepts, Don't Memorise",
-                    tip: "Digital logic builds on itself. When you understand why a K-Map works, Boolean simplification becomes intuitive. Focus on the why, not just the how.",
-                    action: "Open K-Map",
-                    path: "/kmapgenerator",
-                    tag: "Mindset",
-                  },
-                ].map((tip, i) => (
-                  <div key={tip.number} className="pd-tip-row" style={{ "--tip-color": tip.color }}>
-                    <div className="pd-tip-number">{tip.number}</div>
-                    <div className="pd-tip-content">
-                      <div className="pd-tip-top">
-                        <span className="pd-tip-icon">{tip.icon}</span>
-                        <span className="pd-tip-title">{tip.title}</span>
-                        <span className="pd-tip-tag" style={{ color: tip.color, background: `${tip.color}18`, border: `1px solid ${tip.color}30` }}>{tip.tag}</span>
-                      </div>
-                      <p className="pd-tip-text">{tip.tip}</p>
-                      <Link to={tip.path} className="pd-tip-cta" style={{ color: tip.color }}>
-                        {tip.action} <span className="pd-tip-arrow">→</span>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          return (
+            <div className="pd-section">
 
-            {/* ── Notifications + Feedback side by side (second) ── */}
-            <div className="pd-two-col">
-              {/* Daily Quests */}
-              <div className="pd-card">
-                <div className="pd-eng-card-header">
+              {/* ── Tier banner ── */}
+              <div className="ach-tier-banner" style={{ "--tier-color": currentTier.color }}>
+                <div className="ach-tier-left">
+                  <span className="ach-tier-icon">{currentTier.icon}</span>
                   <div>
-                    <h2 className="pd-card-title">Daily Quests</h2>
-                    <p className="pd-card-sub" style={{ margin: 0 }}>
-                      Complete quests to earn bonus XP
-                    </p>
+                    <div className="ach-tier-label">Current Rank</div>
+                    <div className="ach-tier-name" style={{ color: currentTier.color }}>
+                      {currentTier.name}
+                    </div>
                   </div>
-                  <span
-                    className="pd-eng-notif-count"
-                    style={{ background: COLORS.amber }}
-                  >
-                    3
-                  </span>
                 </div>
-                <ul className="pd-eng-notif-list">
-                  <li className="pd-eng-notif-item pd-eng-notif-item--achievement">
-                    <div className="pd-eng-notif-icon-wrap">
-                      <span className="pd-eng-notif-icon">🔥</span>
-                    </div>
-                    <div className="pd-eng-notif-body">
-                      <span className="pd-eng-notif-msg">
-                        Maintain a 3-day streak
+
+                <div className="ach-tier-center">
+                  <div className="ach-tier-xp-row">
+                    <span className="ach-tier-xp-val">{totalXP} XP</span>
+                    {nextTier && (
+                      <span className="ach-tier-xp-next">
+                        {nextTier.min - totalXP} XP to {nextTier.icon} {nextTier.name}
                       </span>
-                      <span className="pd-eng-notif-time">
-                        {streakCurrent}/3 Days
-                      </span>
-                    </div>
-                  </li>
-                  <li className="pd-eng-notif-item pd-eng-notif-item--info">
-                    <div className="pd-eng-notif-icon-wrap">
-                      <span className="pd-eng-notif-icon">🎯</span>
-                    </div>
-                    <div className="pd-eng-notif-body">
-                      <span className="pd-eng-notif-msg">Solve 5 problems</span>
-                      <span className="pd-eng-notif-time">
-                        {Math.min(solvedCount, 5)}/5 Solved
-                      </span>
-                    </div>
-                  </li>
-                  <li className="pd-eng-notif-item pd-eng-notif-item--badge">
-                    <div className="pd-eng-notif-icon-wrap">
-                      <span className="pd-eng-notif-icon">📚</span>
-                    </div>
-                    <div className="pd-eng-notif-body">
-                      <span className="pd-eng-notif-msg">
-                        Start a new topic
-                      </span>
-                      <span className="pd-eng-notif-time">0/1 Completed</span>
-                    </div>
-                  </li>
-                </ul>
+                    )}
+                  </div>
+                  <div className="ach-tier-bar-track">
+                    <div
+                      className="ach-tier-bar-fill"
+                      style={{ width: `${tierPct}%`, background: currentTier.color }}
+                    />
+                  </div>
+                  <div className="ach-tier-bar-labels">
+                    <span>{currentTier.name}</span>
+                    {nextTier && <span>{nextTier.name}</span>}
+                  </div>
+                </div>
+
+                <div className="ach-tier-right">
+                  <div className="ach-tier-stat">
+                    <strong>{earned.length}</strong>
+                    <span>Unlocked</span>
+                  </div>
+                  <div className="ach-tier-divider" />
+                  <div className="ach-tier-stat">
+                    <strong>{earnedXP}</strong>
+                    <span>XP Earned</span>
+                  </div>
+                  <div className="ach-tier-divider" />
+                  <div className="ach-tier-stat">
+                    <strong>{TIERS.indexOf(currentTier) + 1}/{TIERS.length}</strong>
+                    <span>Tier</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Feedback widget */}
-              <div className="pd-card">
-                <div className="pd-eng-card-header">
-                  <div>
-                    <h2 className="pd-card-title">Rate Your Experience</h2>
-                    <p className="pd-card-sub" style={{ margin: 0 }}>
-                      Help us improve the platform
-                    </p>
-                  </div>
-                  <span className="pd-eng-feedback-badge">Feedback</span>
-                </div>
-                {feedbackDone ? (
-                  <div className="pd-eng-feedback-done">
-                    <div className="pd-eng-feedback-done-icon">🙏</div>
-                    <span className="pd-eng-feedback-done-title">
-                      Thank you!
-                    </span>
-                    <span className="pd-eng-feedback-done-sub">
-                      Your feedback helps us build a better learning experience.
-                    </span>
-                  </div>
-                ) : (
-                  <FeedbackWidget
-                    onSubmit={({ rating, comment }) => {
-                      localStorage.setItem(
-                        `pd_feedback_${user?.id || user?.email}`,
-                        "1",
-                      );
-                      setFeedbackDone(true);
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* ── Skill Mastery Showcase ── */}
-            <div className="pd-card pd-card--transparent pd-mastery-container">
-              <h2 className="pd-card-title">Skill Specializations</h2>
-              <p className="pd-card-sub">
-                Professional credentials earned through topic mastery
-              </p>
-              <div className="pd-cert-grid">
-                {[
-                  {
-                    id: "cert-boolean",
-                    title: "Boolean Architect",
-                    level: "Intermediate",
-                    icon: "⚡",
-                    color: COLORS.blue,
-                    progress: topicStats.booleanAlgebra || 0,
-                    unlocked: (topicStats.booleanAlgebra || 0) >= 100,
-                  },
-                  {
-                    id: "cert-kmap",
-                    title: "K-Map Master",
-                    level: "Advanced",
-                    icon: "🗺️",
-                    color: COLORS.purple,
-                    progress: topicStats.kmap || 0,
-                    unlocked: (topicStats.kmap || 0) >= 100,
-                  },
-                  {
-                    id: "cert-seq",
-                    title: "Sequential Systems",
-                    level: "Expert",
-                    icon: "⏱️",
-                    color: COLORS.green,
-                    progress: topicStats.sequential || 0,
-                    unlocked: (topicStats.sequential || 0) >= 100,
-                  },
-                ].map((cert) => (
-                  <div
-                    key={cert.id}
-                    className={`pd-cert-card ${cert.unlocked ? "pd-cert-card--unlocked" : "pd-cert-card--locked"}`}
-                    style={{ "--cert-color": cert.color }}
-                  >
-                    <div className="pd-cert-glow"></div>
-                    <div className="pd-cert-seal">{cert.icon}</div>
-                    <div className="pd-cert-content">
-                      <span className="pd-cert-level">{cert.level}</span>
-                      <h3 className="pd-cert-title">{cert.title}</h3>
-                      <div className="pd-cert-progress-wrapper">
-                        <div className="pd-cert-progress-bar">
+              {/* ── Next unlock spotlight ── */}
+              {nextUnlock && (
+                <div className="ach-spotlight" style={{ "--spot-color": CAT_COLORS[nextUnlock.category] || COLORS.blue }}>
+                  <div className="ach-spotlight-label">🎯 Next Unlock</div>
+                  <div className="ach-spotlight-body">
+                    <span className="ach-spotlight-icon">{nextUnlock.icon}</span>
+                    <div className="ach-spotlight-info">
+                      <div className="ach-spotlight-name">{nextUnlock.label}</div>
+                      <div className="ach-spotlight-desc">{nextUnlock.desc}</div>
+                      <div className="ach-spotlight-bar-wrap">
+                        <div className="ach-spotlight-bar-track">
                           <div
-                            className="pd-cert-progress-fill"
+                            className="ach-spotlight-bar-fill"
                             style={{
-                              width: `${cert.progress}%`,
-                              background: cert.color,
+                              width: `${Math.round((nextUnlock.progress / nextUnlock.total) * 100)}%`,
+                              background: CAT_COLORS[nextUnlock.category] || COLORS.blue,
                             }}
-                          ></div>
+                          />
                         </div>
-                        <span className="pd-cert-progress-text">
-                          {cert.unlocked ? "Certified" : `${cert.progress}%`}
+                        <span className="ach-spotlight-bar-txt">
+                          {nextUnlock.isPercent
+                            ? `${nextUnlock.progress}% / 100%`
+                            : `${nextUnlock.progress} / ${nextUnlock.total}`}
                         </span>
                       </div>
                     </div>
+                    <div className="ach-spotlight-xp">+{nextUnlock.xp} XP</div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Milestone journey ── */}
+              <div className="ach-journey">
+                {/* Earned */}
+                {earned.length > 0 && (
+                  <div className="ach-group">
+                    <div className="ach-group-header">
+                      <span className="ach-group-dot ach-group-dot--earned" />
+                      <span className="ach-group-title">Unlocked ({earned.length})</span>
+                    </div>
+                    <div className="ach-milestone-grid">
+                      {earned.map((m) => (
+                        <div key={m.id} className="ach-card ach-card--earned"
+                          style={{ "--m-color": CAT_COLORS[m.category] || COLORS.blue }}>
+                          <div className="ach-card-glow" />
+                          <div className="ach-card-top">
+                            <span className="ach-card-icon">{m.icon}</span>
+                            <span className="ach-card-cat"
+                              style={{ color: CAT_COLORS[m.category], background: `${CAT_COLORS[m.category]}18`, border: `1px solid ${CAT_COLORS[m.category]}30` }}>
+                              {m.category}
+                            </span>
+                          </div>
+                          <div className="ach-card-label">{m.label}</div>
+                          <div className="ach-card-desc">{m.desc}</div>
+                          <div className="ach-card-footer">
+                            <span className="ach-card-xp">+{m.xp} XP</span>
+                            <span className="ach-card-check">✓</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* In progress */}
+                {inProgress.length > 0 && (
+                  <div className="ach-group">
+                    <div className="ach-group-header">
+                      <span className="ach-group-dot ach-group-dot--progress" />
+                      <span className="ach-group-title">In Progress ({inProgress.length})</span>
+                    </div>
+                    <div className="ach-milestone-grid">
+                      {inProgress.map((m) => {
+                        const pct = Math.round((m.progress / m.total) * 100);
+                        return (
+                          <div key={m.id} className="ach-card ach-card--progress"
+                            style={{ "--m-color": CAT_COLORS[m.category] || COLORS.blue }}>
+                            <div className="ach-card-top">
+                              <span className="ach-card-icon ach-card-icon--dim">{m.icon}</span>
+                              <span className="ach-card-cat"
+                                style={{ color: CAT_COLORS[m.category], background: `${CAT_COLORS[m.category]}12`, border: `1px solid ${CAT_COLORS[m.category]}25` }}>
+                                {m.category}
+                              </span>
+                            </div>
+                            <div className="ach-card-label">{m.label}</div>
+                            <div className="ach-card-desc">{m.desc}</div>
+                            <div className="ach-card-progress-wrap">
+                              <div className="ach-card-progress-track">
+                                <div className="ach-card-progress-fill"
+                                  style={{ width: `${pct}%`, background: CAT_COLORS[m.category] }} />
+                              </div>
+                              <span className="ach-card-progress-txt">
+                                {m.isPercent ? `${m.progress}%` : `${m.progress}/${m.total}`}
+                              </span>
+                            </div>
+                            <div className="ach-card-footer">
+                              <span className="ach-card-xp ach-card-xp--muted">+{m.xp} XP</span>
+                              <span className="ach-card-pct-badge">{pct}%</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Locked */}
+                {locked.length > 0 && (
+                  <div className="ach-group">
+                    <div className="ach-group-header">
+                      <span className="ach-group-dot ach-group-dot--locked" />
+                      <span className="ach-group-title">Locked ({locked.length})</span>
+                    </div>
+                    <div className="ach-milestone-grid">
+                      {locked.map((m) => (
+                        <div key={m.id} className="ach-card ach-card--locked">
+                          <div className="ach-card-top">
+                            <span className="ach-card-icon ach-card-icon--locked">🔒</span>
+                            <span className="ach-card-cat ach-card-cat--locked">{m.category}</span>
+                          </div>
+                          <div className="ach-card-label ach-card-label--locked">{m.label}</div>
+                          <div className="ach-card-desc ach-card-desc--locked">{m.desc}</div>
+                          <div className="ach-card-footer">
+                            <span className="ach-card-xp ach-card-xp--locked">+{m.xp} XP</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ══════════════ ENGAGEMENT TAB ══════════════ */}
+        {activeTab === "engagement" && (() => {
+          const accuracy = solvedCount > 0
+            ? Math.round((solvedCount / Math.max(attemptedCount, 1)) * 100)
+            : 0;
+
+          const weakestTopic = Object.entries(topicStats)
+            .sort((a, b) => a[1] - b[1])[0];
+          const weakestLabel = weakestTopic
+            ? weakestTopic[0].replace(/([A-Z])/g, " $1").trim()
+            : "a new topic";
+
+          const PORTALS = [
+            { icon: "⊕", label: "Circuit Forge",    desc: "Build & simulate logic circuits",   path: "/boolforge",                    color: COLORS.blue   },
+            { icon: "◈", label: "K-Map Studio",      desc: "Simplify Boolean expressions",      path: "/kmapgenerator",                 color: COLORS.purple },
+            { icon: "#", label: "Number Systems",    desc: "Convert & calculate across bases",  path: "/number-systems/calculator",     color: COLORS.green  },
+            { icon: "≡", label: "Flip-Flops",        desc: "Sequential circuit deep dive",      path: "/sequential/flip-flops",         color: COLORS.amber  },
+            { icon: "∿", label: "Timing Diagrams",   desc: "Visualise signal propagation",      path: "/timing-diagrams",               color: COLORS.cyan   },
+            { icon: "✦", label: "Problems",          desc: "Practice & reinforce concepts",     path: "/problems",                      color: COLORS.pink   },
+          ];
+
+          const SIGNAL_TOPICS = [
+            { label: "Boolean",    pct: topicStats.booleanAlgebra, color: COLORS.blue   },
+            { label: "K-Map",      pct: topicStats.kmap,           color: COLORS.purple },
+            { label: "Sequential", pct: topicStats.sequential,     color: COLORS.green  },
+            { label: "Numbers",    pct: topicStats.numberSystems,  color: COLORS.amber  },
+            { label: "Arithmetic", pct: topicStats.arithmetic,     color: COLORS.pink   },
+          ];
+
+          const STUDY_PLAN = [
+            {
+              phase: "01", label: "Warm Up",
+              task: `Review ${weakestLabel} for 5 min`,
+              icon: "🔥", color: COLORS.amber, done: activeDays > 0,
+            },
+            {
+              phase: "02", label: "Solve",
+              task: `Attempt ${Math.max(1, 5 - (solvedCount % 5))} new problem${Math.max(1, 5 - (solvedCount % 5)) > 1 ? "s" : ""}`,
+              icon: "🎯", color: COLORS.blue, done: solvedCount > 0,
+            },
+            {
+              phase: "03", label: "Explore",
+              task: completedTopics < 3 ? "Open an unvisited topic" : "Revisit a completed topic",
+              icon: "📖", color: COLORS.purple, done: completedTopics > 0,
+            },
+            {
+              phase: "04", label: "Reflect",
+              task: "Check your Skill tab — spot any gaps",
+              icon: "🔬", color: COLORS.green, done: false,
+            },
+          ];
+
+          return (
+            <div className="pd-section">
+
+              {/* ── Status strip ── */}
+              <div className="eng-status-strip">
+                {[
+                  { label: "Active Days",     value: activeDays,          icon: "📅", color: COLORS.blue   },
+                  { label: "Current Streak",  value: `${streakCurrent}d`, icon: "🔥", color: COLORS.amber  },
+                  { label: "Best Streak",     value: `${streakLongest}d`, icon: "⚡", color: COLORS.purple },
+                  { label: "Accuracy",        value: accuracy > 0 ? `${accuracy}%` : "—", icon: "🎯", color: COLORS.green  },
+                  { label: "Problems Solved", value: solvedCount,          icon: "✅", color: COLORS.cyan   },
+                ].map((s) => (
+                  <div key={s.label} className="eng-status-pill" style={{ "--pill-color": s.color }}>
+                    <span className="eng-status-icon">{s.icon}</span>
+                    <span className="eng-status-val">{s.value}</span>
+                    <span className="eng-status-label">{s.label}</span>
                   </div>
                 ))}
               </div>
-            </div>
 
-          </div>
-        )}
+              {/* ── Main grid: signal + study plan ── */}
+              <div className="eng-main-grid">
+
+                {/* Signal strength panel */}
+                <div className="eng-panel eng-signal-panel">
+                  <div className="eng-panel-header">
+                    <div className="eng-panel-dot" style={{ background: COLORS.green }} />
+                    <h2 className="eng-panel-title">Topic Signal Strength</h2>
+                  </div>
+                  <p className="eng-panel-sub">How strong is your coverage in each area?</p>
+                  <div className="eng-signals">
+                    {SIGNAL_TOPICS.map((t) => {
+                      const bars = 5;
+                      const filled = Math.round((t.pct / 100) * bars);
+                      return (
+                        <div key={t.label} className="eng-signal-row">
+                          <span className="eng-signal-label">{t.label}</span>
+                          <div className="eng-signal-bars">
+                            {Array.from({ length: bars }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="eng-signal-bar"
+                                style={{
+                                  background: i < filled ? t.color : "rgba(148,163,184,0.12)",
+                                  height: `${10 + i * 4}px`,
+                                  opacity: i < filled ? 1 : 0.35,
+                                  boxShadow: i < filled ? `0 0 6px ${t.color}` : "none",
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <span className="eng-signal-pct" style={{ color: t.color }}>
+                            {t.pct}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Today's study plan */}
+                <div className="eng-panel eng-plan-panel">
+                  <div className="eng-panel-header">
+                    <div className="eng-panel-dot" style={{ background: COLORS.amber }} />
+                    <h2 className="eng-panel-title">Today's Study Plan</h2>
+                  </div>
+                  <p className="eng-panel-sub">A focused 4-step session for today</p>
+                  <div className="eng-plan-steps">
+                    {STUDY_PLAN.map((step) => (
+                      <div
+                        key={step.phase}
+                        className={`eng-step${step.done ? " eng-step--done" : ""}`}
+                        style={{ "--step-color": step.color }}
+                      >
+                        <div className="eng-step-phase">{step.phase}</div>
+                        <div className="eng-step-body">
+                          <div className="eng-step-top">
+                            <span className="eng-step-icon">{step.icon}</span>
+                            <span className="eng-step-label">{step.label}</span>
+                            {step.done && <span className="eng-step-tick">✓</span>}
+                          </div>
+                          <p className="eng-step-task">{step.task}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Tool portals ── */}
+              <div className="eng-portals-wrap">
+                <div className="eng-portals-header">
+                  <h2 className="eng-section-title">Quick Launch</h2>
+                  <p className="eng-section-sub">Jump straight into any tool</p>
+                </div>
+                <div className="eng-portals-grid">
+                  {PORTALS.map((p) => (
+                    <Link key={p.path} to={p.path} className="eng-portal" style={{ "--portal-color": p.color }}>
+                      <div className="eng-portal-glow" />
+                      <span className="eng-portal-icon">{p.icon}</span>
+                      <span className="eng-portal-label">{p.label}</span>
+                      <span className="eng-portal-desc">{p.desc}</span>
+                      <span className="eng-portal-arrow">→</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Feedback terminal ── */}
+              <div className="eng-terminal">
+                <div className="eng-terminal-bar">
+                  <span className="eng-terminal-dot eng-terminal-dot--red" />
+                  <span className="eng-terminal-dot eng-terminal-dot--amber" />
+                  <span className="eng-terminal-dot eng-terminal-dot--green" />
+                  <span className="eng-terminal-title">feedback.exe</span>
+                </div>
+                <div className="eng-terminal-body">
+                  <p className="eng-terminal-prompt">
+                    <span className="eng-terminal-chevron">&gt;</span> Rate your learning experience
+                  </p>
+                  {feedbackDone ? (
+                    <div className="eng-terminal-thanks">
+                      <span className="eng-terminal-ok">[OK]</span> Thank you — your feedback helps us improve Boolforge.
+                    </div>
+                  ) : (
+                    <FeedbackWidget
+                      onSubmit={() => {
+                        localStorage.setItem(`pd_feedback_${user?.id || user?.email}`, "1");
+                        setFeedbackDone(true);
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+
+            </div>
+          );
+        })()}
 
       </main>
       <Footer />

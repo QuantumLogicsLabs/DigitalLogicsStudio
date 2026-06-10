@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 
+const STATS = [
+  { value: "12+", label: "Interactive Tools" },
+  { value: "200+", label: "Practice Problems" },
+  { value: "Free", label: "Always" },
+];
+
 export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit }) {
   const heroRef = useRef(null);
   const { user } = useAuth();
@@ -20,6 +26,11 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
 
   return (
     <section className="home-hero" id="top" ref={heroRef}>
+      {/* Ambient glow blobs */}
+      <div className="hero-glow hero-glow--blue" aria-hidden="true" />
+      <div className="hero-glow hero-glow--purple" aria-hidden="true" />
+
+      {/* Ghost logo */}
       <svg
         className="hero-ghost-logo"
         viewBox="0 0 100 100"
@@ -46,20 +57,37 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
       </svg>
 
       <div className="home-hero-content">
+        {/* Badge */}
         <div className="hero-badge">
           <span className="hero-badge-dot" aria-hidden="true" />
           {user ? `Welcome back, ${user.name}` : "Free interactive digital logic platform"}
         </div>
 
-        <h1>Boolforge interactive digital logic learning platform</h1>
+        {/* Heading */}
+        <h1>
+          <span className="hero-title-line">Master Digital Logic</span>
+          <span className="hero-title-accent"> Interactively</span>
+        </h1>
+
+        {/* Sub-description */}
         <p>
           {user
-            ? "Your account is active. Keep building with circuits, Karnaugh maps, number systems, and binary arithmetic in one smooth workspace."
-            : "Jump into interactive tools for circuits, Karnaugh maps, number systems, and binary arithmetic — all in one smooth experience."}
+            ? "Your workspace is ready. Build circuits, simplify expressions with K-Maps, explore number systems, and tackle problems — all in one place."
+            : "Build circuits visually, simplify Boolean expressions with K-Maps, convert number systems, and solve logic problems — no setup required."}
         </p>
 
-        <form className="search-container" onSubmit={onSearchSubmit} role="search">
-          <div className="home-search-field">
+        {/* Stats row */}
+        <div className="hero-stats" aria-label="Platform statistics">
+          {STATS.map((s) => (
+            <div key={s.label} className="hero-stat">
+              <span className="hero-stat-value">{s.value}</span>
+              <span className="hero-stat-label">{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Search */}
+        <form className="search-container" onSubmit={onSearchSubmit} role="search">          <div className="home-search-field">
             <svg
               className="search-field-icon"
               width="16"
@@ -98,7 +126,6 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
             Search
           </button>
         </form>
-
       </div>
     </section>
   );
