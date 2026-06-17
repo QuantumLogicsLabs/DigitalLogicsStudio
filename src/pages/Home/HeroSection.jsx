@@ -77,13 +77,19 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
         </p>
 
         {/* Stats row */}
-        <div className="hero-stats" aria-label="Platform statistics">
-          {STATS.map((s) => (
-            <div key={s.label} className="hero-stat">
-              <span className="hero-stat-value">{s.value}</span>
-              <span className="hero-stat-label">{s.label}</span>
-            </div>
-          ))}
+        <div className="hero-stats-marquee" aria-label="Platform statistics">
+          <div className="hero-stats-track">
+            {[...STATS, ...STATS].map((s, index) => (
+              <div
+                key={`${s.label}-${index}`}
+                className="hero-stat-card"
+                aria-hidden={index >= STATS.length ? "true" : undefined}
+              >
+                <span className="hero-stat-value">{s.value}</span>
+                <span className="hero-stat-label">{s.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Search */}
