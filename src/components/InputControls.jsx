@@ -3,23 +3,31 @@ import React from 'react';
 export const InputControls = ({
     numVariables,
     variables,
-    minterms,
+    inputValue,
     dontCares,
     optimizationType,
     onVariablesChange,
     onVariablesUpdate,
-    onMintermsChange,
+    onInputValueChange,
     onDontCaresChange,
     onOptimizationTypeChange,
     onGenerate,
     onExample,
-    onReset
+    onReset,
+    expression,
+    onExperiment,
+    showGroupingGuide,  
+    onToggleGroupingGuide
 }) => {
     const handleVariableNameChange = (index, value) => {
         const newVars = [...variables];
         newVars[index] = value.toUpperCase().charAt(0) || variables[index];
         onVariablesUpdate(newVars);
     };
+
+    const isSOP = optimizationType === "SOP";
+    const termLabel = isSOP ? "Minterms" : "Maxterms";
+    const examplePlaceholder = isSOP ? "e.g., 0,1,2,5,6,7" : "e.g., 3,4,8,11";
 
     return (
         <div className="kmap-card">
@@ -56,21 +64,25 @@ export const InputControls = ({
                 </div>
 
                 <div className="kmap-control-group">
-                    <label className="kmap-label">Minterms (comma-separated)</label>
+                    <label className="kmap-label" title={`Enter ${termLabel.toLowerCase()} (comma separated)`}>
+                        {termLabel}
+                    </label>
                     <input
                         type="text"
                         className="kmap-input"
-                        value={minterms}
-                        onChange={(e) => onMintermsChange(e.target.value)}
-                        placeholder="e.g., 0,1,2,5,6,7"
+                        value={inputValue}
+                        onChange={(e) => onInputValueChange(e.target.value)}
+                        placeholder={examplePlaceholder}
                     />
                     <p className="kmap-helper-text">
-                        Enter decimal minterm numbers (0 to {Math.pow(2, numVariables) - 1})
+                        Decimal numbers 0–{Math.pow(2, numVariables) - 1}
                     </p>
                 </div>
 
                 <div className="kmap-control-group">
-                    <label className="kmap-label">Don't Cares (comma-separated, optional)</label>
+                    <label className="kmap-label" title="Optional: terms that can be 0 or 1">
+                        Don't Cares
+                    </label>
                     <input
                         type="text"
                         className="kmap-input"
@@ -78,13 +90,12 @@ export const InputControls = ({
                         onChange={(e) => onDontCaresChange(e.target.value)}
                         placeholder="e.g., 3,4,12"
                     />
-                    <p className="kmap-helper-text">
-                        Don't care terms can be treated as 0 or 1 for optimal grouping
-                    </p>
                 </div>
 
                 <div className="kmap-control-group">
-                    <label className="kmap-label">Optimization Type</label>
+                    <label className="kmap-label" title="Select SOP (Sum of Products) or POS (Product of Sums)">
+                        Optimization
+                    </label>
                     <select
                         className="kmap-input"
                         value={optimizationType}
@@ -93,31 +104,59 @@ export const InputControls = ({
                         <option value="SOP">Sum of Products (SOP)</option>
                         <option value="POS">Product of Sums (POS)</option>
                     </select>
-                    <p className="kmap-helper-text">
-                        SOP: F = Σ minterms | POS: F = Π maxterms
-                    </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-md)' }} className="kmap-btn-row">
+                <div className="kmap-control-group">
+                    <label className="kmap-label">Grouping Guide</label>
+                    <label className="kmap-toggle">
+                        <input
+                            type="checkbox"
+                            checked={showGroupingGuide}
+                            onChange={onToggleGroupingGuide}
+                        />
+                        <span className="kmap-toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div className="kmap-btn-row">
                     <button
                         className="kmap-btn kmap-btn-primary"
                         onClick={onGenerate}
+                        title="Solve the K‑Map"
                     >
-                        Generate K-Map
+                        🔍 
                     </button>
                     <button
                         className="kmap-btn kmap-btn-secondary"
                         onClick={onExample}
+                        title="Load a pre‑filled example"
                     >
-                        Load Example
+                        📋 
                     </button>
                     <button
                         className="kmap-btn kmap-btn-outline"
                         onClick={onReset}
+                        title="Clear all inputs"
                     >
-                        Reset
+                        🔄 
                     </button>
                 </div>
+
+                {/* Divider */}
+                <div className="kmap-section-divider">
+                    <span>Experiment</span>
+                </div>
+
+                {/* Circuit experiment button – visible only when a solution exists */}
+                {expression && (
+                    <button
+                        className="kmap-btn kmap-btn-circuit"
+                        onClick={onExperiment}
+                        title="Open the interactive circuit editor"
+                    >
+                        🔌 Experiment with Circuit
+                    </button>
+                )}
             </div>
         </div>
     );

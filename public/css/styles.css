@@ -4929,19 +4929,209 @@ select:focus-visible {
 }
 
 /* ─── K-Map page shell ───────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════════
+   KMAP WORKSPACE LAYOUT — Split-pane engineering UI
+   Left: sticky sidebar controls | Right: scrollable canvas
+   ═══════════════════════════════════════════════════════════ */
+
+/* Workspace row — the two-pane shell */
+.kmap-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 0 0 48px 24px;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+
+/* ── LEFT SIDEBAR ───────────────────────────────────────────── */
+.kmap-sidebar {
+  width: 380px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96,165,250,0.3) transparent;
+  padding-right: 4px;
+  box-sizing: border-box;
+}
+
+.kmap-sidebar::-webkit-scrollbar { width: 4px; }
+.kmap-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(96,165,250,0.3);
+  border-radius: 99px;
+}
+
+.kmap-sidebar-inner {
+  padding: 0 12px 24px 0;         /* right gap between sidebar and canvas */
+}
+
+/* Small label above controls — workspace convention */
+/*Used in both left and right panels*/
+.kmap-sidebar-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-secondary);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(96,165,250,0.15);
+}
+
+/* ── RIGHT CANVAS ───────────────────────────────────────────── */
+.kmap-canvas {
+  padding-top: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  padding-left: 24px;
+  padding-right: 24px;
+  border-left: 1px solid rgba(96,165,250,0.1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96,165,250,0.3) transparent;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Stack of result cards */
+.kmap-results-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;                         
+}
+
+/* ── EMPTY STATE ────────────────────────────────────────────── */
+.kmap-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  text-align: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  border: 2px dashed rgba(96,165,250,0.2);
+  border-radius: var(--radius-xl);
+  background: rgba(10,14,26,0.3);
+}
+
+.kmap-empty-icon {
+  font-size: 4rem;
+  color: rgba(96,165,250,0.25);
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.kmap-empty-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.kmap-empty-hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  line-height: 1.7;
+}
+
+.kmap-empty-hint strong {
+  color: var(--accent-primary);
+}
+
+.kmap-sidebar,
+.kmap-canvas {
+  align-self: stretch;
+}
+
+/* ── RESPONSIVE COLLAPSE ────────────────────────────────────── */
+
+/* Tablets: shrink sidebar */
+@media (max-width: 1024px) {
+  .kmap-workspace {
+    padding: 0 0 40px 16px;
+  }
+  .kmap-sidebar {
+    width: 300px;
+  }
+   .kmap-canvas {
+    padding-right: 16px;     
+    padding-left: 16px;
+  }
+}
+
+/* Mobile: stack vertically, sidebar becomes top bar */
+@media (max-width: 768px) {
+  .kmap-workspace {
+    flex-direction: column;
+    gap: 0;
+    padding: 0 14px 32px;
+    overflow-y: visible;
+    height: auto;
+  }
+
+  .kmap-empty-state {
+    min-height: 240px;
+    padding: var(--spacing-xl) var(--spacing-md);
+    border-radius: var(--radius-lg);
+  }
+  .kmap-empty-icon {
+    font-size: 2.5rem;
+  }
+  .kmap-empty-title {
+    font-size: 1.1rem;
+  }
+  .kmap-empty-hint {
+    font-size: 0.85rem;
+  }
+
+  .kmap-sidebar {
+    width: 100%;
+    position: static;             /* un-sticky on mobile */
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .kmap-sidebar-inner {
+    padding: 0 0 16px 0;
+  }
+
+  .kmap-canvas {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(96,165,250,0.1);
+    padding-top: 20px;
+    height: auto;
+    overflow-y: visible;
+    padding-right: 0; 
+  }
+}
+
 .kmap-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--bg-color, var(--bg-dark));
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .kmap-page-main {
   flex: 1;
-  position: relative;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Footer baseline — same fix used in ProfileDashboard and Boolforge */
@@ -4964,26 +5154,12 @@ select:focus-visible {
   z-index: 1;
 }
 
-/* Header gradient block — wraps title + subtitle */
-.kmap-header-gradient {
-  text-align: center;
-  padding: 2.5rem 1.5rem 1.5rem;
-  margin-bottom: var(--spacing-xl);
-}
-
-/* Content wrapper: constrain width on large screens */
 .kmap-content-wrapper {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* Header Styles */
-.kmap-header {
-  text-align: center;
-  margin-bottom: var(--spacing-3xl);
-  animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
 
 @keyframes slideDown {
   from {
@@ -4997,32 +5173,30 @@ select:focus-visible {
   }
 }
 
-.kmap-main-title {
-  font-size: 3.5rem;
+/* .kmap-main-title {
+  font-size: clamp(1.6rem, 6vw, 3.5rem); 
   font-weight: 800;
-  background: linear-gradient(
-    135deg,
-    var(--accent-primary) 0%,
-    var(--accent-secondary) 100%
-  );
+  letter-spacing: -0.02em;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-align: center;
   margin-bottom: var(--spacing-md);
-  letter-spacing: -1px;
   text-shadow: 0 0 60px rgba(96, 165, 250, 0.3);
 }
 
 .kmap-subtitle {
-  font-size: 1.2rem;
+  font-size: clamp(0.85rem, 2vw, 1.2rem);
   color: var(--text-secondary);
   font-weight: 400;
   text-align: center;
-  margin-bottom: 50px;
-  letter-spacing: 2px;
   text-transform: uppercase;
-}
+  letter-spacing: 2px;
+  margin-bottom: 40px;
+} */
 
 /* Card Styles */
 .kmap-card {
@@ -5087,6 +5261,10 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .kmap-section-title::before {
@@ -5161,7 +5339,7 @@ select:focus-visible {
 
 /* Grid Layouts */
 .kmap-controls-grid {
-  gap: var(--spacing-lg);
+  gap: var(--spacing-lg) var(--spacing-md); 
   margin-bottom: var(--spacing-lg);
   display: flex;
   justify-content: center;
@@ -5729,6 +5907,150 @@ select:focus-visible {
   transform: scale(1.3);
 }
 
+/* ── Toggle switch (grouping guide) ──────────────────────────── */
+.kmap-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  margin-top: 6px;
+}
+
+.kmap-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.kmap-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(96,165,250,0.15);
+  border: 2px solid var(--color-border);
+  border-radius: 34px;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.kmap-toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 2px;
+  background: var(--accent-secondary);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 8px rgba(0,255,136,0.4);
+}
+
+.kmap-toggle input:checked + .kmap-toggle-slider {
+  background: rgba(0,255,136,0.25);
+  border-color: var(--accent-primary);
+}
+
+.kmap-toggle input:checked + .kmap-toggle-slider::before {
+  transform: translateX(22px);
+  background: var(--accent-primary);
+}
+
+.kmap-toggle:hover .kmap-toggle-slider {
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 12px rgba(0,255,136,0.3);
+}
+
+/* ── Refined control layout ─────────────────────────────────── */
+.kmap-control-row {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.kmap-control-row .kmap-control-group {
+  flex: 1;
+}
+
+@media (max-width: 540px) {
+  .kmap-control-row {
+    flex-direction: column;
+  }
+}
+
+/* ── Section divider between standard controls and experiment ── */
+.kmap-section-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.kmap-section-divider::before,
+.kmap-section-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-border) 20%,
+    var(--color-border) 80%,
+    transparent
+  );
+}
+
+/* ── Circuit experiment button – matches existing button family ── */
+.kmap-btn-circuit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-top: var(--spacing-sm);
+}
+
+.kmap-btn-circuit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.kmap-btn-circuit:active {
+  transform: translateY(-1px);
+}
+
+/* Keep the ripple effect from .kmap-btn::before – reuse it */
+.kmap-btn-circuit::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  overflow: hidden;
+}
+
+.kmap-btn-circuit:active::before {
+  width: 300px;
+  height: 300px;
+}
+
 /* ─── Truth Table ─────────────────────────────────────────────────────────── */
 .kmap-truth-table {
   width: 100%;
@@ -5780,8 +6102,8 @@ select:focus-visible {
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-/* Minterm index column */
-.kmap-truth-table .minterm-cell {
+/* input term index column */
+.kmap-truth-table .input-term-cell {
   color: #8b9dc3;
   font-weight: 700;
   font-size: 0.82rem;
@@ -5840,7 +6162,7 @@ select:focus-visible {
   border-bottom-color: rgba(148, 163, 184, 0.18);
 }
 
-[data-theme="light"] .kmap-truth-table .minterm-cell {
+[data-theme="light"] .kmap-truth-table .input-term-cell {
   color: #475569 !important;
 }
 
@@ -5862,7 +6184,7 @@ select:focus-visible {
    ═══════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  .kmap-main-title {
+  /* .kmap-main-title {
     font-size: 2rem;
     letter-spacing: -0.5px;
   }
@@ -5871,7 +6193,7 @@ select:focus-visible {
     font-size: 0.9rem;
     letter-spacing: 1px;
     margin-bottom: 28px;
-  }
+  } */
 
   .kmap-card {
     padding: var(--spacing-lg);
@@ -6009,9 +6331,9 @@ select:focus-visible {
 }
 
 @media (max-width: 380px) {
-  .kmap-main-title {
+  /* .kmap-main-title {
     font-size: 1.35rem;
-  }
+  } */
 
   .kmap-cell,
   .kmap-header-cell {
@@ -6025,13 +6347,6 @@ select:focus-visible {
     min-width: 50px;
     height: 42px;
     font-size: 0.72rem;
-  }
-}
-
-/* ── Header gradient block ── */
-@media (max-width: 768px) {
-  .kmap-header-gradient {
-    padding: 1.5rem 1rem 1rem;
   }
 }
 
@@ -7000,48 +7315,6 @@ select:focus-visible {
 
   .kmap-content-wrapper {
     max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .kmap-container {
-    padding: 20px 14px;
-  }
-
-  .kmap-header-gradient {
-    padding: 1.25rem 0.75rem 0.75rem;
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .kmap-main-title {
-    font-size: 1.75rem;
-    letter-spacing: -0.5px;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .kmap-subtitle {
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .kmap-container {
-    padding: 12px 10px;
-  }
-
-  .kmap-header-gradient {
-    padding: 1rem 0.5rem 0.5rem;
-  }
-
-  .kmap-main-title {
-    font-size: 1.45rem;
-  }
-
-  .kmap-subtitle {
-    font-size: 0.78rem;
-    letter-spacing: 0;
   }
 }
 

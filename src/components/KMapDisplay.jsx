@@ -1,4 +1,3 @@
-// import React from 'react';
 
 export const KMapDisplay = ({
     grid,
@@ -7,13 +6,10 @@ export const KMapDisplay = ({
     variables,
     getColumnLabels,
     getRowLabels,
-    showGroupingGuide,
     optimizationType = 'SOP'
 }) => {
-    // const getCellKey = (rowIdx, colIdx) => `${rowIdx}-${colIdx}`;
 
     const getCellGroups = (rowIdx, colIdx) => {
-        if (!showGroupingGuide) return [];
         return groups.filter(group =>
             group.cells.some(cell => cell.row === rowIdx && cell.col === colIdx)
         );
@@ -29,7 +25,7 @@ export const KMapDisplay = ({
         if (cell === 1 && !isPOS) {
             cellClass += ' kmap-cell-filled';
         } else if (cell === 0 && isPOS) {
-            cellClass += ' kmap-cell-filled kmap-cell-pos';
+            cellClass += ` kmap-cell-filled ${!isGrouped ? 'kmap-cell-pos' : ''}`;
         } else if (cell === 'X') {
             cellClass += ' kmap-cell-dontcare';
         } else {
@@ -80,11 +76,13 @@ export const KMapDisplay = ({
                                 <tr>
                                     <th className="kmap-corner">
                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                            {numVariables === 2
-                                                ? variables[0]
-                                                : variables.slice(0, 2).join('')} \ {numVariables === 2
-                                                    ? variables[1]
-                                                    : (numVariables === 3 ? variables[2] : variables.slice(2).join(''))}
+                                            {numVariables === 4
+                                                ? variables.slice(0, 2).join('')
+                                                : variables[0]}
+                                                {' \\ '}
+                                                {numVariables === 2
+                                                ? variables[1]
+                                                : variables.slice(1).join('')}
                                         </div>
                                     </th>
                                     {getColumnLabels().map((label, idx) => (
@@ -104,7 +102,7 @@ export const KMapDisplay = ({
                     </div>
                 </div>
 
-                {showGroupingGuide && groups.length > 0 && (
+                {groups.length > 0 && (
                     <div className="kmap-groups-legend">
                         <h3 className="kmap-groups-legend-title">
                             Detected Groups ({optimizationType === 'POS' ? 'Maxterms' : 'Minterms'})
@@ -118,7 +116,7 @@ export const KMapDisplay = ({
                                     />
                                     <span>
                                         Group {idx + 1}: {group.size} cells 
-                                        ({optimizationType === 'POS' ? 'maxterms' : 'minterms'}: {group.minterms.join(', ')})
+                                        ({optimizationType === 'POS' ? 'maxterms' : 'minterms'}: {(group.maxterms || group.minterms)?.join(', ')})
                                     </span>
                                 </div>
                             ))}
