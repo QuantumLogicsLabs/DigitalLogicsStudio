@@ -64,7 +64,7 @@ test("builds a calendar matrix with intensity values from activity", async () =>
   });
 
   const monthMatrix = progressTestUtils.getMonthMatrix(
-    progressTestUtils.safeRead(userKey).activity,
+    (progressTestUtils._getCache(userKey) || {}).activity || {},
     new Date(),
   );
   const todayKey = new Date().toISOString().slice(0, 10);

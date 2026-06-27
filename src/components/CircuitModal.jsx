@@ -307,7 +307,7 @@ function AssignmentPanel({
           >
             Inputs
           </strong>
-          {problem.inputs.map((name) => (
+          {(problem?.inputs || []).map((name) => (
             <div key={name} style={S.assignRow}>
               <span style={S.assignLabel}>{name}</span>
               <select
@@ -337,7 +337,7 @@ function AssignmentPanel({
           >
             Outputs
           </strong>
-          {problem.outputs.map((name) => (
+          {(problem?.outputs || []).map((name) => (
             <div key={name} style={S.assignRow}>
               <span
                 style={{
@@ -503,8 +503,8 @@ const CircuitModal = ({
 
   const inputGates = gates.filter((g) => g.type === "INPUT");
   const outputGates = gates.filter((g) => g.type === "OUTPUT");
-  const needInputs = problem?.inputs.length ?? 0;
-  const needOutputs = problem?.outputs.length ?? 0;
+  const needInputs = problem?.inputs?.length ?? 0;
+  const needOutputs = problem?.outputs?.length ?? 0;
   const hasRight =
     inputGates.length === needInputs && outputGates.length === needOutputs;
 
@@ -615,11 +615,11 @@ const CircuitModal = ({
           <span style={S.needLabel}>Need:</span>
           <span style={S.pill("#00ff88")}>
             {needInputs} INPUT{needInputs !== 1 ? "S" : ""} (
-            {problem.inputs.join(", ")})
+            {(problem?.inputs || []).join(", ")})
           </span>
           <span style={S.pill("#00d4ff")}>
             {needOutputs} OUTPUT{needOutputs !== 1 ? "S" : ""} (
-            {problem.outputs.join(", ")})
+            {(problem?.outputs || []).join(", ")})
           </span>
           <span
             style={{
@@ -725,7 +725,7 @@ const CircuitModal = ({
       </div>
 
       {/* ── Problem description bar ── */}
-      {!isExperimentMode && problem.description && (
+      {!isExperimentMode && problem?.description && (
         <div style={S.descBar}>
           {/* 1. Left Gradient Bar */}
           <span
@@ -754,7 +754,7 @@ const CircuitModal = ({
           </span>
 
           {/* 3. Equations Container */}
-          {problem.equations?.length > 0 && (
+          {problem?.equations?.length > 0 && (
             <div
               style={{
                 display: "flex",
@@ -763,7 +763,7 @@ const CircuitModal = ({
                 flexShrink: 0,
               }}
             >
-              {problem.equations.map((eq, i) => (
+              {(problem.equations || []).map((eq, i) => (
                 <code
                   key={i}
                   style={{
@@ -792,7 +792,7 @@ const CircuitModal = ({
           <Boolforge
             embedded={true}
             onCircuitChange={handleCircuitChange}
-            portNames={{ inputs: problem.inputs, outputs: problem.outputs }}
+            portNames={{ inputs: problem?.inputs || [], outputs: problem?.outputs || [] }}
             simplifiedExpression={isExperimentMode ? boolforgeExpression : null}
             variables={isExperimentMode ? variables : []}
           />
@@ -826,8 +826,8 @@ const CircuitModal = ({
             {!result.error &&
               result.rows.length > 0 &&
               (() => {
-                const inputKeys = problem.inputs;
-                const outputKeys = problem.outputs;
+                const inputKeys = problem?.inputs || [];
+                const outputKeys = problem?.outputs || [];
                 const failCount = result.rows.filter((r) => !r.pass).length;
                 return (
                   <div style={S.tableWrap}>
@@ -928,12 +928,12 @@ const CircuitModal = ({
               >
                 {isAssigned
                   ? "🔀 Using custom gate assignment."
-                  : `⚡ Inputs matched by position: ${problem.inputs
+                  : `⚡ Inputs matched by position: ${(problem?.inputs || [])
                       .map((name, i) => {
                         const g = inputGates[i];
                         return g ? `${name}→${g.label}` : name;
                       })
-                      .join(", ")}. Outputs: ${problem.outputs
+                      .join(", ")}. Outputs: ${(problem?.outputs || [])
                       .map((name, i) => {
                         const g = outputGates[i];
                         return g ? `${name}→${g.label}` : name;

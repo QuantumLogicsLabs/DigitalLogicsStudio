@@ -5,16 +5,16 @@ function evalGate(
   depth = 0,
   visited = new Set(),
 ) {
-  if (depth > 100 || !gate || visited.has(gate.id)) return false;
-  if (gate.type === "INPUT") return gate.inputValues[0] || false;
+  if (depth > 100 || !gate || !gate.id || visited.has(gate.id)) return false;
+  if (gate.type === "INPUT") return (gate.inputValues && gate.inputValues[0]) || false;
 
   const newVisited = new Set(visited);
   newVisited.add(gate.id);
   const inputs = [];
 
-  wiresArray.forEach((wire) => {
-    if (wire.toId === gate.id) {
-      const fromGate = gatesArray.find((candidate) => candidate.id === wire.fromId);
+  (wiresArray || []).forEach((wire) => {
+    if (wire && wire.toId === gate.id) {
+      const fromGate = (gatesArray || []).find((candidate) => candidate && candidate.id === wire.fromId);
       if (fromGate) {
         inputs[wire.toIndex] = evalGate(
           fromGate,
@@ -59,11 +59,21 @@ function evalGate(
 }
 
 function validateCircuit(gates, wires, problem, assignment = null) {
-  const inputGates = gates.filter((gate) => gate.type === "INPUT");
-  const outputGates = gates.filter((gate) => gate.type === "OUTPUT");
+  if (!gates) gates = [];
+  if (!wires) wires = [];
+  if (!problem) {
+    return {
+      pass: false,
+      rows: [],
+      error: "No problem definition provided for validation.",
+    };
+  }
 
-  const problemInputs = problem.inputs;
-  const problemOutputs = problem.outputs;
+  const inputGates = gates.filter((gate) => gate && gate.type === "INPUT");
+  const outputGates = gates.filter((gate) => gate && gate.type === "OUTPUT");
+
+  const problemInputs = problem.inputs || [];
+  const problemOutputs = problem.outputs || [];
 
   if (inputGates.length !== problemInputs.length) {
     return {
@@ -82,8 +92,9 @@ function validateCircuit(gates, wires, problem, assignment = null) {
   }
 
   const tryLabelMatch = (portNames, gateList) => {
+    if (!portNames || !gateList) return null;
     const matched = portNames.map((name) =>
-      gateList.find((gate) => gate.label === name),
+      gateList.find((gate) => gate && gate.label === name),
     );
 
     return matched.every(Boolean) ? matched : null;
@@ -94,14 +105,16 @@ function validateCircuit(gates, wires, problem, assignment = null) {
 
   if (
     assignment &&
+    assignment.inputMap &&
+    assignment.outputMap &&
     (Object.keys(assignment.inputMap).length > 0 ||
       Object.keys(assignment.outputMap).length > 0)
   ) {
     orderedInputs = problemInputs.map((name) =>
-      gates.find((gate) => gate.id === assignment.inputMap[name]),
+      gates.find((gate) => gate && gate.id === assignment.inputMap[name]),
     );
     orderedOutputs = problemOutputs.map((name) =>
-      gates.find((gate) => gate.id === assignment.outputMap[name]),
+      gates.find((gate) => gate && gate.id === assignment.outputMap[name]),
     );
   } else {
     orderedInputs = tryLabelMatch(problemInputs, inputGates) ?? inputGates;
@@ -116,16 +129,26 @@ function validateCircuit(gates, wires, problem, assignment = null) {
     };
   }
 
+  if (!problem.truthTable || !Array.isArray(problem.truthTable) || problem.truthTable.length === 0) {
+    return {
+      pass: false,
+      rows: [],
+      error: "No truth table available for automatic validation on this problem.",
+    };
+  }
+
   const rows = [];
   let allPass = true;
 
   for (const truthRow of problem.truthTable) {
+    if (!truthRow) continue;
     const tempGates = gates.map((gate) => {
+      if (!gate) return gate;
       const inputIndex = orderedInputs.findIndex(
         (inputGate) => inputGate && inputGate.id === gate.id,
       );
 
-      if (inputIndex !== -1) {
+      if (inputIndex !== -1 && problemInputs[inputIndex] !== undefined) {
         return {
           ...gate,
           inputValues: [!!truthRow[problemInputs[inputIndex]]],
@@ -139,11 +162,13 @@ function validateCircuit(gates, wires, problem, assignment = null) {
     let rowPass = true;
 
     for (let outputIndex = 0; outputIndex < orderedOutputs.length; outputIndex += 1) {
+      const targetOutput = orderedOutputs[outputIndex];
+      if (!targetOutput) continue;
       const outGate = tempGates.find(
-        (gate) => gate.id === orderedOutputs[outputIndex].id,
+        (gate) => gate && gate.id === targetOutput.id,
       );
       const got = evalGate(outGate, tempGates, wires) ? 1 : 0;
-      const expected = truthRow[problemOutputs[outputIndex]];
+      const expected = truthRow[problemOutputs[outputIndex]] !== undefined ? truthRow[problemOutputs[outputIndex]] : 0;
 
       gotValues[problemOutputs[outputIndex]] = got;
 

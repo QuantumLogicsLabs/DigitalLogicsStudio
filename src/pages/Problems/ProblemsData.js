@@ -1091,6 +1091,364 @@ const problemsData = [
     inputs: ["En", "D"],
     outputs: ["Q", "Qb"],
   },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 19 — K-Map: 2-Variable SOP Minimisation
+  // Variables: A, B  |  Output: F
+  // Minterms: Σm(1, 2, 3) → F = A + B
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 19,
+    title: "K-Map: 2-Variable SOP Minimization",
+    difficulty: "Easy",
+    tags: ["K-Map", "Boolean Algebra", "SOP"],
+    description:
+      "Use a 2-variable Karnaugh map to minimise the function F(A,B) = Σm(1,2,3). " +
+      "Group adjacent 1-cells and write the simplified Sum-of-Products expression.",
+    truthTable: [
+      { A: 0, B: 0, F: 0 },
+      { A: 0, B: 1, F: 1 },
+      { A: 1, B: 0, F: 1 },
+      { A: 1, B: 1, F: 1 },
+    ],
+    equations: ["F = A + B"],
+    hint: "Minterms 1, 2, 3 form a group of 2 (m1,m3 → B) and a group of 2 (m2,m3 → A). Both share m3 — overlap is allowed. The simplified expression is F = A + B.",
+    inputs: ["A", "B"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 20 — K-Map: 3-Variable SOP Minimisation
+  // Variables: A, B, C  |  Output: F
+  // Minterms: Σm(0, 2, 4, 6) → F = B'   (all rows where B=0)
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 20,
+    title: "K-Map: 3-Variable SOP Minimization",
+    difficulty: "Easy",
+    tags: ["K-Map", "Boolean Algebra", "SOP"],
+    description:
+      "Minimise F(A,B,C) = Σm(0,2,4,6) using a 3-variable K-map. " +
+      "Identify the largest valid groupings (power-of-2 size) to find the simplest SOP.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, F: 1 },
+      { A: 0, B: 0, C: 1, F: 0 },
+      { A: 0, B: 1, C: 0, F: 0 },
+      { A: 0, B: 1, C: 1, F: 0 },
+      { A: 1, B: 0, C: 0, F: 1 },
+      { A: 1, B: 0, C: 1, F: 0 },
+      { A: 1, B: 1, C: 0, F: 1 },
+      { A: 1, B: 1, C: 1, F: 0 },
+    ],
+    equations: ["F = C'"],
+    hint: "Minterms 0,2,4,6 all have C=0. They form a group of 4 across both A values, eliminating A and B. The only variable that stays constant is C=0, giving F = C'.",
+    inputs: ["A", "B", "C"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 21 — K-Map: 3-Variable with Don't-Cares
+  // Variables: A, B, C  |  Output: F
+  // Minterms: Σm(1,3,5) + d(0,2) → use don't-cares to get F = C
+  // For truth-table validation we treat don't-cares as 1 (largest group wins)
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 21,
+    title: "K-Map: 3-Variable with Don't-Cares",
+    difficulty: "Medium",
+    tags: ["K-Map", "Boolean Algebra", "Don't-Care"],
+    description:
+      "Minimise F(A,B,C) = Σm(1,3,5) + d(0,2) using a 3-variable K-map. " +
+      "Treat don't-care cells as 1 or 0 to form the largest possible groups.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, F: 1 }, // don't-care treated as 1
+      { A: 0, B: 0, C: 1, F: 1 }, // minterm 1
+      { A: 0, B: 1, C: 0, F: 1 }, // don't-care treated as 1
+      { A: 0, B: 1, C: 1, F: 1 }, // minterm 3
+      { A: 1, B: 0, C: 0, F: 0 },
+      { A: 1, B: 0, C: 1, F: 1 }, // minterm 5
+      { A: 1, B: 1, C: 0, F: 0 },
+      { A: 1, B: 1, C: 1, F: 0 },
+    ],
+    equations: ["F = C + A'B'"],
+    hint: "Group minterms 1,3,5 with don't-cares 0,2. Including d(0,2) lets you form a group of 4 (0,1,2,3 → A') and a pair (1,5 → B'C). Alternatively use don't-cares to extend to F = C + A'B'.",
+    inputs: ["A", "B", "C"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 22 — K-Map: 4-Variable SOP Minimisation
+  // Variables: A, B, C, D  |  Output: F
+  // Minterms: Σm(0,2,5,7,8,10,13,15) → F = BD + B'D'
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 22,
+    title: "K-Map: 4-Variable SOP Minimization",
+    difficulty: "Medium",
+    tags: ["K-Map", "Boolean Algebra", "SOP"],
+    description:
+      "Minimise F(A,B,C,D) = Σm(0,2,5,7,8,10,13,15) using a 4-variable K-map. " +
+      "Form groups of 4 or 8 to get a minimal two-term SOP expression.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, D: 0, F: 1 }, // m0
+      { A: 0, B: 0, C: 0, D: 1, F: 0 },
+      { A: 0, B: 0, C: 1, D: 0, F: 1 }, // m2
+      { A: 0, B: 0, C: 1, D: 1, F: 0 },
+      { A: 0, B: 1, C: 0, D: 0, F: 0 },
+      { A: 0, B: 1, C: 0, D: 1, F: 1 }, // m5
+      { A: 0, B: 1, C: 1, D: 0, F: 0 },
+      { A: 0, B: 1, C: 1, D: 1, F: 1 }, // m7
+      { A: 1, B: 0, C: 0, D: 0, F: 1 }, // m8
+      { A: 1, B: 0, C: 0, D: 1, F: 0 },
+      { A: 1, B: 0, C: 1, D: 0, F: 1 }, // m10
+      { A: 1, B: 0, C: 1, D: 1, F: 0 },
+      { A: 1, B: 1, C: 0, D: 0, F: 0 },
+      { A: 1, B: 1, C: 0, D: 1, F: 1 }, // m13
+      { A: 1, B: 1, C: 1, D: 0, F: 0 },
+      { A: 1, B: 1, C: 1, D: 1, F: 1 }, // m15
+    ],
+    equations: ["F = BD + B'D'"],
+    hint: "Minterms 5,7,13,15 all have B=1, D=1 → group of 4 gives BD. Minterms 0,2,8,10 all have B=0, D=0 → group of 4 gives B'D'. The two groups together cover all minterms.",
+    inputs: ["A", "B", "C", "D"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 23 — K-Map: POS (Product-of-Sums) Minimisation
+  // Variables: A, B, C  |  Output: F
+  // Maxterms: ΠM(1, 4, 5) → F = (A'+B)(A+B'+C')
+  // Equivalently via 0-cells: A,B,C combinations 001, 100, 101
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 23,
+    title: "K-Map: POS Minimization",
+    difficulty: "Medium",
+    tags: ["K-Map", "Boolean Algebra", "POS"],
+    description:
+      "Use a 3-variable K-map to derive the minimal Product-of-Sums expression for " +
+      "F(A,B,C) = ΠM(1,4,5). Group the 0-cells on the map to form maxterm groups.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, F: 1 },
+      { A: 0, B: 0, C: 1, F: 0 }, // maxterm 1
+      { A: 0, B: 1, C: 0, F: 1 },
+      { A: 0, B: 1, C: 1, F: 1 },
+      { A: 1, B: 0, C: 0, F: 0 }, // maxterm 4
+      { A: 1, B: 0, C: 1, F: 0 }, // maxterm 5
+      { A: 1, B: 1, C: 0, F: 1 },
+      { A: 1, B: 1, C: 1, F: 1 },
+    ],
+    equations: ["F = (A' + B)(A + C')"],
+    hint: "Group the 0-cells: maxterms 4 and 5 (A=1,B=0) form a pair → sum term (A'+B). Maxterm 1 and 4 pair — but 4 is already used. Maxterms 1 alone: (A+B+C'). The minimal POS is F = (A'+B)(A+C').",
+    inputs: ["A", "B", "C"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 24 — K-Map: 4-Variable with Don't-Cares (POS)
+  // Variables: A, B, C, D  |  Output: F
+  // Minterms: Σm(0,1,4,5) + d(10,11,14,15) → largest 0-cell group from rest
+  // Simplified SOP: F = A'B' + A'C'   (equivalent to F = A'(B'+C'))
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 24,
+    title: "K-Map: 4-Variable with Don't-Cares",
+    difficulty: "Hard",
+    tags: ["K-Map", "Boolean Algebra", "Don't-Care", "SOP"],
+    description:
+      "Minimise F(A,B,C,D) = Σm(0,1,4,5) + d(10,11,14,15) using a 4-variable K-map. " +
+      "Use the don't-care entries to form the largest possible 1-cell groups and reduce the expression.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, D: 0, F: 1 }, // m0
+      { A: 0, B: 0, C: 0, D: 1, F: 1 }, // m1
+      { A: 0, B: 0, C: 1, D: 0, F: 0 },
+      { A: 0, B: 0, C: 1, D: 1, F: 0 },
+      { A: 0, B: 1, C: 0, D: 0, F: 1 }, // m4
+      { A: 0, B: 1, C: 0, D: 1, F: 1 }, // m5
+      { A: 0, B: 1, C: 1, D: 0, F: 0 },
+      { A: 0, B: 1, C: 1, D: 1, F: 0 },
+      { A: 1, B: 0, C: 0, D: 0, F: 0 },
+      { A: 1, B: 0, C: 0, D: 1, F: 0 },
+      { A: 1, B: 0, C: 1, D: 0, F: 1 }, // d10 treated as 1
+      { A: 1, B: 0, C: 1, D: 1, F: 1 }, // d11 treated as 1
+      { A: 1, B: 1, C: 0, D: 0, F: 0 },
+      { A: 1, B: 1, C: 0, D: 1, F: 0 },
+      { A: 1, B: 1, C: 1, D: 0, F: 1 }, // d14 treated as 1
+      { A: 1, B: 1, C: 1, D: 1, F: 1 }, // d15 treated as 1
+    ],
+    equations: ["F = A'C' + AC"],
+    hint: "1-cells 0,1,4,5 all have A=0,C=0 → group of 4 gives A'C'. Don't-care cells 10,11,14,15 all have A=1,C=1 → use them to form group of 4 giving AC. Combined: F = A'C' + AC.",
+    inputs: ["A", "B", "C", "D"],
+    outputs: ["F"],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 25 — Number Systems: Binary to Decimal Conversion
+  // Given 8-bit binary number, find decimal value
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 25,
+    title: "Binary-to-Decimal Conversion",
+    difficulty: "Easy",
+    tags: ["Number Systems", "Binary", "Conversion"],
+    description:
+      "Convert the 8-bit unsigned binary number 10110101 to its decimal equivalent. " +
+      "Each bit position has a positional weight that is a power of 2.",
+    truthTable: [
+      { "Bit Position": 7, "Bit Value": 1, "Weight (2^n)": 128, "Contribution": 128 },
+      { "Bit Position": 6, "Bit Value": 0, "Weight (2^n)": 64,  "Contribution": 0   },
+      { "Bit Position": 5, "Bit Value": 1, "Weight (2^n)": 32,  "Contribution": 32  },
+      { "Bit Position": 4, "Bit Value": 1, "Weight (2^n)": 16,  "Contribution": 16  },
+      { "Bit Position": 3, "Bit Value": 0, "Weight (2^n)": 8,   "Contribution": 0   },
+      { "Bit Position": 2, "Bit Value": 1, "Weight (2^n)": 4,   "Contribution": 4   },
+      { "Bit Position": 1, "Bit Value": 0, "Weight (2^n)": 2,   "Contribution": 0   },
+      { "Bit Position": 0, "Bit Value": 1, "Weight (2^n)": 1,   "Contribution": 1   },
+    ],
+    equations: [
+      "10110101₂ = 1×2⁷ + 0×2⁶ + 1×2⁵ + 1×2⁴ + 0×2³ + 1×2² + 0×2¹ + 1×2⁰",
+      "= 128 + 32 + 16 + 4 + 1 = 181₁₀",
+    ],
+    hint: "Multiply each bit by its positional weight (2^position, counting from right starting at 0) and sum all contributions.",
+    inputs: ["Binary Number"],
+    outputs: ["Decimal Value"],
+    isSynthetic: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 26 — Number Systems: 2's Complement Negation
+  // Inputs: 4-bit signed number  |  Outputs: 2's complement negation
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 26,
+    title: "2's Complement Negation",
+    difficulty: "Easy",
+    tags: ["Number Systems", "2's Complement", "Signed Arithmetic"],
+    description:
+      "Find the 2's complement representation of −6 using a 4-bit signed system. " +
+      "Start from +6 (0110), invert all bits (1's complement), then add 1.",
+    truthTable: [
+      { Step: "Original +6",          "Binary": "0110", Note: "Positive 6 in 4-bit" },
+      { Step: "Invert bits (1's comp)","Binary": "1001", Note: "Flip every bit"       },
+      { Step: "Add 1",                 "Binary": "1010", Note: "1001 + 0001 = 1010"   },
+    ],
+    equations: [
+      "+6  = 0110₂",
+      "1's complement = 1001₂",
+      "2's complement (−6) = 1010₂",
+      "Verify: 1010₂ = −8 + 2 = −6 ✓",
+    ],
+    hint: "Two steps: (1) invert every bit, (2) add 1 to the result. The MSB=1 confirms a negative value in signed representation.",
+    inputs: ["4-bit Signed Number"],
+    outputs: ["2's Complement"],
+    isSynthetic: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 27 — Number Systems: Hex to Binary Conversion
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 27,
+    title: "Hexadecimal to Binary Conversion",
+    difficulty: "Easy",
+    tags: ["Number Systems", "Hexadecimal", "Binary", "Conversion"],
+    description:
+      "Convert the hexadecimal number 3F to its 8-bit binary equivalent. " +
+      "Each hex digit maps directly to a 4-bit nibble.",
+    truthTable: [
+      { "Hex Digit": "3", "Decimal": 3,  "4-bit Binary": "0011" },
+      { "Hex Digit": "F", "Decimal": 15, "4-bit Binary": "1111" },
+    ],
+    equations: [
+      "3₁₆ = 0011₂",
+      "F₁₆ = 1111₂",
+      "3F₁₆ = 0011 1111₂ = 63₁₀",
+    ],
+    hint: "Split the hex number into individual digits, then convert each digit to its 4-bit binary value. Concatenate the nibbles left-to-right.",
+    inputs: ["Hex Number"],
+    outputs: ["Binary Number"],
+    isSynthetic: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 28 — Number Systems: BCD Encoding
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 28,
+    title: "BCD (8421) Encoding",
+    difficulty: "Easy",
+    tags: ["Number Systems", "BCD", "Conversion"],
+    description:
+      "Encode the decimal number 93 in BCD (Binary Coded Decimal) format. " +
+      "Each decimal digit is independently converted to its 4-bit binary representation.",
+    truthTable: [
+      { "Decimal Digit": "9", "BCD (8421)": "1001", "Weight Breakdown": "8+1" },
+      { "Decimal Digit": "3", "BCD (8421)": "0011", "Weight Breakdown": "2+1" },
+    ],
+    equations: [
+      "9₁₀ = 1001 (BCD)",
+      "3₁₀ = 0011 (BCD)",
+      "93₁₀ = 1001 0011 (BCD)",
+    ],
+    hint: "BCD stores each decimal digit separately as a 4-bit code (0000 to 1001). Codes 1010–1111 are invalid in BCD. Encode digit by digit.",
+    inputs: ["Decimal Number"],
+    outputs: ["BCD Code"],
+    isSynthetic: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 29 — Number Systems: Octal Arithmetic
+  // Add two octal numbers: 37₈ + 54₈
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 29,
+    title: "Octal Addition",
+    difficulty: "Medium",
+    tags: ["Number Systems", "Octal", "Arithmetic"],
+    description:
+      "Add the two octal numbers 37₈ + 54₈. Work column by column from right to left " +
+      "using base-8 arithmetic, carrying 1 whenever the column sum reaches 8.",
+    truthTable: [
+      { Column: "Units",  "Digit A": 7, "Digit B": 4, Sum: 11, "Octal Carry": 1, "Octal Digit": 3 },
+      { Column: "Eights", "Digit A": 3, "Digit B": 5, Sum: 9,  "Octal Carry": 1, "Octal Digit": 1 },
+      { Column: "Carry",  "Digit A": 0, "Digit B": 0, Sum: 1,  "Octal Carry": 0, "Octal Digit": 1 },
+    ],
+    equations: [
+      "Units:  7 + 4 = 11₁₀ = 1×8 + 3 → write 3, carry 1",
+      "Eights: 3 + 5 + 1(carry) = 9₁₀ = 1×8 + 1 → write 1, carry 1",
+      "Result: 37₈ + 54₈ = 113₈ = 75₁₀",
+    ],
+    hint: "Octal uses digits 0–7. When a column sum ≥ 8, subtract 8 to get the result digit and carry 1 to the next column.",
+    inputs: ["Octal A", "Octal B"],
+    outputs: ["Octal Sum"],
+    isSynthetic: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Problem 30 — Number Systems: Signed 4-bit Overflow Detection
+  // Detect when signed 4-bit addition overflows
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 30,
+    title: "Signed Overflow Detection",
+    difficulty: "Medium",
+    tags: ["Number Systems", "Signed Arithmetic", "Overflow", "2's Complement"],
+    description:
+      "Determine whether each of the following 4-bit signed additions overflows. " +
+      "Overflow in 2's complement occurs when the carry into the MSB ≠ carry out of the MSB.",
+    truthTable: [
+      { "Operand A": "0111 (+7)", "Operand B": "0001 (+1)", "Raw Sum": "1000",  "Interpreted": "-8", "Overflow": "Yes" },
+      { "Operand A": "0100 (+4)", "Operand B": "0011 (+3)", "Raw Sum": "0111",  "Interpreted": "+7", "Overflow": "No"  },
+      { "Operand A": "1001 (-7)", "Operand B": "1110 (-2)", "Raw Sum": "10111", "Interpreted": "+7 (truncated)", "Overflow": "Yes" },
+      { "Operand A": "1010 (-6)", "Operand B": "1011 (-5)", "Raw Sum": "10101", "Interpreted": "+5 (truncated)", "Overflow": "Yes" },
+    ],
+    equations: [
+      "Overflow if: Carry_in(MSB) ⊕ Carry_out(MSB) = 1",
+      "Equivalently: both positive inputs give negative result, or both negative give positive",
+    ],
+    hint: "Check MSB carry-in vs carry-out: if they differ, overflow occurred. For two positives summing to a negative (or two negatives summing to a positive) — that is always an overflow.",
+    inputs: ["4-bit A", "4-bit B"],
+    outputs: ["Sum", "Overflow"],
+    isSynthetic: true,
+  },
 ];
 
 export default problemsData;

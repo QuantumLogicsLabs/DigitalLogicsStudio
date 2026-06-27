@@ -11,8 +11,8 @@ export default function useLearningProgress({
   // Stabilize catalog with a deep-equality ref so a new array reference
   // from the parent (e.g. filtered topics) doesn't trigger effects on every render.
   const catalogRef = useRef(null);
-  const topicsKey = topics.map((t) => t.id).join(",");
-  const problemsKey = problems.map((p) => p.id ?? p).join(",");
+  const topicsKey = (topics || []).map((t) => t?.id || "").join(",");
+  const problemsKey = (problems || []).map((p) => p?.id ?? p ?? "").join(",");
 
   if (
     catalogRef.current === null ||

@@ -487,3 +487,30 @@ body:has(.boolforge-page) {
   height: 100% !important;
   min-height: 0 !important;
 }
+
+/* ── Multi-selection & Drag Selection Box ── */
+.selection-rectangle {
+  position: absolute;
+  border: 1.5px dashed var(--accent-secondary, #00d4ff);
+  background: rgba(0, 212, 255, 0.12);
+  pointer-events: none;
+  z-index: 5000;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.15);
+}
+
+/* Premium Selected Gate glow and border styling */
+.gate.selected,
+.gate--ic.selected {
+  border-color: var(--accent-secondary, #00d4ff) !important;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.6), inset 0 0 8px rgba(0, 212, 255, 0.25) !important;
+  transform: translateY(-2px) scale(1.02);
+  z-index: 20 !important;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease !important;
+}
+
+[data-theme="light"] .gate.selected,
+[data-theme="light"] .gate--ic.selected {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 20px rgba(2, 132, 199, 0.4), inset 0 0 8px rgba(2, 132, 199, 0.15) !important;
+}

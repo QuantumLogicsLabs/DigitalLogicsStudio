@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { gateSymbols, IC_META, IC_TYPES } from "../data/gates";
 import { TruthTableGenerator } from "../components/TruthTable";
@@ -78,9 +79,10 @@ const Boolforge = ({
   const [gates, setGates] = useState([]);
   const [wires, setWires] = useState([]);
   const [selectedGate, setSelectedGate] = useState(null);
+  const [selectedGateIds, setSelectedGateIds] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 }); // eslint-disable-line no-unused-vars
   const [gateIdCounter, setGateIdCounter] = useState(0);
   const [wireIdCounter, setWireIdCounter] = useState(0);
   const [inputCounter, setInputCounter] = useState(0);
@@ -93,6 +95,20 @@ const Boolforge = ({
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [renamingGate, setRenamingGate] = useState(null); // { id, currentLabel }
   const [renameValue, setRenameValue] = useState("");
+
+  // Multi-Selection and group dragging state/refs
+  const [dragStartPositions, setDragStartPositions] = useState({});
+  const [dragStartMouse, setDragStartMouse] = useState({ x: 0, y: 0 });
+  const [spacePressed, setSpacePressed] = useState(false);
+  const [selectionToolActive, setSelectionToolActive] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 });
+  const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
+  const [selectionStartIds, setSelectionStartIds] = useState([]);
+
+  const hasMovedRef = useRef(false);
+  const wasCtrlClickRef = useRef(false);
+  const copiedDataRef = useRef(null);
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -133,19 +149,44 @@ const Boolforge = ({
 
   // ── Gate deletion ──────────────────────────────────────────────────────────
   const deleteGate = useCallback(
-    (gate) => {
-      setGates((prev) => prev.filter((g) => g.id !== gate.id));
-      setWires((prev) =>
-        prev.filter((w) => w.fromId !== gate.id && w.toId !== gate.id),
+    (gateOrId = null) => {
+      let targets = [];
+      if (gateOrId) {
+        const id = typeof gateOrId === "object" ? gateOrId.id : gateOrId;
+        targets = selectedGateIds.includes(id) ? selectedGateIds : [id];
+      } else {
+        targets = selectedGateIds;
+      }
+      
+      if (targets.length === 0) return;
+
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete the ${targets.length} selected component(s)?`
       );
-      if (gate.type === "INPUT")
-        setInputCounter((prev) => Math.max(0, prev - 1));
-      if (gate.type === "OUTPUT")
-        setOutputCounter((prev) => Math.max(0, prev - 1));
+      if (!confirmDelete) return;
+
+      setGates((prev) => prev.filter((g) => !targets.includes(g.id)));
+      setWires((prev) =>
+        prev.filter((w) => !targets.includes(w.fromId) && !targets.includes(w.toId)),
+      );
+
+      let inputDec = 0;
+      let outputDec = 0;
+      gates.forEach((g) => {
+        if (targets.includes(g.id)) {
+          if (g.type === "INPUT") inputDec++;
+          if (g.type === "OUTPUT") outputDec++;
+        }
+      });
+
+      if (inputDec > 0) setInputCounter((prev) => Math.max(0, prev - inputDec));
+      if (outputDec > 0) setOutputCounter((prev) => Math.max(0, prev - outputDec));
+
+      setSelectedGateIds((prev) => prev.filter((id) => !targets.includes(id)));
       setSelectedGate(null);
       saveToHistory();
     },
-    [setGates, setWires, setSelectedGate, saveToHistory],
+    [selectedGateIds, gates, saveToHistory],
   );
 
   // ── Snap to grid ──────────────────────────────────────────────────────────
@@ -473,27 +514,187 @@ const Boolforge = ({
     }
   }, [history, historyIndex]);
 
+  // ── Spacebar key listeners for panning ─────────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") {
+        return;
+      }
+      if (e.key === " ") {
+        setSpacePressed(true);
+      }
+    };
+    const handleKeyUp = (e) => {
+      if (e.key === " ") {
+        setSpacePressed(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  // ── Copy/Paste and Duplicate helpers ───────────────────────────────────────
+  const copySelectedGates = useCallback(() => {
+    if (selectedGateIds.length === 0) return;
+    const selectedGatesList = gates.filter((g) => selectedGateIds.includes(g.id));
+    const selectedWiresList = wires.filter(
+      (w) => selectedGateIds.includes(w.fromId) && selectedGateIds.includes(w.toId)
+    );
+    copiedDataRef.current = {
+      gates: JSON.parse(JSON.stringify(selectedGatesList)),
+      wires: JSON.parse(JSON.stringify(selectedWiresList)),
+    };
+  }, [selectedGateIds, gates, wires]);
+
+  const pasteGates = useCallback(() => {
+    if (!copiedDataRef.current) return;
+    const { gates: copiedGates, wires: copiedWires } = copiedDataRef.current;
+    if (copiedGates.length === 0) return;
+
+    const idMap = {};
+    let currentGateId = gateIdCounter;
+    let currentWireId = wireIdCounter;
+    let newInputCounter = inputCounter;
+    let newOutputCounter = outputCounter;
+
+    const pastedGates = copiedGates.map((g) => {
+      const newId = currentGateId++;
+      idMap[g.id] = newId;
+
+      let newLabel = g.label;
+      if (g.type === "INPUT") {
+        newLabel = generateInputLabel(newInputCounter++);
+      } else if (g.type === "OUTPUT") {
+        newLabel = generateOutputLabel(newOutputCounter++);
+      }
+
+      return {
+        ...g,
+        id: newId,
+        label: newLabel,
+        x: g.x + 40,
+        y: g.y + 40,
+        inputValues: g.type === "INPUT" ? [false] : [],
+      };
+    });
+
+    const pastedWires = copiedWires.map((w) => ({
+      ...w,
+      id: currentWireId++,
+      fromId: idMap[w.fromId],
+      toId: idMap[w.toId],
+    }));
+
+    setGates((prev) => [...prev, ...pastedGates]);
+    setWires((prev) => [...prev, ...pastedWires]);
+    setGateIdCounter(currentGateId);
+    setWireIdCounter(currentWireId);
+    setInputCounter(newInputCounter);
+    setOutputCounter(newOutputCounter);
+
+    const pastedIds = pastedGates.map((g) => g.id);
+    setSelectedGateIds(pastedIds);
+    saveToHistory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gates, wires, gateIdCounter, wireIdCounter, inputCounter, outputCounter, saveToHistory]);
+
+  const duplicateSelectedGates = useCallback(() => {
+    if (selectedGateIds.length === 0) return;
+    const selectedGatesList = gates.filter((g) => selectedGateIds.includes(g.id));
+    const selectedWiresList = wires.filter(
+      (w) => selectedGateIds.includes(w.fromId) && selectedGateIds.includes(w.toId)
+    );
+
+    const idMap = {};
+    let currentGateId = gateIdCounter;
+    let currentWireId = wireIdCounter;
+    let newInputCounter = inputCounter;
+    let newOutputCounter = outputCounter;
+
+    const duplicatedGates = selectedGatesList.map((g) => {
+      const newId = currentGateId++;
+      idMap[g.id] = newId;
+
+      let newLabel = g.label;
+      if (g.type === "INPUT") {
+        newLabel = generateInputLabel(newInputCounter++);
+      } else if (g.type === "OUTPUT") {
+        newLabel = generateOutputLabel(newOutputCounter++);
+      }
+
+      return {
+        ...g,
+        id: newId,
+        label: newLabel,
+        x: g.x + 40,
+        y: g.y + 40,
+        inputValues: g.type === "INPUT" ? [false] : [],
+      };
+    });
+
+    const duplicatedWires = selectedWiresList.map((w) => ({
+      ...w,
+      id: currentWireId++,
+      fromId: idMap[w.fromId],
+      toId: idMap[w.toId],
+    }));
+
+    setGates((prev) => [...prev, ...duplicatedGates]);
+    setWires((prev) => [...prev, ...duplicatedWires]);
+    setGateIdCounter(currentGateId);
+    setWireIdCounter(currentWireId);
+    setInputCounter(newInputCounter);
+    setOutputCounter(newOutputCounter);
+
+    const duplicatedIds = duplicatedGates.map((g) => g.id);
+    setSelectedGateIds(duplicatedIds);
+    saveToHistory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGateIds, gates, wires, gateIdCounter, wireIdCounter, inputCounter, outputCounter, saveToHistory]);
+
   // ── Keyboard shortcuts ─────────────────────────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") {
+        return;
+      }
+
       if (e.ctrlKey && e.shiftKey && e.key === "Z") {
         e.preventDefault();
         redo();
       } else if (e.ctrlKey && e.key === "z") {
         e.preventDefault();
         undo();
+      } else if (e.ctrlKey && e.key === "a") {
+        e.preventDefault();
+        setSelectedGateIds(gates.map((g) => g.id));
+      } else if (e.ctrlKey && e.key === "c") {
+        e.preventDefault();
+        copySelectedGates();
+      } else if (e.ctrlKey && e.key === "v") {
+        e.preventDefault();
+        pasteGates();
+      } else if (e.ctrlKey && e.key === "d") {
+        e.preventDefault();
+        duplicateSelectedGates();
       } else if (
         (e.key === "Delete" || e.key === "Backspace") &&
-        selectedGate
+        selectedGateIds.length > 0
       ) {
-        deleteGate(selectedGate);
+        e.preventDefault();
+        deleteGate();
       } else if (e.key === "Escape") {
         setConnectingFrom(null);
+        setSelectedGateIds([]);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo, selectedGate, deleteGate]);
+  }, [undo, redo, gates, selectedGateIds, deleteGate, copySelectedGates, pasteGates, duplicateSelectedGates]);
 
   // ── Zoom with mouse wheel ──────────────────────────────────────────────────
   useEffect(() => {
@@ -517,19 +718,80 @@ const Boolforge = ({
     return () => container.removeEventListener("wheel", handleWheel);
   }, [zoom, panOffset]);
 
-  // ── Pan with canvas drag ───────────────────────────────────────────────────
+  // ── Pan and Drag Selection with canvas drag ────────────────────────────────
   const handleCanvasMouseDown = (e) => {
     if (e.target === canvasRef.current) {
       e.preventDefault();
-      setIsPanning(true);
-      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const startX = (e.clientX - rect.left - panOffset.x) / zoom;
+      const startY = (e.clientY - rect.top - panOffset.y) / zoom;
+      
+      const isCtrl = e.ctrlKey || e.metaKey;
+      const isShift = e.shiftKey;
+      const isMiddleClick = e.button === 1;
+      
+      // Middle click, Space held, or Shift always pans
+      if (spacePressed || isMiddleClick) {
+        setIsPanning(true);
+        setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+      } else if (e.button === 0) {
+        // When selection tool is OFF (default): left-drag pans the canvas
+        // When selection tool is ON or Shift held: left-drag draws a selection rectangle
+        if (!selectionToolActive && !isShift) {
+          setIsPanning(true);
+          setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+        } else {
+          // Selection mode: box-select
+          setIsSelecting(true);
+          setSelectionStart({ x: startX, y: startY });
+          setSelectionEnd({ x: startX, y: startY });
+          setSelectionStartIds(isCtrl ? selectedGateIds : []);
+          
+          if (!isCtrl) {
+            setSelectedGateIds([]);
+            setSelectedGate(null);
+          }
+        }
+      }
     }
   };
+  
   const handleMouseMove = (e) => {
-    if (isPanning)
+    if (isPanning) {
       setPanOffset({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
+    } else if (isSelecting) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const currentX = (e.clientX - rect.left - panOffset.x) / zoom;
+      const currentY = (e.clientY - rect.top - panOffset.y) / zoom;
+      setSelectionEnd({ x: currentX, y: currentY });
+      
+      const left = Math.min(selectionStart.x, currentX);
+      const top = Math.min(selectionStart.y, currentY);
+      const width = Math.abs(selectionStart.x - currentX);
+      const height = Math.abs(selectionStart.y - currentY);
+      
+      const box = { x1: left, y1: top, x2: left + width, y2: top + height };
+      
+      const intersectingIds = gates.filter((g) => {
+        const gH = IC_TYPES.has(g.type) ? getICHeight(g.type) : 100;
+        const gateBox = { x1: g.x, y1: g.y, x2: g.x + 120, y2: g.y + gH };
+        return gateBox.x1 < box.x2 && gateBox.x2 > box.x1 && gateBox.y1 < box.y2 && gateBox.y2 > box.y1;
+      }).map((g) => g.id);
+      
+      const isCtrl = e.ctrlKey || e.metaKey;
+      if (isCtrl) {
+        setSelectedGateIds(Array.from(new Set([...selectionStartIds, ...intersectingIds])));
+      } else {
+        setSelectedGateIds(intersectingIds);
+      }
+    }
   };
-  const handleMouseUp = () => setIsPanning(false);
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+    setIsSelecting(false);
+  };
 
   // ── Touch support: pan canvas and drag gates ───────────────────────────────
   const touchStateRef = useRef({ type: null, id: null, startX: 0, startY: 0 });
@@ -547,6 +809,27 @@ const Boolforge = ({
       const gate = gates.find((g) => g.id === gateId);
       if (gate) {
         e.preventDefault();
+        
+        let nextSelection = [...selectedGateIds];
+        if (!selectedGateIds.includes(gate.id)) {
+          nextSelection = [gate.id];
+        }
+        setSelectedGateIds(nextSelection);
+        setSelectedGate(gate);
+
+        const startDragPositions = {};
+        gates.forEach((g) => {
+          if (nextSelection.includes(g.id)) {
+            startDragPositions[g.id] = { x: g.x, y: g.y };
+          }
+        });
+        setDragStartPositions(startDragPositions);
+
+        const rect = containerRef.current.getBoundingClientRect();
+        const mouseX = (touch.clientX - rect.left - panOffset.x) / zoom;
+        const mouseY = (touch.clientY - rect.top - panOffset.y) / zoom;
+        setDragStartMouse({ x: mouseX, y: mouseY });
+
         touchStateRef.current = {
           type: "drag",
           id: gateId,
@@ -554,7 +837,6 @@ const Boolforge = ({
           startY: touch.clientY,
         };
         setDragging(true);
-        setSelectedGate(gate);
         setDragOffset({
           x: touch.clientX - gate.x * zoom - panOffset.x,
           y: touch.clientY - gate.y * zoom - panOffset.y,
@@ -570,7 +852,7 @@ const Boolforge = ({
       setIsPanning(true);
       setPanStart({ x: touch.clientX - panOffset.x, y: touch.clientY - panOffset.y });
     }
-  }, [gates, zoom, panOffset]);
+  }, [gates, zoom, panOffset, selectedGateIds]);
 
   const handleTouchMove = useCallback((e) => {
     if (e.touches.length !== 1) return;
@@ -582,13 +864,27 @@ const Boolforge = ({
       setPanOffset({ x: touch.clientX - panStart.x, y: touch.clientY - panStart.y });
     } else if (state.type === "drag") {
       e.preventDefault();
-      const x = snapToGrid((touch.clientX - dragOffset.x - panOffset.x) / zoom);
-      const y = snapToGrid((touch.clientY - dragOffset.y - panOffset.y) / zoom);
+      const rect = containerRef.current.getBoundingClientRect();
+      const mouseX = (touch.clientX - rect.left - panOffset.x) / zoom;
+      const mouseY = (touch.clientY - rect.top - panOffset.y) / zoom;
+      const dx = mouseX - dragStartMouse.x;
+      const dy = mouseY - dragStartMouse.y;
+      
       setGates((prev) =>
-        prev.map((g) => (g.id === state.id ? { ...g, x, y } : g)),
+        prev.map((g) => {
+          if (selectedGateIds.includes(g.id)) {
+            const startPos = dragStartPositions[g.id];
+            if (startPos) {
+              const targetX = snapToGrid(startPos.x + dx);
+              const targetY = snapToGrid(startPos.y + dy);
+              return { ...g, x: targetX, y: targetY };
+            }
+          }
+          return g;
+        }),
       );
     }
-  }, [panStart, dragOffset, zoom, panOffset, snapToGrid]);
+  }, [panStart, zoom, panOffset, snapToGrid, selectedGateIds, dragStartMouse, dragStartPositions]);
 
   const handleTouchEnd = useCallback(() => {
     const state = touchStateRef.current;
@@ -735,24 +1031,86 @@ const Boolforge = ({
     if (e.button !== 0) return;
     e.stopPropagation();
     setIsPanning(false);
-    setDragging(true);
+
+    const isCtrl = e.ctrlKey || e.metaKey;
+    let nextSelection = [...selectedGateIds];
+    
+    if (isCtrl) {
+      if (selectedGateIds.includes(gate.id)) {
+        nextSelection = nextSelection.filter(id => id !== gate.id);
+      } else {
+        nextSelection.push(gate.id);
+      }
+    } else {
+      if (!selectedGateIds.includes(gate.id)) {
+        nextSelection = [gate.id];
+      }
+    }
+    
+    setSelectedGateIds(nextSelection);
     setSelectedGate(gate);
+    wasCtrlClickRef.current = isCtrl;
+    hasMovedRef.current = false;
+
+    const startDragPositions = {};
+    gates.forEach((g) => {
+      if (nextSelection.includes(g.id)) {
+        startDragPositions[g.id] = { x: g.x, y: g.y };
+      }
+    });
+    setDragStartPositions(startDragPositions);
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left - panOffset.x) / zoom;
+    const mouseY = (e.clientY - rect.top - panOffset.y) / zoom;
+    setDragStartMouse({ x: mouseX, y: mouseY });
+
+    setDragging(true);
     setDragOffset({
       x: e.clientX - gate.x * zoom - panOffset.x,
       y: e.clientY - gate.y * zoom - panOffset.y,
     });
   };
+
   const onDrag = (e) => {
-    if (!dragging || !selectedGate || isPanning) return;
-    const x = snapToGrid((e.clientX - dragOffset.x - panOffset.x) / zoom);
-    const y = snapToGrid((e.clientY - dragOffset.y - panOffset.y) / zoom);
+    if (!dragging || selectedGateIds.length === 0 || isPanning) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left - panOffset.x) / zoom;
+    const mouseY = (e.clientY - rect.top - panOffset.y) / zoom;
+    
+    const dx = mouseX - dragStartMouse.x;
+    const dy = mouseY - dragStartMouse.y;
+
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+      hasMovedRef.current = true;
+    }
+
     setGates((prev) =>
-      prev.map((g) => (g.id === selectedGate.id ? { ...g, x, y } : g)),
+      prev.map((g) => {
+        if (selectedGateIds.includes(g.id)) {
+          const startPos = dragStartPositions[g.id];
+          if (startPos) {
+            const targetX = snapToGrid(startPos.x + dx);
+            const targetY = snapToGrid(startPos.y + dy);
+            return { ...g, x: targetX, y: targetY };
+          }
+        }
+        return g;
+      })
     );
   };
+
   const stopDrag = () => {
     if (dragging) {
       setDragging(false);
+      
+      if (!hasMovedRef.current && selectedGate) {
+        if (!wasCtrlClickRef.current) {
+          setSelectedGateIds([selectedGate.id]);
+        }
+      }
+      
       saveToHistory();
     }
   };
@@ -1069,7 +1427,11 @@ const Boolforge = ({
     <div
       className="container circuit-maker"
       onMouseMove={(e) => {
-        isPanning ? handleMouseMove(e) : onDrag(e);
+        if (isPanning || isSelecting) {
+          handleMouseMove(e);
+        } else {
+          onDrag(e);
+        }
       }}
       onMouseUp={() => {
         stopDrag();
@@ -1093,6 +1455,34 @@ const Boolforge = ({
       {/* ── Sidebar ── */}
       <div className="sidebar">
         <h2>Circuit Forge</h2>
+
+        {/* ── Selection Tool Toggle ── */}
+        <button
+          onClick={() => setSelectionToolActive((v) => !v)}
+          title={selectionToolActive ? "Selection Tool ON — click to switch to Pan mode" : "Selection Tool OFF — click to enable box-select"}
+          style={{
+            width: "100%",
+            padding: "10px 14px",
+            marginBottom: "16px",
+            background: selectionToolActive ? "var(--accent-primary, #00ff88)" : "transparent",
+            color: selectionToolActive ? "var(--bg-dark, #0a0e1a)" : "var(--accent-primary, #00ff88)",
+            border: "2px solid var(--accent-primary, #00ff88)",
+            borderRadius: "4px",
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: "12px",
+            fontWeight: "700",
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <span style={{ fontSize: "16px" }}>{selectionToolActive ? "✦" : "⬚"}</span>
+          {selectionToolActive ? "Selection ON" : "Selection OFF"}
+        </button>
 
         {simplifiedExpression && (
           <div className="simplified-expression-display">
@@ -1173,18 +1563,23 @@ const Boolforge = ({
         <div className="instructions">
           <p><strong>Controls:</strong></p>
           <p>• Click buttons to add components</p>
-          <p>• Drag gates to move them</p>
-          <p>• Drag canvas background to pan</p>
+          <p>• Drag gates to move them (Group Drag supported!)</p>
+          <p>• <strong>Drag empty space</strong> to pan the canvas (default)</p>
+          <p>• Enable <strong>⬚ Selection Tool</strong> (top-left overlay) to box-select components</p>
+          <p>• Hold <strong>Space</strong> or drag with <strong>Middle Button</strong> to pan anytime</p>
+          <p>• Ctrl + Click to add/remove individual gates</p>
           <p>• Click output dot → input dot to wire</p>
-          <p>• ICs: click a numbered output dot</p>
           <p>• Right-click wire to delete it</p>
-          <p>• Right-click gate to delete</p>
+          <p>• Right-click gate to delete (deletes selection)</p>
           <p>• Double-click gate to rename it</p>
           <p>• Scroll to zoom in/out</p>
-          <p>• Click <strong>+</strong> / <strong>−</strong> to resize gate inputs</p>
+          <p>• Click <strong>+</strong> / <strong>−</strong> to resize inputs</p>
           <p><strong>Shortcuts:</strong></p>
-          <p>• Ctrl+Z: Undo &nbsp; Ctrl+Shift+Z: Redo</p>
-          <p>• Delete: Remove selected &nbsp; Esc: Cancel wire</p>
+          <p>• Ctrl + Z: Undo &nbsp; Ctrl + Shift + Z: Redo</p>
+          <p>• Ctrl + A: Select All &nbsp; Ctrl + D: Duplicate</p>
+          <p>• Ctrl + C: Copy &nbsp; Ctrl + V: Paste</p>
+          <p>• Delete / Backspace: Remove selected</p>
+          <p>• Esc: Cancel wire / Clear selection</p>
         </div>
       </div>
 
@@ -1206,7 +1601,7 @@ const Boolforge = ({
           }}
           style={{
             pointerEvents: "auto",
-            cursor: isPanning ? "grabbing" : "grab",
+            cursor: isPanning ? "grabbing" : (spacePressed ? "grab" : (selectionToolActive ? "crosshair" : "grab")),
           }}
         />
 
@@ -1217,6 +1612,24 @@ const Boolforge = ({
             transformOrigin: "0 0",
           }}
         >
+          {isSelecting && (
+            <div
+              className="selection-rectangle"
+              style={{
+                position: "absolute",
+                left: Math.min(selectionStart.x, selectionEnd.x),
+                top: Math.min(selectionStart.y, selectionEnd.y),
+                width: Math.abs(selectionStart.x - selectionEnd.x),
+                height: Math.abs(selectionStart.y - selectionEnd.y),
+                border: "1.5px dashed var(--accent-secondary, #00d4ff)",
+                background: "rgba(0, 212, 255, 0.12)",
+                pointerEvents: "none",
+                zIndex: 1000,
+                borderRadius: "3px",
+                boxShadow: "0 0 8px rgba(0, 212, 255, 0.2)",
+              }}
+            />
+          )}
           {gates.map((gate) => {
             const canExpand = MULTI_INPUT_GATES.has(gate.type);
             const canAddInput = canExpand && gate.inputs < MAX_GATE_INPUTS;
@@ -1231,7 +1644,7 @@ const Boolforge = ({
               <div
                 key={gate.id}
                 data-gate-id={gate.id}
-                className={`gate ${gate.type === "OUTPUT" ? "output-gate" : ""} ${isIC ? "gate--ic" : ""} ${selectedGate?.id === gate.id ? "selected" : ""} ${gate.type === "OUTPUT" && evaluateGate(gate) ? "active" : ""}`}
+                className={`gate ${gate.type === "OUTPUT" ? "output-gate" : ""} ${isIC ? "gate--ic" : ""} ${selectedGateIds.includes(gate.id) ? "selected" : ""} ${gate.type === "OUTPUT" && evaluateGate(gate) ? "active" : ""}`}
                 style={{ left: gate.x, top: gate.y, height: isIC ? icH : undefined }}
                 onMouseDown={(e) => startDrag(e, gate)}
                 onTouchStart={(e) => {
@@ -1344,6 +1757,19 @@ const Boolforge = ({
 
         {/* ── Floating canvas controls overlay (mobile-friendly) ── */}
         <div className="canvas-overlay-controls">
+          <button
+            className={`canvas-overlay-btn${selectionToolActive ? " canvas-overlay-btn--active" : ""}`}
+            onClick={() => setSelectionToolActive((v) => !v)}
+            title={selectionToolActive ? "Selection Tool ON — click to switch to Pan mode" : "Selection Tool OFF — click to enable box-select"}
+            onTouchEnd={(e) => { e.preventDefault(); setSelectionToolActive((v) => !v); }}
+            style={{
+              background: selectionToolActive ? "var(--accent-primary, #7c3aed)" : undefined,
+              color: selectionToolActive ? "#fff" : undefined,
+              borderColor: selectionToolActive ? "var(--accent-primary, #7c3aed)" : undefined,
+            }}
+          >
+            ⬚
+          </button>
           <button
             className="canvas-overlay-btn"
             onClick={fitToView}
@@ -1667,3 +2093,5 @@ const Boolforge = ({
 };
 
 export default Boolforge;
+
+

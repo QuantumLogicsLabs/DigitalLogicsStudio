@@ -49,14 +49,52 @@ const leftNavSections = [
   {
     title: "Practice Arenas",
     items: [
-      { label: "Problems Library", icon: LibraryBig },
-      { label: "K-Map Arena", icon: Layers, topicSlug: "k-map", badge: "Core" },
       {
-        label: "Sequential Arena",
-        icon: Sparkles,
-        topicSlug: "sequential-circuits",
+        label: "Problems Library",
+        icon: LibraryBig,
+        panel: {
+          description: "All digital logic problems — combinational, sequential, arithmetic and more.",
+          links: [
+            { label: "All Problems", action: "navigate", value: "/problems" },
+            { label: "Easy problems", action: "filter", value: "Easy" },
+            { label: "Medium problems", action: "filter", value: "Medium" },
+            { label: "Hard problems", action: "filter", value: "Hard" },
+            { label: "Combinational", action: "topic", value: "Combinational Circuits" },
+            { label: "Sequential", action: "topic", value: "Sequential Circuits" },
+          ],
+        },
       },
-      { label: "Number Arena", icon: Binary, topicSlug: "number-systems" },
+      {
+        label: "K-Map Arena",
+        icon: Layers,
+        topicSlug: "k-map",
+        badge: "Core",
+        panel: {
+          description: "Karnaugh map simplification — SOP, POS, don't-cares, 2 to 4 variables.",
+          links: [
+            { label: "K-Map Problems", action: "navigate", value: "/problems/k-map" },
+            { label: "K-Map Simplifier Tool", action: "navigate", value: "/kmapgenerator" },
+            { label: "Minterms Tutorial", action: "navigate", value: "/boolean/minterms" },
+            { label: "Maxterms Tutorial", action: "navigate", value: "/boolean/maxterms" },
+            { label: "Boolean Laws", action: "navigate", value: "/boolean/laws" },
+          ],
+        },
+      },
+      {
+        label: "Number Arena",
+        icon: Binary,
+        topicSlug: "number-systems",
+        panel: {
+          description: "Binary, hex, BCD, 2's complement, signed arithmetic and base conversions.",
+          links: [
+            { label: "Number Problems", action: "navigate", value: "/problems/number-systems" },
+            { label: "Base Converter", action: "navigate", value: "/number-systems/number-conversion" },
+            { label: "Binary Visualizer", action: "navigate", value: "/number-systems/binary-representation" },
+            { label: "BCD Notation", action: "navigate", value: "/number-systems/bcd-notation" },
+            { label: "2's Complement", action: "navigate", value: "/arithmetic/complements" },
+          ],
+        },
+      },
     ],
   },
   {
@@ -201,37 +239,38 @@ const problemTopicLandingMap = {
     ],
   },
   "k-map": {
-    group: "Boolean Algebra",
+    group: "K-Map",
     title: "K-Map Problems",
     description:
-      "Train on Karnaugh map grouping, SOP/POS simplification, and expression minimization with guided K-map practice.",
+      "Train on Karnaugh map grouping, SOP/POS simplification, don't-care conditions, and expression minimization with guided K-map practice.",
     links: [
-      { to: "/kmapgenerator", label: "K-map simplifier online" },
+      { to: "/kmapgenerator", label: "K-Map simplifier tool" },
       { to: "/boolean/minterms", label: "Minterms tutorial" },
       { to: "/boolean/maxterms", label: "Maxterms tutorial" },
+      { to: "/boolean/laws", label: "Boolean laws reference" },
     ],
   },
   "number-systems": {
     group: "Number Systems",
     title: "Number System Problems",
     description:
-      "Practice number conversion, complements, signed representation, and binary arithmetic across common base systems.",
+      "Practice number conversion, 2's complement, signed representation, BCD, hexadecimal, and binary arithmetic across common base systems.",
     links: [
       { to: "/number-systems/calculator", label: "Number system calculator" },
-      {
-        to: "/number-systems/number-conversion",
-        label: "Base conversion tutorial",
-      },
+      { to: "/number-systems/number-conversion", label: "Base conversion tutorial" },
       { to: "/arithmetic/complements", label: "2's complement guide" },
+      { to: "/number-systems/bcd-notation", label: "BCD notation" },
     ],
   },
   "sequential-circuits": {
     group: "Sequential Circuits",
     title: "Sequential Circuit Problems",
     description:
-      "Revise latches, flip-flops, state tables, and sequence design with focused sequential-circuit practice.",
+      "Revise latches, flip-flops, state tables, SR/D/JK/T behavior, and sequence design with focused sequential-circuit practice.",
     links: [
       { to: "/sequential/intro", label: "Sequential circuits introduction" },
+      { to: "/sequential/latches", label: "Latches tutorial" },
+      { to: "/sequential/flip-flops", label: "Flip-flops tutorial" },
       { to: "/sequential/state-diagram", label: "State diagrams and tables" },
       { to: "/timing-diagrams", label: "Timing diagrams" },
     ],
@@ -423,6 +462,41 @@ function SelectedProblemCard({ problem, status, onAttempt, onToggleSolved }) {
   );
 }
 
+/* ── Static always-open section for non-arena sidebar groups ── */
+function SidebarAccordion({ section, activeItemLabel, onItemClick }) {
+  return (
+    <div className="sidebar-nav-section">
+      <h4 className="sidebar-section-title">{section.title}</h4>
+      <div className="sidebar-section-items">
+        {section.items.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeItemLabel === item.label;
+          return (
+            <button
+              key={item.label}
+              type="button"
+              className={`problems-sidebar-link ${isActive ? "is-active" : ""}`}
+              onClick={() => onItemClick(item)}
+            >
+              <span className="problems-sidebar-link-main">
+                <Icon size={15} />
+                <span>{item.label}</span>
+              </span>
+              {item.badge ? (
+                <span
+                  className={`problems-sidebar-link-badge badge-${item.badge.toLowerCase()}`}
+                >
+                  {item.badge}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function ProblemsPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
   const { topicSlug } = useParams();
@@ -437,7 +511,6 @@ export default function ProblemsPage() {
 
   const getActiveItem = () => {
     if (topicSlug === "k-map") return "K-Map Arena";
-    if (topicSlug === "sequential-circuits") return "Sequential Arena";
     if (topicSlug === "number-systems") return "Number Arena";
     if (!topicSlug) return "Problems Library";
     return "";
@@ -556,6 +629,7 @@ export default function ProblemsPage() {
     problemsCatalog[0]?.id,
   );
   const [activeProblem, setActiveProblem] = React.useState(null);
+  const [openArenaPanel, setOpenArenaPanel] = React.useState(null);
   const [month, setMonth] = React.useState(
     () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
@@ -642,13 +716,13 @@ export default function ProblemsPage() {
       const month = String(day.getMonth() + 1).padStart(2, "0");
       const date = String(day.getDate()).padStart(2, "0");
       const key = `${year}-${month}-${date}`;
-      const dayData = snapshot.state.activity[key];
+      const dayData = snapshot?.state?.activity?.[key];
       if (dayData && dayData.solved) {
         count += dayData.solved;
       }
     }
     return count;
-  }, [snapshot.state.activity]);
+  }, [snapshot?.state?.activity]);
 
   // Rotating quick reference formula cheat-sheet card
   const cheatSheetFormula = React.useMemo(() => {
@@ -693,7 +767,7 @@ export default function ProblemsPage() {
 
     const matches = problemsCatalog.filter((problem) => {
       const problemStatus =
-        snapshot.state.problems[problem.id]?.status || "not_started";
+        snapshot?.state?.problems?.[problem.id]?.status || "not_started";
       const matchesSearch =
         !normalizedSearch ||
         problem.title.toLowerCase().includes(normalizedSearch) ||
@@ -730,13 +804,13 @@ export default function ProblemsPage() {
       );
     });
 
-    return sortProblems(matches, sortBy, snapshot.state.problems);
+    return sortProblems(matches, sortBy, snapshot?.state?.problems || {});
   }, [
     activeGroup,
     deferredSearch,
     difficulty,
     sortBy,
-    snapshot.state.problems,
+    snapshot?.state?.problems,
     statusFilter,
     topicFilter,
   ]);
@@ -767,7 +841,7 @@ export default function ProblemsPage() {
   const topTopicProgress = coreTopics
     .map((topic) => ({
       topic,
-      progress: snapshot.state.topics[topic.id],
+      progress: snapshot?.state?.topics?.[topic.id],
     }))
     .sort(
       (left, right) =>
@@ -842,38 +916,99 @@ export default function ProblemsPage() {
             className="problems-sidebar-nav"
             aria-label="Problems navigation"
           >
-            {leftNavSections.map((section) => (
-              <div key={section.title} className="sidebar-nav-section">
-                <h4 className="sidebar-section-title">{section.title}</h4>
-                <div className="sidebar-section-items">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeItemLabel === item.label;
+            {/* ── Practice Arenas: always visible, with inline tab panels ── */}
+            <div className="sidebar-nav-section">
+              <h4 className="sidebar-section-title">Practice Arenas</h4>
+              <div className="sidebar-section-items">
+                {leftNavSections[0].items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeItemLabel === item.label;
+                  const isPanelOpen = openArenaPanel === item.label;
 
-                    return (
+                  return (
+                    <div key={item.label} className="arena-item-wrapper">
+                      {/* The main arena button — same original style */}
                       <button
-                        key={item.label}
                         type="button"
-                        className={`problems-sidebar-link ${isActive ? "is-active" : ""}`}
-                        onClick={() => handleSidebarClick(item)}
+                        className={`problems-sidebar-link ${isActive ? "is-active" : ""} ${isPanelOpen ? "panel-open" : ""}`}
+                        onClick={() => {
+                          setOpenArenaPanel(
+                            isPanelOpen ? null : item.label
+                          );
+                        }}
                       >
                         <span className="problems-sidebar-link-main">
                           <Icon size={16} />
                           <span>{item.label}</span>
                         </span>
-                        {item.badge ? (
+                        <span className="arena-item-right">
+                          {item.badge ? (
+                            <span
+                              className={`problems-sidebar-link-badge badge-${item.badge.toLowerCase()}`}
+                            >
+                              {item.badge}
+                            </span>
+                          ) : null}
                           <span
-                            className={`problems-sidebar-link-badge badge-${item.badge.toLowerCase()}`}
+                            className={`arena-panel-chevron ${isPanelOpen ? "rotated" : ""}`}
+                            aria-hidden="true"
                           >
-                            {item.badge}
+                            <ChevronRight size={12} />
                           </span>
-                        ) : null}
+                        </span>
                       </button>
-                    );
-                  })}
-                </div>
+
+                      {/* Inline sub-panel — slides open on click */}
+                      <div className={`arena-sub-panel ${isPanelOpen ? "is-open" : ""}`}>
+                        <div className="arena-sub-panel-inner">
+                          <p className="arena-sub-desc">
+                            {item.panel?.description}
+                          </p>
+                          <div className="arena-sub-links">
+                            {item.panel?.links.map((link) => (
+                              <button
+                                key={link.label}
+                                type="button"
+                                className="arena-sub-link"
+                                onClick={() => {
+                                  setOpenArenaPanel(null);
+                                  setIsMobileSidebarOpen(false);
+                                  if (link.action === "navigate") {
+                                    navigate(link.value);
+                                  } else if (link.action === "filter") {
+                                    navigate("/problems");
+                                    setDifficulty(link.value);
+                                  } else if (link.action === "topic") {
+                                    navigate("/problems");
+                                    setActiveGroup(link.value);
+                                    setTopicFilter(link.value);
+                                  }
+                                }}
+                              >
+                                <span className="arena-sub-link-dot" />
+                                {link.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
+
+            {/* ── All other sections as accordion tabs ── */}
+            <div className="sidebar-accordion">
+              {leftNavSections.slice(1).map((section) => (
+                <SidebarAccordion
+                  key={section.title}
+                  section={section}
+                  activeItemLabel={activeItemLabel}
+                  onItemClick={handleSidebarClick}
+                />
+              ))}
+            </div>
           </nav>
 
           <section className="problems-sidebar-foot">
@@ -982,21 +1117,59 @@ export default function ProblemsPage() {
 
           {topicLanding ? (
             <section
-              className="problems-widget"
+              className="problems-widget arena-landing-widget"
               aria-labelledby="topic-cluster-links"
             >
-              <div className="problems-widget-head">
-                <div>
-                  <span className="problems-widget-label">Topic Cluster</span>
-                  <h2 id="topic-cluster-links">Related Tutorials</h2>
+              <div className="arena-landing-header">
+                <div className="arena-landing-meta">
+                  <span className="problems-widget-label">Practice Arena</span>
+                  <h2 id="topic-cluster-links" className="arena-landing-title">
+                    {topicLanding.title}
+                  </h2>
+                  <p className="arena-landing-desc">{topicLanding.description}</p>
+                </div>
+                <div className="arena-landing-stats">
+                  <div className="arena-stat-pill">
+                    <strong>{filteredProblems.length}</strong>
+                    <span>Problems</span>
+                  </div>
+                  <div className="arena-stat-pill">
+                    <strong>
+                      {filteredProblems.filter(
+                        (p) => snapshot?.state?.problems?.[p.id]?.status === "solved"
+                      ).length}
+                    </strong>
+                    <span>Solved</span>
+                  </div>
+                  <div className="arena-stat-pill">
+                    <strong>
+                      {filteredProblems.filter((p) => p.difficulty === "Easy").length}
+                    </strong>
+                    <span>Easy</span>
+                  </div>
+                  <div className="arena-stat-pill">
+                    <strong>
+                      {filteredProblems.filter((p) => p.difficulty === "Medium").length}
+                    </strong>
+                    <span>Medium</span>
+                  </div>
+                  <div className="arena-stat-pill">
+                    <strong>
+                      {filteredProblems.filter((p) => p.difficulty === "Hard").length}
+                    </strong>
+                    <span>Hard</span>
+                  </div>
                 </div>
               </div>
-              <div className="selected-problem-tags">
-                {topicLanding.links.map((link) => (
-                  <Link key={link.to} to={link.to}>
-                    {link.label}
-                  </Link>
-                ))}
+              <div className="arena-landing-links-row">
+                <span className="arena-links-label">Related tutorials →</span>
+                <div className="selected-problem-tags">
+                  {topicLanding.links.map((link) => (
+                    <Link key={link.to} to={link.to} className="arena-tutorial-link">
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </section>
           ) : null}
@@ -1293,19 +1466,19 @@ export default function ProblemsPage() {
 
             <div className="stats-grid">
               <div>
-                <strong>{snapshot.summary.solvedProblems}</strong>
+                <strong>{snapshot?.summary?.solvedProblems ?? 0}</strong>
                 <span>Solved</span>
               </div>
               <div>
-                <strong>{snapshot.summary.attemptedProblems}</strong>
+                <strong>{snapshot?.summary?.attemptedProblems ?? 0}</strong>
                 <span>Attempted</span>
               </div>
               <div>
-                <strong>{snapshot.summary.completedTopics}</strong>
+                <strong>{snapshot?.summary?.completedTopics ?? 0}</strong>
                 <span>Topics complete</span>
               </div>
               <div>
-                <strong>{snapshot.summary.streaks.longest}</strong>
+                <strong>{snapshot?.summary?.streaks?.longest ?? 0}</strong>
                 <span>Best streak</span>
               </div>
             </div>
@@ -1321,7 +1494,7 @@ export default function ProblemsPage() {
             problem={selectedProblem}
             status={
               selectedProblem
-                ? snapshot.state.problems[selectedProblem.id]
+                ? snapshot?.state?.problems?.[selectedProblem.id]
                 : null
             }
             onAttempt={handleRecordAttempt}
@@ -1367,7 +1540,7 @@ export default function ProblemsPage() {
             </div>
 
             <div className="recent-activity-list">
-              {snapshot.recentEvents.length ? (
+               {(snapshot?.recentEvents || []).length ? (
                 snapshot.recentEvents.slice(0, 5).map((event) => {
                   const topic = event.topicId
                     ? topicLookup[event.topicId]

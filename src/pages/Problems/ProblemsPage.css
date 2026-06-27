@@ -2128,3 +2128,421 @@
   background: rgba(245, 158, 11, 0.16);
   border-color: #d97706;
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   Arena Landing Widget — shown when a topicSlug is active
+   ══════════════════════════════════════════════════════════════ */
+
+.arena-landing-widget {
+  padding: 1.25rem 1.4rem !important;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.08) 0%,
+    var(--problems-surface) 60%,
+    rgba(124, 58, 237, 0.06) 100%
+  ) !important;
+  border-color: rgba(96, 165, 250, 0.22) !important;
+}
+
+.arena-landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+
+.arena-landing-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.arena-landing-title {
+  margin: 0.45rem 0 0.55rem !important;
+  font-size: 1.3rem !important;
+  font-weight: 800;
+  color: var(--problems-text-strong) !important;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.arena-landing-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+/* ── Stats pills row ── */
+.arena-landing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.arena-stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.9rem;
+  background: var(--problems-surface-soft);
+  border: 1px solid var(--problems-border);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.arena-stat-pill:hover {
+  border-color: var(--problems-border-strong);
+  background: var(--problems-surface-strong);
+}
+
+.arena-stat-pill strong {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--problems-text-strong);
+  line-height: 1.1;
+}
+
+.arena-stat-pill span {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--secondary-text);
+  margin-top: 0.2rem;
+}
+
+/* ── Tutorial links row ── */
+.arena-landing-links-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--problems-border);
+}
+
+.arena-links-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--secondary-text);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.arena-tutorial-link {
+  display: inline-flex;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--problems-tag-bg);
+  border: 1px solid var(--problems-tag-border);
+  color: var(--problems-tag-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.arena-tutorial-link:hover {
+  background: rgba(96, 165, 250, 0.18);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #e0f2fe;
+}
+
+/* ── Light theme overrides ── */
+.problems-page.theme-light .arena-landing-widget {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.05) 0%,
+    #ffffff 60%,
+    rgba(124, 58, 237, 0.03) 100%
+  ) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.problems-page.theme-light .arena-landing-title {
+  color: #0f172a !important;
+}
+
+.problems-page.theme-light .arena-landing-desc {
+  color: #475569;
+}
+
+.problems-page.theme-light .arena-stat-pill {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.problems-page.theme-light .arena-stat-pill:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.problems-page.theme-light .arena-stat-pill strong {
+  color: #0f172a;
+}
+
+.problems-page.theme-light .arena-stat-pill span {
+  color: #64748b;
+}
+
+.problems-page.theme-light .arena-landing-links-row {
+  border-top-color: #e2e8f0;
+}
+
+.problems-page.theme-light .arena-links-label {
+  color: #64748b;
+}
+
+.problems-page.theme-light .arena-tutorial-link {
+  background: rgba(37, 99, 235, 0.07);
+  border-color: rgba(37, 99, 235, 0.18);
+  color: #1d4ed8;
+}
+
+.problems-page.theme-light .arena-tutorial-link:hover {
+  background: rgba(37, 99, 235, 0.14);
+  border-color: #2563eb;
+  color: #1e40af;
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .arena-landing-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .arena-landing-stats {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .arena-stat-pill {
+    flex: 1 1 calc(20% - 0.6rem);
+    min-width: 48px;
+  }
+
+  .arena-landing-links-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .arena-tutorial-link {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .arena-landing-widget {
+    padding: 1rem !important;
+  }
+
+  .arena-landing-title {
+    font-size: 1.1rem !important;
+  }
+
+  .arena-stat-pill {
+    flex: 1 1 calc(33% - 0.6rem);
+  }
+}
+
+/* ── Divider between Practice Arenas and other sections ── */
+.sidebar-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-top: 1px solid var(--problems-border);
+  padding-top: 0.75rem;
+  margin-top: 0.1rem;
+}
+
+.problems-page.theme-light .sidebar-accordion {
+  border-top-color: #e2e8f0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Arena Item Inline Dropdown
+   ══════════════════════════════════════════════════════════════ */
+
+.arena-item-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ── panel-open: button gets active glow ── */
+.problems-sidebar-link.panel-open {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.18) 0%,
+    rgba(124, 58, 237, 0.18) 100%
+  );
+  border-color: rgba(96, 165, 250, 0.45);
+  color: var(--problems-text-strong);
+  font-weight: 600;
+}
+
+/* Right side of button: badge + chevron */
+.arena-item-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Chevron arrow */
+.arena-panel-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-text);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.arena-panel-chevron.rotated {
+  transform: rotate(90deg);
+  color: #60a5fa;
+}
+
+/* ── Dropdown panel — hidden by default ── */
+.arena-sub-panel {
+  max-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease,
+    visibility 0s linear 0.3s;
+}
+
+.arena-sub-panel.is-open {
+  max-height: 400px;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease,
+    visibility 0s linear 0s;
+}
+
+/* Inner card — the actual dropdown box */
+.arena-sub-panel-inner {
+  margin: 0.3rem 0 0.5rem 0;
+  padding: 0.75rem 0.85rem;
+  background: var(--problems-surface-soft);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 0.9rem;
+  border-top: 2px solid rgba(96, 165, 250, 0.35);
+}
+
+/* Description text */
+.arena-sub-desc {
+  font-size: 0.76rem;
+  color: var(--secondary-text);
+  line-height: 1.55;
+  margin: 0 0 0.6rem;
+}
+
+/* Link list */
+.arena-sub-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.arena-sub-link {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.42rem 0.6rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--problems-text-soft);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.arena-sub-link:hover {
+  background: rgba(96, 165, 250, 0.12);
+  color: var(--problems-text-strong);
+}
+
+/* Small dot bullet */
+.arena-sub-link-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(96, 165, 250, 0.45);
+  transition: background 0.15s ease;
+}
+
+.arena-sub-link:hover .arena-sub-link-dot {
+  background: #60a5fa;
+}
+
+/* ── Light theme ── */
+.problems-page.theme-light .problems-sidebar-link.panel-open {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.1) 0%,
+    rgba(124, 58, 237, 0.06) 100%
+  );
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+.problems-page.theme-light .arena-panel-chevron {
+  color: #94a3b8;
+}
+
+.problems-page.theme-light .arena-panel-chevron.rotated {
+  color: #2563eb;
+}
+
+.problems-page.theme-light .arena-sub-panel-inner {
+  background: #f8fafc;
+  border-color: rgba(37, 99, 235, 0.2);
+  border-top-color: rgba(37, 99, 235, 0.4);
+}
+
+.problems-page.theme-light .arena-sub-desc {
+  color: #64748b;
+}
+
+.problems-page.theme-light .arena-sub-link {
+  color: #334155;
+}
+
+.problems-page.theme-light .arena-sub-link:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: #0f172a;
+}
+
+.problems-page.theme-light .arena-sub-link-dot {
+  background: rgba(37, 99, 235, 0.35);
+}
+
+.problems-page.theme-light .arena-sub-link:hover .arena-sub-link-dot {
+  background: #2563eb;
+}
+
