@@ -17,6 +17,8 @@ import { Navbar } from "../Home/Navbar";
 import Footer from "../Home/Footer";
 import { useTheme } from "../../context/ThemeContext";
 import usePointerGlow from "../../hooks/usePointerGlow";
+import CoreTopicsSection from "../../components/topics/CoreTopicsSection";
+import coreTopics from "../../data/coreTopics";
 import "../Home/Home.css";
 import "./LearningResourcesPage.css";
 
@@ -93,12 +95,6 @@ const trackConfig = {
         description: "Try simple beginner exercises to build confidence.",
         to: "#practice",
         icon: GraduationCap,
-      },
-      {
-        title: "Study Roadmap",
-        description: "Follow a simple path from basics to deeper topics.",
-        to: "#roadmap",
-        icon: BookOpen,
       },
     ],
     concepts: [
@@ -254,48 +250,6 @@ const trackConfig = {
   },
 };
 
-const RoadmapConnector = ({ side }) => {
-  const isRight = side === "right";
-  const pathData = isRight
-    ? "M 110 30 H 35 C 30 30, 20 38, 20 80 V 130"
-    : "M 10 30 H 85 C 90 30, 100 38, 100 80 V 130";
-  const arrowPoints = isRight ? "10,126 20,140 30,126" : "90,126 100,140 110,126";
-
-  return (
-    <div className="learning-resources-roadmap-connector" aria-hidden="true">
-      <svg
-        viewBox="0 0 120 180"
-        preserveAspectRatio="none"
-        className="learning-resources-roadmap-connector-svg"
-      >
-        <defs>
-          <linearGradient id="roadmapLineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(139, 92, 246, 0.18)" />
-            <stop offset="55%" stopColor="rgba(96, 165, 250, 0.65)" />
-            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.95)" />
-          </linearGradient>
-        </defs>
-
-        {/* horizontal out -> gentle curve down -> vertical shaft */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#roadmapLineGradient)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-
-        {/* subtle blue arrowhead pointing into the receiving card */}
-        <polygon
-          points={arrowPoints}
-          fill="#60a5fa"
-          className="learning-resources-roadmap-arrowhead"
-        />
-      </svg>
-    </div>
-  );
-};
-
 const LearningResourcesPage = () => {
   const { theme, toggle: toggleTheme } = useTheme();
   const location = useLocation();
@@ -333,27 +287,6 @@ const LearningResourcesPage = () => {
     }
   };
 
-  const handleRoadmapTooltipMove = (event) => {
-    const cell = event.currentTarget;
-    const tooltip = cell.querySelector(".learning-resources-tooltip");
-    if (!tooltip) return;
-
-    const rect = cell.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    tooltip.style.setProperty("--tooltip-x", `${x}px`);
-    tooltip.style.setProperty("--tooltip-y", `${y}px`);
-  };
-
-  const resetRoadmapTooltipPosition = (event) => {
-    const cell = event.currentTarget;
-    const tooltip = cell.querySelector(".learning-resources-tooltip");
-    if (!tooltip) return;
-
-    tooltip.style.setProperty("--tooltip-x", "50%");
-    tooltip.style.setProperty("--tooltip-y", "-12px");
-  };
 
   return (
     <div className="learning-resources-page" ref={glowRootRef}>
@@ -532,70 +465,9 @@ const LearningResourcesPage = () => {
           </>
         ) : null}
 
-        <section id="roadmap" className="learning-resources-section">
-          <div className="learning-resources-section-header">
-            <h2>Study roadmap</h2>
-            <p>Follow the sequence below to build COAL knowledge step by step, inspired by a roadmap-style learning flow.</p>
-          </div>
-
-          <div className="learning-resources-roadmap-zigzag">
-            {resolvedTrack === "coal"
-              ? content.roadmapPhases.map((step, idx) => {
-                  const side = idx % 2 === 0 ? "left" : "right";
-                  return (
-                    <div key={step.phase} className={`learning-resources-roadmap-row ${side}`}>
-                      <div
-                        className="learning-resources-roadmap-cell"
-                        onPointerMove={handleRoadmapTooltipMove}
-                        onPointerLeave={resetRoadmapTooltipPosition}
-                      >
-                        <div className="learning-resources-roadmap-meta">
-                          <h3>{step.title}</h3>
-                          <span>{step.duration}</span>
-                        </div>
-                        <div className="learning-resources-roadmap-body">
-                          <ul>
-                            {step.points.map((point) => (
-                              <li key={point}>{point}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="learning-resources-tooltip">
-                          <strong>Topics:</strong>
-                          <ul>
-                            {step.points.slice(0, 6).map((p) => (
-                              <li key={p}>{p}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                      {idx < content.roadmapPhases.length - 1 && (
-                        <RoadmapConnector side={side} />
-                      )}
-                    </div>
-                  );
-                })
-              : content.studyPlan.map((step, index) => (
-                  <div key={step} className={`learning-resources-roadmap-row left`}>
-                    <div
-                      className="learning-resources-roadmap-cell"
-                      onPointerMove={handleRoadmapTooltipMove}
-                      onPointerLeave={resetRoadmapTooltipPosition}
-                    >
-                      <div className="learning-resources-roadmap-meta">
-                        <h3>Step {index + 1}</h3>
-                        <span>Core concept</span>
-                      </div>
-                      <p>{step}</p>
-                      <div className="learning-resources-tooltip">More details coming soon for this path.</div>
-                    </div>
-                    {index < content.studyPlan.length - 1 && (
-                      <RoadmapConnector side="left" />
-                    )}
-                  </div>
-                ))}
-          </div>
-        </section>
+        {resolvedTrack === "dld" ? (
+          <CoreTopicsSection topics={coreTopics} />
+        ) : null}
       </main>
 
       <Footer />

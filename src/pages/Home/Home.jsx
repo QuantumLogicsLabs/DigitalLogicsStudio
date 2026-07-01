@@ -1,13 +1,12 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Clock3, Search } from "lucide-react";
+import { ArrowRight, BookOpen, Clock3, Search, Sparkles } from "lucide-react";
 import { Navbar } from "./Navbar";
 import HeroSection from "./HeroSection";
 import Footer from "./Footer";
 import FeaturedToolsSection from "./FeaturedToolsSection";
 import homeData from "./HomeData";
 import { useTheme } from "../../context/ThemeContext";
-import CoreTopicsSection from "../../components/topics/CoreTopicsSection";
 import coreTopics from "../../data/coreTopics";
 import { buildSearchIndex, searchIndexedItems } from "../../utils/search";
 import "./Home.css";
@@ -89,6 +88,55 @@ const Home = () => {
     });
   }, [deferredSearchTerm]);
 
+  const coalResources = [
+    {
+      title: "COAL Resources",
+      description: "Beginner-friendly practice paths and concept guides for COAL topics.",
+      badge: "Study track",
+    },
+    {
+      title: "Timing Diagrams",
+      description: "Visualize clocked transitions and sequential behavior with a cleaner learning lens.",
+      badge: "Visual aid",
+    },
+    {
+      title: "COAL Practice",
+      description: "Practice problems and quick drills to lock in the basics.",
+      badge: "Practice",
+    },
+  ];
+
+  const dldResources = [
+    {
+      title: "DLD Resources",
+      description: "Structured lessons and concept guides for digital logic design.",
+      badge: "Track",
+    },
+    {
+      title: "Circuit Tools",
+      description: "Key tools for Boolean simplification, timing diagrams, and circuits.",
+      badge: "Tools",
+    },
+    {
+      title: "Practice Paths",
+      description: "Focused exercises to bridge theory with applied design.",
+      badge: "Practice",
+    },
+  ];
+
+  const renderRecommendedResourceMarquee = (resources) => (
+    <div className="recommended-resource-marquee" aria-label="Recommended resource carousel">
+      <div className="recommended-resource-marquee-track">
+        {resources.concat(resources).map((resource, index) => (
+          <div key={`${resource.title}-${index}`} className="recommended-resource-pill">
+            <span>{resource.badge}</span>
+            <strong>{resource.title}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     const nextSearch = searchTerm.trim()
@@ -147,7 +195,59 @@ const Home = () => {
           {hasResults ? (
             <>
               <FeaturedToolsSection data={featuredTools} />
-              {filteredTopics.length > 0 ? <CoreTopicsSection topics={filteredTopics} /> : null}
+
+              <section className="home-section home-recommended-section is-visible">
+                <div className="home-section-header">
+                  <h2 className="home-section-title home-section-title--single-line">Recommended Courses</h2>
+                  <p className="home-section-description">
+                    A cleaner study experience with guided COAL resources, a full DLD learning path, and a polished intro to Boolforge.
+                  </p>
+                </div>
+
+                <div className="recommended-courses-grid">
+                  <Link to="/resources/coal" className="recommended-course-card recommended-course-card--coal recommended-course-card--link">
+                    <div className="recommended-course-card__top">
+                      <span className="recommended-course-chip">COAL</span>
+                      <span className="recommended-course-badge">Resources</span>
+                    </div>
+                    <h3>Build confidence with focused COAL practice</h3>
+                    <p>
+                      Explore beginner-friendly resources, concept refreshers, and visual practice that help you move from fundamentals to fluency.
+                    </p>
+                    {renderRecommendedResourceMarquee(coalResources)}
+                  </Link>
+
+                  <Link to="/resources/dld" className="recommended-course-card recommended-course-card--dld recommended-course-card--link">
+                    <div className="recommended-course-card__top">
+                      <span className="recommended-course-chip">DLD</span>
+                      <span className="recommended-course-badge">Resources</span>
+                    </div>
+                    <h3>Find everything you need for DLD resources</h3>
+                    <p>
+                      Clean and compact course entry with focused DLD sections, leaving the detailed topics for the DLD page itself.
+                    </p>
+                    {renderRecommendedResourceMarquee(dldResources)}
+                  </Link>
+                </div>
+
+                <div className="boolforge-spotlight">
+                  <div className="boolforge-spotlight__content">
+                    <div className="boolforge-spotlight__icon">
+                      <Sparkles size={20} />
+                    </div>
+                    <div>
+                      <span className="recommended-course-chip">Boolforge</span>
+                      <h3>Design, simplify, and explore logic with clarity</h3>
+                      <p>
+                        Boolforge turns abstract digital logic into interactive visual practice. Build circuits, test expressions, and understand behavior in real time without the usual clutter.
+                      </p>
+                    </div>
+                  </div>
+                  <Link to="/boolforge" className="boolforge-spotlight__cta">
+                    Open Boolforge <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </section>
 
               {/* ── Learning Resources ── */}
               {learningResources.length > 0 && (
