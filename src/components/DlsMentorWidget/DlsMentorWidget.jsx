@@ -11,6 +11,7 @@ import {
   topicFromPath,
 } from "../../utils/topicFromPath";
 import "./DlsMentorWidget.css";
+import { renderChatMessage } from "./formatChatMessage";
 
 const LEVEL_OPTIONS = [
   { value: "beginner", label: "Beginner" },
@@ -364,7 +365,9 @@ function DlsMentorWidget() {
                   👤
                 </div>
               )}
-              <div className="dls-mentor-msg__bubble">{message.text}</div>
+              <div className="dls-mentor-msg__bubble">
+                {isUser || isError ? message.text : renderChatMessage(message.text)}
+              </div>
             </div>
           );
         })}

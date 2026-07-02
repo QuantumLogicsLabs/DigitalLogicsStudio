@@ -385,6 +385,24 @@
   border-bottom-right-radius: 4px;
 }
 
+.dls-mentor-msg__bubble strong {
+  font-weight: 700;
+  color: inherit;
+}
+
+.dls-mentor-msg__bubble em {
+  font-style: italic;
+}
+
+.dls-mentor-inline-code {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.84em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
 .dls-mentor-msg--error .dls-mentor-msg__bubble {
   background: rgba(239, 68, 68, 0.14);
   color: #fecaca;
