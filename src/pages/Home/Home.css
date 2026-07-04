@@ -621,17 +621,47 @@
 }
 
 .recommended-resource-pill {
+  position: relative;
   display: inline-flex;
   flex: 0 0 auto;
   flex-direction: column;
   gap: 0.35rem;
-  min-width: 220px;
+  min-width: 0;
   padding: 1rem 1.05rem;
   border-radius: 1.4rem;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(16px);
+  overflow: hidden;
+  isolation: isolate;
   transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+
+.recommended-resource-pill__shine {
+  position: absolute;
+  top: -20%;
+  left: -120%;
+  width: 55%;
+  height: 140%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.32) 50%,
+    rgba(255, 255, 255, 0.08) 70%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: recommendedPillShine 3.2s ease-in-out infinite;
+  animation-delay: var(--pill-shine-delay, 0s);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.recommended-resource-pill__label,
+.recommended-resource-pill__title {
+  position: relative;
+  z-index: 1;
 }
 
 .recommended-resource-pill:hover {
@@ -640,7 +670,7 @@
   border-color: rgba(255, 255, 255, 0.24);
 }
 
-.recommended-resource-pill span {
+.recommended-resource-pill__label {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -648,7 +678,7 @@
   color: var(--accent-color);
 }
 
-.recommended-resource-pill strong {
+.recommended-resource-pill__title {
   display: block;
   font-size: 1rem;
   font-weight: 700;
@@ -656,10 +686,33 @@
   line-height: 1.45;
 }
 
-.recommended-resource-pill:hover {
-  background: rgba(255, 255, 255, 0.18);
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.24);
+@keyframes recommendedPillShine {
+  0% {
+    left: -120%;
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  48% {
+    left: 160%;
+    opacity: 1;
+  }
+
+  55%,
+  100% {
+    left: 160%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recommended-resource-pill__shine {
+    animation: none;
+    display: none;
+  }
 }
 
 .recommended-topic-grid {
@@ -815,16 +868,27 @@
   backdrop-filter: blur(12px);
 }
 
-[data-theme="light"] .recommended-resource-pill strong {
+[data-theme="light"] .recommended-resource-pill__title {
   color: #0f172a;
 }
 
-[data-theme="light"] .recommended-course-card--coal .recommended-resource-pill span {
+[data-theme="light"] .recommended-course-card--coal .recommended-resource-pill__label {
   color: #1d4ed8;
 }
 
-[data-theme="light"] .recommended-course-card--dld .recommended-resource-pill span {
+[data-theme="light"] .recommended-course-card--dld .recommended-resource-pill__label {
   color: #047857;
+}
+
+[data-theme="light"] .recommended-resource-pill__shine {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 30%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.35) 70%,
+    transparent 100%
+  );
 }
 
 [data-theme="light"] .recommended-course-card p,

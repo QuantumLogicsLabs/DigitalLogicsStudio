@@ -739,6 +739,601 @@ const coalTopicContent = {
     },
   },
 
+  "digital-logic-bridge": {
+    slug: "digital-logic-bridge",
+    level: "Beginner",
+    duration: "3 days",
+    preview: {
+      summary:
+        "Before you study the CPU in depth, you need to see how tiny logic circuits become adders, storage, and the building blocks of a processor. This module bridges Digital Logic Design (DLD) to Computer Organization.",
+      highlights: [
+        "Logic gates are the atoms of every ALU and control circuit",
+        "Adders and multiplexers route data inside the datapath",
+        "Flip-flops turn combinational logic into registers and memory",
+      ],
+    },
+    sections: [
+      {
+        id: "why-bridge",
+        title: "Why Connect DLD to COAL?",
+        body: [
+          "In Digital Logic Design you drew gates on paper. In COAL you meet the same ideas inside a real CPU — just scaled to billions of transistors on one chip.",
+          "Understanding gates, adders, and flip-flops answers questions like: How does ADD AX, BX actually work? Where does the result sit before it reaches a register?",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "A calculator's '+' button triggers the same half-adder logic you study in DLD. Your laptop's CPU runs the same pattern millions of times per second — just hidden inside the ALU.",
+        },
+      },
+      {
+        id: "logic-gates-review",
+        title: "Logic Gates — Quick Review",
+        body: [
+          "A gate takes one or more binary inputs and produces an output according to a truth table. CPUs are built entirely from these primitives.",
+          { type: "subheading", text: "Gates you must know" },
+          {
+            type: "list",
+            items: [
+              "AND — output 1 only when all inputs are 1 (used to mask/select bits).",
+              "OR — output 1 when any input is 1 (combines enable lines).",
+              "NOT — inverts a bit (turns 0 into 1 and vice versa).",
+              "XOR — output 1 when inputs differ (core of addition and parity).",
+            ],
+          },
+        ],
+        diagram: "logic-gates-co",
+        table: {
+          caption: "Gate truth tables (2-input)",
+          headers: ["A", "B", "AND", "OR", "XOR"],
+          rows: [
+            ["0", "0", "0", "0", "0"],
+            ["0", "1", "0", "1", "1"],
+            ["1", "0", "0", "1", "1"],
+            ["1", "1", "1", "1", "0"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "When you AND a byte with 0x0F (00001111), you keep only the lower 4 bits — the same masking trick used in graphics, networking, and assembly bit tricks.",
+        },
+      },
+      {
+        id: "combinational-blocks",
+        title: "Combinational Blocks in the CPU",
+        body: [
+          "Combinational circuits have no memory — output depends only on current inputs. The CPU uses them to compute results and route data.",
+          { type: "subheading", text: "Key building blocks" },
+          {
+            type: "list",
+            items: [
+              "Half adder / full adder — adds binary digits and propagates carry (heart of the ALU).",
+              "Multiplexer (MUX) — selects one of several inputs (picks which register feeds the ALU).",
+              "Decoder — activates exactly one output line (used in memory addressing and control).",
+            ],
+          },
+        ],
+        diagram: "half-adder",
+        table: {
+          caption: "Combinational blocks and CPU roles",
+          headers: ["Block", "What it does", "CPU role"],
+          rows: [
+            ["Half adder", "Adds 2 bits → sum + carry", "Lowest level of integer addition"],
+            ["Full adder", "Adds 3 bits (includes carry-in)", "Chains into multi-bit adders"],
+            ["Multiplexer", "Selects one input from many", "Routes register operands to ALU"],
+            ["Decoder", "One-hot output from binary code", "Instruction decode, memory chip select"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "A traffic light controller uses decoders to turn one binary code into exactly one green/yellow/red output — the same one-hot idea used when the control unit activates one ALU operation.",
+        },
+      },
+      {
+        id: "sequential-storage",
+        title: "Sequential Logic: Latches & Flip-Flops",
+        body: [
+          "Combinational logic alone cannot remember values. Sequential circuits add storage using a clock signal — the heartbeat of the CPU.",
+          "A latch is level-sensitive (transparent while enabled). A flip-flop is edge-triggered (captures data only on a clock edge) — more reliable for synchronous design.",
+          "One D flip-flop stores one bit. Eight flip-flops make one byte of register storage. Thousands of them form a register file.",
+        ],
+        diagram: "flip-flop",
+        realLife: {
+          title: "Real-life connection",
+          text: "Think of a flip-flop like a camera shutter: the data (D) is only captured at the moment the clock (CLK) clicks — not continuously. That is how a 3 GHz CPU stays synchronized.",
+        },
+      },
+      {
+        id: "register-file",
+        title: "From Circuits to Register Files",
+        body: [
+          "A register file is a small, ultra-fast bank of storage inside the CPU. General-purpose registers (AX, BX, CX, DX in x86) are implemented as arrays of flip-flops with MUX/DEMUX routing.",
+          "Registers are orders of magnitude faster than RAM because they sit directly on the chip next to the ALU — no bus trip to external memory.",
+        ],
+        diagram: "register-file",
+        table: {
+          caption: "Storage speed comparison (typical desktop CPU)",
+          headers: ["Storage", "Access time (order of)", "Capacity"],
+          rows: [
+            ["Register", "~1 CPU cycle (< 1 ns)", "Bytes to KB"],
+            ["L1 cache", "~4 cycles", "32–64 KB per core"],
+            ["RAM", "~100+ cycles", "GB"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "When a game loop runs hot, compilers keep loop counters in registers (ECX) instead of RAM — because hitting main memory every iteration would slow the game noticeably.",
+        },
+      },
+      {
+        id: "dld-to-coal",
+        title: "Putting It Together: DLD → CPU",
+        body: [
+          "The path from DLD to COAL is direct: gates → adders → ALU; flip-flops → registers; decoders + MUX → control unit and datapath routing.",
+          "Every assembly instruction you will write ultimately toggles these hardware blocks. MOV copies bits between flip-flop banks. ADD sends two register values through the adder chain.",
+        ],
+        diagram: "cpu-datapath",
+        code: {
+          code: "; Conceptual view — ADD AX, BX\n; 1. Control unit decodes ADD\n; 2. MUX routes AX and BX to ALU inputs\n; 3. Adder chain computes sum + flags\n; 4. Result written back to AX flip-flops",
+        },
+      },
+    ],
+    keyTakeaways: [
+      "Logic gates (AND, OR, NOT, XOR) are the building blocks of every ALU and control circuit.",
+      "Adders and multiplexers are combinational — they compute and route without memory.",
+      "Flip-flops provide storage; register files are banks of flip-flops inside the CPU.",
+      "DLD concepts directly explain how assembly instructions manipulate hardware.",
+    ],
+    relatedTool: {
+      label: "Explore Boolean logic interactively",
+      to: "/boolean/overview",
+    },
+  },
+
+  "cpu-components": {
+    slug: "cpu-components",
+    level: "Beginner",
+    duration: "3 days",
+    preview: {
+      summary:
+        "The CPU is more than a single chip label — it contains an ALU, control unit, special registers, and a register file working together. This module names every major piece and shows how data moves through them.",
+      highlights: [
+        "ALU performs arithmetic and logic; control unit directs everything",
+        "PC points to the next instruction; IR holds the current one",
+        "Registers are fast on-chip storage — very different from RAM",
+      ],
+    },
+    sections: [
+      {
+        id: "cpu-overview",
+        title: "What Is Inside the CPU?",
+        body: [
+          "The Central Processing Unit (CPU) is the brain of the computer. It does not store your files long-term — it executes instructions, one after another, at incredible speed.",
+          "Modern CPUs contain multiple cores (each a full processor), but the mental model starts with one core: ALU + control unit + registers + cache interfaces.",
+        ],
+        diagram: "cpu-datapath",
+        realLife: {
+          title: "Real-life connection",
+          text: "When you open a browser tab, the OS schedules thousands of instructions per millisecond across CPU cores — each instruction passes through the same internal components you study here.",
+        },
+      },
+      {
+        id: "alu",
+        title: "Arithmetic Logic Unit (ALU)",
+        body: [
+          "The ALU is the calculator inside the CPU. It performs integer addition, subtraction, bitwise AND/OR/XOR, comparisons, and shift operations.",
+          "The ALU also sets status flags (Zero, Carry, Overflow, Sign) after operations — assembly branches read these flags to make decisions.",
+        ],
+        table: {
+          caption: "ALU operations and assembly examples",
+          headers: ["ALU operation", "Assembly mnemonic", "Example"],
+          rows: [
+            ["Add", "ADD", "ADD AX, 5"],
+            ["Subtract", "SUB", "SUB BX, CX"],
+            ["Bitwise AND", "AND", "AND AX, 0xFF"],
+            ["Compare (subtract, keep flags)", "CMP", "CMP AX, BX"],
+            ["Shift left", "SHL", "SHL AX, 1"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Your phone's camera app applies filters by running millions of AND/SHL operations on pixel values — each one executed by the ALU in a fraction of a microsecond.",
+        },
+      },
+      {
+        id: "control-unit",
+        title: "Control Unit",
+        body: [
+          "The control unit is the conductor of the orchestra. It reads the instruction in the IR, decodes the opcode, and sends control signals to the ALU, registers, and bus.",
+          "It decides: which registers to read, which ALU operation to perform, whether to write a result back, and whether to jump to a new address.",
+        ],
+        table: {
+          caption: "Control unit decisions per instruction type",
+          headers: ["Instruction", "Control unit action"],
+          rows: [
+            ["MOV AX, BX", "Enable register file write; route BX → AX"],
+            ["ADD AX, 5", "Route AX and immediate to ALU; ADD; write result to AX; update flags"],
+            ["JMP label", "Load new address into PC instead of PC+size"],
+            ["MOV AX, [BX]", "Put BX on address bus; read memory; write to AX"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "A factory assembly line robot follows a recipe (instruction). The control unit is the supervisor deciding which machine (ALU, memory, register) activates at each step.",
+        },
+      },
+      {
+        id: "pc-ir",
+        title: "Program Counter & Instruction Register",
+        body: [
+          "The Program Counter (PC), called EIP in x86, holds the memory address of the next instruction to fetch. After each instruction, PC usually advances by the instruction's size.",
+          "The Instruction Register (IR) holds the instruction currently being decoded and executed. Fetch loads IR; decode reads IR; execute acts on IR's opcode and operands.",
+        ],
+        table: {
+          caption: "PC and IR during a 3-instruction program",
+          headers: ["Step", "PC points to", "IR contains"],
+          rows: [
+            ["Start", "Address 1000", "(empty)"],
+            ["After fetch #1", "1000", "MOV AX, 5"],
+            ["After execute #1", "1003", "MOV AX, 5"],
+            ["After fetch #2", "1003", "ADD AX, 3"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "PC is like a bookmark in a recipe book — it always shows which step comes next. A jump instruction is like skipping to a different page number.",
+        },
+      },
+      {
+        id: "registers",
+        title: "General-Purpose vs Special-Purpose Registers",
+        body: [
+          "General-purpose registers (GPRs) hold data and addresses during computation — AX, BX, CX, DX in 16-bit x86; EAX, EBX, etc. in 32-bit.",
+          "Special-purpose registers have fixed roles: PC/EIP (next instruction), IR (internal), stack pointer ESP, flags register (condition codes).",
+        ],
+        diagram: "register-file",
+        table: {
+          caption: "x86 registers and typical uses",
+          headers: ["Register", "Type", "Common use"],
+          rows: [
+            ["EAX / AX", "General", "Accumulator, function return value, arithmetic"],
+            ["EBX / BX", "General", "Base pointer for arrays and data blocks"],
+            ["ECX / CX", "General", "Loop counter (LOOP instruction)"],
+            ["EDX / DX", "General", "I/O ports, multiply/divide high bits"],
+            ["EIP", "Special", "Instruction pointer — address of next instruction"],
+            ["ESP", "Special", "Stack pointer — top of runtime stack"],
+            ["EFLAGS", "Special", "Zero, Carry, Sign, Overflow flags"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Registers are like the chef's hands — always within reach. RAM is the pantry across the room. Good programs keep working data in registers as long as possible.",
+        },
+      },
+      {
+        id: "datapath-trace",
+        title: "Tracing a Value Through the Datapath",
+        body: [
+          "Follow ADD AX, BX step by step to see every component in action:",
+          {
+            type: "list",
+            items: [
+              "1. PC sends address to memory; instruction ADD AX, BX loaded into IR.",
+              "2. Control unit decodes: operation = ADD, dest = AX, source = BX.",
+              "3. Register file outputs current AX and BX values to ALU inputs.",
+              "4. ALU adds them, sets flags (ZF if result is zero, etc.).",
+              "5. Result written back to AX; PC advances to next instruction.",
+            ],
+          },
+        ],
+        code: {
+          code: "; Before: AX = 10, BX = 25\nADD AX, BX\n; After:  AX = 35, CF = 0, ZF = 0\n; PC advanced by instruction length",
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Debuggers show register values after each step because this trace is real — every breakpoint stops the CPU between these exact stages.",
+        },
+      },
+    ],
+    keyTakeaways: [
+      "ALU computes; control unit coordinates; registers hold working data.",
+      "PC (EIP) = next instruction address; IR = current instruction being executed.",
+      "GPRs are flexible storage; special registers (ESP, EFLAGS) have fixed roles.",
+      "Every assembly instruction is a sequence of control signals across these components.",
+    ],
+  },
+
+  "instruction-cycle": {
+    slug: "instruction-cycle",
+    level: "Beginner",
+    duration: "3 days",
+    preview: {
+      summary:
+        "A program is not magic — the CPU repeats the same four-step loop for every single instruction: fetch, decode, execute, store. Understanding this loop is the key to reading assembly and predicting program behavior.",
+      highlights: [
+        "Fetch loads the instruction from memory into the IR",
+        "Decode turns opcode bits into control signals",
+        "Execute runs the ALU or data transfer; PC updates for the next round",
+      ],
+    },
+    sections: [
+      {
+        id: "cycle-overview",
+        title: "The Instruction Cycle",
+        body: [
+          "Also called the fetch–decode–execute cycle (sometimes with a separate writeback/store stage), this loop runs continuously while the CPU has power and a program to run.",
+          "One full cycle usually takes multiple clock ticks. A 3 GHz CPU can complete billions of cycles per second.",
+        ],
+        diagram: "instruction-cycle",
+        realLife: {
+          title: "Real-life connection",
+          text: "A washing machine repeats: fill → wash → rinse → spin. The CPU repeats: fetch → decode → execute → store. Both are fixed cycles driven by a clock.",
+        },
+      },
+      {
+        id: "fetch-stage",
+        title: "Stage 1: Fetch",
+        body: [
+          "The CPU places the address in PC onto the address bus and reads the instruction bytes from memory.",
+          "The fetched instruction is loaded into the Instruction Register (IR). PC is prepared to advance (actual update may happen at end of cycle).",
+          { type: "subheading", text: "Micro-operations during fetch" },
+          {
+            type: "list",
+            items: [
+              "MAR ← PC (memory address register gets PC value)",
+              "MDR ← Memory[MAR] (memory data register gets instruction bytes)",
+              "IR ← MDR",
+              "PC ← PC + instruction_size",
+            ],
+          },
+        ],
+        table: {
+          caption: "Fetch example — 3-byte instruction at address 0x1000",
+          headers: ["Micro-op", "Value after step"],
+          rows: [
+            ["MAR ← PC", "0x1000"],
+            ["MDR ← Mem[0x1000]", "B8 05 00 (MOV AX, 5 in machine code)"],
+            ["IR ← MDR", "Instruction stored in IR"],
+            ["PC ← PC + 3", "0x1003 (ready for next fetch)"],
+          ],
+        },
+      },
+      {
+        id: "decode-stage",
+        title: "Stage 2: Decode",
+        body: [
+          "The control unit examines the opcode field in the IR and generates control signals: which ALU operation, which registers to read/write, whether memory is accessed.",
+          "Operand fields tell the control unit where data lives — register number, immediate value, or memory address.",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "Decode is like reading a recipe step: 'Add two cups of flour' — you identify the action (add), the ingredients (registers), and the tools (ALU) before doing anything.",
+        },
+      },
+      {
+        id: "execute-stage",
+        title: "Stage 3: Execute",
+        body: [
+          "The actual work happens: ALU computes, data moves between registers, memory is read or written, or PC is overwritten for a jump.",
+          "For ADD AX, BX: ALU adds register values. For MOV AX, [BX]: memory at address BX is read into AX. For JMP target: PC is loaded with target address.",
+        ],
+        table: {
+          caption: "Execute actions by instruction type",
+          headers: ["Instruction", "Execute action"],
+          rows: [
+            ["ADD AX, BX", "ALU: AX + BX → AX; update flags"],
+            ["MOV AX, 5", "Load immediate 5 into AX (no ALU)"],
+            ["MOV AX, [BX]", "Memory read at address BX → AX"],
+            ["JMP label", "PC ← address of label (skip normal advance)"],
+            ["CMP AX, BX", "ALU subtracts for flags only; AX unchanged"],
+          ],
+        },
+      },
+      {
+        id: "store-stage",
+        title: "Stage 4: Store / Writeback",
+        body: [
+          "If the instruction produces a result, it is written to the destination register or memory location. Flags register is updated if applicable.",
+          "For most instructions, PC was already incremented during fetch. Jump instructions overwrite PC during execute instead.",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "After a calculator shows '35', the result is stored in the display register. After ADD AX, BX, the sum is stored in AX — same idea, different hardware.",
+        },
+      },
+      {
+        id: "hand-trace",
+        title: "Hand Trace: A Short Program",
+        body: [
+          "Trace this program by hand to cement the cycle. Assume all values start at 0.",
+        ],
+        code: {
+          code: "; Address  Instruction      ; Effect after full cycle\n; 1000     MOV AX, 10       ; AX=10, PC→1003\n; 1003     MOV BX, 5        ; BX=5,  PC→1006\n; 1006     ADD AX, BX       ; AX=15, PC→1009\n; 1009     CMP AX, 15       ; ZF=1,  PC→100C\n; 100C     JE  1012         ; jump if equal → PC=1012",
+        },
+        table: {
+          caption: "Register state after each instruction completes",
+          headers: ["After instruction", "AX", "BX", "PC", "ZF"],
+          rows: [
+            ["MOV AX, 10", "10", "0", "1003", "—"],
+            ["MOV BX, 5", "10", "5", "1006", "—"],
+            ["ADD AX, BX", "15", "5", "1009", "0"],
+            ["CMP AX, 15", "15", "5", "100C", "1"],
+            ["JE (taken)", "15", "5", "1012", "1"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "COAL exams often ask you to trace 5–10 instructions by hand. This skill proves you understand the machine, not just syntax.",
+        },
+      },
+      {
+        id: "clock-throughput",
+        title: "Clock Cycles & Throughput",
+        body: [
+          "Each stage may take one or more clock cycles. Simple instructions might complete in 1–4 cycles; complex ones (memory access, multiply) take more.",
+          "Throughput = instructions per second ≈ clock speed / average cycles per instruction. Pipelining (covered later) overlaps stages to improve throughput.",
+        ],
+        table: {
+          caption: "Cycle intuition",
+          headers: ["CPU clock", "Cycles per instruction (avg)", "Approx. instructions/sec"],
+          rows: [
+            ["1 GHz", "4", "250 million"],
+            ["3 GHz", "4", "750 million"],
+            ["3 GHz (pipelined, 1/cycle)", "1", "3 billion"],
+          ],
+        },
+      },
+    ],
+    keyTakeaways: [
+      "Every instruction goes through fetch → decode → execute → store (writeback).",
+      "PC tracks the next instruction; IR holds the current one during decode/execute.",
+      "Hand-tracing short programs is the best way to build machine-level intuition.",
+      "Clock speed and cycles-per-instruction determine how fast code runs.",
+    ],
+  },
+
+  "memory-hierarchy": {
+    slug: "memory-hierarchy",
+    level: "Beginner",
+    duration: "4 days",
+    preview: {
+      summary:
+        "Not all memory is equal. Registers, cache, RAM, and disk form a hierarchy of speed, size, and cost. Understanding this pyramid explains why data placement matters in assembly and high-performance programming.",
+      highlights: [
+        "Registers and cache are fast but tiny; RAM is larger but slower",
+        "Every byte in memory has an address — programs use addresses, not names",
+        "Stack and heap are regions of RAM with different growth patterns",
+      ],
+    },
+    sections: [
+      {
+        id: "hierarchy-pyramid",
+        title: "The Memory Hierarchy",
+        body: [
+          "Computer architects organize storage in levels. The CPU tries to keep frequently used data in the fastest levels (registers, cache) and uses slower levels (RAM, SSD) for bulk storage.",
+          "This is driven by cost and physics: faster memory is more expensive per byte and harder to scale in size.",
+        ],
+        diagram: "memory-hierarchy",
+        table: {
+          caption: "Memory hierarchy at a glance",
+          headers: ["Level", "Typical size", "Typical access time", "Managed by"],
+          rows: [
+            ["Registers", "Bytes–KB", "< 1 ns", "Compiler / programmer"],
+            ["L1 cache", "32–64 KB", "~1 ns", "Hardware (CPU)"],
+            ["L2/L3 cache", "256 KB – 32 MB", "~10–40 ns", "Hardware (CPU)"],
+            ["Main memory (RAM)", "8–64 GB", "~100 ns", "OS + hardware"],
+            ["SSD / HDD", "256 GB – 4 TB", "µs – ms", "OS"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Your desk (registers) holds what you are working on now. The bookshelf (RAM) holds today's books. The warehouse (disk) holds everything else. You slow down if you walk to the warehouse for every page.",
+        },
+      },
+      {
+        id: "addressable-memory",
+        title: "Addressable Memory & Byte Addressing",
+        body: [
+          "Main memory is a linear array of bytes, each with a unique address starting from 0. A 32-bit system can address up to 4 GB (2³² bytes); 64-bit systems can address vastly more.",
+          "Instructions refer to memory by address: MOV AX, [1000h] reads the word at address 0x1000. The address bus carries these addresses; the data bus carries the bytes.",
+        ],
+        table: {
+          caption: "Addressing and operand sizes",
+          headers: ["Operand size", "Bytes accessed", "Example"],
+          rows: [
+            ["BYTE", "1", "MOV AL, [BX]"],
+            ["WORD", "2", "MOV AX, [BX]"],
+            ["DWORD", "4", "MOV EAX, [BX]"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "A street address pinpoints one house. A memory address pinpoints one byte. Arrays are consecutive addresses — index 5 of a byte array is at base + 5.",
+        },
+      },
+      {
+        id: "locality-cache",
+        title: "Locality & Cache Basics",
+        body: [
+          "Programs tend to reuse data and instructions they recently accessed — this is called locality. Temporal locality: use again soon. Spatial locality: use nearby addresses next.",
+          "Cache is small, fast memory that holds copies of recently used RAM blocks. On a cache hit, access is nearly as fast as a register. On a miss, the CPU waits for RAM.",
+          { type: "subheading", text: "Why this matters in COAL" },
+          "Looping over an array sequentially is cache-friendly. Jumping randomly through memory causes cache misses and slows execution.",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "Re-reading the same textbook chapter (temporal locality) and reading the next page (spatial locality) is faster than fetching a new book from the library each sentence.",
+        },
+      },
+      {
+        id: "stack-heap",
+        title: "Stack, Heap & Program Layout",
+        body: [
+          "A running program's memory is divided into regions. Code holds instructions. Data holds global variables. The stack grows downward for function calls, local variables, and return addresses. The heap grows upward for dynamic allocation.",
+          "ESP (stack pointer) tracks the top of the stack. EBP (base pointer) anchors a function's stack frame. You will use both heavily when studying procedures.",
+        ],
+        diagram: "memory-layout",
+        table: {
+          caption: "Memory regions and contents",
+          headers: ["Region", "Grows", "Typical contents"],
+          rows: [
+            ["Stack", "Down (high → low addresses)", "Return addresses, local variables, parameters"],
+            ["Heap", "Up (low → high addresses)", "Dynamic allocations (malloc, new)"],
+            ["Data segment", "Fixed size at load", "Global and static variables"],
+            ["Code segment", "Fixed size at load", "Machine instructions (read-only)"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Each phone call (function call) pushes a return address on the stack — like leaving a bookmark so you know where to resume. Too many nested calls without returning causes a stack overflow.",
+        },
+      },
+      {
+        id: "endianness",
+        title: "Endianness & Alignment (Intro)",
+        body: [
+          "Endianness defines byte order in multi-byte values. Little-endian (x86): least significant byte at lowest address. Big-endian: most significant byte first.",
+          "Example: 32-bit value 0x12345678 stored at address 1000 in little-endian: [1000]=78, [1001]=56, [1002]=34, [1003]=12.",
+          "Alignment means placing data at addresses divisible by their size (e.g., DWORD at address divisible by 4). Unaligned access can be slower or illegal on some CPUs.",
+        ],
+        table: {
+          caption: "Little-endian storage of 0x12345678 at address 1000",
+          headers: ["Address", "Byte stored"],
+          rows: [
+            ["1000", "0x78"],
+            ["1001", "0x56"],
+            ["1002", "0x34"],
+            ["1003", "0x12"],
+          ],
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Network protocols often use big-endian (network byte order). x86 uses little-endian. Bugs appear when programs send raw memory bytes over the network without converting.",
+        },
+      },
+      {
+        id: "registers-vs-ram",
+        title: "Registers vs Memory Trade-offs",
+        body: [
+          "Registers are scarce (roughly 8–16 GPRs in x86) but instant. RAM is abundant but slow. Good assembly and compiler output minimize memory traffic.",
+          "Rule of thumb: keep loop counters, pointers, and frequently reused values in registers. Spill to stack or RAM only when you run out.",
+        ],
+        code: {
+          code: "; Slow: memory-heavy loop\n    MOV CX, 1000\nloop1:\n    MOV AX, [BX]    ; read from RAM every iteration\n    INC AX\n    MOV [BX], AX\n    INC BX\n    LOOP loop1\n\n; Faster: keep accumulator in register\n    MOV CX, 1000\nloop2:\n    MOV AX, [BX]\n    INC AX\n    MOV [BX], AX    ; still need store, but AX stays hot in register",
+        },
+        realLife: {
+          title: "Real-life connection",
+          text: "Game engines profile cache misses because moving data between RAM levels costs more than ALU math. The hierarchy is not academic — it determines real-world performance.",
+        },
+      },
+    ],
+    keyTakeaways: [
+      "Memory forms a hierarchy: registers → cache → RAM → disk, each slower and larger.",
+      "Every byte has an address; instructions access memory with addresses, not variable names.",
+      "Stack grows down for calls/locals; heap grows up for dynamic data.",
+      "x86 is little-endian; alignment and locality affect performance.",
+    ],
+  },
+
   "ia32-architecture": {
     slug: "ia32-architecture",
     level: "Intermediate",

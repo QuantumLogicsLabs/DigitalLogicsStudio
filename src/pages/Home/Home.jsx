@@ -126,10 +126,15 @@ const Home = () => {
 
   const renderRecommendedResources = (resources) => (
     <div className="recommended-resource-row" aria-label="Recommended resources">
-      {resources.map((resource) => (
-        <div key={resource.title} className="recommended-resource-pill">
-          <span>{resource.badge}</span>
-          <strong>{resource.title}</strong>
+      {resources.map((resource, index) => (
+        <div
+          key={resource.title}
+          className="recommended-resource-pill"
+          style={{ "--pill-shine-delay": `${index * 0.75}s` }}
+        >
+          <span className="recommended-resource-pill__shine" aria-hidden="true" />
+          <span className="recommended-resource-pill__label">{resource.badge}</span>
+          <strong className="recommended-resource-pill__title">{resource.title}</strong>
         </div>
       ))}
     </div>

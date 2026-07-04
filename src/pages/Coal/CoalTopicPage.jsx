@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, GraduationCap } from "lucide-react";
 import { Navbar } from "../Home/Navbar";
-import Footer from "../Home/Footer";
+import CoalFooter from "../../components/coal/CoalFooter";
 import { useTheme } from "../../context/ThemeContext";
 import CoalTopicContent from "../../components/coal/CoalTopicContent";
 import { getCoalTopicContent } from "../../data/coalTopicContent";
@@ -25,7 +25,7 @@ function CoalTopicPage() {
             <ArrowLeft size={16} /> Back to COAL course
           </Link>
         </main>
-        <Footer />
+        <CoalFooter showPartAnchors={false} />
       </div>
     );
   }
@@ -123,7 +123,7 @@ function CoalTopicPage() {
         </footer>
       </main>
 
-      <Footer />
+      <CoalFooter showPartAnchors={false} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { coalCourseParts } from "../data/coalCourseOutline";
-import { getCoalTopicContent } from "../data/coalTopicContent";import {
+import { getCoalTopicContent } from "../data/coalTopicContent";
+import {
   Binary,
   BookOpen,
   Cpu,
