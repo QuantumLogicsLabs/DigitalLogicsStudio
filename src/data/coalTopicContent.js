@@ -1365,6 +1365,197 @@ const coalTopicContent = {
     ],
   },
 
+  "io-interrupts": {
+    slug: "io-interrupts",
+    level: "Advanced",
+    duration: "4 days",
+    preview: {
+      summary:
+        "External devices like keyboards, mice, and hard drives work at their own pace. This module shows how the CPU communicates with them via polling, interrupts, and direct memory access (DMA), ensuring the CPU doesn't waste precious cycles waiting for slow hardware.",
+      highlights: [
+        "Memory-Mapped vs Isolated I/O address organization",
+        "Programmed I/O (Polling) vs Interrupt-driven I/O vs DMA",
+        "Mechanics of interrupts: ISR execution, IVT/IDT vectors, and IRET",
+      ],
+    },
+    sections: [
+      {
+        id: "io-mapping",
+        title: "How the CPU Finds I/O Devices",
+        body: [
+          "Before a CPU can read keys from a keyboard or write blocks to a disk, it needs a way to address those devices. There are two main ways computer systems map device registers: Memory-Mapped I/O and Isolated I/O.",
+          "In Memory-Mapped I/O, the hardware makes the device registers look exactly like regular RAM addresses. A write to address 0x8000 might update a screen pixel rather than store a variable in memory. This means the CPU can use normal instructions like `MOV` to talk to devices, but it reduces the address space available for actual RAM.",
+          "In Isolated I/O (or Port-Mapped I/O), devices live in a separate, isolated address space (usually called ports). The CPU uses dedicated hardware control lines and special instructions — specifically `IN` and `OUT` in x86 — to read and write to these ports. This keeps memory address space clean but requires special assembly instructions.",
+        ],
+        diagram: "io-mapping-comparison",
+        realLife: {
+          title: "Real-life connection",
+          text: "Think of Memory-Mapped I/O like having mail slots inside your house (everything goes to the same wall). Isolated I/O is like having a separate PO Box downtown. You need a different key (a special instruction) to check the PO Box.",
+        },
+        table: {
+          caption: "I/O Mapping Methods Comparison",
+          headers: ["Feature", "Memory-Mapped I/O", "Isolated (Port-Mapped) I/O"],
+          rows: [
+            ["Address Space", "Shared (I/O registers occupy RAM addresses)", "Separate (Ports are distinct from RAM addresses)"],
+            ["Instructions", "Regular memory instructions (MOV, ADD, etc.)", "Special instructions (IN, OUT in x86)"],
+            ["Hardware Complexity", "Simpler CPU design, but requires device address decoding", "Separate address lines and control signals needed"],
+            ["Address Space Cost", "Reduces available RAM space", "Does not affect RAM space"],
+          ],
+        },
+      },
+      {
+        id: "io-techniques",
+        title: "Three Ways to Transfer Data",
+        body: [
+          "Once the mapping is established, how does the actual data move between the CPU and the device? There are three standard techniques, each solving a specific efficiency problem.",
+          { type: "subheading", text: "1. Programmed I/O (Polling)" },
+          "The CPU executes a loop, repeatedly checking a device's status register until the device is ready to send or receive data. While simple to implement, polling wastes almost 100% of the CPU's time on waiting.",
+          { type: "subheading", text: "2. Interrupt-Driven I/O" },
+          "Instead of checking constantly, the CPU goes about its normal work. When a device becomes ready, it sends an electrical signal (an Interrupt Request, or IRQ) to the CPU. The CPU pauses its current program, handles the device, and then returns to what it was doing.",
+          { type: "subheading", text: "3. Direct Memory Access (DMA)" },
+          "For massive data transfers (like loading a file from disk to RAM), interrupts still waste CPU time because the CPU has to move every single byte. Under DMA, a specialized hardware chip called the DMA Controller takes over. The CPU tells the DMA controller the source, destination, and size of the transfer, and goes to sleep or does other work. The DMA controller transfers the data directly between RAM and the device, interrupting the CPU only once when the entire transfer is complete.",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "Imagine ordering pizza. Polling is standing by the door and opening it every 30 seconds to check if the delivery person is there. Interrupt-driven is watching TV until the doorbell rings. DMA is telling a butler to get the pizza, pay for it, set the table, and only tap your shoulder when the food is ready to eat.",
+        },
+        table: {
+          caption: "Data Transfer Techniques Summary",
+          headers: ["Technique", "CPU Overhead", "Ideal Use Case"],
+          rows: [
+            ["Programmed I/O (Polling)", "Maximum (CPU busy-waits in a loop)", "Very simple systems, low-cost microcontrollers"],
+            ["Interrupt-Driven I/O", "Medium (CPU handles each byte via ISR)", "Keyboard keystrokes, mouse movement, network packets"],
+            ["Direct Memory Access (DMA)", "Minimum (CPU only coordinates start/end)", "Disk read/writes, GPU framebuffers, audio streaming"],
+          ],
+        },
+      },
+      {
+        id: "interrupt-mechanics",
+        title: "How Interrupts Work Under the Hood",
+        body: [
+          "Interrupts are the backbone of modern operating systems. They let a computer multi-task. Let's trace exactly what happens when you press a key on your keyboard:",
+          { type: "list", items: [
+            "1. Hardware Signal: The keyboard controller raises an Interrupt Request (IRQ) on the system control bus.",
+            "2. Complete Instruction: The CPU finishes executing its current assembly instruction so it doesn't leave registers in a half-computed state.",
+            "3. Save State: The CPU automatically pushes the Flags register, the Code Segment (CS), and the Instruction Pointer (EIP) onto the stack. This preserves the exact spot where the main program was paused.",
+            "4. Vector Lookup: The CPU reads the interrupt number (e.g., Interrupt 9 for keyboard). It uses this number as an index to look up the address of the handler in the Interrupt Vector Table (IVT, in real mode) or the Interrupt Descriptor Table (IDT, in protected mode).",
+            "5. Execute ISR: The CPU jumps to that address and runs the Interrupt Service Routine (ISR) — the function that reads the key code and saves it to a buffer.",
+            "6. IRET: The ISR concludes with a special instruction called IRET (Interrupt Return). This pops the saved EIP, CS, and Flags back off the stack, and the CPU seamlessly resumes the main program.",
+          ]},
+        ],
+        diagram: "interrupt-lifecycle",
+        realLife: {
+          title: "Real-life connection",
+          text: "It is exactly like reading a book. When the phone rings (Interrupt), you don't throw the book away. You place a bookmark (Save EIP/CS/Flags on Stack), answer the phone (Run ISR), hang up (IRET), open the book to the bookmark, and continue reading from the exact word you left off.",
+        },
+      },
+      {
+        id: "assembly-io-example",
+        title: "Assembly I/O: Polling Keyboard Port",
+        body: [
+          "In assembly, you interface with hardware ports directly using `IN` and `OUT`. Below is a standard routine showing how a CPU polls a keyboard status port (port 64h) and reads the key data (port 60h) once it's ready. If the key is the Escape key (scan code 0x01), it jumps to exit.",
+        ],
+        code: {
+          code: "; Poll the keyboard controller status port until data is available\nPollKeyboard:\n    IN AL, 64h          ; Read status register from port 64h\n    TEST AL, 01h        ; Bit 0 is 'Output Buffer Full' (data ready)\n    JZ PollKeyboard     ; If 0, no data yet, loop back\n\n; Data is ready, read the scan code\n    IN AL, 60h          ; Read scan code from data port 60h\n    CMP AL, 01h         ; 01h is the scan code for the ESC key\n    JE ExitProgram      ; If equal, jump to exit handler\n    RET",
+        },
+      },
+    ],
+    keyTakeaways: [
+      "Memory-Mapped I/O treats device registers as memory locations; Isolated I/O treats them as separate ports using IN/OUT instructions.",
+      "Polling wastes CPU cycles. Interrupt-driven I/O allows asynchronous device alerts. DMA enables high-speed block transfers bypassing the CPU.",
+      "An interrupt saves the Flags and Instruction Pointer on the stack, jumps to the ISR address found in the IVT/IDT, and returns using the IRET instruction.",
+    ],
+  },
+  "buses-storage": {
+    slug: "buses-storage",
+    level: "Advanced",
+    duration: "2 days",
+    preview: {
+      summary:
+        "Bits need physical paths to travel across the motherboard. This module covers the System Bus structure (Address, Data, and Control lines), the differences between secondary storage systems (HDDs vs SSDs), and how RAID arrays protect critical data from physical disk failures.",
+      highlights: [
+        "How Address, Data, and Control buses split responsibilities",
+        "Mechanical magnetic HDDs vs electrical Flash-based SSDs",
+        "RAID levels 0, 1, and 5 safety and performance trade-offs",
+      ],
+    },
+    sections: [
+      {
+        id: "system-buses",
+        title: "The Motherboard Highways: System Buses",
+        body: [
+          "A computer is not just a CPU; it is a collaborative ecosystem. The physical wires on the motherboard that transport bits between the CPU, RAM, and I/O devices are called the System Bus. To prevent chaos, this bus is divided into three distinct sets of lines:",
+          { type: "subheading", text: "1. Address Bus" },
+          "Carries the memory address or I/O port address that the CPU wants to access. It is unidirectional (CPU-to-device). The width of the address bus determines the maximum memory the CPU can address. For example, a 32-bit address bus can address 2^32 bytes (4 Gigabytes) of RAM.",
+          { type: "subheading", text: "2. Data Bus" },
+          "Carries the actual data bytes being read from or written to memory/devices. It is bidirectional (data flows in and out of the CPU). Its width determines the system's word size and directly impacts memory throughput.",
+          { type: "subheading", text: "3. Control Bus" },
+          "Carries signals that coordinate and synchronize the system. Examples include read/write command signals (MEMRD, MEMWR), system clock signals, interrupt lines, and bus request/grant signals.",
+        ],
+        diagram: "system-bus-split",
+        realLife: {
+          title: "Real-life connection",
+          text: "Think of a shipping company. The Address Bus is the GPS coordinate of the warehouse. The Data Bus is the truck carrying the actual cargo boxes. The Control Bus is the traffic lights and dispatch signals telling the driver whether to pick up (Read) or drop off (Write) the cargo.",
+        },
+        table: {
+          caption: "System Bus Types & Properties",
+          headers: ["Bus Type", "Direction", "Determines", "Example Signal"],
+          rows: [
+            ["Address Bus", "Unidirectional (CPU out)", "Maximum addressable memory capacity", "Target memory index (e.g. 0x00FF4B20)"],
+            ["Data Bus", "Bidirectional", "Word size and parallel data throughput", "Value of variable or instruction bytes (e.g. 0x55)"],
+            ["Control Bus", "Both directions / Multi-line", "System timing and command synchronization", "Read/Write strobe, Clock ticks, Interrupt Requests"],
+          ],
+        },
+      },
+      {
+        id: "secondary-storage",
+        title: "Secondary Storage: HDD vs SSD",
+        body: [
+          "RAM is volatile — it forgets everything when the computer is turned off. To store files, operating systems, and assembly programs permanently, we need non-volatile secondary storage. The two dominant technologies are Hard Disk Drives (HDDs) and Solid State Drives (SSDs).",
+          "HDDs are mechanical devices. They store data magnetically on spinning platters. A mechanical read/write arm moves back and forth to find data. Because of physical limits, HDDs suffer from seek latency (waiting for the arm to move) and rotational latency (waiting for the disk to spin to the right spot). They are also sensitive to drop shocks.",
+          "SSDs have no moving parts. They store data electrically using NAND Flash memory chips. Because there is no physical arm to move, SSDs have near-zero seek latency, offering vastly faster random read/write speeds, silent operation, and high durability.",
+        ],
+        realLife: {
+          title: "Real-life connection",
+          text: "Searching for a song on an HDD is like looking for a track on a vinyl record by moving the physical needle arm. An SSD is like selecting a track instantly on a digital MP3 player. That is why replacing an old HDD with an SSD is the single best upgrade to speed up a slow computer.",
+        },
+        table: {
+          caption: "HDD vs SSD Comparison",
+          headers: ["Specification", "Hard Disk Drive (HDD)", "Solid State Drive (SSD)"],
+          rows: [
+            ["Mechanism", "Spinning magnetic platters & moving arm", "NAND Flash memory chips"],
+            ["Random Access Time", "Slow (5 - 15 milliseconds mechanical seek)", "Near-instant (0.1 milliseconds electrical lookup)"],
+            ["Durability", "Fragile (mechanical parts can break if dropped)", "Highly durable (solid-state electronics)"],
+            ["Typical Read Speed", "80 - 160 MB/s", "500 - 7000+ MB/s (NVMe/PCIe)"],
+            ["Cost per GB", "Very low (great for mass archival storage)", "Medium to High"],
+          ],
+        },
+      },
+      {
+        id: "raid-storage",
+        title: "Data Protection: RAID Arrays",
+        body: [
+          "In enterprise servers and databases, a single drive failure could destroy critical company data. RAID (Redundant Array of Independent Disks) solves this by combining multiple physical hard drives into a single logical volume to improve speed, reliability, or both. Let's look at the three most common RAID levels:",
+          { type: "subheading", text: "RAID 0 (Stripping)" },
+          "Data is sliced into blocks and written alternately across two or more disks. This doubles the read/write speed because both disks read/write in parallel. However, there is zero safety: if one disk fails, all data on all disks is permanently lost.",
+          { type: "subheading", text: "RAID 1 (Mirroring)" },
+          "Data written to Disk 1 is simultaneously copied identically to Disk 2. This offers excellent safety: if one disk dies, the system keeps running on the other. The downside is that you pay for two disks but only get the storage capacity of one.",
+          { type: "subheading", text: "RAID 5 (Distributed Parity)" },
+          "Requires at least three disks. Data is striped across disks, but a mathematically calculated safety check block (called parity) is also written and distributed across the drives. If any single drive fails, the system can use the parity blocks on the remaining drives to reconstruct the missing data in real time. This offers a great balance of speed, protection, and capacity cost.",
+        ],
+        diagram: "raid-comparison",
+        realLife: {
+          title: "Real-life connection",
+          text: "Imagine writing a long school report. RAID 0 is writing odd chapters in one notebook and even chapters in another (faster writing, but lose one notebook and the whole report is ruined). RAID 1 is copying the whole report onto a backup notebook (very safe, but requires twice the work and paper). RAID 5 is using three notebooks and writing code keys in the margins so you can rebuild any lost page by comparing the other two.",
+        },
+      },
+    ],
+    keyTakeaways: [
+      "The System Bus splits into the Address Bus (location selection), Data Bus (value transport), and Control Bus (timing/operation commands).",
+      "SSDs are much faster than HDDs because they eliminate mechanical seek latency by accessing NAND Flash memory electrically.",
+      "RAID 0 offers raw speed with no backup, RAID 1 offers full mirroring backup at 50% capacity, and RAID 5 offers parity recovery across 3+ disks.",
+    ],
+  },
 };
 
 function getCoalTopicContent(slug) {
