@@ -531,13 +531,15 @@ export default function ProblemsPage() {
   };
 
   const handleBannerCardClick = (card) => {
-    if (card.filterGroup) {
+    trackPracticeEngagement("banner_card_click", {
+      card_title: card.title,
+      filter_group: card.filterGroup,
+    });
+    if (card.path) {
+      navigate(card.path);
+    } else if (card.filterGroup) {
       setActiveGroup(card.filterGroup);
       setTopicFilter(card.filterGroup);
-      trackPracticeEngagement("banner_card_click", {
-        card_title: card.title,
-        filter_group: card.filterGroup,
-      });
     }
   };
 
@@ -1050,7 +1052,16 @@ export default function ProblemsPage() {
                   key={card.title}
                   className="problems-banner-card"
                   style={{ background: card.gradient, cursor: "pointer" }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${card.title} — ${card.eyebrow}`}
                   onClick={() => handleBannerCardClick(card)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleBannerCardClick(card);
+                    }
+                  }}
                 >
                   <span>{card.eyebrow}</span>
                   <h2>{card.title}</h2>

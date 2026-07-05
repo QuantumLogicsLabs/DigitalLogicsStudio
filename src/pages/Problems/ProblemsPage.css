@@ -673,6 +673,20 @@
   border-radius: 1rem;
   padding: 0.8rem 0.9rem;
   color: #fff;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.problems-banner-card:hover,
+.problems-banner-card:focus-visible {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.problems-banner-card:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .problems-banner-card span {
@@ -2546,3 +2560,50 @@
   background: #2563eb;
 }
 
+
+/* ── Banner cards responsive layout ───────────────────────────────────────
+   Large desktop (≥1280px): all 6 in one row, auto-scroll kicks in
+   Medium (≥960px <1280px): 3 cards per row, wrap naturally
+   Small (≥600px <960px):  2 cards per row
+   Mobile (<600px):        1 card full-width, no scroll
+────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1280px) {
+  /* Wide enough to show all 6 — GSAP auto-scroll handles overflow */
+  .problems-banner-row {
+    grid-template-columns: repeat(6, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 1279px) and (min-width: 960px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .problems-banner-card h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 959px) and (min-width: 600px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+}
+
+@media (max-width: 599px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .problems-banner-card {
+    min-height: 90px;
+  }
+
+  .problems-banner-card h2 {
+    font-size: 1rem;
+  }
+}
