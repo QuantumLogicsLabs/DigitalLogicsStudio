@@ -179,12 +179,12 @@ const homeData = [
   },
   {
     title: "Learning Resources",
-    description: "Access curated problems and additional tools.",
+    description: "Explore dedicated DLD and COAL study tracks with beginner-level concepts and practice paths.",
     section: "resources",
     sortOrder: 1,
     links: [
-      { text: "Book Ch1 Problems", to: "/book" },
-      { text: "Book Ch2 Problems", to: "/book/ch2" },
+      { text: "DLD Resources", to: "/resources/dld" },
+      { text: "COAL Resources", to: "/resources/coal" },
       { text: "Timing Diagrams", to: "/timing-diagrams" },
     ],
   },

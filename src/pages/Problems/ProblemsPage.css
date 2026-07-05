@@ -651,7 +651,7 @@
 .problems-banner-row {
   display: grid;
   grid-template-columns: repeat(6, minmax(180px, 1fr));
-  gap: 0.9rem;
+  gap: 4.9rem;
   overflow-x: auto;
   padding-bottom: 0.2rem;
   /* hide scrollbar cross-browser */
@@ -673,6 +673,7 @@
   border-radius: 1rem;
   padding: 0.8rem 0.9rem;
   color: #fff;
+<<<<<<< HEAD
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -687,6 +688,9 @@
 
 .problems-banner-card:active {
   transform: translateY(0) scale(0.98);
+=======
+  width: 250px;
+>>>>>>> upstream/main
 }
 
 .problems-banner-card span {
@@ -867,6 +871,15 @@
   transition: background 0.16s ease;
 }
 
+.problems-table tbody tr.is-locked {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.problems-table tbody tr.is-locked:hover {
+  background: transparent;
+}
+
 .problems-table tbody tr:hover,
 .problems-table tbody tr.is-selected {
   background: var(--problems-row-hover);
@@ -914,13 +927,15 @@
 }
 
 .status-chip {
+  display: inline-flex;
+  align-items: center;
   border: 1px solid var(--problems-border-strong);
   border-radius: 999px;
   background: var(--problems-surface-strong);
   color: var(--problems-text-soft);
   min-height: 34px;
   padding: 0.45rem 0.85rem;
-  cursor: pointer;
+  cursor: default;
 }
 
 .status-chip.is-attempted {
@@ -931,6 +946,27 @@
 .status-chip.is-solved {
   color: #4ade80;
   border-color: rgba(74, 222, 128, 0.3);
+}
+
+.access-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  min-height: 30px;
+}
+
+.access-pill.is-open {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.access-pill.is-locked {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
 }
 
 .problem-tag-list {
@@ -2559,6 +2595,7 @@
 .problems-page.theme-light .arena-sub-link:hover .arena-sub-link-dot {
   background: #2563eb;
 }
+<<<<<<< HEAD
 
 
 /* ── Banner cards responsive layout ───────────────────────────────────────
@@ -2607,3 +2644,5 @@
     font-size: 1rem;
   }
 }
+=======
+>>>>>>> upstream/main

@@ -1,0 +1,1078 @@
+.learning-resources-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 28%),
+    radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.16), transparent 26%),
+    var(--bg-color, #060816);
+  color: var(--text-color);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.learning-resources-main {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1.25rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.learning-resources-section[id],
+.learning-resources-section[id] * {
+  scroll-margin-top: 110px;
+}
+
+/* see here first */
+.learning-resources-hero {
+  display: grid;
+  grid-template-columns: 1.35fr 0.95fr;
+  gap: 1.8rem;
+  align-items: center;
+  padding: 2.5rem 0 3rem;
+}
+
+.learning-resources-hero-content h1 {
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  line-height: 1.05;
+  margin: 0.35rem 0 0.85rem;
+}
+
+.learning-resources-hero-content p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--secondary-text, #92a0b8);
+  max-width: 720px;
+}
+
+.learning-resources-badge {
+  display: inline-flex;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--badge-border);
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.learning-resources-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.learning-resources-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.learning-resources-btn:hover {
+  transform: translateY(-2px);
+}
+
+.learning-resources-btn.primary {
+  background: linear-gradient(135deg, var(--accent-color, #60a5fa), #8b5cf6);
+  color: white;
+  box-shadow: 0 12px 30px rgba(96, 165, 250, 0.23);
+}
+
+.learning-resources-btn.secondary {
+  background: var(--surface-elevated);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.learning-resources-hero-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(8, 12, 24, 0.94));
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.8rem;
+  padding: 1.6rem;
+  box-shadow: 0 22px 50px rgba(2, 8, 23, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.learning-resources-hero-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+
+.learning-resources-hero-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.learning-resources-hero-card p {
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.learning-resources-section {
+  margin-top: 1.35rem;
+  padding: 1.75rem;
+  border-radius: 1.7rem;
+  background: linear-gradient(145deg, rgba(9, 13, 24, 0.95), rgba(12, 18, 31, 0.9));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 20px 45px rgba(2, 8, 23, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.learning-resources-section-header h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+}
+
+.learning-resources-section-header p {
+  margin: 0;
+  color: var(--secondary-text, #92a0b8);
+}
+
+.learning-resources-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 1.15rem;
+}
+
+.learning-resources-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(8, 12, 24, 0.92));
+  color: var(--text-color);
+  text-decoration: none;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 18px 36px rgba(2, 8, 23, 0.34);
+  overflow: hidden;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+  text-align: left;
+}
+
+.learning-resources-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59, 130, 246, 0.34);
+  background: linear-gradient(145deg, rgba(17, 25, 45, 0.97), rgba(10, 15, 28, 0.94));
+  box-shadow: 0 24px 48px rgba(2, 8, 23, 0.42);
+}
+
+.learning-resources-glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--pointer-glow-x, 50%) var(--pointer-glow-y, 50%),
+    var(--pointer-glow-color, rgba(59, 130, 246, 0.12)) 0%,
+    transparent 42%
+  );
+  opacity: var(--pointer-glow-opacity, 0);
+  transition: opacity 250ms ease, background-position 80ms ease;
+}
+
+.learning-resources-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.learning-resources-card-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+}
+
+.learning-resources-card-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  text-align: left;
+}
+
+.learning-resources-card-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.learning-resources-card-copy p {
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.learning-resources-card-icon {
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(139, 92, 246, 0.16));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.learning-resources-card h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.learning-resources-card p {
+  margin: 0;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.6;
+}
+
+.learning-resources-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.14);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  color: var(--accent-color, #60a5fa);
+  font-weight: 600;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+.learning-resources-concepts-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1.15rem;
+}
+
+.learning-resources-concept-card {
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(8, 12, 24, 0.9));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.learning-resources-concept-card h3 {
+  margin: 0 0 0.45rem;
+}
+
+.learning-resources-concept-card p {
+  margin: 0;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.65;
+}
+
+.learning-resources-visual-grid,
+.learning-resources-demo-grid,
+.learning-resources-practice-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+.learning-resources-visual-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.learning-resources-demo-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.learning-resources-practice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.learning-resources-visual-card,
+.learning-resources-demo-card,
+.learning-resources-practice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(8, 12, 24, 0.9));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  text-align: left;
+}
+
+.learning-resources-visual-icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--chip-bg);
+  color: var(--accent-color);
+  margin-bottom: 0.7rem;
+}
+
+.learning-resources-visual-card h3,
+.learning-resources-demo-card h3,
+.learning-resources-practice-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.02rem;
+}
+
+.learning-resources-visual-card p,
+.learning-resources-demo-card pre,
+.learning-resources-practice-card p {
+  margin: 0;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.65;
+}
+
+.learning-resources-demo-card pre {
+  margin: 0;
+  white-space: pre-wrap;
+  background: var(--surface-inset);
+  border-radius: 0.8rem;
+  padding: 0.85rem;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.92rem;
+}
+
+.learning-resources-practice-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.learning-resources-difficulty {
+  display: inline-flex;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  color: var(--accent-color);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.learning-resources-idea {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+}
+
+.learning-resources-roadmap {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.15rem;
+}
+
+.learning-resources-roadmap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+}
+
+.learning-resources-roadmap-number {
+  width: 54px;
+  height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent-color, #60a5fa), #8b5cf6);
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.learning-resources-roadmap-body {
+  flex: 1;
+}
+
+.learning-resources-roadmap-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.learning-resources-roadmap-meta h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.learning-resources-roadmap-meta span {
+  color: var(--accent-color, #60a5fa);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.learning-resources-roadmap-body ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.7;
+}
+
+.learning-resources-roadmap-item p {
+  margin: 0;
+  color: var(--text-color);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .learning-resources-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-resources-grid,
+  .learning-resources-visual-grid,
+  .learning-resources-demo-grid,
+  .learning-resources-practice-grid,
+  .learning-resources-concepts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.learning-resources-card-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  gap: 0.8rem;
+  justify-content: space-between;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  color: inherit;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.learning-resources-card-button:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.learning-resources-roadmap {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+.learning-resources-roadmap-zigzag {
+  display: grid;
+  gap: 0;
+  margin-top: 1.15rem;
+}
+
+.learning-resources-roadmap-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 12px;
+}
+
+.learning-resources-roadmap-row.left .learning-resources-roadmap-cell {
+  grid-column: 1 / 2;
+  justify-self: start;
+}
+
+.learning-resources-roadmap-row.right .learning-resources-roadmap-cell {
+  grid-column: 2 / 3;
+  justify-self: end;
+}
+
+.learning-resources-roadmap-cell {
+  position: relative;
+  min-height: 140px;
+  padding: 1rem;
+  border-radius: 1.15rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  width: calc(100% - 40px);
+}
+
+.learning-resources-roadmap-cell:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59, 130, 246, 0.28);
+  background: var(--surface-muted);
+}
+
+/* ---------------------------------------------------------------- */
+/* Curved arrow connectors between zigzag roadmap steps               */
+/* Built as an SVG path: horizontal out -> gentle curve -> vertical   */
+/* shaft -> arrowhead, mirrored via scaleX for right-side cards.      */
+/* ---------------------------------------------------------------- */
+
+.learning-resources-roadmap-connector {
+  position: absolute;
+  top: calc(100% - 130px);
+  width: 280px;
+  height: 170px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.learning-resources-roadmap-row.left .learning-resources-roadmap-connector {
+  left: calc(50% - 70px);
+}
+
+.learning-resources-roadmap-row.right .learning-resources-roadmap-connector {
+  right: calc(50% - 70px);
+}
+
+.learning-resources-roadmap-connector.flip {
+  transform: scaleX(-1);
+}
+
+.learning-resources-roadmap-connector-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(59, 130, 246, 0.12));
+}
+
+.learning-resources-roadmap-arrowhead {
+  filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.45));
+}
+
+.learning-resources-roadmap-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.learning-resources-roadmap-meta h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.learning-resources-roadmap-meta span {
+  color: var(--accent-color, #60a5fa);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.learning-resources-roadmap-body ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.7;
+}
+
+.learning-resources-roadmap-item p {
+  margin: 0;
+  color: var(--text-primary, #f8fafc);
+  line-height: 1.7;
+}
+
+.learning-resources-course-section {
+  overflow: hidden;
+}
+
+.learning-resources-course-shell {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) 1fr;
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+  align-items: start;
+}
+
+.learning-resources-course-nav {
+  position: sticky;
+  top: 6.5rem;
+}
+
+.learning-resources-course-nav-card {
+  padding: 1.15rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(155deg, rgba(15, 23, 42, 0.98), rgba(8, 12, 24, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 20px 44px rgba(2, 8, 23, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.learning-resources-course-nav-label,
+.learning-resources-course-eyebrow {
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-color, #60a5fa);
+}
+
+.learning-resources-course-nav-card h3 {
+  margin: 0 0 0.7rem;
+  font-size: 1.08rem;
+  line-height: 1.4;
+}
+
+.learning-resources-course-progress {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 0.95rem 1.1rem;
+  border-radius: 1rem;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.16), rgba(139, 92, 246, 0.12));
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  color: var(--secondary-text, #92a0b8);
+  font-size: 0.85rem;
+}
+
+.learning-resources-course-progress-track {
+  width: 100%;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  overflow: hidden;
+}
+
+.learning-resources-course-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-color, #60a5fa), #8b5cf6);
+  transition: width 220ms ease;
+}
+
+.learning-resources-course-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.learning-resources-course-progress-meta span:first-child {
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.learning-resources-course-nav-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.learning-resources-course-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  min-height: 3.8rem;
+  padding: 1.2rem 0.99rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text-color);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.learning-resources-course-nav-item:hover,
+.learning-resources-course-nav-item.active {
+  transform: translateX(2px);
+  border-color: rgba(96, 165, 250, 0.32);
+  background: rgba(96, 165, 250, 0.12);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.learning-resources-course-nav-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.learning-resources-course-nav-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.learning-resources-course-nav-copy strong {
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.learning-resources-course-nav-copy small {
+  color: var(--secondary-text, #92a0b8);
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+.learning-resources-course-topics {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.learning-resources-course-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(8, 12, 24, 0.9));
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+  min-height: 5.25rem;
+}
+
+.learning-resources-course-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(96, 165, 250, 0.24);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
+.learning-resources-course-card.open {
+  border-color: rgba(96, 165, 250, 0.38);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.13), rgba(10, 15, 28, 0.96));
+  box-shadow: 0 18px 40px rgba(2, 8, 23, 0.32);
+  transform: translateY(-1px);
+}
+
+.learning-resources-course-card-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.2rem;
+  background: transparent;
+  border: 0;
+  color: var(--text-color);
+  text-align: left;
+  cursor: pointer;
+}
+
+.learning-resources-course-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.learning-resources-course-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(96, 165, 250, 0.16);
+  color: var(--accent-color, #60a5fa);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.learning-resources-course-card-heading h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.learning-resources-course-card-body {
+  padding: 0 1.2rem 1.2rem;
+  color: var(--secondary-text, #92a0b8);
+}
+
+.learning-resources-course-card-body p {
+  margin: 0 0 0.8rem;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+.learning-resources-course-card-body ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.55rem;
+  line-height: 1.7;
+  font-size: 0.96rem;
+}
+
+.learning-resources-course-card-body li {
+  position: relative;
+  padding-left: 0.2rem;
+}
+
+.learning-resources-course-card-body li::marker {
+  color: var(--accent-color, #60a5fa);
+  font-size: 0.95rem;
+}
+
+.learning-resources-course-card-body pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  background: var(--surface-inset);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: #f8fafc;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.learning-resources-course-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(120deg, rgba(96, 165, 250, 0.14), rgba(139, 92, 246, 0.12));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.learning-resources-course-footer h3 {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.35;
+}
+
+.learning-resources-course-footer p {
+  margin: 0;
+  color: var(--secondary-text, #92a0b8);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.learning-resources-tooltip {
+  position: absolute;
+  left: var(--tooltip-x, 50%);
+  top: var(--tooltip-y, -12px);
+  transform: translate(-50%, -110%);
+  width: calc(100% - 1.5rem);
+  max-width: 260px;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  transition: opacity 180ms ease, left 120ms ease, top 120ms ease;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.22);
+  z-index: 10;
+}
+
+.learning-resources-roadmap-cell:hover .learning-resources-tooltip {
+  opacity: 1;
+}
+
+.learning-resources-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(15, 23, 42, 0.98);
+}
+
+@media (max-width: 900px) {
+  .learning-resources-roadmap-row {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-resources-roadmap-row.left .learning-resources-roadmap-cell,
+  .learning-resources-roadmap-row.right .learning-resources-roadmap-cell {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .learning-resources-roadmap-connector,
+  .learning-resources-roadmap-cell::after,
+  .learning-resources-roadmap-cell::before {
+    display: none;
+  }
+
+  .learning-resources-roadmap-row {
+    margin-bottom: 1rem;
+  }
+
+  .learning-resources-course-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-resources-course-nav {
+    position: static;
+  }
+
+  .learning-resources-course-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ─── Light theme — uses global blue-frost tokens from index.css ─────── */
+[data-theme='light'] .learning-resources-section {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 45%),
+    var(--light-glass-strong);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='light'] .learning-resources-section-header h2 {
+  color: var(--heading-color);
+}
+
+[data-theme='light'] .learning-resources-hero-card,
+[data-theme='light'] .learning-resources-card,
+[data-theme='light'] .learning-resources-concept-card,
+[data-theme='light'] .learning-resources-visual-card,
+[data-theme='light'] .learning-resources-demo-card,
+[data-theme='light'] .learning-resources-practice-card,
+[data-theme='light'] .learning-resources-roadmap-cell,
+[data-theme='light'] .learning-resources-course-nav-card,
+[data-theme='light'] .learning-resources-course-card {
+  background: var(--light-glass);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  color: var(--text-color);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='light'] .learning-resources-card:hover,
+[data-theme='light'] .learning-resources-roadmap-cell:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(224, 236, 255, 0.92));
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow: var(--card-shadow-hover);
+}
+
+[data-theme='light'] .learning-resources-card-copy h3,
+[data-theme='light'] .learning-resources-card h3,
+[data-theme='light'] .learning-resources-concept-card h3,
+[data-theme='light'] .learning-resources-visual-card h3,
+[data-theme='light'] .learning-resources-demo-card h3,
+[data-theme='light'] .learning-resources-practice-card h3,
+[data-theme='light'] .learning-resources-roadmap-meta h3,
+[data-theme='light'] .learning-resources-course-nav-card h3 {
+  color: var(--heading-color);
+}
+
+[data-theme='light'] .learning-resources-card-copy p,
+[data-theme='light'] .learning-resources-card p,
+[data-theme='light'] .learning-resources-concept-card p,
+[data-theme='light'] .learning-resources-visual-card p,
+[data-theme='light'] .learning-resources-practice-card p,
+[data-theme='light'] .learning-resources-section-header p,
+[data-theme='light'] .learning-resources-hero-content p {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .learning-resources-roadmap-item p {
+  color: var(--text-color);
+}
+
+[data-theme='light'] .learning-resources-card-link {
+  color: var(--accent-color);
+  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(37, 99, 235, 0.06);
+}
+
+[data-theme='light'] .learning-resources-card-link:hover {
+  background: var(--accent-color);
+  color: #ffffff;
+}
+
+[data-theme='light'] .learning-resources-demo-card pre,
+[data-theme='light'] .learning-resources-course-card-body pre {
+  background: var(--surface-inset);
+  border-color: var(--card-border);
+  color: #1e293b;
+}
+
+[data-theme='light'] .learning-resources-tooltip {
+  background: #ffffff;
+  border-color: var(--card-border);
+  color: var(--text-color);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme='light'] .learning-resources-course-footer {
+  background: linear-gradient(120deg, rgba(37, 99, 235, 0.06), rgba(124, 58, 237, 0.05));
+  border-color: var(--card-border);
+}
+
+[data-theme='light'] .learning-resources-roadmap-number {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.22);
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .learning-resources-difficulty {
+  color: #b45309;
+  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.22);
+}
+
+[data-theme='light'] .learning-resources-idea {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .learning-resources-btn.secondary {
+  background: #ffffff;
+  border-color: var(--card-border);
+  color: var(--text-color);
+}
+
+[data-theme='light'] .learning-resources-btn.secondary:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}

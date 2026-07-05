@@ -10,6 +10,10 @@ import RelatedSeoLinks from '../components/seo/RelatedSeoLinks';
 import { trackToolInteraction } from '../utils/analytics';
 import { Navbar } from './Home/Navbar';
 import { useTheme } from '../context/ThemeContext';
+import {
+    CirclePlus, 
+    X, 
+} from 'lucide-react';
 
 const KMapGenerator = () => {
     const { theme, toggle: toggleTheme } = useTheme();
@@ -99,7 +103,6 @@ const KMapGenerator = () => {
                         onExample={handleExample}
                         onReset={handleReset}
                         showGroupingGuide={showGroupingGuide}
-                        onToggleGroupingGuide={() => setShowGroupingGuide(!showGroupingGuide)}
                         expression={expression}
                         onExperiment={() => setShowCircuitModal(true)}  
                     />
@@ -112,7 +115,9 @@ const KMapGenerator = () => {
                 <p className="kmap-sidebar-label">Karnaugh Map</p>
                 {!showSolution && (
                     <div className="kmap-empty-state">
-                        <div className="kmap-empty-icon">⊕</div>
+                        <div className="kmap-empty-icon">
+                            <CirclePlus className="h-5 w-5" />
+                        </div>
                         <h2 className="kmap-empty-title">Your K-Map will appear here</h2>
                         <p className="kmap-empty-hint">
                         Configure your variables and minterms in the panel on the left,
@@ -183,7 +188,7 @@ const KMapGenerator = () => {
                     onClick={() => setShowCircuitModal(false)}
                     title="Close Circuit Editor"
                 >
-                    ✕
+                    <X className="h-4 w-4" />
                 </button>
                 <Boolforge
                     simplifiedExpression={expression}

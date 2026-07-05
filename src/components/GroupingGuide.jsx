@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
 import { WhiteboardAnimation } from './WhiteboardAnimation';
+import {  
+  Volume2, 
+  SkipBack, 
+  ChevronLeft, 
+  ChevronRight, 
+  Play, 
+  Pause, 
+  Presentation 
+} from 'lucide-react';
 
 export const GroupingGuide = ({ groups, variables, numVariables, grid, getColumnLabels, getRowLabels, optimizationType = 'SOP' }) => {
     const [currentStep, setCurrentStep] = useState(0);
@@ -92,7 +101,7 @@ export const GroupingGuide = ({ groups, variables, numVariables, grid, getColumn
     return (
         <div className="kmap-card kmap-grouping-guide">
             <h2 className="kmap-section-title">
-                <span className="kmap-voice-icon">🔊</span>
+                <Volume2 className="h-6 w-6 text-primary" />
                 Interactive Grouping Explanation
             </h2>
 
@@ -101,50 +110,58 @@ export const GroupingGuide = ({ groups, variables, numVariables, grid, getColumn
                 
                 {/* 1. Restart */}
                 <button
-                    className="kmap-btn kmap-btn-outline"
-                    onClick={handleRestart}
-                    disabled={!isRestartActive}
-                    title="Restart from beginning"
+                className="kmap-btn kmap-btn-outline"
+                onClick={handleRestart}
+                disabled={!isRestartActive}
+                title="Restart from beginning"
                 >
-                    ⏪ 
+                <SkipBack className="h-4 w-4" /> 
                 </button>
 
                 {/* 2. Step Backward */}
                 <button
-                    className="kmap-btn kmap-btn-outline"
-                    onClick={() => handleStepChange(currentStep - 1)}
-                    disabled={!isBackActive}
-                    title="Previous Step"
+                className="kmap-btn kmap-btn-outline"
+                onClick={() => handleStepChange(currentStep - 1)}
+                disabled={!isBackActive}
+                title="Previous Step"
                 >
-                    ⏮️ 
+                <ChevronLeft className="h-4 w-4" /> 
                 </button>
 
                 {/* 3. Play / Pause / Resume */}
                 <button
-                    className={`kmap-btn ${isPlaying ? 'kmap-btn-outline' : 'kmap-btn-primary'}`}
-                    onClick={handlePlayPauseToggle}
-                    style={{ minWidth: '120px' }}
+                className={`kmap-btn ${isPlaying ? 'kmap-btn-outline' : 'kmap-btn-primary'}`}
+                onClick={handlePlayPauseToggle}
+                style={{ minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                    {isPlaying ? '⏸️ Pause' : (isPaused ? '▶️ Resume' : '▶️ Play')}
+                {isPlaying ? (
+                    <>
+                    <Pause className="h-4 w-4" /> Pause
+                    </>
+                ) : (
+                    <>
+                    <Play className="h-4 w-4" /> {isPaused ? 'Resume' : 'Play'}
+                    </>
+                )}
                 </button>
 
                 {/* 4. Step Forward  */}
                 <button
-                    className="kmap-btn kmap-btn-outline"
-                    onClick={() => handleStepChange(currentStep + 1)}
-                    disabled={!isForwardActive}
-                    title="Next Step"
+                className="kmap-btn kmap-btn-outline"
+                onClick={() => handleStepChange(currentStep + 1)}
+                disabled={!isForwardActive}
+                title="Next Step"
                 >
-                    ⏭️ 
+                <ChevronRight className="h-4 w-4" /> 
                 </button>
 
                 {/* 5. Whiteboard Toggle */}
                 <button
-                    className="kmap-btn kmap-btn-secondary"
-                    onClick={() => setShowWhiteboard(!showWhiteboard)}
-                    style={{ marginLeft: 'auto' }} 
+                className="kmap-btn kmap-btn-secondary"
+                onClick={() => setShowWhiteboard(!showWhiteboard)}
+                style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }} 
                 >
-                    📋 Whiteboard
+                <Presentation className="h-4 w-4" /> Whiteboard
                 </button>
             </div>
 
@@ -176,7 +193,11 @@ export const GroupingGuide = ({ groups, variables, numVariables, grid, getColumn
                                 onClick={() => handlePlayExplanation(index)}
                                 title="Play this step"
                             >
-                                {currentStep === index && isPlaying ? '⏸️' : '🔊'}
+                                {currentStep === index && isPlaying ? (
+                                <Pause className="h-4 w-4" />
+                                ) : (
+                                <Volume2 className="h-4 w-4" />
+                                )}
                             </button>
                         </div>
                         <div className="kmap-step-content">

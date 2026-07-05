@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+    Cpu, 
+    FileCode, 
+    RotateCcw, 
+    Plug,
+} from 'lucide-react';
 
 export const InputControls = ({
     numVariables,
@@ -16,8 +22,7 @@ export const InputControls = ({
     onReset,
     expression,
     onExperiment,
-    showGroupingGuide,  
-    onToggleGroupingGuide
+    showGroupingGuide
 }) => {
     const handleVariableNameChange = (index, value) => {
         const newVars = [...variables];
@@ -106,39 +111,28 @@ export const InputControls = ({
                     </select>
                 </div>
 
-                <div className="kmap-control-group">
-                    <label className="kmap-label">Grouping Guide</label>
-                    <label className="kmap-toggle">
-                        <input
-                            type="checkbox"
-                            checked={showGroupingGuide}
-                            onChange={onToggleGroupingGuide}
-                        />
-                        <span className="kmap-toggle-slider"></span>
-                    </label>
-                </div>
-
+                {/* Core Action Button Row */}
                 <div className="kmap-btn-row">
                     <button
-                        className="kmap-btn kmap-btn-primary"
-                        onClick={onGenerate}
-                        title="Solve the K‑Map"
+                    className="kmap-btn kmap-btn-primary"
+                    onClick={onGenerate}
+                    title="Solve the KMap"
                     >
-                        🔍 
+                    <Cpu className="h-5 w-5" /> 
                     </button>
                     <button
-                        className="kmap-btn kmap-btn-secondary"
-                        onClick={onExample}
-                        title="Load a pre‑filled example"
+                    className="kmap-btn kmap-btn-secondary"
+                    onClick={onExample}
+                    title="Load a prefilled example"
                     >
-                        📋 
+                    <FileCode className="h-5 w-5" /> 
                     </button>
                     <button
-                        className="kmap-btn kmap-btn-outline"
-                        onClick={onReset}
-                        title="Clear all inputs"
+                    className="kmap-btn kmap-btn-outline"
+                    onClick={onReset}
+                    title="Clear all inputs"
                     >
-                        🔄 
+                    <RotateCcw className="h-5 w-5" /> 
                     </button>
                 </div>
 
@@ -154,7 +148,7 @@ export const InputControls = ({
                         onClick={onExperiment}
                         title="Open the interactive circuit editor"
                     >
-                        🔌 Experiment with Circuit
+                        <Plug className="h-4 w-4 mr-2" /> Experiment with Circuit
                     </button>
                 )}
             </div>

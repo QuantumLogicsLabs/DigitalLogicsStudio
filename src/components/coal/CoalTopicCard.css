@@ -1,0 +1,595 @@
+.coal-topic-card__body {
+  padding-top: 0.25rem;
+}
+
+.coal-topic-preview-summary {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+
+.coal-topic-preview-list {
+  margin: 0 0 1.25rem 1.1rem;
+  padding: 0;
+  color: var(--secondary-text, #92a0b8);
+  line-height: 1.6;
+}
+
+.coal-topic-preview-list li {
+  margin-bottom: 0.45rem;
+}
+
+.coal-topic-preview-list li::marker {
+  color: #8b5cf6;
+}
+
+.coal-topic-full-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.coal-topic-full-btn:hover {
+  background: rgba(139, 92, 246, 0.22);
+  transform: translateY(-1px);
+}
+
+.coal-full-content {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.coal-section h4 {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  color: #e9e4ff;
+}
+
+.coal-section p {
+  margin: 0 0 0.75rem;
+  line-height: 1.65;
+  color: var(--secondary-text, #92a0b8);
+}
+
+.coal-real-life {
+  margin-top: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.coal-real-life__head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+  color: #fcd34d;
+  font-size: 0.9rem;
+}
+
+.coal-real-life p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #e8d9a8;
+}
+
+.coal-table-wrap {
+  overflow-x: auto;
+  margin: 0.85rem 0;
+}
+
+.coal-table-caption {
+  font-size: 0.82rem;
+  color: #a78bfa;
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.coal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.coal-table th,
+.coal-table td {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  text-align: left;
+  vertical-align: top;
+}
+
+.coal-table th {
+  background: rgba(139, 92, 246, 0.15);
+  color: #ddd6fe;
+  font-weight: 600;
+}
+
+.coal-table td {
+  color: var(--secondary-text, #92a0b8);
+}
+
+.coal-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.coal-diagram {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  background: rgba(8, 10, 24, 0.6);
+}
+
+.coal-diagram__svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.coal-diagram--cards {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.9rem;
+}
+
+.coal-isa-grid,
+.coal-address-grid,
+.coal-flag-grid {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 620px;
+}
+
+.coal-isa-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.coal-address-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.coal-flag-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.coal-isa-card,
+.coal-address-card,
+.coal-flag-card {
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.coal-isa-card strong,
+.coal-address-card strong,
+.coal-flag-card strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #f5f3ff;
+}
+
+.coal-isa-card span,
+.coal-address-card span,
+.coal-flag-card span {
+  display: block;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.coal-address-card__code {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  font-size: 0.82rem;
+  color: #c4b5fd;
+}
+
+.coal-isa-card--transfer {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.coal-isa-card--arithmetic {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.coal-isa-card--logic {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.coal-isa-card--control {
+  border-color: rgba(236, 72, 153, 0.35);
+}
+
+.coal-flag-card--active {
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.15);
+}
+
+@media (max-width: 640px) {
+  .coal-isa-grid,
+  .coal-address-grid,
+  .coal-flag-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.coal-diagram__box {
+  fill: rgba(139, 92, 246, 0.15);
+  stroke: rgba(167, 139, 250, 0.55);
+  stroke-width: 1.5;
+}
+
+.coal-diagram__box--cpu {
+  fill: rgba(59, 130, 246, 0.18);
+  stroke: rgba(96, 165, 250, 0.6);
+}
+
+.coal-diagram__box--mem {
+  fill: rgba(16, 185, 129, 0.15);
+  stroke: rgba(52, 211, 153, 0.55);
+}
+
+.coal-diagram__box--io {
+  fill: rgba(251, 191, 36, 0.12);
+  stroke: rgba(251, 191, 36, 0.45);
+}
+
+.coal-diagram__box--bus {
+  fill: rgba(139, 92, 246, 0.22);
+  stroke: rgba(196, 181, 253, 0.65);
+}
+
+.coal-diagram__label {
+  fill: #e9e4ff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.coal-diagram__sublabel {
+  fill: #a78bfa;
+  font-size: 10px;
+}
+
+.coal-diagram__line,
+.coal-diagram__arrow {
+  stroke: rgba(167, 139, 250, 0.5);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.coal-diagram__arrowhead {
+  fill: rgba(167, 139, 250, 0.7);
+}
+
+.coal-diagram__bus-label {
+  fill: #a78bfa;
+  font-size: 10px;
+}
+
+.coal-diagram figcaption,
+.coal-diagram--steps figcaption {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #c4b5fd;
+  text-align: left;
+}
+
+.coal-diagram--cards figcaption {
+  width: 100%;
+}
+
+.coal-bit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+}
+
+.coal-bit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.6rem;
+  padding: 0.5rem 0.35rem;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.coal-bit--on {
+  background: rgba(139, 92, 246, 0.35);
+  color: #fff;
+}
+
+.coal-bit--off {
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+}
+
+.coal-bit__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+}
+
+.coal-bit__weight {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  margin-top: 0.2rem;
+}
+
+.coal-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.8;
+  color: var(--secondary-text, #92a0b8);
+}
+
+.coal-steps strong {
+  color: #c4b5fd;
+  font-family: ui-monospace, monospace;
+}
+
+.coal-takeaways {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.coal-takeaways h4 {
+  margin: 0 0 0.5rem;
+  color: #ddd6fe;
+}
+
+.coal-takeaways ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  line-height: 1.6;
+  color: var(--secondary-text, #92a0b8);
+}
+
+.coal-related-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.coal-related-tool:hover {
+  color: #c4b5fd;
+}
+
+.coal-topic-coming-soon {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #64748b;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .coal-table {
+    font-size: 0.82rem;
+  }
+
+  .coal-bit {
+    min-width: 2.2rem;
+  }
+}
+
+/* ─── Light theme ─────────────────────────────────────────────────────── */
+[data-theme='light'] .coal-topic-full-btn {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.28);
+  color: #6d28d9;
+}
+
+[data-theme='light'] .coal-topic-full-btn:hover {
+  background: rgba(124, 58, 237, 0.14);
+}
+
+[data-theme='light'] .coal-section h4 {
+  color: #5b21b6;
+}
+
+[data-theme='light'] .coal-real-life {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(217, 119, 6, 0.25);
+}
+
+[data-theme='light'] .coal-real-life__head {
+  color: #b45309;
+}
+
+[data-theme='light'] .coal-real-life p {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .coal-table-caption {
+  color: #7c3aed;
+}
+
+[data-theme='light'] .coal-table th {
+  background: rgba(124, 58, 237, 0.1);
+  color: #5b21b6;
+}
+
+[data-theme='light'] .coal-table th,
+[data-theme='light'] .coal-table td {
+  border-color: var(--card-border);
+}
+
+[data-theme='light'] .coal-table td {
+  color: var(--text-color);
+}
+
+[data-theme='light'] .coal-table tbody tr:nth-child(even) td {
+  background: var(--surface-inset);
+}
+
+[data-theme='light'] .coal-diagram {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(224, 236, 255, 0.88));
+  border-color: rgba(59, 130, 246, 0.22);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+}
+
+[data-theme='light'] .coal-isa-card,
+[data-theme='light'] .coal-address-card,
+[data-theme='light'] .coal-flag-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme='light'] .coal-isa-card strong,
+[data-theme='light'] .coal-address-card strong,
+[data-theme='light'] .coal-flag-card strong {
+  color: #0f172a;
+}
+
+[data-theme='light'] .coal-isa-card span,
+[data-theme='light'] .coal-address-card span,
+[data-theme='light'] .coal-flag-card span {
+  color: #334155;
+}
+
+[data-theme='light'] .coal-address-card__code {
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .coal-isa-card--transfer {
+  background: linear-gradient(145deg, #ffffff, #eff6ff);
+  border-color: rgba(37, 99, 235, 0.28);
+}
+
+[data-theme='light'] .coal-isa-card--arithmetic {
+  background: linear-gradient(145deg, #ffffff, #ecfdf5);
+  border-color: rgba(5, 150, 105, 0.28);
+}
+
+[data-theme='light'] .coal-isa-card--logic {
+  background: linear-gradient(145deg, #ffffff, #fffbeb);
+  border-color: rgba(217, 119, 6, 0.28);
+}
+
+[data-theme='light'] .coal-isa-card--control {
+  background: linear-gradient(145deg, #ffffff, #fdf2f8);
+  border-color: rgba(219, 39, 119, 0.24);
+}
+
+[data-theme='light'] .coal-flag-card--active {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.32);
+}
+
+[data-theme='light'] .coal-diagram figcaption,
+[data-theme='light'] .coal-diagram--steps figcaption {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: #1e293b;
+  font-weight: 500;
+}
+
+[data-theme='light'] .coal-diagram__label {
+  fill: #0f172a;
+}
+
+[data-theme='light'] .coal-diagram__sublabel,
+[data-theme='light'] .coal-diagram__bus-label {
+  fill: #475569;
+}
+
+[data-theme='light'] .coal-diagram__box {
+  fill: rgba(37, 99, 235, 0.1);
+  stroke: rgba(37, 99, 235, 0.4);
+}
+
+[data-theme='light'] .coal-diagram__box--cpu {
+  fill: rgba(37, 99, 235, 0.14);
+  stroke: rgba(37, 99, 235, 0.5);
+}
+
+[data-theme='light'] .coal-diagram__box--mem {
+  fill: rgba(5, 150, 105, 0.12);
+  stroke: rgba(5, 150, 105, 0.45);
+}
+
+[data-theme='light'] .coal-diagram__box--io {
+  fill: rgba(217, 119, 6, 0.1);
+  stroke: rgba(217, 119, 6, 0.4);
+}
+
+[data-theme='light'] .coal-diagram__box--bus {
+  fill: rgba(124, 58, 237, 0.1);
+  stroke: rgba(124, 58, 237, 0.4);
+}
+
+[data-theme='light'] .coal-diagram__line,
+[data-theme='light'] .coal-diagram__arrow {
+  stroke: rgba(37, 99, 235, 0.45);
+}
+
+[data-theme='light'] .coal-diagram__arrowhead {
+  fill: rgba(37, 99, 235, 0.55);
+}
+
+[data-theme='light'] .coal-steps strong {
+  color: #6d28d9;
+}
+
+[data-theme='light'] .coal-takeaways {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.18);
+}
+
+[data-theme='light'] .coal-takeaways h4 {
+  color: #5b21b6;
+}
+
+[data-theme='light'] .coal-related-tool {
+  color: #7c3aed;
+}
+
+[data-theme='light'] .coal-related-tool:hover {
+  color: #6d28d9;
+}
+
+[data-theme='light'] .coal-bit--on {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .coal-bit--off {
+  background: var(--surface-inset);
+  color: var(--text-muted);
+}
+

@@ -81,6 +81,21 @@ const leftNavSections = [
         },
       },
       {
+        label: "Sequential Arena",
+        icon: Sparkles,
+        topicSlug: "sequential-circuits",
+        panel: {
+          description: "Latches, flip-flops, state diagrams and sequential circuit design.",
+          links: [
+            { label: "Sequential Problems", action: "navigate", value: "/problems/sequential-circuits" },
+            { label: "Latches", action: "navigate", value: "/sequential/latches" },
+            { label: "Flip-Flops", action: "navigate", value: "/sequential/flip-flops" },
+            { label: "State Diagrams", action: "navigate", value: "/sequential/state-diagram" },
+            { label: "Timing Diagrams", action: "navigate", value: "/timing-diagrams" },
+          ],
+        },
+      },
+      {
         label: "Number Arena",
         icon: Binary,
         topicSlug: "number-systems",
@@ -511,6 +526,7 @@ export default function ProblemsPage() {
 
   const getActiveItem = () => {
     if (topicSlug === "k-map") return "K-Map Arena";
+    if (topicSlug === "sequential-circuits") return "Sequential Arena";
     if (topicSlug === "number-systems") return "Number Arena";
     if (!topicSlug) return "Problems Library";
     return "";
@@ -1288,11 +1304,14 @@ export default function ProblemsPage() {
                     const attempted = progress.status === "attempted";
                     const isSelected = selectedProblemId === problem.id;
 
+                    const isLocked = Boolean(problem.premium);
+
                     return (
                       <tr
                         key={problem.id}
-                        className={isSelected ? "is-selected" : ""}
+                        className={`${isSelected ? "is-selected" : ""} ${isLocked ? "is-locked" : ""}`}
                         onClick={() => {
+                          if (isLocked) return;
                           setSelectedProblemId(problem.id);
                           setActiveProblem(problem);
                           trackPracticeEngagement("open_problem", {
@@ -1300,6 +1319,11 @@ export default function ProblemsPage() {
                             problem_title: problem.title,
                             problem_topic: problem.topic,
                           });
+                          // Opening a problem for the first time marks it "attempted".
+                          // It will later be upgraded to "solved" via onSolved from the modal.
+                          if (!solved && !attempted) {
+                            handleRecordAttempt(problem);
+                          }
                         }}
                       >
                         <td>{problem.listId}</td>
@@ -1322,33 +1346,29 @@ export default function ProblemsPage() {
                           </span>
                         </td>
                         <td>
-                          {problem.premium ? (
-                            <Lock size={16} aria-label="Premium problem" />
-                          ) : (
-                            "Open"
-                          )}
+                          <span
+                            className={`access-pill ${isLocked ? "is-locked" : "is-open"}`}
+                          >
+                            {isLocked ? (
+                              <>
+                                <Lock size={14} aria-hidden="true" />
+                                Locked
+                              </>
+                            ) : (
+                              "Open"
+                            )}
+                          </span>
                         </td>
                         <td>
-                          <button
-                            type="button"
+                          <span
                             className={`status-chip ${solved ? "is-solved" : attempted ? "is-attempted" : ""}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              if (solved) {
-                                handleSetProblemSolved(problem, false);
-                              } else if (attempted) {
-                                handleSetProblemSolved(problem, true);
-                              } else {
-                                handleRecordAttempt(problem);
-                              }
-                            }}
                           >
                             {solved
                               ? "Solved"
                               : attempted
                                 ? "Attempted"
-                                : "Start"}
-                          </button>
+                                : "Not started"}
+                          </span>
                         </td>
                         <td>
                           <div className="problem-tag-list">

@@ -19,7 +19,7 @@ build/
 Set these in the hosting provider:
 
 ```env
-REACT_APP_API_URL=https://digital-logics-studio-backend.vercel.app/api
+REACT_APP_API_URL=https://digital-logics-studio-backend-three.vercel.app/api
 REACT_APP_SITE_URL=https://circuits.quantumlogicslimited.com
 REACT_APP_GA_MEASUREMENT_ID=
 REACT_APP_GOOGLE_SITE_VERIFICATION=

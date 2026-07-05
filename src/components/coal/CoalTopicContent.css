@@ -1,0 +1,58 @@
+.coal-topic-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.coal-topic-content__intro {
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: var(--secondary-text, #94a3b8);
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.coal-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+  color: #ede9fe;
+}
+
+.coal-section p {
+  margin: 0 0 0.7rem;
+  line-height: 1.7;
+  color: var(--secondary-text, #94a3b8);
+}
+
+.coal-section__subhead {
+  margin: 1rem 0 0.45rem;
+  font-size: 1rem;
+  color: #ddd6fe;
+}
+
+.coal-bullets {
+  margin: 0 0 1rem 1.15rem;
+  padding: 0;
+  color: var(--secondary-text, #94a3b8);
+  line-height: 1.7;
+}
+
+.coal-bullets__item + .coal-bullets__item {
+  margin-top: 0.45rem;
+}
+
+.coal-code-block {
+  margin: 0.7rem 0 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.72);
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  overflow-x: auto;
+}
+
+.coal-code-block code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9rem;
+  color: #e9d5ff;
+}
