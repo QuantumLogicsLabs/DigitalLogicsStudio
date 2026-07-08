@@ -51,6 +51,15 @@ const PLANNED_PRACTICALS = [
     icon: Wrench,
     ready: false,
   },
+  {
+    key: "addressing-mode-playground",
+    title: "Addressing Mode Playground",
+    description:
+      "Build instructions, calculate effective addresses, and quiz yourself on all 8 addressing modes.",
+    icon: Cpu,
+    ready: true,
+    path: "/resources/coal/practical/addressing-mode-playground",
+  },
 ];
 
 function CoalPracticalPage() {
