@@ -1,4 +1,5 @@
 import { validateCircuit } from "./circuitProblemValidator";
+import problemsData from "../pages/Problems/ProblemsData";
 
 const halfAdderProblem = {
   inputs: ["A", "B"],
@@ -54,4 +55,26 @@ test("fails when the sum output is wired incorrectly", () => {
 
   expect(result.pass).toBe(false);
   expect(result.rows.some((row) => !row.pass)).toBe(true);
+});
+
+test("passes for a functionally correct 3-bit even parity generator", () => {
+  const problem31 = problemsData.find((p) => p.id === 31);
+  const gates = [
+    { id: 1, type: "INPUT", label: "A", inputValues: [false] },
+    { id: 2, type: "INPUT", label: "B", inputValues: [false] },
+    { id: 3, type: "INPUT", label: "C", inputValues: [false] },
+    { id: 4, type: "XOR", label: "XOR1" },
+    { id: 5, type: "XOR", label: "XOR2" },
+    { id: 6, type: "OUTPUT", label: "P" },
+  ];
+  const wires = [
+    { fromId: 1, toId: 4, toIndex: 0 },
+    { fromId: 2, toId: 4, toIndex: 1 },
+    { fromId: 4, toId: 5, toIndex: 0 },
+    { fromId: 3, toId: 5, toIndex: 1 },
+    { fromId: 5, toId: 6, toIndex: 0 },
+  ];
+
+  const result = validateCircuit(gates, wires, problem31);
+  expect(result.pass).toBe(true);
 });

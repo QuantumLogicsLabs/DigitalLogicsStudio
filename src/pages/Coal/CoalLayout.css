@@ -1,0 +1,111 @@
+/* COAL theory shell — purple accent on shared PremiumLearningShell */
+
+.coal-layout.premium-topic-shell {
+  --afhdl-accent: #8b5cf6;
+  --afhdl-accent-soft: rgba(139, 92, 246, 0.14);
+  --afhdl-border-strong: rgba(167, 139, 250, 0.32);
+}
+
+[data-theme="dark"] .coal-layout.premium-topic-shell {
+  --afhdl-bg:
+    radial-gradient(circle at top left, rgba(139, 92, 246, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 12%, rgba(91, 140, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #050810 0%, #0a0f1e 45%, #0c1224 100%);
+}
+
+[data-theme="light"] .coal-layout.premium-topic-shell {
+  --afhdl-accent: #7c3aed;
+  --afhdl-accent-soft: rgba(124, 58, 237, 0.1);
+}
+
+.coal-layout .afhdl-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.coal-layout .afhdl-body {
+  padding-top: var(--afhdl-topbar-height);
+}
+
+.coal-layout .afhdl-bg-1 {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 64%);
+}
+
+.coal-layout .afhdl-category-pill {
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.coal-layout .afhdl-pill-dot {
+  background: #a78bfa;
+}
+
+.coal-theory-overview {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.coal-theory-overview__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--afhdl-border);
+  background: var(--afhdl-surface-soft);
+  font-size: 0.88rem;
+  color: var(--afhdl-muted);
+}
+
+.coal-theory-overview__stats strong {
+  color: var(--afhdl-text);
+  margin-right: 0.25rem;
+}
+
+.coal-theory-overview .core-topic-card {
+  scroll-margin-top: 5.5rem;
+}
+
+.coal-theory-overview .core-topics-header h2 {
+  font-size: 1.35rem;
+}
+
+.coal-theory-overview .core-topics-header p {
+  max-width: 62ch;
+}
+
+
+.coal-theory-overview .core-topics-header {
+  margin-bottom: 1.5rem;
+}
+
+.coal-topic-shell-content {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.coal-topic-hero--embedded {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+.coal-topic-hero--embedded h1 {
+  display: none;
+}
+
+/* COAL home / practical — fixed site navbar */
+.coal-site-shell .home-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+.coal-site-shell .learning-resources-main {
+  padding-top: 5.25rem;
+}

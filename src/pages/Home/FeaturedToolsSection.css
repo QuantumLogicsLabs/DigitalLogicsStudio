@@ -10,7 +10,7 @@
 }
 
 .ft-section__header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .ft-section__eyebrow {
@@ -341,22 +341,23 @@
   background:
     radial-gradient(
       ellipse 80% 60% at 110% -10%,
-      color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 14%, transparent) 0%,
       transparent 60%
     ),
-    linear-gradient(160deg, #ffffff 0%, #f8fafc 100%);
-  border-color: rgba(0, 0, 0, 0.07);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.94) 0%, rgba(224, 236, 255, 0.82) 100%);
+  border-color: rgba(59, 130, 246, 0.18);
   box-shadow:
-    0 2px 12px rgba(15, 23, 42, 0.04),
+    0 8px 28px rgba(37, 99, 235, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
 }
 
 [data-theme="light"] .ft-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent),
-    0 16px 40px rgba(15, 23, 42, 0.08),
-    0 0 32px color-mix(in srgb, var(--accent) 8%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 16px 44px rgba(37, 99, 235, 0.14),
+    0 0 40px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 [data-theme="light"] .ft-card__title {
@@ -395,15 +396,15 @@
 }
 
 [data-theme="light"] .ft-card__glow--a {
-  opacity: 0.06;
+  opacity: 0.12;
 }
 
 [data-theme="light"] .ft-card__glow--b {
-  opacity: 0.04;
+  opacity: 0.08;
 }
 
 [data-theme="light"] .ft-card:hover .ft-card__glow--a {
-  opacity: 0.1;
+  opacity: 0.2;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

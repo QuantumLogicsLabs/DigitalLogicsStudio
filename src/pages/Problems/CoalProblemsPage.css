@@ -1,0 +1,188 @@
+@import "./ProblemsPage.css";
+
+/* COAL Purple-Indigo Branding Skin */
+
+.problems-page.coal-track {
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139, 92, 246, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(99, 102, 241, 0.16),
+      transparent 28%
+    ),
+    linear-gradient(180deg, #090514 0%, #0d091a 55%, #030107 100%) !important;
+}
+
+/* Accent overlays */
+.problems-page.coal-track .problems-backdrop-left {
+  background: rgba(139, 92, 246, 0.35) !important;
+}
+
+.problems-page.coal-track .problems-backdrop-right {
+  background: rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Sidebar branding badge */
+.problems-page.coal-track .problems-sidebar-badge,
+.problems-page.coal-track .problems-widget-label,
+.problems-page.coal-track .table-summary-label {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border: 1px solid rgba(167, 139, 250, 0.3) !important;
+  color: #c084fc !important;
+}
+
+/* Sidebar links */
+.problems-page.coal-track .problems-sidebar-link.is-active {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.18) 0%,
+    rgba(99, 102, 241, 0.18) 100%
+  ) !important;
+  border-color: rgba(167, 139, 250, 0.4) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
+}
+
+.problems-page.coal-track .problems-sidebar-link.is-active .problems-sidebar-link-main svg {
+  color: #c084fc !important;
+  filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.4)) !important;
+}
+
+.problems-page.coal-track .problems-sidebar-link:hover {
+  background: rgba(139, 92, 246, 0.08) !important;
+  color: #ffffff !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Sub-panel styling */
+.problems-page.coal-track .arena-sub-link:hover {
+  color: #c084fc !important;
+}
+
+.problems-page.coal-track .arena-sub-link-dot {
+  background-color: #8b5cf6 !important;
+}
+
+.problems-page.coal-track .problems-sidebar-link-badge.badge-core {
+  background: rgba(139, 92, 246, 0.18) !important;
+  color: #c084fc !important;
+}
+
+/* Stats Hover icons */
+.problems-page.coal-track .sidebar-stat-item.solved:hover .stat-icon {
+  color: #a78bfa !important;
+}
+
+.problems-page.coal-track .sidebar-stat-item.attempted:hover .stat-icon {
+  color: #818cf8 !important;
+}
+
+/* Filter chips */
+.problems-page.coal-track .problems-filter-chip.is-active {
+  background: #8b5cf6 !important;
+  border-color: #a78bfa !important;
+  color: #ffffff !important;
+}
+
+.problems-page.coal-track .problems-filter-chip:hover:not(.is-active) {
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  background: rgba(139, 92, 246, 0.05) !important;
+}
+
+/* Search bar focus */
+.problems-page.coal-track .problems-search:focus-within {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Selected problem card actions */
+.problems-page.coal-track .selected-problem-actions button:hover:not(.is-solved),
+.problems-page.coal-track .selected-problem-link:hover {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  background: rgba(139, 92, 246, 0.05) !important;
+  color: #c084fc !important;
+}
+
+.problems-page.coal-track .selected-problem-actions button:active,
+.problems-page.coal-track .selected-problem-link:active {
+  transform: scale(0.97) !important;
+}
+
+.problems-page.coal-track .selected-problem-actions .is-solved {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #34d399 !important;
+}
+
+/* Table interactions */
+.problems-page.coal-track .problems-table tbody tr:hover {
+  background: rgba(139, 92, 246, 0.04) !important;
+}
+
+.problems-page.coal-track .problems-table tbody tr.is-selected {
+  background: rgba(139, 92, 246, 0.08) !important;
+  border-left: 3px solid #8b5cf6 !important;
+}
+
+.problems-page.coal-track .problem-title-text {
+  transition: color 0.15s ease;
+}
+
+.problems-page.coal-track .problems-table tbody tr:hover .problem-title-text {
+  color: #c084fc !important;
+}
+
+/* Daily Challenge card override */
+.problems-page.coal-track .inline-daily-challenge {
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(49, 46, 129, 0.3) 100%) !important;
+  border: 1px solid rgba(139, 92, 246, 0.25) !important;
+}
+
+.problems-page.coal-track .inline-daily-btn {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2) !important;
+}
+
+.problems-page.coal-track .inline-daily-btn:hover {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.problems-page.coal-track .xp-bonus {
+  color: #a78bfa !important;
+}
+
+/* light theme compatibility override */
+.problems-page.coal-track.theme-light {
+  background: linear-gradient(180deg, #f5efff 0%, #eae2ff 55%, #f4f0fc 100%) !important;
+}
+
+.problems-page.coal-track.theme-light .problems-filter-chip.is-active {
+  background: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #ffffff !important;
+}
+
+.problems-page.coal-track.theme-light .problems-sidebar-link.is-active {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(99, 102, 241, 0.1) 100%
+  ) !important;
+  border-color: rgba(139, 92, 246, 0.25) !important;
+  color: #7c3aed !important;
+}
+
+.problems-page.coal-track.theme-light .problems-sidebar-link.is-active .problems-sidebar-link-main svg {
+  color: #7c3aed !important;
+}
+
+.problems-page.coal-track.theme-light .problems-sidebar-link:hover {
+  background: rgba(139, 92, 246, 0.05) !important;
+  color: #7c3aed !important;
+}

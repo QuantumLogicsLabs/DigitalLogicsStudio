@@ -646,14 +646,16 @@
   display: flex;
   align-items: center;
   gap: 0;
+  overflow: hidden;
+  width: 100%;
 }
 
 .problems-banner-row {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(180px, 1fr));
-  gap: 0.9rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem;
   overflow-x: auto;
-  padding-bottom: 0.2rem;
+  padding: 0.5rem 0.2rem 1.2rem 0.2rem;
   /* hide scrollbar cross-browser */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -666,36 +668,56 @@
 }
 
 .problems-banner-card {
+  flex: 0 0 320px; /* fixed width matching the screenshot */
+  min-height: 155px;
+  border-radius: 1.25rem; /* rounder corners */
+  padding: 1.5rem; /* increased spacing */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+  border: none;
+  text-align: left;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
 }
 
-.problems-banner-card {
-  min-height: 110px;
-  border-radius: 1rem;
-  padding: 0.8rem 0.9rem;
-  color: #fff;
+.problems-banner-card:hover,
+.problems-banner-card:focus-visible {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.problems-banner-card:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .problems-banner-card span {
   display: inline-block;
-  font-size: 0.65rem;
-  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
-  opacity: 0.9;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
 }
 
 .problems-banner-card h2 {
-  margin: 0.5rem 0 0.4rem;
-  font-size: 1.25rem;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: 1.45rem; /* bold, prominent title */
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
 }
 
 .problems-banner-card p {
   margin: 0;
-  max-width: 14rem;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.4;
-  font-size: 0.85rem;
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+  font-size: 0.88rem; /* clean description text */
 }
 
 .problems-filter-chip-row {
@@ -853,6 +875,15 @@
   transition: background 0.16s ease;
 }
 
+.problems-table tbody tr.is-locked {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.problems-table tbody tr.is-locked:hover {
+  background: transparent;
+}
+
 .problems-table tbody tr:hover,
 .problems-table tbody tr.is-selected {
   background: var(--problems-row-hover);
@@ -900,13 +931,15 @@
 }
 
 .status-chip {
+  display: inline-flex;
+  align-items: center;
   border: 1px solid var(--problems-border-strong);
   border-radius: 999px;
   background: var(--problems-surface-strong);
   color: var(--problems-text-soft);
   min-height: 34px;
   padding: 0.45rem 0.85rem;
-  cursor: pointer;
+  cursor: default;
 }
 
 .status-chip.is-attempted {
@@ -917,6 +950,27 @@
 .status-chip.is-solved {
   color: #4ade80;
   border-color: rgba(74, 222, 128, 0.3);
+}
+
+.access-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  min-height: 30px;
+}
+
+.access-pill.is-open {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.access-pill.is-locked {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
 }
 
 .problem-tag-list {
@@ -2545,4 +2599,52 @@
 .problems-page.theme-light .arena-sub-link:hover .arena-sub-link-dot {
   background: #2563eb;
 }
+<<<<<<< HEAD
 
+
+/* ── Banner cards responsive layout ───────────────────────────────────────
+   Large desktop (≥1280px): all 6 in one row, auto-scroll kicks in
+   Medium (≥960px <1280px): 3 cards per row, wrap naturally
+   Small (≥600px <960px):  2 cards per row
+   Mobile (<600px):        1 card full-width, no scroll
+────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1280px) {
+  /* Wide enough to show all 6 — GSAP auto-scroll handles overflow */
+  .problems-banner-row {
+    grid-template-columns: repeat(6, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 1279px) and (min-width: 960px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .problems-banner-card h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 959px) and (min-width: 600px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+}
+
+@media (max-width: 599px) {
+  .problems-banner-row {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .problems-banner-card {
+    min-height: 90px;
+  }
+
+  .problems-banner-card h2 {
+    font-size: 1rem;
+  }
+}

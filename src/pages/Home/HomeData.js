@@ -1,13 +1,13 @@
 const homeData = [
   {
-    title: "🔧 Circuit Forge",
+    title: "Circuit Forge",
     description:
       "Drag-and-drop logic gates, connect wires, and instantly see truth tables and outputs.",
     section: "featured",
     sortOrder: 1,
     links: [
       {
-        text: "Open Circuit Forge →",
+        text: "Open Circuit Forge",
         to: "/boolforge",
         primary: true,
       },
@@ -15,14 +15,14 @@ const homeData = [
     featured: true,
   },
   {
-    title: "🗺️ K-Map Generator",
+    title: "K-Map Generator",
     description:
       "Generate and simplify boolean expressions visually using interactive Karnaugh maps with SOP/POS optimization.",
     section: "featured",
     sortOrder: 2,
     links: [
       {
-        text: "Go to K-Maps →",
+        text: "Go to K-Maps",
         to: "/kmapgenerator",
         primary: true,
       },
@@ -30,7 +30,7 @@ const homeData = [
     featured: true,
   },
   {
-    title: "📐 Boolean Algebra",
+    title: "Boolean Algebra",
     description:
       "Master the foundations of digital logic with interactive tools for identities, laws, and expressions.",
     section: "topics",
@@ -50,7 +50,7 @@ const homeData = [
     ],
   },
   {
-    title: "⚡ Advanced Logic",
+    title: "Advanced Logic",
     description:
       "Explore circuit optimization, universal gates, and special functions for deeper understanding.",
     section: "topics",
@@ -64,7 +64,7 @@ const homeData = [
     ],
   },
   {
-    title: "🔀 Combinational Circuits",
+    title: "Combinational Circuits",
     description:
       "Explore encoders, decoders, multiplexers, and demultiplexers — the core combinational building blocks used in memory and data-routing systems.",
     section: "topics",
@@ -78,7 +78,7 @@ const homeData = [
     ],
   },
   {
-    title: "🔁 Sequential Circuits",
+    title: "Sequential Circuits",
     description:
       "Dive into memory elements, state machines, and time-dependent circuits.",
     section: "topics",
@@ -100,7 +100,7 @@ const homeData = [
     ],
   },
   {
-    title: "⇌ Registers & Register Transfers",
+    title: "Registers & Register Transfers",
     description:
       "Explore how digital systems store and move data — from basic flip-flop registers to shift registers, counters, and synchronous binary counting circuits.",
     section: "topics",
@@ -119,7 +119,7 @@ const homeData = [
     ],
   },
   {
-    title: "🧠 Memory Systems",
+    title: "Memory Systems",
     description:
       "Explore how digital systems store data permanently and temporarily — from ROM and PLA devices to RAM construction using real IC chips.",
     section: "topics",
@@ -142,7 +142,7 @@ const homeData = [
     ],
   },
   {
-    title: "🔢 Number Systems",
+    title: "Number Systems",
     description:
       "Convert between bases and run detailed step-by-step operations.",
     section: "topics",
@@ -159,7 +159,7 @@ const homeData = [
     ],
   },
   {
-    title: "➕ ARITHMETIC FUNCTIONS AND HDLs",
+    title: "ARITHMETIC FUNCTIONS AND HDLs",
     description: "Dedicated interactive modules for arithmetic logic design.",
     section: "topics",
     topicGroup: "algebra",
@@ -178,13 +178,13 @@ const homeData = [
     ],
   },
   {
-    title: "📚 Learning Resources",
-    description: "Access curated problems and additional tools.",
+    title: "Learning Resources",
+    description: "Explore dedicated DLD and COAL study tracks with beginner-level concepts and practice paths.",
     section: "resources",
     sortOrder: 1,
     links: [
-      { text: "Book Ch1 Problems", to: "/book" },
-      { text: "Book Ch2 Problems", to: "/book/ch2" },
+      { text: "DLD Resources", to: "/resources/dld" },
+      { text: "COAL Resources", to: "/resources/coal" },
       { text: "Timing Diagrams", to: "/timing-diagrams" },
     ],
   },

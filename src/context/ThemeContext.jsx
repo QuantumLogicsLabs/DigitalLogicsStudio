@@ -20,7 +20,7 @@ export const applyThemeToDocument = (theme) => {
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    meta.setAttribute('content', resolved === 'light' ? '#f8fafc' : '#020617');
+    meta.setAttribute('content', resolved === 'light' ? '#eef4ff' : '#020617');
   }
 };
 

@@ -523,6 +523,8 @@ export default function ProblemsPage() {
   const bannerRef = React.useRef(null);
   const tweenRef = React.useRef(null);
   const resumeTimeoutRef = React.useRef(null);
+  const retryTimeoutRef = React.useRef(null);
+  const retryCountRef = React.useRef(0);
 
   const getActiveItem = () => {
     if (topicSlug === "k-map") return "K-Map Arena";
@@ -547,13 +549,15 @@ export default function ProblemsPage() {
   };
 
   const handleBannerCardClick = (card) => {
-    if (card.filterGroup) {
+    trackPracticeEngagement("banner_card_click", {
+      card_title: card.title,
+      filter_group: card.filterGroup,
+    });
+    if (card.path) {
+      navigate(card.path);
+    } else if (card.filterGroup) {
       setActiveGroup(card.filterGroup);
       setTopicFilter(card.filterGroup);
-      trackPracticeEngagement("banner_card_click", {
-        card_title: card.title,
-        filter_group: card.filterGroup,
-      });
     }
   };
 
@@ -561,7 +565,18 @@ export default function ProblemsPage() {
     const el = bannerRef.current;
     if (!el) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
-    if (maxScroll <= 0) return;
+    if (maxScroll <= 0) {
+      if (retryCountRef.current < 8) {
+        retryCountRef.current += 1;
+        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = setTimeout(() => {
+          startAutoscroll(fromStart);
+        }, 800);
+      }
+      return;
+    }
+
+    retryCountRef.current = 0; // reset on success
 
     if (tweenRef.current) {
       tweenRef.current.kill();
@@ -570,7 +585,7 @@ export default function ProblemsPage() {
     const currentScroll = el.scrollLeft;
     const targetScroll = fromStart ? maxScroll : 0;
     const distance = Math.abs(currentScroll - targetScroll);
-    const duration = distance / 30; // 30 pixels per second for slow, smooth move
+    const duration = distance / 22; // Slow drift: 22 pixels per second
 
     tweenRef.current = gsap.to(el, {
       scrollLeft: targetScroll,
@@ -598,6 +613,9 @@ export default function ProblemsPage() {
       }
       if (resumeTimeout) {
         clearTimeout(resumeTimeout);
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
       }
     };
   }, [startAutoscroll]);
@@ -1061,12 +1079,21 @@ export default function ProblemsPage() {
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              {problemBannerCards.map((card) => (
+              {[...problemBannerCards, ...problemBannerCards].map((card, idx) => (
                 <article
-                  key={card.title}
+                  key={`${card.title}-${idx}`}
                   className="problems-banner-card"
                   style={{ background: card.gradient, cursor: "pointer" }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${card.title} — ${card.eyebrow}`}
                   onClick={() => handleBannerCardClick(card)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleBannerCardClick(card);
+                    }
+                  }}
                 >
                   <span>{card.eyebrow}</span>
                   <h2>{card.title}</h2>
@@ -1293,11 +1320,14 @@ export default function ProblemsPage() {
                     const attempted = progress.status === "attempted";
                     const isSelected = selectedProblemId === problem.id;
 
+                    const isLocked = Boolean(problem.premium);
+
                     return (
                       <tr
                         key={problem.id}
-                        className={isSelected ? "is-selected" : ""}
+                        className={`${isSelected ? "is-selected" : ""} ${isLocked ? "is-locked" : ""}`}
                         onClick={() => {
+                          if (isLocked) return;
                           setSelectedProblemId(problem.id);
                           setActiveProblem(problem);
                           trackPracticeEngagement("open_problem", {
@@ -1305,6 +1335,11 @@ export default function ProblemsPage() {
                             problem_title: problem.title,
                             problem_topic: problem.topic,
                           });
+                          // Opening a problem for the first time marks it "attempted".
+                          // It will later be upgraded to "solved" via onSolved from the modal.
+                          if (!solved && !attempted) {
+                            handleRecordAttempt(problem);
+                          }
                         }}
                       >
                         <td>{problem.listId}</td>
@@ -1327,33 +1362,29 @@ export default function ProblemsPage() {
                           </span>
                         </td>
                         <td>
-                          {problem.premium ? (
-                            <Lock size={16} aria-label="Premium problem" />
-                          ) : (
-                            "Open"
-                          )}
+                          <span
+                            className={`access-pill ${isLocked ? "is-locked" : "is-open"}`}
+                          >
+                            {isLocked ? (
+                              <>
+                                <Lock size={14} aria-hidden="true" />
+                                Locked
+                              </>
+                            ) : (
+                              "Open"
+                            )}
+                          </span>
                         </td>
                         <td>
-                          <button
-                            type="button"
+                          <span
                             className={`status-chip ${solved ? "is-solved" : attempted ? "is-attempted" : ""}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              if (solved) {
-                                handleSetProblemSolved(problem, false);
-                              } else if (attempted) {
-                                handleSetProblemSolved(problem, true);
-                              } else {
-                                handleRecordAttempt(problem);
-                              }
-                            }}
                           >
                             {solved
                               ? "Solved"
                               : attempted
                                 ? "Attempted"
-                                : "Start"}
-                          </button>
+                                : "Not started"}
+                          </span>
                         </td>
                         <td>
                           <div className="problem-tag-list">

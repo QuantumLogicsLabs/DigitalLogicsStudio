@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Search, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const STATS = [
@@ -65,50 +66,30 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
 
         {/* Heading */}
         <h1>
-          <span className="hero-title-line">Master Digital Logic</span>
-          <span className="hero-title-accent"> Interactively</span>
+          Master Digital Logic{" "}
+          <span className="hero-title-accent">Interactively</span>
         </h1>
 
         {/* Sub-description */}
-        <p>
+        <p className="hero-subtitle">
           {user
             ? "Your workspace is ready. Build circuits, simplify expressions with K-Maps, explore number systems, and tackle problems — all in one place."
             : "Build circuits visually, simplify Boolean expressions with K-Maps, convert number systems, and solve logic problems — no setup required."}
         </p>
 
         {/* Stats row */}
-        <div className="hero-stats-marquee" aria-label="Platform statistics">
-          <div className="hero-stats-track">
-            {[...STATS, ...STATS].map((s, index) => (
-              <div
-                key={`${s.label}-${index}`}
-                className="hero-stat-card"
-                aria-hidden={index >= STATS.length ? "true" : undefined}
-              >
-                <span className="hero-stat-value">{s.value}</span>
-                <span className="hero-stat-label">{s.label}</span>
-              </div>
-            ))}
-          </div>
+        <div className="hero-stats-row" aria-label="Platform statistics">
+          {STATS.map((s) => (
+            <div key={s.label} className="hero-stat-card">
+              <span className="hero-stat-value">{s.value}</span>
+              <span className="hero-stat-label">{s.label}</span>
+            </div>
+          ))}
         </div>
 
         {/* Search */}
         <form className="search-container" onSubmit={onSearchSubmit} role="search">          <div className="home-search-field">
-            <svg
-              className="search-field-icon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            <Search size={16} className="search-field-icon" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search tools — K-Map, Boolean, Flip-Flop..."
@@ -124,7 +105,7 @@ export default function HeroSection({ searchTerm, setSearchTerm, onSearchSubmit 
                 onClick={() => setSearchTerm("")}
                 aria-label="Clear search"
               >
-                ✕
+                <X size={14} />
               </button>
             )}
           </div>

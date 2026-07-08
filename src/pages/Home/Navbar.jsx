@@ -1,16 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-const NAV_LINKS = [
+const DLD_NAV_LINKS = [
   { to: "/problems", label: "Problems" },
   { to: "/boolforge", label: "Circuit Forge" },
   { to: "/kmapgenerator", label: "K-Map Studio" },
-  // { to: "/boolean-algebra", label: "Boolean Algebra" },
-  // { to: "/numbersystemcalculator", label: "Number Systems" },
-  // { to: "/sequential/intro", label: "Sequential" },
-  // { to: "/timing-diagrams", label: "Resources" },
 ];
+
+const COAL_NAV_LINKS = [
+  { to: "/resources/coal", label: "COAL Home", end: true },
+  { to: "/resources/coal/theory", label: "Theory", matchTheory: true },
+  { to: "/resources/coal/practical", label: "Practical" },
+  { to: "/resources/coal/problems", label: "Problems" },
+];
+
+function isCoalTheoryRoute(pathname) {
+  return pathname.startsWith("/resources/coal/theory") || pathname.startsWith("/coal/");
+}
+
+function isCoalRoute(pathname) {
+  return pathname.startsWith("/resources/coal") || pathname.startsWith("/coal/");
+}
 
 function SunIcon() {
   return (
@@ -61,9 +72,15 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const profileMenuRef = useRef(null);
   const displayName = user?.name?.trim() || "User";
   const displayEmail = user?.email?.trim() || "No email linked";
+  const onCoalTrack = isCoalRoute(location.pathname);
+  const navLinks = onCoalTrack ? COAL_NAV_LINKS : DLD_NAV_LINKS;
+  const brandTagline = onCoalTrack
+    ? "Computer Organization & Assembly"
+    : "The Digital Logic Playground";
 
   const userInitials = useMemo(() => {
     const name = user?.name?.trim();
@@ -118,6 +135,28 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
       setProfileMenuOpen(false);
     }
   };
+
+  const renderNavLinks = (baseClassName) =>
+    navLinks.map(({ to, label, end, matchTheory }) => (
+      <NavLink
+        key={to}
+        to={to}
+        end={end}
+        className={() => {
+          const active = matchTheory
+            ? isCoalTheoryRoute(location.pathname)
+            : end
+              ? location.pathname === to
+              : location.pathname.startsWith(to);
+          return active
+            ? `${baseClassName} home-nav-link--active`
+            : baseClassName;
+        }}
+        onClick={() => setMenuOpen(false)}
+      >
+        {label}
+      </NavLink>
+    ));
 
   return (
     <header className="home-header">
@@ -196,25 +235,12 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
           </div>
           <div className="home-brand-text">
             <span className="home-title">Boolforge</span>
-            <span className="home-tagline">The Digital Logic Playground</span>
+            <span className="home-tagline">{brandTagline}</span>
           </div>
         </Link>
 
         <nav className="home-nav" aria-label="Main navigation">
-          {NAV_LINKS.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                isActive
-                  ? "home-nav-link home-nav-link--active"
-                  : "home-nav-link"
-              }
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </NavLink>
-          ))}
+          {renderNavLinks("home-nav-link")}
         </nav>
 
         <div className="home-nav-controls">
@@ -353,20 +379,7 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
         aria-hidden={!menuOpen}
       >
         <div className="home-mobile-nav-inner">
-          {NAV_LINKS.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                isActive
-                  ? "home-mobile-link home-nav-link--active"
-                  : "home-mobile-link"
-              }
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </NavLink>
-          ))}
+          {renderNavLinks("home-mobile-link")}
           {!loading && (
             <div className="home-mobile-auth">
               {user ? (

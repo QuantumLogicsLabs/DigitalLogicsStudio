@@ -452,6 +452,7 @@ const CircuitModal = ({
   const isSavingRef = React.useRef(false);
   const [assignment, setAssignment] = useState({ inputMap: {}, outputMap: {} });
   const solvedNotifiedRef = React.useRef(false);
+  const [validationPage, setValidationPage] = useState(1);
 
   const {
     isAuthenticated = false,
@@ -467,6 +468,7 @@ const CircuitModal = ({
 
   useEffect(() => {
     solvedNotifiedRef.current = false;
+    setValidationPage(1);
   }, [open, problemId]);
 
   // Never call hasSolvedProblem(null): Number(null) === 0 which is a valid
@@ -480,6 +482,7 @@ const CircuitModal = ({
     setGates(g);
     setWires(w);
     setResult(null);
+    setValidationPage(1);
     solvedNotifiedRef.current = false;
   }, []);
 
@@ -495,6 +498,7 @@ const CircuitModal = ({
     const useAssignment = isAssigned ? assignment : null;
     const res = validateCircuit(gates, wires, problem, useAssignment);
     setResult(res);
+    setValidationPage(1);
     if (res.pass) {
       handleSolvedLocally();
       persistSolvedState();
@@ -829,6 +833,13 @@ const CircuitModal = ({
                 const inputKeys = problem?.inputs || [];
                 const outputKeys = problem?.outputs || [];
                 const failCount = result.rows.filter((r) => !r.pass).length;
+
+                const rowsPerPage = 16;
+                const totalPages = Math.ceil(result.rows.length / rowsPerPage);
+                const effectivePage = Math.min(validationPage, Math.max(1, totalPages));
+                const startIndex = (effectivePage - 1) * rowsPerPage;
+                const paginatedRows = result.rows.slice(startIndex, startIndex + rowsPerPage);
+
                 return (
                   <div style={S.tableWrap}>
                     {!result.pass && (
@@ -871,7 +882,7 @@ const CircuitModal = ({
                         </tr>
                       </thead>
                       <tbody>
-                        {result.rows.map((row, i) => (
+                        {paginatedRows.map((row, i) => (
                           <tr
                             key={i}
                             style={{
@@ -912,6 +923,56 @@ const CircuitModal = ({
                         ))}
                       </tbody>
                     </table>
+
+                    {totalPages > 1 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginTop: "0.5rem",
+                          padding: "0.35rem 0.6rem",
+                          background: "var(--bg-light, #1e2842)",
+                          border: "1px solid var(--border-color, #2a3550)",
+                          borderRadius: "6px",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setValidationPage((p) => Math.max(1, p - 1))}
+                          disabled={effectivePage === 1}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: effectivePage === 1 ? "var(--secondary-text, #8899aa)" : "var(--accent-secondary, #00d4ff)",
+                            cursor: effectivePage === 1 ? "default" : "pointer",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          ◀ Prev
+                        </button>
+                        <span style={{ color: "var(--text-color, #e8f0ff)" }}>
+                          Page <strong>{effectivePage}</strong> of {totalPages}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setValidationPage((p) => Math.min(totalPages, p + 1))}
+                          disabled={effectivePage === totalPages}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: effectivePage === totalPages ? "var(--secondary-text, #8899aa)" : "var(--accent-secondary, #00d4ff)",
+                            cursor: effectivePage === totalPages ? "default" : "pointer",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          Next ▶
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })()}

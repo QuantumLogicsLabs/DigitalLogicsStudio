@@ -12,7 +12,10 @@ import { useTheme } from "./context/ThemeContext";
 import RouteSeoManager from "./components/seo/RouteSeoManager";
 import RouteNormalizer from "./components/seo/RouteNormalizer";
 import AnalyticsTracker from "./components/seo/AnalyticsTracker";
-
+import DlsMentorWidget from "./components/DlsMentorWidget/DlsMentorWidget";
+import InstructionTraceLabPage from "./pages/Coal/InstructionTraceLabPage";
+import StackMemorySimulatorPage from "./pages/Coal/StackMemorySimulatorPage";
+import AddressingModePlaygroundPage from "./pages/Coal/AddressingModePlaygroundPage";
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -20,6 +23,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 const Home = lazy(() => import("./pages/Home/Home"));
 const Boolforge = lazy(() => import("./pages/Boolforge"));
 const ProblemsPage = lazy(() => import("./pages/Problems/ProblemsPage"));
+const CoalProblemsPage = lazy(() => import("./pages/Problems/CoalProblemsPage"));
 const RegCounters = lazy(
   () => import("./pages/RegistersAndTransfers/RegCounters"),
 );
@@ -47,6 +51,13 @@ const RegSyncBinaryCounters = lazy(
 );
 const ProblemSolver = lazy(() => import("./pages/Book/Ch1"));
 const Ch2ProblemSolver = lazy(() => import("./pages/Book/Ch2"));
+const LearningResourcesPage = lazy(
+  () => import("./pages/LearningResources/LearningResourcesPage"),
+);
+const CoalHomePage = lazy(() => import("./pages/Coal/CoalHomePage"));
+const CoalTheoryPage = lazy(() => import("./pages/Coal/CoalTheoryPage"));
+const CoalPracticalPage = lazy(() => import("./pages/Coal/CoalPracticalPage"));
+const CoalTopicPage = lazy(() => import("./pages/Coal/CoalTopicPage"));
 const ParityBitCalculator = lazy(() => import("./pages/ParityBitCalculator"));
 const KMapGenerator = lazy(() => import("./pages/KmapGenerator"));
 const GateExplanation = lazy(() => import("./pages/GateExplanation"));
@@ -194,9 +205,7 @@ const AppContent = () => {
 
     scheduleTypeset();
 
-    const observer = root
-      ? new MutationObserver(scheduleTypeset)
-      : null;
+    const observer = root ? new MutationObserver(scheduleTypeset) : null;
     observer?.observe(root, {
       childList: true,
       subtree: true,
@@ -244,6 +253,19 @@ const AppContent = () => {
           />
           <Route path="/problems" element={<ProblemsPage />} />
           <Route path="/problems/:topicSlug" element={<ProblemsPage />} />
+          <Route path="/resources/coal/theory" element={<CoalTheoryPage />} />
+          <Route
+            path="/resources/coal/practical"
+            element={<CoalPracticalPage />}
+          />
+          <Route path="/resources/coal/problems" element={<CoalProblemsPage />} />
+          <Route path="/resources/coal/problems/:topicSlug" element={<CoalProblemsPage />} />
+          <Route path="/resources/coal" element={<CoalHomePage />} />
+          <Route path="/coal/:slug" element={<CoalTopicPage />} />
+          <Route
+            path="/resources/:track?"
+            element={<LearningResourcesPage />}
+          />
           <Route path="/boolforge" element={<Boolforge />} />
 
           {/* ── Boolean Algebra (/boolean/* matches baConfig.js) ── */}
@@ -465,6 +487,20 @@ const AppContent = () => {
           {/* ── Misc ──────────────────────────────────────────── */}
           <Route path="/trainer-board" element={<DLDTrainerBoard />} />
           <Route path="*" element={<NotFoundPage />} />
+
+          {/* Coal routes */}
+          <Route
+            path="/resources/coal/practical/instruction-trace-lab"
+            element={<InstructionTraceLabPage />}
+          />
+          <Route
+            path="/resources/coal/practical/stack-memory-simulator"
+            element={<StackMemorySimulatorPage />}
+          />
+          <Route
+            path="/resources/coal/practical/addressing-mode-playground"
+            element={<AddressingModePlaygroundPage />}
+          />
         </Routes>
       </Suspense>
     </>
@@ -480,6 +516,7 @@ function App() {
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <AppContent />
+        <DlsMentorWidget />
       </BrowserRouter>
       <Analytics />
     </div>

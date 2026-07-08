@@ -1237,8 +1237,8 @@ const problemsData = [
       { A: 1, B: 1, C: 0, F: 1 },
       { A: 1, B: 1, C: 1, F: 1 },
     ],
-    equations: ["F = (A' + B)(A + C')"],
-    hint: "Group the 0-cells: maxterms 4 and 5 (A=1,B=0) form a pair → sum term (A'+B). Maxterm 1 and 4 pair — but 4 is already used. Maxterms 1 alone: (A+B+C'). The minimal POS is F = (A'+B)(A+C').",
+    equations: ["F = (A' + B)(B + C')"],
+    hint: "Group the 0-cells: maxterms 4 and 5 (A=1,B=0) form a pair → sum term (A'+B). Maxterm 1 and 4 pair — but 4 is already used. Maxterms 1 and 5 pair → sum term (B+C'). The minimal POS is F = (A'+B)(B+C').",
     inputs: ["A", "B", "C"],
     outputs: ["F"],
   },
@@ -1449,6 +1449,600 @@ const problemsData = [
     outputs: ["Sum", "Overflow"],
     isSynthetic: true,
   },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+// Problem 31 – Even Parity Generator (3-bit)
+// Inputs: A, B, C  |  Output: P
+// P = A ⊕ B ⊕ C
+// 2^3 = 8 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 31,
+    title: "Even Parity Generator",
+    difficulty: "Easy",
+    tags: ["Combinational", "Parity", "Boolean Algebra"],
+    description:
+      "Design a 3-bit even parity generator. Given inputs A, B, C, output P such that the total number of 1s (A, B, C, P) is always even.",
+    truthTable: [
+      { A: 0, B: 0, C: 0, P: 0 },
+      { A: 0, B: 0, C: 1, P: 1 },
+      { A: 0, B: 1, C: 0, P: 1 },
+      { A: 0, B: 1, C: 1, P: 0 },
+      { A: 1, B: 0, C: 0, P: 1 },
+      { A: 1, B: 0, C: 1, P: 0 },
+      { A: 1, B: 1, C: 0, P: 0 },
+      { A: 1, B: 1, C: 1, P: 1 },
+    ],
+    equations: ["P = A ⊕ B ⊕ C"],
+    hint: "XOR all three inputs. No final inversion is needed (unlike odd parity).",
+    inputs: ["A", "B", "C"],
+    outputs: ["P"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 32 – 4-to-2 Priority Encoder
+// Inputs: I0,I1,I2,I3 (priority I3>I2>I1>I0)  |  Outputs: Y1,Y0, V
+// Truth table: 2^4 = 16 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 32,
+    title: "4-to-2 Priority Encoder",
+    difficulty: "Medium",
+    tags: ["Combinational", "Conversion", "Boolean Algebra"],
+    description:
+      "Design a 4-to-2 priority encoder. Inputs I0–I3 are active high (1 = asserted). I3 has the highest priority, I0 the lowest. Output a 2-bit code Y1,Y0 representing the highest‑priority active input, and a valid signal V (1 when any input is active).",
+    truthTable: [
+      { I3: 0, I2: 0, I1: 0, I0: 0, Y1: 0, Y0: 0, V: 0 },
+      { I3: 0, I2: 0, I1: 0, I0: 1, Y1: 0, Y0: 0, V: 1 },
+      { I3: 0, I2: 0, I1: 1, I0: 0, Y1: 0, Y0: 1, V: 1 },
+      { I3: 0, I2: 0, I1: 1, I0: 1, Y1: 0, Y0: 1, V: 1 },
+      { I3: 0, I2: 1, I1: 0, I0: 0, Y1: 1, Y0: 0, V: 1 },
+      { I3: 0, I2: 1, I1: 0, I0: 1, Y1: 1, Y0: 0, V: 1 },
+      { I3: 0, I2: 1, I1: 1, I0: 0, Y1: 1, Y0: 0, V: 1 },
+      { I3: 0, I2: 1, I1: 1, I0: 1, Y1: 1, Y0: 0, V: 1 },
+      { I3: 1, I2: 0, I1: 0, I0: 0, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 0, I1: 0, I0: 1, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 0, I1: 1, I0: 0, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 0, I1: 1, I0: 1, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 1, I1: 0, I0: 0, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 1, I1: 0, I0: 1, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 1, I1: 1, I0: 0, Y1: 1, Y0: 1, V: 1 },
+      { I3: 1, I2: 1, I1: 1, I0: 1, Y1: 1, Y0: 1, V: 1 },
+    ],
+    equations: [
+      "Y1 = I3 + I2",
+      "Y0 = I3 + I2'·I1",
+      "V  = I3 + I2 + I1 + I0"
+    ],
+    hint: "Y1 is 1 when I3 or I2 is active. Y0 is 1 when I3 is active, or I1 is active and I2 is not. V simply ORs all inputs.",
+    inputs: ["I3", "I2", "I1", "I0"],
+    outputs: ["Y1", "Y0", "V"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 33 – 2-bit Magnitude Comparator
+// Inputs: A1,A0, B1,B0  |  Outputs: G (A>B), E (A=B), L (A<B)
+// 2^4 = 16 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 33,
+    title: "2-bit Magnitude Comparator",
+    difficulty: "Medium",
+    tags: ["Combinational", "Arithmetic", "Boolean Algebra"],
+    description:
+      "Design a circuit that compares two 2‑bit unsigned numbers A = A1A0 and B = B1B0. It produces three outputs: G (A>B), E (A=B), and L (A<B). Exactly one output is 1 at any time.",
+    truthTable: [
+      { A1:0, A0:0, B1:0, B0:0, G:0, E:1, L:0 },
+      { A1:0, A0:0, B1:0, B0:1, G:0, E:0, L:1 },
+      { A1:0, A0:0, B1:1, B0:0, G:0, E:0, L:1 },
+      { A1:0, A0:0, B1:1, B0:1, G:0, E:0, L:1 },
+      { A1:0, A0:1, B1:0, B0:0, G:1, E:0, L:0 },
+      { A1:0, A0:1, B1:0, B0:1, G:0, E:1, L:0 },
+      { A1:0, A0:1, B1:1, B0:0, G:0, E:0, L:1 },
+      { A1:0, A0:1, B1:1, B0:1, G:0, E:0, L:1 },
+      { A1:1, A0:0, B1:0, B0:0, G:1, E:0, L:0 },
+      { A1:1, A0:0, B1:0, B0:1, G:1, E:0, L:0 },
+      { A1:1, A0:0, B1:1, B0:0, G:0, E:1, L:0 },
+      { A1:1, A0:0, B1:1, B0:1, G:0, E:0, L:1 },
+      { A1:1, A0:1, B1:0, B0:0, G:1, E:0, L:0 },
+      { A1:1, A0:1, B1:0, B0:1, G:1, E:0, L:0 },
+      { A1:1, A0:1, B1:1, B0:0, G:1, E:0, L:0 },
+      { A1:1, A0:1, B1:1, B0:1, G:0, E:1, L:0 },
+    ],
+    equations: [
+      "G = A1·B1' + (A1⊙B1)·A0·B0'",
+      "E = (A1⊙B1)·(A0⊙B0)",
+      "L = A1'·B1 + (A1⊙B1)·A0'·B0",
+    ],
+    hint: "Compare the most significant bits first. Use XNOR gates to detect equality at each bit position. G = A1·B1' + (A1⊙B1)·A0·B0', etc.",
+    inputs: ["A1", "A0", "B1", "B0"],
+    outputs: ["G", "E", "L"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 34 – Binary to Gray Code Converter (3-bit)
+// Inputs: B2,B1,B0  |  Outputs: G2,G1,G0
+// 2^3 = 8 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 34,
+    title: "Binary to Gray Code Converter ",
+    difficulty: "Easy",
+    tags: ["Combinational", "Conversion", "Boolean Algebra"],
+    description:
+      "Convert a 3-bit binary number B2B1B0 into its corresponding 3-bit Gray code G2G1G0. Gray code changes only one bit between adjacent values.",
+    truthTable: [
+      { B2:0, B1:0, B0:0, G2:0, G1:0, G0:0 },
+      { B2:0, B1:0, B0:1, G2:0, G1:0, G0:1 },
+      { B2:0, B1:1, B0:0, G2:0, G1:1, G0:1 },
+      { B2:0, B1:1, B0:1, G2:0, G1:1, G0:0 },
+      { B2:1, B1:0, B0:0, G2:1, G1:1, G0:0 },
+      { B2:1, B1:0, B0:1, G2:1, G1:1, G0:1 },
+      { B2:1, B1:1, B0:0, G2:1, G1:0, G0:1 },
+      { B2:1, B1:1, B0:1, G2:1, G1:0, G0:0 },
+    ],
+    equations: [
+      "G2 = B2",
+      "G1 = B2 ⊕ B1",
+      "G0 = B1 ⊕ B0"
+    ],
+    hint: "The MSB of Gray code equals the MSB of binary. Each subsequent Gray bit is the XOR of adjacent binary bits.",
+    inputs: ["B2", "B1", "B0"],
+    outputs: ["G2", "G1", "G0"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 35 – Gray to Binary Code Converter (3-bit)
+// Inputs: G2,G1,G0  |  Outputs: B2,B1,B0
+// 2^3 = 8 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 35,
+    title: "Gray to Binary Code Converter",
+    difficulty: "Easy",
+    tags: ["Combinational", "Conversion", "Boolean Algebra"],
+    description:
+      "Convert a 3-bit Gray code G2G1G0 back into its binary equivalent B2B1B0.",
+    truthTable: [
+      { G2:0, G1:0, G0:0, B2:0, B1:0, B0:0 },
+      { G2:0, G1:0, G0:1, B2:0, B1:0, B0:1 },
+      { G2:0, G1:1, G0:1, B2:0, B1:1, B0:0 },
+      { G2:0, G1:1, G0:0, B2:0, B1:1, B0:1 },
+      { G2:1, G1:1, G0:0, B2:1, B1:0, B0:0 },
+      { G2:1, G1:1, G0:1, B2:1, B1:0, B0:1 },
+      { G2:1, G1:0, G0:1, B2:1, B1:1, B0:0 },
+      { G2:1, G1:0, G0:0, B2:1, B1:1, B0:1 },
+    ],
+    equations: [
+      "B2 = G2",
+      "B1 = G2 ⊕ G1",
+      "B0 = G2 ⊕ G1 ⊕ G0"
+    ],
+    hint: "Start with B2 = G2. Then compute B1 = B2 ⊕ G1, B0 = B1 ⊕ G0. This is a chain of XORs.",
+    inputs: ["G2", "G1", "G0"],
+    outputs: ["B2", "B1", "B0"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 36 – 2-to-4 Decoder with Active-Low Outputs
+// Inputs: E, A1, A0  |  Outputs: Y0n, Y1n, Y2n, Y3n (active low)
+// 2^3 = 8 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 36,
+    title: "2-to-4 Decoder (Active-Low Outputs)",
+    difficulty: "Easy",
+    tags: ["Combinational", "Decoder", "Boolean Algebra"],
+    description:
+      "Design a 2-to-4 decoder with active-high enable E and active low outputs Y0n,Y1n,Y2n,Y3n. When E=1, the selected output goes LOW (0) while others stay HIGH (1). When E=0, all outputs remain HIGH (1).",
+    truthTable: [
+      { E:0, A1:0, A0:0, Y0n:1, Y1n:1, Y2n:1, Y3n:1 },
+      { E:0, A1:0, A0:1, Y0n:1, Y1n:1, Y2n:1, Y3n:1 },
+      { E:0, A1:1, A0:0, Y0n:1, Y1n:1, Y2n:1, Y3n:1 },
+      { E:0, A1:1, A0:1, Y0n:1, Y1n:1, Y2n:1, Y3n:1 },
+      { E:1, A1:0, A0:0, Y0n:0, Y1n:1, Y2n:1, Y3n:1 },
+      { E:1, A1:0, A0:1, Y0n:1, Y1n:0, Y2n:1, Y3n:1 },
+      { E:1, A1:1, A0:0, Y0n:1, Y1n:1, Y2n:0, Y3n:1 },
+      { E:1, A1:1, A0:1, Y0n:1, Y1n:1, Y2n:1, Y3n:0 },
+    ],
+    equations: [
+      "Y0n = (E·A1'·A0')'",
+      "Y1n = (E·A1'·A0)'",
+      "Y2n = (E·A1·A0')'",
+      "Y3n = (E·A1·A0)'"
+    ],
+    hint: "A NAND gate at each output: one input is enable, the others are the required address bits. The output goes low only when all gate inputs are high.",
+    inputs: ["E", "A1", "A0"],
+    outputs: ["Y0n", "Y1n", "Y2n", "Y3n"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 37 – BCD to 7‑Segment Decoder
+// Inputs: A, B, C, D (4‑bit BCD, D = MSB)  |  Outputs: a,b,c,d,e,f,g
+// 2^4 = 16 rows – complete ✓
+// Invalid BCD codes (10–15) produce all segments off.
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 37,
+    title: "BCD to 7 Segment Decoder",
+    difficulty: "Medium",
+    tags: ["Combinational", "Decoder", "Conversion"],
+    description:
+      "Design a BCD to 7 segment decoder. The circuit accepts a 4 bit BCD digit A,B,C,D (D is the most significant bit) and drives the seven outputs a–g of a common‑cathode display. Each output is active high (1 = segment ON). For invalid input codes (10–15) all segments must be OFF.",
+    truthTable: [
+      { D:0, C:0, B:0, A:0, a:1, b:1, c:1, d:1, e:1, f:1, g:0 }, // 0
+      { D:0, C:0, B:0, A:1, a:0, b:1, c:1, d:0, e:0, f:0, g:0 }, // 1
+      { D:0, C:0, B:1, A:0, a:1, b:1, c:0, d:1, e:1, f:0, g:1 }, // 2
+      { D:0, C:0, B:1, A:1, a:1, b:1, c:1, d:1, e:0, f:0, g:1 }, // 3
+      { D:0, C:1, B:0, A:0, a:0, b:1, c:1, d:0, e:0, f:1, g:1 }, // 4
+      { D:0, C:1, B:0, A:1, a:1, b:0, c:1, d:1, e:0, f:1, g:1 }, // 5
+      { D:0, C:1, B:1, A:0, a:1, b:0, c:1, d:1, e:1, f:1, g:1 }, // 6
+      { D:0, C:1, B:1, A:1, a:1, b:1, c:1, d:0, e:0, f:0, g:0 }, // 7
+      { D:1, C:0, B:0, A:0, a:1, b:1, c:1, d:1, e:1, f:1, g:1 }, // 8
+      { D:1, C:0, B:0, A:1, a:1, b:1, c:1, d:1, e:0, f:1, g:1 }, // 9
+      // Invalid codes 10–15: all segments off
+      { D:1, C:0, B:1, A:0, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+      { D:1, C:0, B:1, A:1, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+      { D:1, C:1, B:0, A:0, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+      { D:1, C:1, B:0, A:1, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+      { D:1, C:1, B:1, A:0, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+      { D:1, C:1, B:1, A:1, a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+    ],
+    equations: [
+      "a = D'·C'·B'·A + D'·C·B'·A' + D'·C·B·A + D·C'·B·A' + D·C'·B·A",
+      "b = D'·C'·B'·A + D'·C'·B·A' + D'·C'·B·A + D'·C·B'·A + D'·C·B·A + D·C'·B'·A + D·C'·B·A",
+      "c = D'·C'·B·A' + D'·C·B'·A' + D'·C·B·A' + D·C'·B·A' + D·C'·B·A",
+      "d = D'·C'·B'·A + D'·C'·B·A' + D'·C'·B·A + D'·C·B'·A + D·C'·B·A'",
+      "e = D'·C'·B'·A + D'·C'·B·A + D'·C·B'·A' + D·C'·B'·A",
+      "f = D'·C'·B'·A + D'·C'·B·A' + D'·C'·B·A + D'·C·B'·A + D·C'·B·A' + D·C'·B·A",
+      "g = D'·C'·B'·A' + D'·C'·B'·A + D'·C·B·A' + D·C'·B·A' + D·C'·B·A"
+    ],
+    hint: "Treat each segment independently. For every segment, look at the truth table rows where it must be 1. Simplify using K‑maps – the invalid codes (10–15) can be used as don’t‑cares, but for this problem all invalid codes are forced to output 0.",
+    inputs: ["D", "C", "B", "A"],
+    outputs: ["a", "b", "c", "d", "e", "f", "g"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 38 – 2‑bit × 2‑bit Binary Multiplier
+// Inputs: A1,A0, B1,B0  |  Outputs: P3,P2,P1,P0 (4‑bit product)
+// 2^4 = 16 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 38,
+    title: "2-bit × 2-bit Binary Multiplier",
+    difficulty: "Medium",
+    tags: ["Combinational", "Arithmetic", "Boolean Algebra"],
+    description:
+      "Design a combinational circuit that multiplies two 2 bit unsigned binary numbers A (A1,A0) and B (B1,B0) and produces a 4‑bit product P3–P0.",
+    truthTable: [
+      { A1:0, A0:0, B1:0, B0:0, P3:0, P2:0, P1:0, P0:0 },
+      { A1:0, A0:0, B1:0, B0:1, P3:0, P2:0, P1:0, P0:0 },
+      { A1:0, A0:0, B1:1, B0:0, P3:0, P2:0, P1:0, P0:0 },
+      { A1:0, A0:0, B1:1, B0:1, P3:0, P2:0, P1:0, P0:0 },
+      { A1:0, A0:1, B1:0, B0:0, P3:0, P2:0, P1:0, P0:0 },
+      { A1:0, A0:1, B1:0, B0:1, P3:0, P2:0, P1:0, P0:1 }, // 1×1=1
+      { A1:0, A0:1, B1:1, B0:0, P3:0, P2:0, P1:1, P0:0 }, // 1×2=2
+      { A1:0, A0:1, B1:1, B0:1, P3:0, P2:0, P1:1, P0:1 }, // 1×3=3
+      { A1:1, A0:0, B1:0, B0:0, P3:0, P2:0, P1:0, P0:0 },
+      { A1:1, A0:0, B1:0, B0:1, P3:0, P2:0, P1:1, P0:0 }, // 2×1=2
+      { A1:1, A0:0, B1:1, B0:0, P3:0, P2:1, P1:0, P0:0 }, // 2×2=4
+      { A1:1, A0:0, B1:1, B0:1, P3:0, P2:1, P1:1, P0:0 }, // 2×3=6
+      { A1:1, A0:1, B1:0, B0:0, P3:0, P2:0, P1:0, P0:0 },
+      { A1:1, A0:1, B1:0, B0:1, P3:0, P2:0, P1:1, P0:1 }, // 3×1=3
+      { A1:1, A0:1, B1:1, B0:0, P3:0, P2:1, P1:1, P0:0 }, // 3×2=6
+      { A1:1, A0:1, B1:1, B0:1, P3:1, P2:0, P1:0, P0:1 }, // 3×3=9
+    ],
+    equations: [
+      "P3 = A1·A0·B1·B0",
+      "P2 = A1·A0'·B1 + A1·B1·B0'",
+      "P1 = A1·A0·B0 + A1·B1'·B0 + A0·B1·B0' + A1'·A0·B1",
+      "P0 = A0·B0"
+    ],
+    hint: "Multiply the two 2 bits numbers using the schoolbook method. A0·B0 gives LSB. Use AND gates for partial products and add them using half and full adders.",
+    inputs: ["A1", "A0", "B1", "B0"],
+    outputs: ["P3", "P2", "P1", "P0"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 39 – 4‑bit Even Parity Checker
+// Inputs: D3, D2, D1, D0, Pin  |  Output: Error
+// Error = (D3 ⊕ D2 ⊕ D1 ⊕ D0 ⊕ Pin)
+// 2^5 = 32 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 39,
+    title: "4-bit Even Parity Checker",
+    difficulty: "Medium",
+    tags: ["Combinational", "Parity", "Boolean Algebra"],
+    description:
+      "Design an even parity checker for a 4 bit data word plus one parity bit. The circuit receives five inputs: D3 D0 (data) and Pin (received parity). It produces a single output Error which is 1 if the total number of 1s among all five inputs is odd (indicating a parity error).",
+    truthTable: [
+      { D3:0, D2:0, D1:0, D0:0, Pin:0, Error:0 },
+      { D3:0, D2:0, D1:0, D0:0, Pin:1, Error:1 },
+      { D3:0, D2:0, D1:0, D0:1, Pin:0, Error:1 },
+      { D3:0, D2:0, D1:0, D0:1, Pin:1, Error:0 },
+      { D3:0, D2:0, D1:1, D0:0, Pin:0, Error:1 },
+      { D3:0, D2:0, D1:1, D0:0, Pin:1, Error:0 },
+      { D3:0, D2:0, D1:1, D0:1, Pin:0, Error:0 },
+      { D3:0, D2:0, D1:1, D0:1, Pin:1, Error:1 },
+      { D3:0, D2:1, D1:0, D0:0, Pin:0, Error:1 },
+      { D3:0, D2:1, D1:0, D0:0, Pin:1, Error:0 },
+      { D3:0, D2:1, D1:0, D0:1, Pin:0, Error:0 },
+      { D3:0, D2:1, D1:0, D0:1, Pin:1, Error:1 },
+      { D3:0, D2:1, D1:1, D0:0, Pin:0, Error:0 },
+      { D3:0, D2:1, D1:1, D0:0, Pin:1, Error:1 },
+      { D3:0, D2:1, D1:1, D0:1, Pin:0, Error:1 },
+      { D3:0, D2:1, D1:1, D0:1, Pin:1, Error:0 },
+      { D3:1, D2:0, D1:0, D0:0, Pin:0, Error:1 },
+      { D3:1, D2:0, D1:0, D0:0, Pin:1, Error:0 },
+      { D3:1, D2:0, D1:0, D0:1, Pin:0, Error:0 },
+      { D3:1, D2:0, D1:0, D0:1, Pin:1, Error:1 },
+      { D3:1, D2:0, D1:1, D0:0, Pin:0, Error:0 },
+      { D3:1, D2:0, D1:1, D0:0, Pin:1, Error:1 },
+      { D3:1, D2:0, D1:1, D0:1, Pin:0, Error:1 },
+      { D3:1, D2:0, D1:1, D0:1, Pin:1, Error:0 },
+      { D3:1, D2:1, D1:0, D0:0, Pin:0, Error:0 },
+      { D3:1, D2:1, D1:0, D0:0, Pin:1, Error:1 },
+      { D3:1, D2:1, D1:0, D0:1, Pin:0, Error:1 },
+      { D3:1, D2:1, D1:0, D0:1, Pin:1, Error:0 },
+      { D3:1, D2:1, D1:1, D0:0, Pin:0, Error:1 },
+      { D3:1, D2:1, D1:1, D0:0, Pin:1, Error:0 },
+      { D3:1, D2:1, D1:1, D0:1, Pin:0, Error:0 },
+      { D3:1, D2:1, D1:1, D0:1, Pin:1, Error:1 },
+    ],
+    equations: [
+      "Error = D3 ⊕ D2 ⊕ D1 ⊕ D0 ⊕ Pin"
+    ],
+    hint: "XOR all five inputs. If the result is 1, the total number of 1s is odd → error. A tree of two input XOR gates does the job.",
+    inputs: ["D3", "D2", "D1", "D0", "Pin"],
+    outputs: ["Error"],
+  },
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Problem 40 – 2‑to‑1 Multiplexer with Enable
+// Inputs: E, S, I0, I1  |  Output: Y
+// Y = E · (S'·I0 + S·I1)
+// 2^4 = 16 rows – complete ✓
+// ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 40,
+    title: "2-to-1 MUX with Enable",
+    difficulty: "Easy",
+    tags: ["Combinational", "MUX", "Boolean Algebra"],
+    description:
+      "Build a 2 to 1 multiplexer with an active high enable input E. When E = 0, the output Y must be 0 regardless of the other inputs. When E = 1, the MUX selects I0 if S = 0, or I1 if S = 1.",
+    truthTable: [
+      { E:0, S:0, I0:0, I1:0, Y:0 },
+      { E:0, S:0, I0:0, I1:1, Y:0 },
+      { E:0, S:0, I0:1, I1:0, Y:0 },
+      { E:0, S:0, I0:1, I1:1, Y:0 },
+      { E:0, S:1, I0:0, I1:0, Y:0 },
+      { E:0, S:1, I0:0, I1:1, Y:0 },
+      { E:0, S:1, I0:1, I1:0, Y:0 },
+      { E:0, S:1, I0:1, I1:1, Y:0 },
+      { E:1, S:0, I0:0, I1:0, Y:0 },
+      { E:1, S:0, I0:0, I1:1, Y:0 },
+      { E:1, S:0, I0:1, I1:0, Y:1 },
+      { E:1, S:0, I0:1, I1:1, Y:1 },
+      { E:1, S:1, I0:0, I1:0, Y:0 },
+      { E:1, S:1, I0:0, I1:1, Y:1 },
+      { E:1, S:1, I0:1, I1:0, Y:0 },
+      { E:1, S:1, I0:1, I1:1, Y:1 },
+    ],
+    equations: ["Y = E · (S'·I0 + S·I1)"],
+    hint: "AND the enable E with the output of a basic 2 to 1 MUX. Alternatively, use three AND gates and one OR gate, with E fed into each AND.",
+    inputs: ["E", "S", "I0", "I1"],
+    outputs: ["Y"],
+  },
 ];
+
+function generateTruthTableForProblem(problem) {
+  const id = problem.id;
+  const inputs = problem.inputs || [];
+
+  // Sequential latch problems need their custom deterministic test cases
+  const sequentialIds = new Set([7, 13, 14, 15, 16]);
+  if (sequentialIds.has(id)) {
+    return problem.truthTable;
+  }
+
+  // Conceptual/synthetic problems do not need dynamically generated truth tables
+  if (problem.isSynthetic) {
+    return problem.truthTable;
+  }
+
+  // Generate complete truth table for combinational problems
+  const numInputs = inputs.length;
+  const numRows = Math.pow(2, numInputs);
+  const table = [];
+
+  for (let i = 0; i < numRows; i++) {
+    const row = {};
+    // Insert inputs first to guarantee column display order in the UI
+    inputs.forEach((inputName, j) => {
+      row[inputName] = (i >> (numInputs - 1 - j)) & 1;
+    });
+
+    // Compute expected outputs using Boolean logic specification
+    switch (id) {
+      case 1: { // Half Adder
+        row.S = row.A ^ row.B;
+        row.C = row.A & row.B;
+        break;
+      }
+      case 2: { // Full Adder
+        row.S = row.A ^ row.B ^ row.Cin;
+        row.Cout = (row.A & row.B) | (row.B & row.Cin) | (row.A & row.Cin);
+        break;
+      }
+      case 3: { // 2‑to‑1 Multiplexer
+        row.Y = row.S ? row.I1 : row.I0;
+        break;
+      }
+      case 4: { // 4‑to‑1 Multiplexer
+        const sel4 = (row.S1 ? 2 : 0) + (row.S0 ? 1 : 0);
+        row.Y = [row.I0, row.I1, row.I2, row.I3][sel4];
+        break;
+      }
+      case 5: { // 1‑to‑2 Demultiplexer
+        row.Y0 = (row.D && !row.S) ? 1 : 0;
+        row.Y1 = (row.D && row.S) ? 1 : 0;
+        break;
+      }
+      case 6: { // 2‑to‑4 Decoder (active‑high outputs)
+        const sel6 = (row.A1 ? 2 : 0) + (row.A0 ? 1 : 0);
+        row.D0 = (row.E && sel6 === 0) ? 1 : 0;
+        row.D1 = (row.E && sel6 === 1) ? 1 : 0;
+        row.D2 = (row.E && sel6 === 2) ? 1 : 0;
+        row.D3 = (row.E && sel6 === 3) ? 1 : 0;
+        break;
+      }
+      case 8: { // Odd Parity Generator (3‑bit)
+        row.P = (row.A ^ row.B ^ row.C) ? 0 : 1;
+        break;
+      }
+      case 9: { // 8‑to‑1 Multiplexer
+        const sel9 = (row.S2 ? 4 : 0) + (row.S1 ? 2 : 0) + (row.S0 ? 1 : 0);
+        row.Y = row[`I${sel9}`];
+        break;
+      }
+      case 11: { // 1‑to‑4 Demultiplexer
+        const sel11 = (row.S1 ? 2 : 0) + (row.S0 ? 1 : 0);
+        row.Y0 = (row.D && sel11 === 0) ? 1 : 0;
+        row.Y1 = (row.D && sel11 === 1) ? 1 : 0;
+        row.Y2 = (row.D && sel11 === 2) ? 1 : 0;
+        row.Y3 = (row.D && sel11 === 3) ? 1 : 0;
+        break;
+      }
+      case 12: { // 1‑to‑8 Demultiplexer
+        const sel12 = (row.S2 ? 4 : 0) + (row.S1 ? 2 : 0) + (row.S0 ? 1 : 0);
+        for (let k = 0; k < 8; k++) {
+          row[`Y${k}`] = (row.D && sel12 === k) ? 1 : 0;
+        }
+        break;
+      }
+      case 17: { // Half Subtractor
+        row.D = row.A ^ row.B;
+        row.Bout = (!row.A & row.B) ? 1 : 0;
+        break;
+      }
+      case 18: { // Full Subtractor
+        row.D = row.A ^ row.B ^ row.Bin;
+        row.Bout = ((!row.A & row.B) | (!row.A & row.Bin) | (row.B & row.Bin)) ? 1 : 0;
+        break;
+      }
+      case 19: { // K‑Map: 2‑Variable SOP
+        row.F = (row.A || row.B) ? 1 : 0;
+        break;
+      }
+      case 20: { // K‑Map: 3‑Variable SOP
+        row.F = (!row.C) ? 1 : 0;
+        break;
+      }
+      case 21: { // K‑Map: 3‑Variable with Don't‑Cares
+        row.F = (row.A === 0 || (row.B === 0 && row.C === 1)) ? 1 : 0;
+        break;
+      }
+      case 22: { // K‑Map: 4‑Variable SOP
+        row.F = ((row.B && row.D) || (!row.B && !row.D)) ? 1 : 0;
+        break;
+      }
+      case 23: { // K‑Map: POS Minimization
+        row.F = ((!row.A || row.B) && (row.A || !row.C)) ? 1 : 0;
+        break;
+      }
+      case 24: { // K‑Map: 4‑Variable with Don't‑Cares
+        row.F = ((!row.A && !row.C) || (row.A && row.C)) ? 1 : 0;
+        break;
+      }
+      case 31: { // Even Parity Generator (3‑bit)
+        row.P = row.A ^ row.B ^ row.C;
+        break;
+      }
+      case 32: { // 4‑to‑2 Priority Encoder
+        const active = row.I3 ? 3 : row.I2 ? 2 : row.I1 ? 1 : row.I0 ? 0 : -1;
+        if (active >= 0) {
+          row.Y1 = (active >> 1) & 1;
+          row.Y0 = active & 1;
+          row.V = 1;
+        } else {
+          row.Y1 = 0; row.Y0 = 0; row.V = 0;
+        }
+        break;
+      }
+      case 33: { // 2‑bit Magnitude Comparator
+        const aVal = (row.A1 << 1) | row.A0;
+        const bVal = (row.B1 << 1) | row.B0;
+        row.G = aVal > bVal ? 1 : 0;
+        row.E = aVal === bVal ? 1 : 0;
+        row.L = aVal < bVal ? 1 : 0;
+        break;
+      }
+      case 34: { // Binary to Gray (3‑bit)
+        row.G2 = row.B2;
+        row.G1 = row.B2 ^ row.B1;
+        row.G0 = row.B1 ^ row.B0;
+        break;
+      }
+      case 35: { // Gray to Binary (3‑bit)
+        row.B2 = row.G2;
+        const b1 = row.G2 ^ row.G1;
+        row.B1 = b1;
+        row.B0 = b1 ^ row.G0;
+        break;
+      }
+      case 36: { // 2‑to‑4 Decoder (Active‑Low Outputs)
+        const sel36 = (row.A1 ? 2 : 0) + (row.A0 ? 1 : 0);
+        row.Y0n = (row.E && sel36 === 0) ? 0 : 1;
+        row.Y1n = (row.E && sel36 === 1) ? 0 : 1;
+        row.Y2n = (row.E && sel36 === 2) ? 0 : 1;
+        row.Y3n = (row.E && sel36 === 3) ? 0 : 1;
+        break;
+      }
+      case 37: { // BCD to 7‑Segment Decoder
+        const dec = (row.D << 3) | (row.C << 2) | (row.B << 1) | row.A;
+        const seg = {
+          0:[1,1,1,1,1,1,0], 1:[0,1,1,0,0,0,0], 2:[1,1,0,1,1,0,1],
+          3:[1,1,1,1,0,0,1], 4:[0,1,1,0,0,1,1], 5:[1,0,1,1,0,1,1],
+          6:[1,0,1,1,1,1,1], 7:[1,1,1,0,0,0,0], 8:[1,1,1,1,1,1,1],
+          9:[1,1,1,1,0,1,1]
+        };
+        if (dec < 10) {
+          const [a,b,c,d,e,f,g] = seg[dec];
+          row.a=a; row.b=b; row.c=c; row.d=d; row.e=e; row.f=f; row.g=g;
+        } else {
+          row.a=row.b=row.c=row.d=row.e=row.f=row.g=0;
+        }
+        break;
+      }
+      case 38: { // 2‑bit × 2‑bit Multiplier
+        const A = (row.A1 << 1) | row.A0;
+        const B = (row.B1 << 1) | row.B0;
+        const prod = A * B;
+        row.P3 = (prod >> 3) & 1;
+        row.P2 = (prod >> 2) & 1;
+        row.P1 = (prod >> 1) & 1;
+        row.P0 = prod & 1;
+        break;
+      }
+      case 39: { // 4‑bit Even Parity Checker
+        row.Error = row.D3 ^ row.D2 ^ row.D1 ^ row.D0 ^ row.Pin;
+        break;
+      }
+      case 40: { // 2‑to‑1 MUX with Enable
+        row.Y = row.E ? (row.S ? row.I1 : row.I0) : 0;
+        break;
+      }
+      default:
+        return problem.truthTable;
+    }
+    table.push(row);
+  }
+  return table;
+}
+
+problemsData.forEach((problem) => {
+  problem.truthTable = generateTruthTableForProblem(problem);
+});
 
 export default problemsData;

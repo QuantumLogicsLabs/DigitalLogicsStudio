@@ -14,6 +14,7 @@ const ProblemModal = ({ problem, onClose, onSolved }) => {
   const [circuitGates, setCircuitGates] = useState([]);
   const [circuitWires, setCircuitWires] = useState([]);
   const [submitResult, setSubmitResult] = useState(null); // null | { passed: bool, details: string }
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Validate the circuit against the problem's truth table
   const handleSubmitCircuit = () => {
@@ -218,37 +219,97 @@ const ProblemModal = ({ problem, onClose, onSolved }) => {
             {showHint && (
               <section className="prob-section prob-hint" style={{ marginTop: "1rem" }}>
                 <h4>💡 Hint: Truth Table</h4>
-                {problem?.truthTable?.length ? (
-                  <div className="prob-table-wrap" style={{ marginTop: "0.75rem", marginBottom: "0.75rem" }}>
-                    <table className="prob-truth-table">
-                      <thead>
-                        <tr>
-                          {problem.truthTable[0] && Object.keys(problem.truthTable[0]).map((col) => (
-                            <th key={col}>{col}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {problem.truthTable.map((row, i) => row && (
-                          <tr key={i}>
-                            {Object.values(row).map((val, j) => (
-                              <td
-                                key={j}
-                                className={
-                                  typeof val === "number" && val === 1
-                                    ? "cell-one"
-                                    : ""
-                                }
-                              >
-                                {String(val)}
-                              </td>
+                {problem?.truthTable?.length ? (() => {
+                  const rowsPerPage = 16;
+                  const totalPages = Math.ceil((problem.truthTable?.length || 0) / rowsPerPage);
+                  const effectivePage = Math.min(currentPage, Math.max(1, totalPages));
+                  const startIndex = (effectivePage - 1) * rowsPerPage;
+                  const paginatedRows = (problem.truthTable || []).slice(startIndex, startIndex + rowsPerPage);
+
+                  return (
+                    <>
+                      <div className="prob-table-wrap" style={{ marginTop: "0.75rem", marginBottom: "0.75rem" }}>
+                        <table className="prob-truth-table">
+                          <thead>
+                            <tr>
+                              {problem.truthTable[0] && Object.keys(problem.truthTable[0]).map((col) => (
+                                <th key={col}>{col}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedRows.map((row, i) => row && (
+                              <tr key={i}>
+                                {Object.values(row).map((val, j) => (
+                                  <td
+                                    key={j}
+                                    className={
+                                      typeof val === "number" && val === 1
+                                        ? "cell-one"
+                                        : ""
+                                    }
+                                  >
+                                    {String(val)}
+                                  </td>
+                                ))}
+                              </tr>
                             ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {totalPages > 1 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginTop: "0.5rem",
+                            padding: "0.35rem 0.6rem",
+                            background: "var(--bg-light, #1e2842)",
+                            border: "1px solid var(--border-color, #2a3550)",
+                            borderRadius: "6px",
+                            fontSize: "0.8rem",
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            disabled={effectivePage === 1}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: effectivePage === 1 ? "var(--secondary-text, #8899aa)" : "var(--accent-secondary, #00d4ff)",
+                              cursor: effectivePage === 1 ? "default" : "pointer",
+                              fontSize: "0.8rem",
+                              fontWeight: 700,
+                            }}
+                          >
+                            ◀ Prev
+                          </button>
+                          <span style={{ color: "var(--text-color, #e8f0ff)" }}>
+                            Page <strong>{effectivePage}</strong> of {totalPages}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={effectivePage === totalPages}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: effectivePage === totalPages ? "var(--secondary-text, #8899aa)" : "var(--accent-secondary, #00d4ff)",
+                              cursor: effectivePage === totalPages ? "default" : "pointer",
+                              fontSize: "0.8rem",
+                              fontWeight: 700,
+                            }}
+                          >
+                            Next ▶
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })() : (
                   <p style={{ color: "var(--secondary-text)", fontSize: "0.85rem" }}>
                     No truth table available for this problem type.
                   </p>

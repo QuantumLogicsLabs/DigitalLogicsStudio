@@ -325,6 +325,7 @@ export const problemBannerCards = [
     eyebrow: "Circuit Forge",
     gradient: "linear-gradient(135deg, #7c3aed, #a78bfa)",
     filterGroup: "Combinational Circuits",
+    path: "/boolforge",
   },
   {
     title: "K-Map Simplification",
@@ -332,6 +333,7 @@ export const problemBannerCards = [
     eyebrow: "K-Map Arena",
     gradient: "linear-gradient(135deg, #2563eb, #60a5fa)",
     filterGroup: "K-Map",
+    path: "/problems/k-map",
   },
   {
     title: "Algebraic Identities",
@@ -339,6 +341,7 @@ export const problemBannerCards = [
     eyebrow: "Boolean Algebra",
     gradient: "linear-gradient(135deg, #f97316, #fb7185)",
     filterGroup: "Boolean Algebra",
+    path: "/problems/boolean-algebra",
   },
   {
     title: "FSM & Flip-Flops",
@@ -346,6 +349,7 @@ export const problemBannerCards = [
     eyebrow: "Sequential Design",
     gradient: "linear-gradient(135deg, #0f766e, #14b8a6)",
     filterGroup: "Sequential Circuits",
+    path: "/problems/sequential-circuits",
   },
   {
     title: "Binary Representations",
@@ -353,6 +357,7 @@ export const problemBannerCards = [
     eyebrow: "Number Systems",
     gradient: "linear-gradient(135deg, #334155, #64748b)",
     filterGroup: "Number Systems",
+    path: "/problems/number-systems",
   },
   {
     title: "Memory Array Maps",
@@ -360,6 +365,7 @@ export const problemBannerCards = [
     eyebrow: "Memory Systems",
     gradient: "linear-gradient(135deg, #111827, #1d4ed8)",
     filterGroup: "Memory Systems",
+    path: "/memory/basics",
   },
 ];
 

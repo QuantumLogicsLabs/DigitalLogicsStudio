@@ -1,0 +1,479 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Blue-frost light theme — tinted surfaces, glow, readable contrast
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Page shells — restore blue/purple ambient glow (matches dark-mode landing feel) */
+[data-theme='light'] .home-page,
+[data-theme='light'] .learning-resources-page,
+[data-theme='light'] .coal-page,
+[data-theme='light'] .auth-page-shell,
+[data-theme='light'] .problems-page.theme-light {
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 30%),
+    radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.14), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.08), transparent 40%),
+    linear-gradient(180deg, var(--bg-color) 0%, var(--bg-gradient-end) 100%);
+}
+
+[data-theme='light'] .home-hero {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(239, 246, 255, 0.18) 45%,
+    transparent 72%
+  );
+}
+
+[data-theme='light'] .grid-background {
+  background-image:
+    linear-gradient(to right, rgba(59, 130, 246, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
+  opacity: 1;
+}
+
+[data-theme='light'] .hero-stat-label {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .home-search-input {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme='light'] .search-field-icon {
+  color: var(--accent-color);
+}
+
+/* Recommended courses — frosted blue glass */
+[data-theme='light'] .home-recommended-section {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 42%),
+    var(--light-glass-strong);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='light'] .recommended-course-card {
+  background: var(--light-glass);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme='light'] .recommended-course-card--coal {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 55%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(224, 236, 255, 0.88));
+  border-color: rgba(37, 99, 235, 0.24);
+}
+
+[data-theme='light'] .recommended-course-card--dld {
+  background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.1), transparent 55%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(224, 248, 240, 0.82));
+  border-color: rgba(5, 150, 105, 0.22);
+}
+
+[data-theme='light'] .recommended-course-card--link:hover,
+[data-theme='light'] .recommended-course-card--link:focus-visible {
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: var(--card-shadow-hover);
+}
+
+[data-theme='light'] .recommended-course-chip {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+}
+
+[data-theme='light'] .recommended-course-badge {
+  background: rgba(224, 236, 255, 0.75);
+  color: var(--secondary-text);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme='light'] .recommended-resource-pill {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.07);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='light'] .recommended-resource-pill:hover {
+  background: rgba(239, 246, 255, 0.95);
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.12);
+}
+
+[data-theme='light'] .boolforge-spotlight {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 50%),
+    var(--light-glass-strong);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='light'] .recommended-resource-link,
+[data-theme='light'] .recommended-topic-card {
+  background: var(--light-glass);
+  border-color: var(--card-border);
+  color: var(--text-color);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06);
+}
+
+[data-theme='light'] .home-card {
+  background: var(--light-glass) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme='light'] .home-card:hover {
+  box-shadow: var(--card-shadow-hover) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+[data-theme='light'] .home-card-link {
+  background: rgba(224, 236, 255, 0.65) !important;
+  border-color: rgba(59, 130, 246, 0.22) !important;
+  color: #1e293b !important;
+}
+
+[data-theme='light'] .home-res-card {
+  background: var(--light-glass) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+[data-theme='light'] .home-problems-cta {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 40%),
+    var(--light-glass-strong) !important;
+  border-color: var(--card-border) !important;
+}
+
+[data-theme='light'] .home-header {
+  border-bottom-color: rgba(59, 130, 246, 0.14) !important;
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.06);
+}
+
+/* Learning resources — blue glass sections */
+[data-theme='light'] .learning-resources-section {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 45%),
+    var(--light-glass-strong);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='light'] .learning-resources-hero-card,
+[data-theme='light'] .learning-resources-card,
+[data-theme='light'] .learning-resources-concept-card,
+[data-theme='light'] .learning-resources-visual-card,
+[data-theme='light'] .learning-resources-demo-card,
+[data-theme='light'] .learning-resources-practice-card,
+[data-theme='light'] .learning-resources-roadmap-cell,
+[data-theme='light'] .learning-resources-course-nav-card,
+[data-theme='light'] .learning-resources-course-card {
+  background: var(--light-glass);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='light'] .learning-resources-card:hover,
+[data-theme='light'] .learning-resources-roadmap-cell:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(224, 236, 255, 0.92));
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow: var(--card-shadow-hover);
+}
+
+[data-theme='light'] .learning-resources-course-footer {
+  background: linear-gradient(120deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.08));
+  border-color: var(--card-border);
+}
+
+/* COAL pages — violet-blue frost */
+[data-theme='light'] .coal-home-start__card,
+[data-theme='light'] .coal-home-part {
+  background: var(--light-glass);
+  border-color: rgba(124, 58, 237, 0.18);
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme='light'] .coal-home-module {
+  background: rgba(224, 236, 255, 0.65);
+  border: 1px solid rgba(59, 130, 246, 0.12);
+}
+
+/* Auth ghost buttons on light nav */
+[data-theme='light'] .home-auth-btn--ghost,
+[data-theme='light'] .home-user-badge {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: var(--card-border);
+  color: var(--text-color);
+  backdrop-filter: blur(8px);
+}
+
+/* DLS Mentor — remaining dark-only pieces */
+[data-theme='light'] .dls-mentor-launcher__hint {
+  color: var(--text-muted);
+}
+
+[data-theme='light'] .dls-mentor-panel__icon-btn {
+  background: #f1f5f9;
+  border-color: var(--card-border);
+  color: #475569;
+}
+
+[data-theme='light'] .dls-mentor-panel__icon-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme='light'] .dls-mentor-panel__controls {
+  background: rgba(224, 236, 255, 0.65);
+  border-bottom-color: var(--card-border);
+}
+
+[data-theme='light'] .home-card-description {
+  color: var(--secondary-text) !important;
+}
+
+[data-theme='light'] .dls-mentor-launcher {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(224, 236, 255, 0.85));
+}
+
+[data-theme='light'] .dls-mentor-panel {
+  --dls-mentor-bg: #f5f8ff;
+}
+
+[data-theme='light'] .dls-mentor-panel__header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(224, 236, 255, 0.88));
+}
+
+[data-theme='light'] .dls-mentor-panel__messages {
+  background: linear-gradient(180deg, #f8faff, #eef4ff);
+}
+
+[data-theme='light'] .dls-mentor-panel__footer {
+  background: rgba(224, 236, 255, 0.75);
+  border-top-color: var(--card-border);
+}
+
+[data-theme='light'] .dls-mentor-panel__select,
+[data-theme='light'] .dls-mentor-quick-prompt,
+[data-theme='light'] .dls-mentor-msg--bot .dls-mentor-msg__bubble {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(59, 130, 246, 0.16);
+  color: var(--text-color);
+}
+
+[data-theme='light'] .dls-mentor-welcome {
+  background: rgba(212, 175, 55, 0.08);
+  color: #334155;
+}
+
+[data-theme='light'] .dls-mentor-welcome strong {
+  color: #0f172a;
+}
+
+[data-theme='light'] .dls-mentor-welcome__focus {
+  color: var(--text-muted);
+}
+
+[data-theme='light'] .dls-mentor-msg--user .dls-mentor-msg__bubble {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+[data-theme='light'] .dls-mentor-panel__input {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+[data-theme='light'] .dls-mentor-panel__send {
+  color: #ffffff;
+}
+
+[data-theme='light'] .dls-mentor-course-badge--dld {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.22);
+}
+
+[data-theme='light'] .dls-mentor-course-badge--coal {
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.22);
+}
+
+/* Override public styles.css body when light — keep readable sans stack */
+[data-theme='light'] body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* ── Explanation blocks (Circuit Cost, Boolean pages, etc.) ─────────────── */
+[data-theme='light'] .explanation {
+  background: var(--light-glass-strong);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme='light'] .explanation-title {
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .explanation-intro {
+  color: var(--text-color);
+}
+
+[data-theme='light'] .explanation-content {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .step-detail {
+  background: var(--surface-inset);
+  border-left-color: var(--accent-color);
+}
+
+[data-theme='light'] .step-header {
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .step-body {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .identity-card {
+  background: var(--light-glass);
+  border-color: var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme='light'] .cost-type {
+  background: rgba(224, 236, 255, 0.55);
+  border-color: var(--card-border);
+}
+
+[data-theme='light'] .cost-type h4 {
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .cost-type p {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .cost-example {
+  background: #eff6ff;
+  border-color: rgba(37, 99, 235, 0.22);
+  color: #1e293b;
+}
+
+[data-theme='light'] .disadvantage-item {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme='light'] .disadvantage-item h4 {
+  color: #b91c1c;
+}
+
+[data-theme='light'] .disadvantage-item p {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .comparison-table table {
+  background: var(--light-glass);
+}
+
+[data-theme='light'] .comparison-table th {
+  background: rgba(224, 236, 255, 0.85);
+  color: #1e293b;
+}
+
+[data-theme='light'] .comparison-table th,
+[data-theme='light'] .comparison-table td {
+  color: var(--text-color);
+  border-color: var(--card-border);
+}
+
+[data-theme='light'] .best-practices {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(5, 150, 105, 0.22);
+}
+
+[data-theme='light'] .best-practices h4 {
+  color: #047857;
+}
+
+[data-theme='light'] .best-practices ul {
+  color: var(--secondary-text);
+}
+
+/* App.css shared learning components */
+[data-theme='light'] .info-card,
+[data-theme='light'] .example-box,
+[data-theme='light'] .key-insight,
+[data-theme='light'] .comparison-card,
+[data-theme='light'] .gate-card,
+[data-theme='light'] .law-card,
+[data-theme='light'] .arithmetic-card {
+  color: var(--text-color);
+}
+
+[data-theme='light'] .info-card h4,
+[data-theme='light'] .comparison-card h5 {
+  color: var(--heading-color);
+}
+
+[data-theme='light'] .comparison-card ul,
+[data-theme='light'] .gate-card p,
+[data-theme='light'] .law-explanation {
+  color: var(--secondary-text);
+}
+
+[data-theme='light'] .note {
+  color: #92400e;
+  background: rgba(251, 191, 36, 0.14);
+}
+
+[data-theme='light'] summary {
+  color: #1d4ed8;
+}
+
+[data-theme='light'] .mini-table {
+  background: var(--light-glass);
+}
+
+[data-theme='light'] .mini-table th {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--heading-color);
+}
+
+[data-theme='light'] .mini-table td {
+  color: var(--text-color);
+}
+
+/* Premium learning shell content area */
+[data-theme='light'] .premium-topic-shell .afhdl-section,
+[data-theme='light'] .premium-topic-stack > * {
+  color: var(--text-color);
+}
+
+[data-theme='light'] .highlight {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+[data-theme='light'] .hint {
+  color: var(--text-muted);
+}

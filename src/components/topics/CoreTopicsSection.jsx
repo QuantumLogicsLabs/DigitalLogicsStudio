@@ -4,13 +4,19 @@ import {
   ArrowRight,
   ArrowLeftRight,
   Binary,
+  BookOpen,
   Calculator,
   Check,
+  Cpu,
   Database,
   GitBranch,
+  HardDrive,
+  Layers3,
+  MonitorPlay,
   Sigma,
   Sparkles,
   Workflow,
+  Zap,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import useLearningProgress from "../../hooks/useLearningProgress";
@@ -25,6 +31,12 @@ const iconMap = {
   ArrowLeftRight,
   Database,
   Sparkles,
+  Cpu,
+  BookOpen,
+  HardDrive,
+  Layers3,
+  MonitorPlay,
+  Zap,
 };
 
 const accentCopy = {
@@ -47,7 +59,10 @@ function TopicCard({ topic, progress, onOpenTopic, onToggleSubtopic }) {
   const primaryPath = topic.links[0]?.to || "/";
 
   return (
-    <article className={`core-topic-card accent-${topic.accent}`}>
+    <article
+      id={topic.anchorId}
+      className={`core-topic-card accent-${topic.accent}`}
+    >
       <div className="core-topic-card-glow" aria-hidden="true" />
 
       <div className="core-topic-card-head">

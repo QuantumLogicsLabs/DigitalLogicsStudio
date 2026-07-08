@@ -8,7 +8,7 @@ import "./FeaturedToolsSection.css";
    but accent, tags, and visual chrome live here.
 ──────────────────────────────────────────────────────────────────────────── */
 const TOOL_META = {
-  "🔧 Circuit Forge": {
+  "Circuit Forge": {
     accent: "#3b82f6",
     accentAlt: "#6366f1",
     tags: ["Drag & Drop", "Truth Tables", "Real-time"],
@@ -36,7 +36,7 @@ const TOOL_META = {
       </svg>
     ),
   },
-  "🗺️ K-Map Generator": {
+  "K-Map Generator": {
     accent: "#8b5cf6",
     accentAlt: "#ec4899",
     tags: ["SOP / POS", "Visual K-Map", "Minimization"],

@@ -81,6 +81,9 @@ const PremiumLearningShell = ({
   highlights = [],
   children,
   pages,
+  sidebarPages,
+  overviewPath = "",
+  isSidebarItemActive = null,
   topicLabel,
   sidebarTitle,
   sidebarCopy,
@@ -88,6 +91,8 @@ const PremiumLearningShell = ({
   progressVerb = "complete",
   tracking,
   rootClassName = "",
+  sidebarFooterLink = "/",
+  sidebarFooterLabel = "← Back to All Topics",
 }) => {
   const location = useLocation();
   const { theme, toggle: toggleTheme } = useTheme();
@@ -96,10 +101,22 @@ const PremiumLearningShell = ({
   const [isScrolled, setIsScrolled] = useState(false);
 
   const currentPath = location.pathname;
-  const currentIndex = pages.findIndex((page) => page.path === currentPath);
+  const navPages = sidebarPages?.length ? sidebarPages : pages;
+  const chapterPages = pages;
+  const isOverview = Boolean(overviewPath) && currentPath === overviewPath;
+  const currentIndex = chapterPages.findIndex((page) => page.path === currentPath);
   const safeIndex = currentIndex >= 0 ? currentIndex : 0;
-  const prev = safeIndex > 0 ? pages[safeIndex - 1] : null;
-  const next = safeIndex < pages.length - 1 ? pages[safeIndex + 1] : null;
+  const dotActiveIndex = currentIndex;
+  const prev = isOverview
+    ? null
+    : currentIndex > 0
+      ? chapterPages[currentIndex - 1]
+      : null;
+  const next = isOverview
+    ? chapterPages[0] || null
+    : currentIndex >= 0 && currentIndex < chapterPages.length - 1
+      ? chapterPages[currentIndex + 1]
+      : null;
 
   const pathToSubtopicId = tracking?.pathToSubtopicId || {};
   const subtopicAliases = tracking?.subtopicAliases || EMPTY_ALIASES;
@@ -169,8 +186,12 @@ const PremiumLearningShell = ({
     ? completedSubtopics.filter((id) =>
         Object.values(pathToSubtopicId).includes(id),
       ).length
-    : safeIndex + 1;
-  const progress = Math.round((readCount / Math.max(pages.length, 1)) * 100);
+    : isOverview
+      ? 0
+      : safeIndex + 1;
+  const progress = Math.round(
+    (readCount / Math.max(chapterPages.length, 1)) * 100,
+  );
   const progressDash = progress * 0.879;
   const isRead = subtopicId ? completedSubtopics.includes(subtopicId) : false;
 
@@ -228,7 +249,7 @@ const PremiumLearningShell = ({
           </button>
           <div
             className="afhdl-progress-ring-wrap"
-            title={`${readCount} of ${pages.length} completed`}
+            title={`${readCount} of ${chapterPages.length} completed`}
           >
             <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
               <circle
@@ -253,7 +274,7 @@ const PremiumLearningShell = ({
               />
             </svg>
             <span className="afhdl-progress-text">
-              {readCount}/{pages.length}
+              {readCount}/{chapterPages.length}
             </span>
           </div>
         </div>
@@ -289,14 +310,19 @@ const PremiumLearningShell = ({
             </div>
 
             <nav className="afhdl-sidebar-nav">
-              {pages.map((page, index) => {
+              {navPages.map((page, index) => {
                 const done = pageDone(index, page);
+                const active = isSidebarItemActive
+                  ? isSidebarItemActive(page, location)
+                  : page.path.split("#")[0] === currentPath &&
+                    (!page.path.includes("#") ||
+                      location.hash === page.path.slice(page.path.indexOf("#")));
                 return (
                   <NavLink
                     key={page.path}
                     to={page.path}
-                    className={({ isActive }) =>
-                      `afhdl-nav-item${isActive ? " is-active" : ""}${done ? " is-visited" : ""}`
+                    className={() =>
+                      `afhdl-nav-item${active ? " is-active" : ""}${done ? " is-visited" : ""}`
                     }
                     onClick={() => setSidebarOpen(false)}
                   >
@@ -322,8 +348,8 @@ const PremiumLearningShell = ({
             </nav>
 
             <div className="afhdl-sidebar-footer">
-              <Link to="/" className="afhdl-sidebar-home-btn">
-                ← Back to All Topics
+              <Link to={sidebarFooterLink} className="afhdl-sidebar-home-btn">
+                {sidebarFooterLabel}
               </Link>
             </div>
           </div>
@@ -342,8 +368,12 @@ const PremiumLearningShell = ({
 
           <section className="afhdl-hero">
             <div className="afhdl-hero-badge">
-              <span className="afhdl-hero-badge-label">Chapter</span>
-              <strong className="afhdl-hero-badge-num">{safeIndex + 1}</strong>
+              <span className="afhdl-hero-badge-label">
+                {isOverview ? "Overview" : "Chapter"}
+              </span>
+              <strong className="afhdl-hero-badge-num">
+                {isOverview ? "·" : safeIndex + 1}
+              </strong>
             </div>
             <p className="afhdl-hero-kicker">{heroKicker || topicLabel}</p>
             <h1 className="afhdl-hero-title">{title}</h1>
@@ -362,11 +392,11 @@ const PremiumLearningShell = ({
             ) : null}
 
             <div className="afhdl-chapter-dots">
-              {pages.map((page, index) => (
+              {chapterPages.map((page, index) => (
                 <Link
                   key={page.path}
                   to={page.path}
-                  className={`afhdl-dot${index === safeIndex ? " active" : ""}${pageDone(index, page) ? " done" : ""}`}
+                  className={`afhdl-dot${index === dotActiveIndex ? " active" : ""}${pageDone(index, page) ? " done" : ""}`}
                   title={page.label}
                 />
               ))}

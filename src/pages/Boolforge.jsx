@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { gateSymbols, IC_META, IC_TYPES } from "../data/gates";
 import { TruthTableGenerator } from "../components/TruthTable";
@@ -33,9 +34,12 @@ function defaultInputCount(type) {
 // ── IC height lookup (module-level — used by helpers below) ──────────────────
 const IC_HEIGHTS = {
   MUX2: 100, MUX4: 120, MUX8: 160,
-  DEMUX2: 100, DEMUX4: 120,
+  DEMUX2: 100, DEMUX4: 120, DEMUX8: 160,
   ENC4: 100, ENC8: 140,
   DEC4: 100, DEC8: 140,
+  HALF_ADDER: 80, FULL_ADDER: 100,
+  ADD4: 160, CLADD4: 160,
+  HALF_SUBTRACTOR: 80, FULL_SUBTRACTOR: 100,
 };
 
 function getICHeight(type) {
@@ -99,6 +103,7 @@ const Boolforge = ({
   const [dragStartPositions, setDragStartPositions] = useState({});
   const [dragStartMouse, setDragStartMouse] = useState({ x: 0, y: 0 });
   const [spacePressed, setSpacePressed] = useState(false);
+  const [selectionToolActive, setSelectionToolActive] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 });
   const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
@@ -263,6 +268,15 @@ const Boolforge = ({
         const sel = (s1 ? 2 : 0) + (s0 ? 1 : 0);
         return sel === outputIndex && d;
       }
+      case "DEMUX8": {
+      // inputs[0] = D, inputs[1] = S0, inputs[2] = S1, inputs[3] = S2
+      const d  = inputs[0] ?? false;
+      const s0 = inputs[1] ?? false;
+      const s1 = inputs[2] ?? false;
+      const s2 = inputs[3] ?? false;
+      const sel = (s2 ? 4 : 0) + (s1 ? 2 : 0) + (s0 ? 1 : 0); // 0..7
+      return sel === outputIndex && d;
+    }
 
       // ── Encoders (priority encoder — highest active input wins) ───────────
       case "ENC4": {
@@ -292,6 +306,72 @@ const Boolforge = ({
                   + ((inputs[1] ?? false) ? 2 : 0)
                   + ((inputs[0] ?? false) ? 1 : 0);
         return sel === outputIndex;
+      }
+
+    // ── Adders & Subtractors ────────────────────────────────────────────────
+      case 'HALF_ADDER': {
+        const a = inputs[0] ?? false;
+        const b = inputs[1] ?? false;
+        // outputIndex 0 = Sum (XOR), 1 = Carry (AND)
+        return outputIndex === 0 ? (a !== b) : (a && b);
+      }
+      case 'FULL_ADDER': {
+        const a = inputs[0] ?? false;
+        const b = inputs[1] ?? false;
+        const cin = inputs[2] ?? false;
+        // Sum = a XOR b XOR cin
+        const sum = (a !== b) !== cin;
+        // Cout = (a AND b) OR (cin AND (a XOR b))
+        const cout = (a && b) || (cin && (a !== b));
+        return outputIndex === 0 ? sum : cout;
+      }
+      case 'ADD4': {
+        // ripple-carry adder: A0..A3, B0..B3, Cin
+        const a = [inputs[0], inputs[1], inputs[2], inputs[3]].map(v => v ?? false);
+        const b = [inputs[4], inputs[5], inputs[6], inputs[7]].map(v => v ?? false);
+        let carry = inputs[8] ?? false;
+        const sums = [];
+        for (let i = 0; i < 4; i++) {
+          const xor_ab = a[i] !== b[i];
+          sums[i] = xor_ab !== carry;
+          carry = (a[i] && b[i]) || (carry && xor_ab);
+        }
+        // outputIndex 0-3 = S0..S3, 4 = Cout
+        return outputIndex === 4 ? carry : sums[outputIndex];
+      }
+      case 'CLADD4': {
+        // carry look-ahead: same pinout, same outputs
+        const a = [inputs[0], inputs[1], inputs[2], inputs[3]].map(v => v ?? false);
+        const b = [inputs[4], inputs[5], inputs[6], inputs[7]].map(v => v ?? false);
+        const cin = inputs[8] ?? false;
+
+        const g = a.map((ai, i) => ai && b[i]);   // generate
+        const p = a.map((ai, i) => ai !== b[i]);  // propagate
+
+        // carry look-ahead
+        const c = [cin]; // c[0] = cin, c[1..4] are carries into each stage
+        for (let i = 0; i < 4; i++) {
+          c[i+1] = g[i] || (p[i] && c[i]);
+        }
+        const sums = p.map((pi, i) => pi !== c[i]); // S_i = P_i XOR C_i
+        const cout = c[4];
+        return outputIndex === 4 ? cout : sums[outputIndex];
+      }
+      case 'HALF_SUBTRACTOR': {
+        const a = inputs[0] ?? false;
+        const b = inputs[1] ?? false;
+        // Diff = A XOR B, Borrow = !A AND B
+        return outputIndex === 0 ? (a !== b) : (!a && b);
+      }
+      case 'FULL_SUBTRACTOR': {
+        const a = inputs[0] ?? false;
+        const b = inputs[1] ?? false;
+        const bin = inputs[2] ?? false;
+        // Diff = A XOR B XOR Bin
+        const diff = (a !== b) !== bin;
+        // Bout = (!A AND B) OR (!A AND Bin) OR (B AND Bin)
+        const bout = (!a && b) || (!a && bin) || (b && bin);
+        return outputIndex === 0 ? diff : bout;
       }
 
       default:
@@ -729,18 +809,27 @@ const Boolforge = ({
       const isShift = e.shiftKey;
       const isMiddleClick = e.button === 1;
       
-      if (spacePressed || isShift || isMiddleClick) {
+      // Middle click, Space held, or Shift always pans
+      if (spacePressed || isMiddleClick) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
       } else if (e.button === 0) {
-        setIsSelecting(true);
-        setSelectionStart({ x: startX, y: startY });
-        setSelectionEnd({ x: startX, y: startY });
-        setSelectionStartIds(isCtrl ? selectedGateIds : []);
-        
-        if (!isCtrl) {
-          setSelectedGateIds([]);
-          setSelectedGate(null);
+        // When selection tool is OFF (default): left-drag pans the canvas
+        // When selection tool is ON or Shift held: left-drag draws a selection rectangle
+        if (!selectionToolActive && !isShift) {
+          setIsPanning(true);
+          setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+        } else {
+          // Selection mode: box-select
+          setIsSelecting(true);
+          setSelectionStart({ x: startX, y: startY });
+          setSelectionEnd({ x: startX, y: startY });
+          setSelectionStartIds(isCtrl ? selectedGateIds : []);
+          
+          if (!isCtrl) {
+            setSelectedGateIds([]);
+            setSelectedGate(null);
+          }
         }
       }
     }
@@ -1304,11 +1393,92 @@ const Boolforge = ({
   );
 
   // ── Truth table generation ─────────────────────────────────────────────────
+  // ── Derive a boolean expression string by walking wires back from a gate ──
+  const deriveExpression = useCallback(
+    (gate, gatesArray, depth = 0, visited = new Set()) => {
+      if (!gate || depth > 20 || visited.has(gate.id)) return "?";
+      const newVisited = new Set(visited);
+      newVisited.add(gate.id);
+
+      if (gate.type === "INPUT") return gate.label;
+
+      // Collect expressions for each input slot, in slot order
+      const incomingForGate = wires.filter((w) => w.toId === gate.id);
+      const slotExprs = {};
+      incomingForGate.forEach((w) => {
+        const src = gatesArray.find((g) => g.id === w.fromId);
+        slotExprs[w.toIndex] = deriveExpression(src, gatesArray, depth + 1, newVisited);
+      });
+
+      const slots = Object.keys(slotExprs)
+        .sort((a, b) => Number(a) - Number(b))
+        .map((k) => slotExprs[k]);
+
+      if (slots.length === 0) return gate.label || gate.type;
+
+      const wrap = (expr) => (expr.includes("+") || expr.includes("⊕") ? `(${expr})` : expr);
+
+      switch (gate.type) {
+        case "OUTPUT":
+        case "BUFFER":
+          return slots[0];
+        case "NOT":
+          return `${wrap(slots[0])}'`;
+        case "AND":
+          return slots.map(wrap).join(".");
+        case "NAND":
+          return `(${slots.map(wrap).join(".")})'`;
+        case "OR":
+          return slots.join("+");
+        case "NOR":
+          return `(${slots.join("+")})'`;
+        case "XOR":
+          return slots.join("⊕");
+        case "XNOR":
+          return `(${slots.join("⊕")})'`;
+        default:
+          // IC types — just show the type name with inputs
+          return `${gate.type}(${slots.join(",")})`;
+      }
+    },
+    [wires],
+  );
+
   const generateTruthTable = useCallback(() => {
     const inputs = gates.filter((g) => g.type === "INPUT");
     const outputs = gates.filter((g) => g.type === "OUTPUT");
     if (inputs.length === 0 || outputs.length === 0)
       return { headers: [], rows: [] };
+
+    // Intermediate gates: everything that isn't INPUT or OUTPUT, sorted by x
+    // position so columns read left-to-right as wired on canvas.
+    const intermediates = gates
+      .filter((g) => g.type !== "INPUT" && g.type !== "OUTPUT")
+      .sort((a, b) => a.x - b.x);
+
+    // Only show an intermediate gate if it has at least one outgoing wire that
+    // goes to a non-OUTPUT gate. Gates that feed directly into OUTPUT are already
+    // captured by the output column — showing them would be redundant.
+    const visibleIntermediates = intermediates.filter((g) => {
+      const outgoingWires = wires.filter((w) => w.fromId === g.id);
+      if (outgoingWires.length === 0) return false; // dangling, skip
+      return outgoingWires.some((w) => !outputs.some((o) => o.id === w.toId));
+    });
+
+    // Generate a readable column label for an intermediate gate.
+    // If multiple gates share the same label, append a 1-based counter to each.
+    const rawLabels = visibleIntermediates.map((g) => g.label || g.type);
+    const labelCount = {};
+    rawLabels.forEach((l) => { labelCount[l] = (labelCount[l] || 0) + 1; });
+    const labelSeen = {};
+    const getIntermediateLabel = (gate) => {
+      const base = gate.label || gate.type;
+      if (labelCount[base] > 1) {
+        labelSeen[base] = (labelSeen[base] || 0) + 1;
+        return `${base}${labelSeen[base]}`;
+      }
+      return base;
+    };
 
     const numCombinations = Math.pow(2, inputs.length);
     const rows = [];
@@ -1323,17 +1493,44 @@ const Boolforge = ({
         }
         return g;
       });
+
+      // Evaluate all intermediate gate outputs for this combination.
+      const intermediateValues = visibleIntermediates.map((intGate) => {
+        const gate = tempGates.find((g) => g.id === intGate.id);
+        if (IC_TYPES.has(intGate.type)) {
+          // For multi-output ICs, show all outputs joined by "/"
+          const numOut = IC_META[intGate.type].outputs;
+          const vals = Array.from({ length: numOut }, (_, oi) =>
+            evaluateGateWithGates(gate, tempGates, oi) ? 1 : 0,
+          );
+          return vals.join("/");
+        }
+        return evaluateGateWithGates(gate, tempGates) ? 1 : 0;
+      });
+
       const outputValues = outputs.map((outGate) => {
         const gate = tempGates.find((g) => g.id === outGate.id);
         return evaluateGateWithGates(gate, tempGates) ? 1 : 0;
       });
-      rows.push([...inputValues.map((v) => (v ? 1 : 0)), ...outputValues]);
+      rows.push([
+        ...inputValues.map((v) => (v ? 1 : 0)),
+        ...intermediateValues,
+        ...outputValues,
+      ]);
     }
     return {
-      headers: [...inputs.map((g) => g.label), ...outputs.map((g) => g.label)],
+      headers: [
+        ...inputs.map((g) => g.label),
+        ...visibleIntermediates.map(getIntermediateLabel),
+        ...outputs.map((g) => {
+          const expr = deriveExpression(g, gates);
+          // expr for an OUTPUT gate is the expression of what feeds into it
+          return expr && expr !== g.label ? `${g.label}=${expr}` : g.label;
+        }),
+      ],
       rows,
     };
-  }, [gates, evaluateGateWithGates]);
+  }, [gates, wires, evaluateGateWithGates, deriveExpression]);
 
   // ── Clear circuit ──────────────────────────────────────────────────────────
   const clearCircuit = () => {
@@ -1445,6 +1642,34 @@ const Boolforge = ({
       <div className="sidebar">
         <h2>Circuit Forge</h2>
 
+        {/* ── Selection Tool Toggle ── */}
+        <button
+          onClick={() => setSelectionToolActive((v) => !v)}
+          title={selectionToolActive ? "Selection Tool ON — click to switch to Pan mode" : "Selection Tool OFF — click to enable box-select"}
+          style={{
+            width: "100%",
+            padding: "10px 14px",
+            marginBottom: "16px",
+            background: selectionToolActive ? "var(--accent-primary, #00ff88)" : "transparent",
+            color: selectionToolActive ? "var(--bg-dark, #0a0e1a)" : "var(--accent-primary, #00ff88)",
+            border: "2px solid var(--accent-primary, #00ff88)",
+            borderRadius: "4px",
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: "12px",
+            fontWeight: "700",
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <span style={{ fontSize: "16px" }}>{selectionToolActive ? "✦" : "⬚"}</span>
+          {selectionToolActive ? "Selection ON" : "Selection OFF"}
+        </button>
+
         {simplifiedExpression && (
           <div className="simplified-expression-display">
             <h3>📐 K-Map Simplified Expression</h3>
@@ -1485,6 +1710,7 @@ const Boolforge = ({
             {[
               { type: "DEMUX2", label: "DEMUX 1:2" },
               { type: "DEMUX4", label: "DEMUX 1:4" },
+              { type: "DEMUX8", label: "DEMUX 1:8" },
             ].map(({ type, label }) => (
               <button key={type} className="gate-btn gate-btn--ic" onClick={() => addGate(type)}>
                 {label}
@@ -1521,12 +1747,43 @@ const Boolforge = ({
           </div>
         </div>
 
+        <div className="palette-section">
+          <div className="palette-section-title">Adders </div>
+          <div className="gate-palette">
+            {[
+              { type: "HALF_ADDER",        label: "Half Adder" },
+              { type: "FULL_ADDER",        label: "Full Adder" },
+              { type: "ADD4",              label: "4 bit Adder" },
+              { type: "CLADD4",            label: "Carry LA 4" },
+            ].map(({ type, label }) => (
+              <button key={type} className="gate-btn gate-btn--ic" onClick={() => addGate(type)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="palette-section">
+          <div className="palette-section-title">Subtractors</div>
+          <div className="gate-palette">
+            {[
+              { type: "HALF_SUBTRACTOR",   label: "Half Subtractor" },
+              { type: "FULL_SUBTRACTOR",   label: "Full Subtractor" },
+            ].map(({ type, label }) => (
+              <button key={type} className="gate-btn gate-btn--ic" onClick={() => addGate(type)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="instructions">
           <p><strong>Controls:</strong></p>
           <p>• Click buttons to add components</p>
           <p>• Drag gates to move them (Group Drag supported!)</p>
-          <p>• Drag empty space to select multiple components</p>
-          <p>• Hold <strong>Space</strong> / <strong>Shift</strong> or drag with <strong>Middle Button</strong> to pan</p>
+          <p>• <strong>Drag empty space</strong> to pan the canvas (default)</p>
+          <p>• Enable <strong>⬚ Selection Tool</strong> (top-left overlay) to box-select components</p>
+          <p>• Hold <strong>Space</strong> or drag with <strong>Middle Button</strong> to pan anytime</p>
           <p>• Ctrl + Click to add/remove individual gates</p>
           <p>• Click output dot → input dot to wire</p>
           <p>• Right-click wire to delete it</p>
@@ -1561,7 +1818,7 @@ const Boolforge = ({
           }}
           style={{
             pointerEvents: "auto",
-            cursor: isPanning ? "grabbing" : (spacePressed ? "grab" : "crosshair"),
+            cursor: isPanning ? "grabbing" : (spacePressed ? "grab" : (selectionToolActive ? "crosshair" : "grab")),
           }}
         />
 
@@ -1717,6 +1974,19 @@ const Boolforge = ({
 
         {/* ── Floating canvas controls overlay (mobile-friendly) ── */}
         <div className="canvas-overlay-controls">
+          <button
+            className={`canvas-overlay-btn${selectionToolActive ? " canvas-overlay-btn--active" : ""}`}
+            onClick={() => setSelectionToolActive((v) => !v)}
+            title={selectionToolActive ? "Selection Tool ON — click to switch to Pan mode" : "Selection Tool OFF — click to enable box-select"}
+            onTouchEnd={(e) => { e.preventDefault(); setSelectionToolActive((v) => !v); }}
+            style={{
+              background: selectionToolActive ? "var(--accent-primary, #7c3aed)" : undefined,
+              color: selectionToolActive ? "#fff" : undefined,
+              borderColor: selectionToolActive ? "var(--accent-primary, #7c3aed)" : undefined,
+            }}
+          >
+            ⬚
+          </button>
           <button
             className="canvas-overlay-btn"
             onClick={fitToView}
@@ -2040,3 +2310,5 @@ const Boolforge = ({
 };
 
 export default Boolforge;
+
+
