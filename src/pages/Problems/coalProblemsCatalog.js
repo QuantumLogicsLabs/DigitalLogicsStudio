@@ -8,7 +8,6 @@ const slugify = (value) =>
 
 const inferTopic = (problem) => {
   const tagText = (problem.tags || []).join(" ").toLowerCase();
-  const titleText = problem.title.toLowerCase();
 
   if (tagText.includes("foundations") || tagText.includes("architecture")) {
     return {

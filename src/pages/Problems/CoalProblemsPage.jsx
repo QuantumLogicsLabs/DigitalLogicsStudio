@@ -1,13 +1,11 @@
 import React from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import {
-  BookOpen,
   ChevronLeft,
   ChevronRight,
   Compass,
   Flame,
-  FolderHeart,
   GraduationCap,
   LibraryBig,
   Lock,
@@ -17,12 +15,10 @@ import {
   Cpu,
   Grid,
   Binary,
-  Layers,
   Activity,
   Info,
   Menu,
   X,
-  FileQuestion,
   Award
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
