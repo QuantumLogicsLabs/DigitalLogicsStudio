@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Cpu,
   Zap,
@@ -11,6 +11,10 @@ import {
   Layers,
   HardDrive,
   Radio,
+  BookOpen,
+  MousePointerClick,
+  StepForward,
+  Waypoints,
 } from "lucide-react";
 import "./CPUExplorer.css";
 
@@ -144,6 +148,58 @@ const MEMORY_SEGMENTS = [
   },
 ];
 
+const GUIDE_SECTIONS = [
+  {
+    icon: MousePointerClick,
+    accent: "cyan",
+    title: "1. Inspect any component",
+    body:
+      "Click the Control Unit, the ALU, or any register (AX, BX, CX, DX) to open a detail panel. Each panel explains what that component does, which instructions rely on it, and — for registers — its live hex value.",
+    points: [
+      "Control Unit: shows the decode steps and which control signals are firing.",
+      "ALU: shows Arithmetic vs. Logic operations and sample instructions that use it.",
+      "AX specifically: click it, then drag the slider — AH (high byte) and AL (low byte) update automatically, showing how the 16-bit register splits.",
+    ],
+  },
+  {
+    icon: StepForward,
+    accent: "purple",
+    title: "2. Step through Fetch–Decode–Execute",
+    body:
+      "Use \u201cNext Step\u201d under \u201cFetch–Decode–Execute Cycle\u201d to move one stage at a time: Fetch \u2192 Decode \u2192 Execute \u2192 Store Result. The component doing the work lights up as you go.",
+    points: [
+      "Fetch & Decode pulse the Control Unit — it's reading and interpreting the instruction.",
+      "Execute & Store Result pulse the ALU — it's doing the actual computation and writing the result.",
+      "\u201cReset\u201d clears the cycle back to the start at any point.",
+    ],
+  },
+  {
+    icon: Waypoints,
+    accent: "green",
+    title: "3. Watch data move on the bus",
+    body:
+      "Press \u201cRun MOV AX, [1000]\u201d in the Bus Communication Simulator to animate a real instruction: the CPU issues an address, it travels the Address Bus to Memory, the value returns on the Data Bus, and lands in AX.",
+    points: [
+      "Each stage lights up in sequence — this mirrors what actually happens in hardware for a memory-read instruction.",
+      "Once it reaches AX, you'll see the register's value update to 0x1000.",
+    ],
+  },
+  {
+    icon: Layers,
+    accent: "purple",
+    title: "4. Explore memory segmentation",
+    body:
+      "Click any segment card (CS, DS, SS, ES) to expand it and see what kind of instructions or data live there.",
+    points: [
+      "CS holds the instructions themselves — what the CPU fetches and executes.",
+      "DS holds your program's variables.",
+      "SS is the call stack — return addresses, PUSH/POP, and local variables.",
+      "ES is used as a destination by string instructions like MOVS and STOS.",
+    ],
+  },
+];
+
+
 /* ────────────────────────────────────────────────────────────────────────
    Helpers
    ──────────────────────────────────────────────────────────────────────── */
@@ -161,6 +217,17 @@ function toHex8(value) {
    ──────────────────────────────────────────────────────────────────────── */
 
 function DetailPanel({ open, onClose, children, accentClass }) {
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
+
   if (!open) return null;
   return (
     <div className="cpux-panel-overlay" onClick={onClose}>
@@ -322,12 +389,52 @@ function RegisterPanel({ regKey, registers, onUpdateAx, onClose }) {
   );
 }
 
+function GuidePanel({ onClose }) {
+  return (
+    <DetailPanel open onClose={onClose} accentClass="cpux-accent-cyan cpux-panel--guide">
+      <div className="cpux-panel-header">
+        <BookOpen size={20} />
+        <h3>Guide — Instruction Trace Lab</h3>
+      </div>
+      <p className="cpux-panel-copy">
+        This module lets you click any component to inspect it, step through the
+        fetch–decode–execute cycle, and watch data travel across the buses in
+        real time. Here's how each part works.
+      </p>
+
+      <div className="cpux-guide-list">
+        {GUIDE_SECTIONS.map((section) => {
+          const Icon = section.icon;
+          return (
+            <div
+              key={section.title}
+              className={`cpux-guide-item cpux-accent-${section.accent}`}
+            >
+              <div className="cpux-guide-item-head">
+                <Icon size={17} />
+                <h4>{section.title}</h4>
+              </div>
+              <p>{section.body}</p>
+              <ul className="cpux-guide-points">
+                {section.points.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </DetailPanel>
+  );
+}
+
 /* ────────────────────────────────────────────────────────────────────────
    Main component
    ──────────────────────────────────────────────────────────────────────── */
 
 function CPUExplorer() {
   const [activePanel, setActivePanel] = useState(null); // 'alu' | 'cu' | 'AX' | 'BX' | 'CX' | 'DX'
+  const [guideOpen, setGuideOpen] = useState(false);
   const [registers, setRegisters] = useState({ AX: 0x1234, BX: 0x2000, CX: 0x0005, DX: 0x0000 });
   const [fdeIndex, setFdeIndex] = useState(-1); // -1 = idle
   const [busStage, setBusStage] = useState(-1); // -1 = idle
@@ -377,8 +484,20 @@ function CPUExplorer() {
   return (
     <div className="cpux-wrapper">
       <div className="cpux-title-block">
-        <span className="cpux-eyebrow">Interactive Module</span>
-        <h2 className="cpux-heading">Instruction Trace Lab</h2>
+        <div className="cpux-title-block-row">
+          <div className="cpux-title-block-copy">
+            <span className="cpux-eyebrow">Interactive Module</span>
+            <h2 className="cpux-heading">Instruction Trace Lab</h2>
+          </div>
+          <button
+            type="button"
+            className="cpux-btn cpux-btn-guide"
+            onClick={() => setGuideOpen(true)}
+          >
+            <BookOpen size={15} />
+            Guide
+          </button>
+        </div>
         <p className="cpux-subheading">
           Click any component to inspect it, step through the fetch–decode–execute
           cycle, and watch data travel across the buses in real time.
@@ -562,6 +681,7 @@ function CPUExplorer() {
         </div>
       </section>
 
+      {guideOpen && <GuidePanel onClose={() => setGuideOpen(false)} />}
       {activePanel === "alu" && <AluPanel onClose={() => setActivePanel(null)} />}
       {activePanel === "cu" && <CuPanel onClose={() => setActivePanel(null)} />}
       {["AX", "BX", "CX", "DX"].includes(activePanel) && (

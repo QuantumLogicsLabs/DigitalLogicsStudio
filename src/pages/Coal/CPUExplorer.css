@@ -12,24 +12,15 @@
   --cpux-purple: #b026ff;
   --cpux-green: #00ff87;
   --cpux-font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --cpux-font-mono:
-    "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
+  --cpux-font-mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
 
   margin-top: 2rem;
   padding: 1.75rem;
   border-radius: 1.25rem;
   border: 1px solid var(--cpux-border);
   background:
-    radial-gradient(
-      circle at top left,
-      rgba(176, 38, 255, 0.08),
-      transparent 45%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(0, 240, 255, 0.06),
-      transparent 45%
-    ),
+    radial-gradient(circle at top left, rgba(176, 38, 255, 0.08), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(0, 240, 255, 0.06), transparent 45%),
     linear-gradient(180deg, var(--cpux-bg-deep), var(--cpux-bg));
   color: var(--cpux-text);
   font-family: var(--cpux-font-sans);
@@ -57,6 +48,30 @@
   border-bottom: 1px solid var(--cpux-border);
 }
 
+.cpux-title-block-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cpux-title-block-copy {
+  min-width: 0;
+}
+
+.cpux-btn-guide {
+  flex-shrink: 0;
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.28);
+  color: #d9fdff;
+}
+
+.cpux-btn-guide:hover:not(:disabled) {
+  border-color: var(--cpux-cyan);
+  box-shadow: 0 10px 24px -14px rgba(0, 240, 255, 0.6);
+}
+
 .cpux-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -78,12 +93,7 @@
   font-size: clamp(1.6rem, 3.2vw, 2.2rem);
   font-weight: 800;
   letter-spacing: -0.01em;
-  background: linear-gradient(
-    90deg,
-    #ffffff 0%,
-    var(--cpux-cyan) 55%,
-    var(--cpux-purple) 110%
-  );
+  background: linear-gradient(90deg, #ffffff 0%, var(--cpux-cyan) 55%, var(--cpux-purple) 110%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -143,11 +153,7 @@
   cursor: pointer;
   background: var(--cpux-surface);
   color: var(--cpux-text);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
 .cpux-btn:hover:not(:disabled) {
@@ -161,11 +167,7 @@
 }
 
 .cpux-btn-primary {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 240, 255, 0.16),
-    rgba(176, 38, 255, 0.16)
-  );
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.16), rgba(176, 38, 255, 0.16));
   border-color: rgba(0, 240, 255, 0.3);
   color: #f0fdff;
 }
@@ -334,13 +336,8 @@
 }
 
 @keyframes cpux-pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0px rgba(255, 255, 255, 0);
-  }
-  50% {
-    box-shadow: 0 0 26px -4px currentColor;
-  }
+  0%, 100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0); }
+  50% { box-shadow: 0 0 26px -4px currentColor; }
 }
 
 .cpux-node-registers {
@@ -421,15 +418,9 @@
 }
 
 @keyframes cpux-node-pop {
-  0% {
-    transform: scale(0.92);
-  }
-  60% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .cpux-bus-connector {
@@ -452,15 +443,8 @@
 }
 
 @keyframes cpux-flow-pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(3px);
-  }
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(3px); }
 }
 
 /* ── Memory segments ──────────────────────────────────────────────────── */
@@ -652,13 +636,14 @@
 .cpux-panel-overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
   background: rgba(4, 4, 8, 0.72);
   backdrop-filter: blur(4px);
+  overscroll-behavior: contain;
 }
 
 .cpux-panel {
@@ -667,6 +652,7 @@
   max-width: 34rem;
   max-height: 85vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.75rem;
   border-radius: 1.1rem;
   border: 1px solid var(--cpux-border);
@@ -770,6 +756,70 @@
 .cpux-slider {
   width: 100%;
   accent-color: var(--cpux-cyan);
+}
+
+/* ── Guide panel ──────────────────────────────────────────────────────── */
+
+.cpux-panel--guide {
+  max-width: 38rem;
+}
+
+.cpux-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.cpux-guide-item {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--cpux-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cpux-guide-item.cpux-accent-cyan {
+  border-left: 2px solid var(--cpux-cyan);
+}
+
+.cpux-guide-item.cpux-accent-purple {
+  border-left: 2px solid var(--cpux-purple);
+}
+
+.cpux-guide-item.cpux-accent-green {
+  border-left: 2px solid var(--cpux-green);
+}
+
+.cpux-guide-item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.cpux-guide-item-head h4 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cpux-text);
+}
+
+.cpux-guide-item > p {
+  margin: 0 0 0.55rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--cpux-text-muted);
+}
+
+.cpux-guide-points {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--cpux-text-muted);
 }
 
 /* ── Reduced motion ───────────────────────────────────────────────────── */
