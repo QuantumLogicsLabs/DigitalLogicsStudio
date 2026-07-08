@@ -49,7 +49,8 @@ const PLANNED_PRACTICALS = [
     title: "Assembly drills",
     description: "Short COAL/MASM-style programs with guided solutions.",
     icon: Wrench,
-    ready: false,
+    ready: true,
+    path: "/resources/coal/practical/assembly-drills",
   },
 ];
 

@@ -1,0 +1,677 @@
+/* ===== Assembly IDE Simulator Base ===== */
+.asm-ide-root {
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #020617;
+  color: #f1f5f9;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  border: 1px solid #1e293b;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.asm-ide-root * {
+  box-sizing: border-box;
+}
+
+/* ===== Tooltip ===== */
+.asm-tooltip {
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  position: relative;
+}
+.asm-tooltip-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: #64748b;
+  transition: color 0.15s;
+}
+.asm-tooltip:hover .asm-tooltip-icon {
+  color: #818cf8;
+}
+.asm-tooltip-box {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 0.5rem;
+  display: none;
+  width: 14rem;
+  padding: 0.5rem;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 11px;
+  line-height: 1.4;
+  border-radius: 0.5rem;
+  border: 1px solid #334155;
+  z-index: 50;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  text-transform: none;
+  text-align: center;
+}
+.asm-tooltip:hover .asm-tooltip-box {
+  display: block;
+}
+.asm-tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1e293b;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+/* ===== Header ===== */
+.asm-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #1e293b;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .asm-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+.asm-header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.asm-header-icon-wrap {
+  padding: 0.5rem;
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: inline-flex;
+}
+.asm-header-icon-wrap svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.asm-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin: 0;
+}
+.asm-subtitle {
+  color: #94a3b8;
+  font-size: 0.850rem;
+  margin-top: 0.25rem;
+}
+
+.asm-header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .asm-header-controls {
+    width: auto;
+  }
+}
+
+.asm-template-select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0f172a;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1e293b;
+}
+.asm-template-select svg {
+  width: 1rem;
+  height: 1rem;
+  color: #38bdf8;
+}
+.asm-template-select label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.asm-template-select select {
+  background: transparent;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.asm-template-select select option {
+  background: #0f172a;
+  color: #fff;
+}
+
+.asm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: #0f172a;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: 1px solid #1e293b;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.asm-btn:hover {
+  background: #1e293b;
+  color: #fff;
+}
+.asm-btn svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.asm-btn-run {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.asm-btn-run:hover {
+  background: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+.asm-btn-step {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+.asm-btn-step:hover {
+  background: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+.asm-btn-pause {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.asm-btn-pause:hover {
+  background: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+.asm-btn-reset {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.asm-btn-reset:hover {
+  background: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+/* ===== Main layout grid ===== */
+.asm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 1280px) {
+  .asm-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .asm-col-left {
+    grid-column: span 6;
+  }
+  .asm-col-right {
+    grid-column: span 6;
+  }
+}
+
+.asm-col-left,
+.asm-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Panels */
+.asm-panel {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.asm-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.asm-panel-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.asm-icon-blue {
+  color: #3b82f6;
+}
+.asm-icon-purple {
+  color: #a855f7;
+}
+.asm-icon-green {
+  color: #10b981;
+}
+.asm-icon-yellow {
+  color: #eab308;
+}
+.asm-icon-red {
+  color: #ef4444;
+}
+
+.asm-panel-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ===== Code Editor View ===== */
+.asm-editor-container {
+  display: flex;
+  flex-direction: column;
+  background: #020617;
+  border-radius: 0.5rem;
+  border: 1px solid #1e293b;
+  overflow: hidden;
+  height: 400px;
+}
+
+.asm-editor-gutter {
+  width: 3rem;
+  background: #090d16;
+  border-right: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.75rem 0.5rem;
+  color: #475569;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+.asm-editor-line-num {
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+.asm-editor-line-num.is-current {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.asm-editor-body {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.asm-editor-textarea {
+  flex: 1;
+  background: transparent;
+  color: #f8fafc;
+  border: none;
+  resize: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 0.75rem;
+  outline: none;
+  overflow-y: auto;
+  tab-size: 4;
+}
+
+.asm-editor-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  padding: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: hidden;
+  color: transparent;
+}
+
+.asm-editor-line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(59, 130, 246, 0.15);
+  border-left: 3px solid #3b82f6;
+  pointer-events: none;
+  transition: top 0.1s ease-out, height 0.1s ease-out;
+}
+
+/* ===== Registers & Flags Panel ===== */
+.asm-registers-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.asm-registers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.asm-register-cell {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.asm-register-cell.is-changed {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+.asm-register-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+}
+
+.asm-register-input {
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+  outline: none;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+.asm-register-input:focus {
+  color: #3b82f6;
+}
+
+.asm-compare-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+}
+.asm-compare-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.asm-flags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.asm-flag-badge {
+  flex: 1;
+  min-width: 60px;
+  padding: 0.375rem 0.5rem;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.375rem;
+  text-align: center;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.asm-flag-badge.is-active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.asm-flag-badge.is-changed {
+  animation: asm-flash-blue 1s ease-out;
+}
+@keyframes asm-flash-blue {
+  0% {
+    outline: 2px solid #3b82f6;
+  }
+  100% {
+    outline: 2px solid transparent;
+  }
+}
+
+/* ===== Memory Simulator Panel ===== */
+.asm-memory-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.asm-memory-input {
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+  outline: none;
+  font-family: ui-monospace, monospace;
+}
+.asm-memory-input:focus {
+  border-color: #3b82f6;
+}
+
+.asm-memory-grid-wrap {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  height: 240px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.asm-memory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.asm-memory-table th,
+.asm-memory-table td {
+  padding: 0.375rem;
+  text-align: center;
+  border: 1px solid #0f172a;
+}
+.asm-memory-table th {
+  color: #64748b;
+  font-size: 11px;
+}
+.asm-memory-row-header {
+  color: #94a3b8;
+  font-weight: 700;
+}
+.asm-memory-cell {
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.asm-memory-cell:hover {
+  background: #1e293b;
+}
+.asm-memory-cell.is-changed {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+}
+.asm-memory-cell.is-highlighted {
+  outline: 2px solid #3b82f6;
+}
+
+.asm-memory-editor-row {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ===== Learning & Explanation Panel ===== */
+.asm-learning-box {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.asm-learning-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #818cf8;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 0.5rem;
+}
+.asm-learning-title-row svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.asm-learning-body {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.asm-learning-code {
+  font-family: ui-monospace, monospace;
+  background: #020617;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  color: #fff;
+  border: 1px solid #1e293b;
+  margin-right: 0.25rem;
+}
+
+/* ===== Activity Log / Console ===== */
+.asm-log-panel {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+}
+
+.asm-log-viewport {
+  flex: 1;
+  overflow-y: auto;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.asm-log-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #cbd5e1;
+}
+.asm-log-row.is-error {
+  color: #f87171;
+}
+.asm-log-row.is-success {
+  color: #34d399;
+}
+.asm-log-row.is-info {
+  color: #60a5fa;
+}
+
+.asm-log-index {
+  color: #475569;
+  user-select: none;
+}
+
+/* Custom Scrollbars */
+.asm-editor-textarea::-webkit-scrollbar,
+.asm-memory-grid-wrap::-webkit-scrollbar,
+.asm-log-viewport::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.asm-editor-textarea::-webkit-scrollbar-track,
+.asm-memory-grid-wrap::-webkit-scrollbar-track,
+.asm-log-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+.asm-editor-textarea::-webkit-scrollbar-thumb,
+.asm-memory-grid-wrap::-webkit-scrollbar-thumb,
+.asm-log-viewport::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+.asm-editor-textarea::-webkit-scrollbar-thumb:hover,
+.asm-memory-grid-wrap::-webkit-scrollbar-thumb:hover,
+.asm-log-viewport::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

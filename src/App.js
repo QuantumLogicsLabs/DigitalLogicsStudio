@@ -15,6 +15,7 @@ import AnalyticsTracker from "./components/seo/AnalyticsTracker";
 import DlsMentorWidget from "./components/DlsMentorWidget/DlsMentorWidget";
 import InstructionTraceLabPage from "./pages/Coal/InstructionTraceLabPage";
 import StackMemorySimulatorPage from "./pages/Coal/StackMemorySimulatorPage";
+import AssemblyDrillsPage from "./pages/Coal/AssemblyDrillsPage";
 // UTILS / OTHER TOOLS:
 import ScrollToTop from "./utils/ScrollToTop";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -493,6 +494,10 @@ const AppContent = () => {
           <Route
             path="/resources/coal/practical/stack-memory-simulator"
             element={<StackMemorySimulatorPage />}
+          />
+          <Route
+            path="/resources/coal/practical/assembly-drills"
+            element={<AssemblyDrillsPage />}
           />
         </Routes>
       </Suspense>
