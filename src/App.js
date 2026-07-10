@@ -499,6 +499,7 @@ const AppContent = () => {
             path="/resources/coal/practical/assembly-drills"
             element={<AssemblyDrillsPage />}
           />
+          <Route
             path="/resources/coal/practical/addressing-mode-playground"
             element={<AddressingModePlaygroundPage />}
           />

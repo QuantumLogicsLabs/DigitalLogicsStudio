@@ -43,6 +43,110 @@ const INSTRUCTION_DATABASE = [
         commonMistakes: "INC cannot be used directly on immediate values (e.g., INC 5 is invalid). Forgetting memory size pointer (e.g., INC [BX]) will fail to compile."
     },
     {
+        id: "mov",
+        instruction: "MOV",
+        category: "Data Transfer",
+        function: "Move / Copy Data",
+        difficulty: "Beginner",
+        syntax: "MOV destination, source",
+        description: "Copies the data from the source operand into the destination operand. The source value remains unchanged.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "None",
+        examples: "MOV AX, BX ; Copy BX into AX\nMOV CX, 0x0F ; Load immediate hex value into CX",
+        commonMistakes: "Cannot move data directly from memory to memory (e.g., MOV [BX], [SI] is invalid). CS and IP registers cannot be targeted directly."
+    },
+    {
+        id: "cmp",
+        instruction: "CMP",
+        category: "Arithmetic",
+        function: "Compare Operands",
+        difficulty: "Beginner",
+        syntax: "CMP destination, source",
+        description: "Compares destination and source by subtracting source from destination. It modifies status flags but does NOT store the arithmetic result.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "ZF, SF, CF, OF, AF, PF",
+        examples: "CMP AX, BX ; Modifies flags based on AX - BX\nCMP CX, 0  ; Checks if CX is zero",
+        commonMistakes: "Often confused with SUB; remember that CMP leaves the original value of the destination completely untouched."
+    },
+    {
+        id: "push",
+        instruction: "PUSH",
+        category: "Data Transfer",
+        function: "Push Word onto Stack",
+        difficulty: "Intermediate",
+        syntax: "PUSH source",
+        description: "Decrements the Stack Pointer (SP) by 2 (in 16-bit) and copies the source operand onto the top of the stack.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "None",
+        examples: "PUSH AX ; Push contents of AX to stack\nPUSH 10 ; Push immediate value onto stack",
+        commonMistakes: "Cannot push an 8-bit register alone (e.g., PUSH AL is invalid). Stack operations must match word size."
+    },
+    {
+        id: "pop",
+        instruction: "POP",
+        category: "Data Transfer",
+        function: "Pop Word from Stack",
+        difficulty: "Intermediate",
+        syntax: "POP destination",
+        description: "Copies the word from the top of the stack into the destination operand, then increments the Stack Pointer (SP) by 2.",
+        operands: "Register, Memory",
+        affectedFlags: "None",
+        examples: "POP AX ; Restore AX from top of stack\nPOP [BX] ; Pop top of stack into memory pointer",
+        commonMistakes: "Cannot pop into an immediate value or the CS (Code Segment) register directly."
+    },
+    {
+        id: "and",
+        instruction: "AND",
+        category: "Logical / Shift",
+        function: "Bitwise AND",
+        difficulty: "Beginner",
+        syntax: "AND destination, source",
+        description: "Performs a bitwise logical AND operation between destination and source, storing the output in the destination.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "ZF, SF, PF (CF and OF are cleared to 0)",
+        examples: "AND AX, 0x0F ; Clear upper nibble of AX\nAND BX, CX   ; Bitwise AND of BX and CX",
+        commonMistakes: "Clears CF and OF automatically, which might break pending conditional jumps depending on carry states."
+    },
+    {
+        id: "or",
+        instruction: "OR",
+        category: "Logical / Shift",
+        function: "Bitwise Inclusive OR",
+        difficulty: "Beginner",
+        syntax: "OR destination, source",
+        description: "Performs a bitwise logical inclusive OR operation between destination and source, storing the result in the destination.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "ZF, SF, PF (CF and OF are cleared to 0)",
+        examples: "OR AX, 1 ; Set the lowest bit of AX\nOR BX, CX ; Bitwise OR of BX and CX",
+        commonMistakes: "Like AND, it resets CF and OF back to 0, which can interfere with condition testing loops if not anticipated."
+    },
+    {
+        id: "xor",
+        instruction: "XOR",
+        category: "Logical / Shift",
+        function: "Bitwise Exclusive OR",
+        difficulty: "Beginner",
+        syntax: "XOR destination, source",
+        description: "Performs a bitwise logical exclusive OR operation between destination and source. Identical bits result in 0, differing bits result in 1.",
+        operands: "Register, Memory, Immediate",
+        affectedFlags: "ZF, SF, PF (CF and OF are cleared to 0)",
+        examples: "XOR AX, AX ; Clears AX efficiently to 0\nXOR BX, 0xFFFF ; Inverts all bits of BX",
+        commonMistakes: "Using XOR AX, AX is a great optimization trick, but don't forget it alters the Zero Flag (ZF) to 1, unlike a MOV AX, 0 instruction."
+    },
+    {
+        id: "not",
+        instruction: "NOT",
+        category: "Logical / Shift",
+        function: "Bitwise One's Complement",
+        difficulty: "Beginner",
+        syntax: "NOT destination",
+        description: "Inverts all bits of the destination operand (0s become 1s, and 1s become 0s).",
+        operands: "Register, Memory",
+        affectedFlags: "None",
+        examples: "NOT AX ; Invert all bits inside AX\nNOT BYTE PTR [BX] ; Complement memory byte values",
+        commonMistakes: "Unlike NEG (Two's Complement), the NOT instruction has absolutely no effect on any CPU flags."
+    },
+    {
         id: "shl",
         instruction: "SHL",
         category: "Logical / Shift",
@@ -93,6 +197,19 @@ const INSTRUCTION_DATABASE = [
         affectedFlags: "None",
         examples: "CALL MY_FUNC ; Direct call to subroutine\nCALL SI ; Indirect call through pointer register",
         commonMistakes: "Forgetting to put a 'RET' instruction at the end of the called procedure will cause the processor to continue executing subsequent memory sequential code, corrupting the execution flow."
+    },
+    {
+        id: "ret",
+        instruction: "RET",
+        category: "Control Transfer",
+        function: "Return from Procedure",
+        difficulty: "Advanced",
+        syntax: "RET",
+        description: "Pops the return address from the top of the stack back into the Instruction Pointer (IP), resuming execution directly after the corresponding CALL instruction.",
+        operands: "None (or optional immediate byte pop count)",
+        affectedFlags: "None",
+        examples: "RET ; Simple pop IP return\nRET 4 ; Pop return address and clean up 4 bytes of parameters from stack",
+        commonMistakes: "If stack values pushed during the subroutine aren't popped out beforehand, RET will pull junk data into the Instruction Pointer, crashing execution."
     }
 ];
 
@@ -117,7 +234,22 @@ const COMPARISON_DATA = {
         desc1: "JMP simply overwrites the Instruction Pointer (IP) to change execution paths. It does not track execution history.",
         desc2: "CALL pushes the current return address onto the Stack before updating the Instruction Pointer, enabling a safe return path.",
         verdict: "Use JMP for infinite loops, loop structures, and localized conditional branches; use CALL for modular, reusable functions and procedures."
+    },
+    mov_pushpop: {
+        title: "MOV vs PUSH/POP",
+        metric: "Direct Copying vs Stack Memory",
+        desc1: "MOV copies data directly between registers or memory locations without altering stack structures or pointer registers.",
+        desc2: "PUSH and POP explicitly interact with Stack Memory, reducing or increasing the Stack Pointer (SP) by 2 bytes with every operation.",
+        verdict: "Use MOV for general variable assignments and quick data copying; use PUSH/POP to temporarily preserve register states before calling functions."
+    },
+    and_xor: {
+        title: "AND vs XOR",
+        metric: "Bit Masking vs Register Clearing",
+        desc1: "AND performs logical multiplication bit-by-bit, commonly used as a 'mask' to turn specific bits off or isolate them.",
+        desc2: "XOR performs exclusive OR logic. Executing 'XOR AX, AX' cancels all matching bits, clearing the entire register to 0.",
+        verdict: "While both clear the Carry Flag, 'XOR AX, AX' is a highly optimized x86 idiom that executes faster and uses fewer machine bytes than 'MOV AX, 0'."
     }
+
 };
 
 
@@ -130,10 +262,26 @@ function InstructionLaboratoryPage() {
     const [showDemo, setShowDemo] = useState(false);
     const [regAX, setRegAX] = useState("10");
     const [regBX, setRegBX] = useState("5");
+    const [regCX, setRegCX] = useState("0"); // 👈 Add this
+    const [regDX, setRegDX] = useState("0"); // 👈 Add this
     const [simOutput, setSimOutput] = useState(null);
+    const [isHex, setIsHex] = useState(false);
 
     // NEW STATE: Tracks active tab inside the comparison panel
     const [activeCompareTab, setActiveCompareTab] = useState("inc_add");
+
+    // START: Hex & Dec formatter utilities (YAHAN DALNA HAI 🌟)
+    const formatValue = (val) => {
+        const num = parseInt(val, 10) || 0;
+        return isHex ? `0x${num.toString(16).toUpperCase()}` : num.toString(10);
+    };
+
+    const parseInputValue = (val) => {
+        if (typeof val === "string" && val.startsWith("0x")) {
+            return parseInt(val.substring(2), 16) || 0;
+        }
+        return parseInt(val, 10) || 0;
+    };
 
     const filteredInstructions = INSTRUCTION_DATABASE.filter((item) => {
         const matchesSearch = item.instruction.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -146,9 +294,17 @@ function InstructionLaboratoryPage() {
     const runSimulation = () => {
         const valAX = parseInt(regAX, 10) || 0;
         const valBX = parseInt(regBX, 10) || 0;
+        const valCX = parseInt(regCX, 10) || 0;
+        const valDX = parseInt(regDX, 10) || 0;
         let finalAX = valAX;
         let finalBX = valBX;
+        let finalCX = valCX;
+        let finalDX = valDX;
         let explanation = "";
+
+        // Flags update behavior tracking variables
+        let modifyFlags = true;
+        let forceCFZero = false;
 
         if (selectedInstruction.id === "sub") {
             finalAX = valAX - valBX;
@@ -159,33 +315,85 @@ function InstructionLaboratoryPage() {
         } else if (selectedInstruction.id === "inc") {
             finalAX = valAX + 1;
             explanation = `Executed: INC AX. Added 1 to destination contents: ${valAX} + 1 = ${finalAX}.`;
-        } else if (selectedInstruction.id === "shl") {
-            finalAX = valAX << 1;
-            explanation = `Executed: SHL AX, 1. Shifted register bits left by 1 position (equivalent to multiplying ${valAX} by 2). New value is ${finalAX}.`;
+            // Note: INC changes ZF and SF, but physically NEVER affects the Carry Flag (CF) in x86 hardware.
+        } else if (selectedInstruction.id === "mov") {
+            finalAX = valBX; // BX ki value AX me copy ho gayi
+            explanation = `Executed: MOV AX, BX. Copied the value of BX (${valBX}) into AX. Register BX remains unchanged, and data transfer does not alter any flags.`;
+            modifyFlags = false; // MOV flags ko change nahi karta
+        } else if (selectedInstruction.id === "cmp") {
+            const cmpResult = valAX - valBX; // Calculation temporary hoti hai
+            explanation = `Executed: CMP AX, BX. Subtracted BX (${valBX}) from AX (${valAX}) internally. Flags updated based on result (${cmpResult}), but AX value remains untouched as ${valAX}.`;
+            // Flags update honge based on subtraction result, temporary value update karenge parameters ke liye
+            finalAX = cmpResult;
+        } else if (selectedInstruction.id === "push") {
+            explanation = `Executed: PUSH AX. Decremented the Stack Pointer (SP) by 2 and pushed the value of AX (${valAX}) onto the top of the stack storage.`;
+            modifyFlags = false; // Stack push leaves flags unaffected
+        } else if (selectedInstruction.id === "pop") {
+            finalAX = 42; // Stack se generic mock value pop karwa di
+            explanation = `Executed: POP AX. Pulled the top value from the Stack Frame (simulated as 42) into AX, then incremented the Stack Pointer (SP) by 2.`;
+            modifyFlags = false;
+        } else if (selectedInstruction.id === "and") {
+            finalAX = valAX & valBX;
+            explanation = `Executed: AND AX, BX. Performed bitwise logical AND. Only bits that are 1 in both registers remain 1. New value is ${finalAX}.`;
+            forceCFZero = true; // Logical operations always clear CF and OF
+        } else if (selectedInstruction.id === "or") {
+            finalAX = valAX | valBX;
+            explanation = `Executed: OR AX, BX. Performed bitwise inclusive OR. Bits are set to 1 if they are 1 in either register. New value is ${finalAX}.`;
+            forceCFZero = true;
+        } else if (selectedInstruction.id === "xor") {
+            finalAX = valAX ^ valBX;
+            explanation = `Executed: XOR AX, BX. Performed bitwise exclusive OR. Identical bits cancel out to 0; differing bits set to 1. New value is ${finalAX}.`;
+            forceCFZero = true;
+        } else if (selectedInstruction.id === "not") {
+            finalAX = ~valAX;
+            explanation = `Executed: NOT AX. Performed bitwise inversion (One's Complement) on AX. All 0s flipped to 1s and vice versa. Result is ${finalAX}.`;
+            modifyFlags = false; // NOT instruction does not modify any flags
+        }
+        // ////////////////////////////////////////////////////////
+        // START: Fixed SHL/SAL to use Register CX as the shift count
+        else if (selectedInstruction.id === "shl") {
+            const shiftCount = valCX; // Asal assembly me shift count CX (CL) se aata hai
+            finalAX = valAX << shiftCount;
+            explanation = `Executed: SHL AX, CL. Shifted AX bits left by ${shiftCount} positions using the count from Register CX. New value is ${finalAX}.`;
+        } else if (selectedInstruction.id === "sal") {
+            const shiftCount = valCX;
+            finalAX = valAX << shiftCount;
+            explanation = `Executed: SAL AX, CL. Shifted AX bits arithmetically left by ${shiftCount} positions using the count from Register CX. New value is ${finalAX}.`;
+            // END: Fixed SHL/SAL to use Register CX as the shift count
+            // ////////////////////////////////////////////////////////
+        } else if (selectedInstruction.id === "jmp") {
+            explanation = `Executed: JMP MY_LOOP. The Instruction Pointer (IP) was updated to 'MY_LOOP'. Registers AX (${valAX}) and BX (${valBX}) remain unchanged.`;
+            modifyFlags = false;
+        } else if (selectedInstruction.id === "call") {
+            explanation = `Executed: CALL MY_FUNC. Pushed return sequential address onto the Stack, then updated IP to 'MY_FUNC'. Registers are untouched.`;
+            modifyFlags = false;
+        } else if (selectedInstruction.id === "ret") {
+            explanation = `Executed: RET. Popped the return address from the top of the stack back into the Instruction Pointer (IP), resuming workflow.`;
+            modifyFlags = false;
         }
 
-        else if (selectedInstruction.id === "sal") {
-            finalAX = valAX << 1; // Exactly identical to SHL
-            explanation = `Executed: SAL AX, 1. Shifted register bits left arithmetically. As Assembly Uncle designed, it performs the exact same binary operation as SHL, resulting in ${finalAX}.`;
+        // Flags logic block calculation
+        let flags;
+        if (!modifyFlags) {
+            // Agar instruction flags change nahi karti (jaise MOV, NOT, PUSH, POP, JMP, CALL, RET)
+            flags = {
+                ZF: "0 (Unchanged)",
+                SF: "0 (Unchanged)",
+                CF: "0 (Unchanged)"
+            };
+        } else {
+            flags = {
+                ZF: finalAX === 0 ? "1 (Active)" : "0 (Clear)",
+                SF: finalAX < 0 ? "1 (Negative)" : "0 (Positive)",
+                CF: forceCFZero
+                    ? "0 (Cleared)"
+                    : (selectedInstruction.id === "inc" ? "0 (Unaffected)" : (finalAX < 0 || finalAX > 255 ? "1 (Triggered)" : "0 (Normal)"))
+            };
         }
 
-        else if (selectedInstruction.id === "jmp") {
-            // JMP overwrites the execution path completely, simulating jumping to a label
-            explanation = `Executed: JMP MY_LOOP. The Instruction Pointer (IP) was immediately updated to the memory address of 'MY_LOOP'. Registers AX (${valAX}) and BX (${valBX}) remain unchanged because no arithmetic was performed.`;
-        }
-
-        else if (selectedInstruction.id === "call") {
-            // CALL pushes the return address to the stack pointer before changing IP
-            explanation = `Executed: CALL MY_FUNC. The processor pushed the next sequential memory address onto the Stack Frame [SP], then updated the Instruction Pointer (IP) to point to 'MY_FUNC'. Registers AX (${valAX}) and BX (${valBX}) are untouched.`;
-        }
-
-        const flags = {
-            ZF: finalAX === 0 ? "1 (Active)" : "0 (Clear)",
-            SF: finalAX < 0 ? "1 (Negative)" : "0 (Positive)",
-            CF: finalAX < 0 || finalAX > 255 ? "1 (Triggered)" : "0 (Normal)"
-        };
-
-        setSimOutput({ finalAX, finalBX, flags, explanation });
+        // CMP ke case mein graphical UI pe AX ki real value revert karne ke liye check
+        const displayAX = selectedInstruction.id === "cmp" ? valAX : finalAX;
+        setSimOutput({ finalAX: displayAX, finalBX, finalCX, finalDX, flags, explanation });
     };
 
     const currentCompare = COMPARISON_DATA[activeCompareTab];
@@ -251,7 +459,9 @@ function InstructionLaboratoryPage() {
                             >
                                 <option value="All">All Categories</option>
                                 <option value="Arithmetic">Arithmetic</option>
+                                <option value="Data Transfer">Data Transfer</option>
                                 <option value="Logical / Shift">Logical / Shift</option>
+                                <option value="Control Transfer">Control Transfer</option>
                             </select>
                         </div>
                         <div style={{ width: "160px" }}>
@@ -264,11 +474,21 @@ function InstructionLaboratoryPage() {
                                 <option value="All">All Levels</option>
                                 <option value="Beginner">Beginner</option>
                                 <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
                             </select>
                         </div>
                     </div>
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            maxHeight: "65vh",       // Box screen ke 65% se bada nahi hoga
+                            overflowY: "auto",       // Commands zyada hone par khud scrollbar aa jayega
+                            paddingRight: "8px"      // Scrollbar text ke upar na chade
+                        }}
+                    >
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                         <h3 style={{ margin: "5px 0", fontSize: "16px", color: "#9ca3af" }}>Search Results ({filteredInstructions.length})</h3>
                         {filteredInstructions.map((item) => {
                             const isSelected = selectedInstruction?.id === item.id;
@@ -342,22 +562,54 @@ function InstructionLaboratoryPage() {
                                 <div>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "15px" }}>
                                         <h2 style={{ margin: 0, fontSize: "22px", color: "#10b981" }}>⚡ Live Sandbox: {selectedInstruction.instruction}</h2>
+                                        {/* //////////////////////////////////////////////////////// */}
+                                        {/* START: Hex vs Dec Toggle Switch UI */}
+                                        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "15px" }}>
+                                            <div style={{ display: "inline-flex", background: "#111827", padding: "4px", borderRadius: "8px", border: "1px solid #1e293b" }}>
+                                                <button
+                                                    onClick={() => setIsHex(false)}
+                                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "none", background: !isHex ? "#3b82f6" : "transparent", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: "600" }}
+                                                >
+                                                    DEC
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsHex(true)}
+                                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "none", background: isHex ? "#3b82f6" : "transparent", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: "600" }}
+                                                >
+                                                    HEX
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {/* END: Hex vs Dec Toggle Switch UI */}
+                                        {/* //////////////////////////////////////////////////////// */}
                                         <button onClick={() => { setShowDemo(false); setSimOutput(null); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af", padding: "4px 10px", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }}>← Back</button>
                                     </div>
-                                    <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-                                        <div style={{ flex: 1 }}>
+                                    {/* UPDATED REGISTER INPUTS: DISPLAYING ALL 4 COAL REGISTERS */}
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px", marginBottom: "20px" }}>
+                                        <div>
                                             <label style={{ display: "block", fontSize: "12px", marginBottom: "5px", color: "#9ca3af" }}>Register AX</label>
                                             <input type="number" value={regAX} onChange={(e) => setRegAX(e.target.value)} style={{ width: "100%", padding: "10px", background: "#111827", border: "1px solid #1e293b", color: "#fff", borderRadius: "6px", boxSizing: "border-box" }} />
                                         </div>
-                                        {selectedInstruction.id !== "inc" && (
-                                            <div style={{ flex: 1 }}>
-                                                <label style={{ display: "block", fontSize: "12px", marginBottom: "5px", color: "#9ca3af" }}>Register BX</label>
-                                                <input type="number" value={regBX} onChange={(e) => setRegBX(e.target.value)} style={{ width: "100%", padding: "10px", background: "#111827", border: "1px solid #1e293b", color: "#fff", borderRadius: "6px", boxSizing: "border-box" }} />
-                                            </div>
-                                        )}
+                                        <div>
+                                            <label style={{ display: "block", fontSize: "12px", marginBottom: "5px", color: "#9ca3af" }}>Register BX</label>
+                                            <input type="number" value={regBX} onChange={(e) => setRegBX(e.target.value)} style={{ width: "100%", padding: "10px", background: "#111827", border: "1px solid #1e293b", color: "#fff", borderRadius: "6px", boxSizing: "border-box" }} />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: "block", fontSize: "12px", marginBottom: "5px", color: "#9ca3af" }}>Register CX</label>
+                                            <input type="number" value={regCX} onChange={(e) => setRegCX(e.target.value)} style={{ width: "100%", padding: "10px", background: "#111827", border: "1px solid #1e293b", color: "#fff", borderRadius: "6px", boxSizing: "border-box" }} />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: "block", fontSize: "12px", marginBottom: "5px", color: "#9ca3af" }}>Register DX</label>
+                                            <input type="number" value={regDX} onChange={(e) => setRegDX(e.target.value)} style={{ width: "100%", padding: "10px", background: "#111827", border: "1px solid #1e293b", color: "#fff", borderRadius: "6px", boxSizing: "border-box" }} />
+                                        </div>
                                     </div>
                                     <div style={{ background: "#030712", padding: "12px", borderRadius: "6px", fontFamily: "monospace", color: "#60a5fa", marginBottom: "20px", border: "1px solid #1e293b" }}>
-                                        {selectedInstruction.id === "inc" ? `INC AX` : `${selectedInstruction.instruction} AX, BX`}
+                                        {selectedInstruction.id === "inc"
+                                            ? `INC AX`
+                                            : (selectedInstruction.id === "shl" || selectedInstruction.id === "sal")
+                                                ? `${selectedInstruction.instruction} AX, CL`
+                                                : `${selectedInstruction.instruction} AX, BX`
+                                        }
                                     </div>
                                     <button onClick={runSimulation} style={{ width: "100%", padding: "12px", borderRadius: "8px", background: "#10b981", border: "none", color: "#064e3b", fontWeight: "700", cursor: "pointer", marginBottom: "20px" }}>Execute Instruction 🚀</button>
 
@@ -365,11 +617,13 @@ function InstructionLaboratoryPage() {
                                         <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                                             <div style={{ background: "rgba(255,255,255,0.02)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
                                                 <h4 style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#9ca3af", textTransform: "uppercase" }}>Register Changes</h4>
-                                                <div style={{ fontSize: "14px", fontFamily: "monospace" }}>
-                                                    <div>AX: <span style={{ color: "#34d399", fontWeight: "bold" }}>{simOutput.finalAX}</span></div>
-                                                    {selectedInstruction.id !== "inc" && (
-                                                        <div>BX: <span style={{ color: "#9ca3af" }}>{simOutput.finalBX}</span></div>
-                                                    )}
+                                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "14px", fontFamily: "monospace" }}>
+                                                    {/* START: Updated Dynamic Output formatting */}
+                                                    <div>AX: <span style={{ color: "#34d399", fontWeight: "bold" }}>{formatValue(simOutput.finalAX)}</span></div>
+                                                    <div>BX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalBX)}</span></div>
+                                                    <div>CX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalCX)}</span></div>
+                                                    <div>DX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalDX)}</span></div>
+                                                    {/* END: Updated Dynamic Output formatting */}
                                                 </div>
                                             </div>
                                             <div style={{ background: "rgba(255,255,255,0.02)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
@@ -403,6 +657,8 @@ function InstructionLaboratoryPage() {
                     <button onClick={() => setActiveCompareTab("inc_add")} style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: activeCompareTab === "inc_add" ? "#3b82f6" : "#1e293b", color: "#fff", cursor: "pointer", fontWeight: "600" }}>INC vs ADD 1</button>
                     <button onClick={() => setActiveCompareTab("shl_sal")} style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: activeCompareTab === "shl_sal" ? "#3b82f6" : "#1e293b", color: "#fff", cursor: "pointer", fontWeight: "600" }}>SHL vs SAL</button>
                     <button onClick={() => setActiveCompareTab("jmp_call")} style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: activeCompareTab === "jmp_call" ? "#3b82f6" : "#1e293b", color: "#fff", cursor: "pointer", fontWeight: "600" }}>JMP vs CALL</button>
+                    <button onClick={() => setActiveCompareTab("mov_pushpop")} style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: activeCompareTab === "mov_pushpop" ? "#3b82f6" : "#1e293b", color: "#fff", cursor: "pointer", fontWeight: "600" }}>MOV vs PUSH/POP</button>
+                    <button onClick={() => setActiveCompareTab("and_xor")} style={{ padding: "10px 20px", borderRadius: "6px", border: "none", background: activeCompareTab === "and_xor" ? "#3b82f6" : "#1e293b", color: "#fff", cursor: "pointer", fontWeight: "600" }}>AND vs XOR</button>
                 </div> {/* End of TAB SWITCHERS */}
 
                 {/* COMPARISON RESULTS VIEWER CONTAINER */}
