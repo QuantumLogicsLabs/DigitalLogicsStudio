@@ -265,9 +265,23 @@ function InstructionLaboratoryPage() {
     const [regCX, setRegCX] = useState("0"); // 👈 Add this
     const [regDX, setRegDX] = useState("0"); // 👈 Add this
     const [simOutput, setSimOutput] = useState(null);
+    const [isHex, setIsHex] = useState(false);
 
     // NEW STATE: Tracks active tab inside the comparison panel
     const [activeCompareTab, setActiveCompareTab] = useState("inc_add");
+
+    // START: Hex & Dec formatter utilities (YAHAN DALNA HAI 🌟)
+    const formatValue = (val) => {
+        const num = parseInt(val, 10) || 0;
+        return isHex ? `0x${num.toString(16).toUpperCase()}` : num.toString(10);
+    };
+
+    const parseInputValue = (val) => {
+        if (typeof val === "string" && val.startsWith("0x")) {
+            return parseInt(val.substring(2), 16) || 0;
+        }
+        return parseInt(val, 10) || 0;
+    };
 
     const filteredInstructions = INSTRUCTION_DATABASE.filter((item) => {
         const matchesSearch = item.instruction.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -334,12 +348,19 @@ function InstructionLaboratoryPage() {
             finalAX = ~valAX;
             explanation = `Executed: NOT AX. Performed bitwise inversion (One's Complement) on AX. All 0s flipped to 1s and vice versa. Result is ${finalAX}.`;
             modifyFlags = false; // NOT instruction does not modify any flags
-        } else if (selectedInstruction.id === "shl") {
-            finalAX = valAX << 1;
-            explanation = `Executed: SHL AX, 1. Shifted register bits left by 1 position (equivalent to multiplying ${valAX} by 2). New value is ${finalAX}.`;
+        }
+        // ////////////////////////////////////////////////////////
+        // START: Fixed SHL/SAL to use Register CX as the shift count
+        else if (selectedInstruction.id === "shl") {
+            const shiftCount = valCX; // Asal assembly me shift count CX (CL) se aata hai
+            finalAX = valAX << shiftCount;
+            explanation = `Executed: SHL AX, CL. Shifted AX bits left by ${shiftCount} positions using the count from Register CX. New value is ${finalAX}.`;
         } else if (selectedInstruction.id === "sal") {
-            finalAX = valAX << 1;
-            explanation = `Executed: SAL AX, 1. Shifted register bits left arithmetically. Performs the exact same binary operation as SHL, resulting in ${finalAX}.`;
+            const shiftCount = valCX;
+            finalAX = valAX << shiftCount;
+            explanation = `Executed: SAL AX, CL. Shifted AX bits arithmetically left by ${shiftCount} positions using the count from Register CX. New value is ${finalAX}.`;
+            // END: Fixed SHL/SAL to use Register CX as the shift count
+            // ////////////////////////////////////////////////////////
         } else if (selectedInstruction.id === "jmp") {
             explanation = `Executed: JMP MY_LOOP. The Instruction Pointer (IP) was updated to 'MY_LOOP'. Registers AX (${valAX}) and BX (${valBX}) remain unchanged.`;
             modifyFlags = false;
@@ -541,6 +562,26 @@ function InstructionLaboratoryPage() {
                                 <div>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "15px" }}>
                                         <h2 style={{ margin: 0, fontSize: "22px", color: "#10b981" }}>⚡ Live Sandbox: {selectedInstruction.instruction}</h2>
+                                        {/* //////////////////////////////////////////////////////// */}
+                                        {/* START: Hex vs Dec Toggle Switch UI */}
+                                        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "15px" }}>
+                                            <div style={{ display: "inline-flex", background: "#111827", padding: "4px", borderRadius: "8px", border: "1px solid #1e293b" }}>
+                                                <button
+                                                    onClick={() => setIsHex(false)}
+                                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "none", background: !isHex ? "#3b82f6" : "transparent", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: "600" }}
+                                                >
+                                                    DEC
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsHex(true)}
+                                                    style={{ padding: "6px 12px", borderRadius: "6px", border: "none", background: isHex ? "#3b82f6" : "transparent", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: "600" }}
+                                                >
+                                                    HEX
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {/* END: Hex vs Dec Toggle Switch UI */}
+                                        {/* //////////////////////////////////////////////////////// */}
                                         <button onClick={() => { setShowDemo(false); setSimOutput(null); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#9ca3af", padding: "4px 10px", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }}>← Back</button>
                                     </div>
                                     {/* UPDATED REGISTER INPUTS: DISPLAYING ALL 4 COAL REGISTERS */}
@@ -563,7 +604,12 @@ function InstructionLaboratoryPage() {
                                         </div>
                                     </div>
                                     <div style={{ background: "#030712", padding: "12px", borderRadius: "6px", fontFamily: "monospace", color: "#60a5fa", marginBottom: "20px", border: "1px solid #1e293b" }}>
-                                        {selectedInstruction.id === "inc" ? `INC AX` : `${selectedInstruction.instruction} AX, BX`}
+                                        {selectedInstruction.id === "inc"
+                                            ? `INC AX`
+                                            : (selectedInstruction.id === "shl" || selectedInstruction.id === "sal")
+                                                ? `${selectedInstruction.instruction} AX, CL`
+                                                : `${selectedInstruction.instruction} AX, BX`
+                                        }
                                     </div>
                                     <button onClick={runSimulation} style={{ width: "100%", padding: "12px", borderRadius: "8px", background: "#10b981", border: "none", color: "#064e3b", fontWeight: "700", cursor: "pointer", marginBottom: "20px" }}>Execute Instruction 🚀</button>
 
@@ -572,10 +618,12 @@ function InstructionLaboratoryPage() {
                                             <div style={{ background: "rgba(255,255,255,0.02)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
                                                 <h4 style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#9ca3af", textTransform: "uppercase" }}>Register Changes</h4>
                                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "14px", fontFamily: "monospace" }}>
-                                                    <div>AX: <span style={{ color: "#34d399", fontWeight: "bold" }}>{simOutput.finalAX}</span></div>
-                                                    <div>BX: <span style={{ color: "#cbd5e1" }}>{simOutput.finalBX}</span></div>
-                                                    <div>CX: <span style={{ color: "#cbd5e1" }}>{simOutput.finalCX}</span></div>
-                                                    <div>DX: <span style={{ color: "#cbd5e1" }}>{simOutput.finalDX}</span></div>
+                                                    {/* START: Updated Dynamic Output formatting */}
+                                                    <div>AX: <span style={{ color: "#34d399", fontWeight: "bold" }}>{formatValue(simOutput.finalAX)}</span></div>
+                                                    <div>BX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalBX)}</span></div>
+                                                    <div>CX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalCX)}</span></div>
+                                                    <div>DX: <span style={{ color: "#cbd5e1" }}>{formatValue(simOutput.finalDX)}</span></div>
+                                                    {/* END: Updated Dynamic Output formatting */}
                                                 </div>
                                             </div>
                                             <div style={{ background: "rgba(255,255,255,0.02)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
