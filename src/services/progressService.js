@@ -68,6 +68,8 @@ const formatMonthKey = (value = new Date()) => {
 
 const mergeTopicState = (topic, currentState) => {
   const existing = currentState || {};
+  // Derive subject from topic id: COAL topics use "part-X" ids
+  const derivedSubject = topic?.id && /^part-\d+$/.test(topic.id) ? "coal" : "dld";
   return {
     openedAt: existing.openedAt || null,
     completedAt: existing.completedAt || null,
@@ -78,6 +80,7 @@ const mergeTopicState = (topic, currentState) => {
       : [],
     totalSubtopics: topic?.links?.length || existing.totalSubtopics || 0,
     title: topic?.title || existing.title || "",
+    subject: existing.subject || derivedSubject,
   };
 };
 
@@ -459,6 +462,7 @@ const progressService = {
       title: topic.title,
       totalSubtopics: topic?.links?.length || 0,
       dateKey,
+      subject: /^part-\d+$/.test(topic.id) ? "coal" : "dld",
     });
 
     return snapshotFor(userKey, catalog);
@@ -515,6 +519,7 @@ const progressService = {
         equivalentSubtopicIds: equivalentIds,
         totalSubtopics: topic?.links?.length || 0,
         dateKey,
+        subject: /^part-\d+$/.test(topic.id) ? "coal" : "dld",
       },
     );
 

@@ -15,6 +15,7 @@ import AnalyticsTracker from "./components/seo/AnalyticsTracker";
 import DlsMentorWidget from "./components/DlsMentorWidget/DlsMentorWidget";
 import InstructionTraceLabPage from "./pages/Coal/InstructionTraceLabPage";
 import StackMemorySimulatorPage from "./pages/Coal/StackMemorySimulatorPage";
+import AssemblyDrillsPage from "./pages/Coal/AssemblyDrillsPage";
 import AddressingModePlaygroundPage from "./pages/Coal/AddressingModePlaygroundPage";
 import InstructionLaboratoryPage from "./pages/Coal/InstructionLaboratoryPage";
 // UTILS / OTHER TOOLS:
@@ -495,6 +496,9 @@ const AppContent = () => {
             element={<StackMemorySimulatorPage />}
           />
           <Route
+            path="/resources/coal/practical/assembly-drills"
+            element={<AssemblyDrillsPage />}
+          />
             path="/resources/coal/practical/addressing-mode-playground"
             element={<AddressingModePlaygroundPage />}
           />

@@ -537,6 +537,7 @@ export default function ProfilePage() {
   const [loadingProgress, setLoadingProgress] = useState(true);
   const [backendOk, setBackendOk] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [activeSubject, setActiveSubject] = useState("DLD");
   const [chartTooltipPosition, setChartTooltipPosition] = useState(null);
 
   // Feedback
@@ -601,108 +602,141 @@ export default function ProfilePage() {
             arr.length,
         );
 
+  // ── DLD topic IDs ───────────────────────────────────────────────────────────
+  const DLD_TOPIC_IDS = [
+    "boolean-algebra", "number-systems", "arithmetic-functions-and-hdls",
+    "combinational-circuits", "sequential-circuits",
+    "registers-and-register-transfers", "memory-systems", "advanced-logic",
+  ];
+  // ── COAL part IDs ───────────────────────────────────────────────────────────
+  const COAL_PART_IDS = ["part-1","part-2","part-3","part-4","part-5","part-6","part-7"];
+
   const topicStats = {
-    booleanAlgebra: avgPct(
-      topicEntries.filter(([id]) => id.startsWith("boolean")),
-    ),
-    kmap: avgPct(
-      topicEntries.filter(
-        ([id]) => id.startsWith("kmap") || id.includes("kmap"),
-      ),
-    ),
-    sequential: avgPct(
-      topicEntries.filter(
-        ([id]) => id.startsWith("seq") || id.startsWith("sequential"),
-      ),
-    ),
-    numberSystems: avgPct(
-      topicEntries.filter(
-        ([id]) => id.startsWith("number") || id.startsWith("ns"),
-      ),
-    ),
-    arithmetic: avgPct(
-      topicEntries.filter(
-        ([id]) => id.startsWith("arith") || id.startsWith("arithmetic"),
-      ),
-    ),
+    booleanAlgebra: avgPct(topicEntries.filter(([id]) => id.startsWith("boolean"))),
+    kmap: avgPct(topicEntries.filter(([id]) => id.startsWith("kmap") || id.includes("kmap"))),
+    sequential: avgPct(topicEntries.filter(([id]) => id.startsWith("seq") || id.startsWith("sequential"))),
+    numberSystems: avgPct(topicEntries.filter(([id]) => id.startsWith("number") || id.startsWith("ns"))),
+    arithmetic: avgPct(topicEntries.filter(([id]) => id.startsWith("arith") || id.startsWith("arithmetic"))),
   };
+
+  const coalTopicStats = {
+    foundations:   avgPct(topicEntries.filter(([id]) => id === "part-1")),
+    machineModel:  avgPct(topicEntries.filter(([id]) => id === "part-2")),
+    isaAddressing: avgPct(topicEntries.filter(([id]) => id === "part-3")),
+    assembly:      avgPct(topicEntries.filter(([id]) => id === "part-4")),
+    x86Arch:       avgPct(topicEntries.filter(([id]) => id === "part-5")),
+    ioInterrupts:  avgPct(topicEntries.filter(([id]) => id === "part-6")),
+    perfPipeline:  avgPct(topicEntries.filter(([id]) => id === "part-7")),
+  };
+
+  // ── Per-subject completion counts ──────────────────────────────────────────
+  const dldTopicsCompleted  = topicEntries.filter(([id, t]) => DLD_TOPIC_IDS.includes(id) && t.status === "completed").length;
+  const coalPartsCompleted  = topicEntries.filter(([id, t]) => COAL_PART_IDS.includes(id) && t.status === "completed").length;
+  const dldTopicsTotal      = DLD_TOPIC_IDS.length;
+  const coalPartsTotal      = COAL_PART_IDS.length;
+
+  // Active-subject values for stat cards
+  const activeCompletedTopics  = activeSubject === "COAL" ? coalPartsCompleted  : dldTopicsCompleted;
+  const activeTotalTopics      = activeSubject === "COAL" ? coalPartsTotal       : dldTopicsTotal;
+  const activeTopicStats       = activeSubject === "COAL" ? coalTopicStats       : topicStats;
+
+  // Overall completion rate for active subject
+  const activeCompletionRate   = activeTotalTopics
+    ? Math.round((activeCompletedTopics / activeTotalTopics) * 100)
+    : 0;
+
+  // ── Best / weakest area for active subject ─────────────────────────────────
+  const activeStatsEntries = Object.entries(activeTopicStats);
+  const bestArea   = activeStatsEntries.filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
+  const weakArea   = activeStatsEntries.filter(([,v]) => v < 100).sort((a,b) => a[1]-b[1])[0];
 
   // ── Badges ──────────────────────────────────────────────────────────────────
   const badges = [
+    // ── DLD Badges ────────────────────────────────────────────────────────────
     {
-      icon: "🧠",
-      title: "Logic Master",
-      desc: "Solve 20+ problems",
+      icon: "🧠", title: "Logic Master", desc: "Solve 20+ problems",
       earned: solvedCount >= 20,
       progress: Math.min((solvedCount / 20) * 100, 100),
-      rarity: "rare",
+      rarity: "rare", subject: "DLD",
     },
     {
-      icon: "⚡",
-      title: "Circuit Creator",
-      desc: "Visit Circuit Forge",
+      icon: "⚡", title: "Circuit Creator", desc: "Visit Circuit Forge",
       earned: recentEvents.some((e) => e.type === "topic_opened"),
       progress: recentEvents.some((e) => e.type === "topic_opened") ? 100 : 0,
-      rarity: "common",
+      rarity: "common", subject: "DLD",
     },
     {
-      icon: "🗺️",
-      title: "K-Map Pro",
-      desc: "Complete K-Map topics",
+      icon: "🗺️", title: "K-Map Pro", desc: "Complete K-Map topics",
       earned: topicStats.kmap >= 80,
       progress: topicStats.kmap,
-      rarity: "epic",
+      rarity: "epic", subject: "DLD",
     },
     {
-      icon: "🔥",
-      title: "Streak Keeper",
-      desc: "Maintain a 7-day streak",
+      icon: "🔥", title: "Streak Keeper", desc: "Maintain a 7-day streak",
       earned: streakCurrent >= 7,
       progress: Math.min((streakCurrent / 7) * 100, 100),
-      rarity: "rare",
+      rarity: "rare", subject: "Both",
     },
     {
-      icon: "🏆",
-      title: "Topic Champion",
-      desc: "Complete 3+ topics",
+      icon: "🏆", title: "Topic Champion", desc: "Complete 3+ topics",
       earned: completedTopics >= 3,
       progress: Math.min((completedTopics / 3) * 100, 100),
-      rarity: "common",
+      rarity: "common", subject: "Both",
     },
     {
-      icon: "🎯",
-      title: "Problem Solver",
-      desc: "Attempt 10+ problems",
+      icon: "🎯", title: "Problem Solver", desc: "Attempt 10+ problems",
       earned: attemptedCount >= 10,
       progress: Math.min((attemptedCount / 10) * 100, 100),
-      rarity: "common",
+      rarity: "common", subject: "Both",
     },
     {
-      icon: "🌟",
-      title: "Quiz Champion",
-      desc: "Solve 50+ problems",
+      icon: "🌟", title: "Quiz Champion", desc: "Solve 50+ problems",
       earned: solvedCount >= 50,
       progress: Math.min((solvedCount / 50) * 100, 100),
-      rarity: "legendary",
+      rarity: "legendary", subject: "Both",
     },
     {
-      icon: "🔬",
-      title: "Logic Explorer",
-      desc: "Open 10+ different topics",
+      icon: "🔬", title: "Logic Explorer", desc: "Open 10+ different topics",
       earned: topicEntries.length >= 10,
       progress: Math.min((topicEntries.length / 10) * 100, 100),
-      rarity: "rare",
+      rarity: "rare", subject: "Both",
     },
     {
-      icon: "💎",
-      title: "Perfect Score",
-      desc: "100% accuracy in a session",
+      icon: "💎", title: "Perfect Score", desc: "100% accuracy in a session",
       earned: solvedCount > 0 && solvedCount === attemptedCount,
-      progress:
-        solvedCount > 0
-          ? Math.round((solvedCount / Math.max(attemptedCount, 1)) * 100)
-          : 0,
-      rarity: "legendary",
+      progress: solvedCount > 0 ? Math.round((solvedCount / Math.max(attemptedCount, 1)) * 100) : 0,
+      rarity: "legendary", subject: "Both",
+    },
+    // ── COAL Badges ───────────────────────────────────────────────────────────
+    {
+      icon: "🖥️", title: "Assembly Coder", desc: "Complete Assembly Programming (Part 4)",
+      earned: coalTopicStats.assembly >= 100,
+      progress: coalTopicStats.assembly,
+      rarity: "epic", subject: "COAL",
+    },
+    {
+      icon: "⚙️", title: "CPU Explorer", desc: "Complete Machine Model (Part 2)",
+      earned: coalTopicStats.machineModel >= 100,
+      progress: coalTopicStats.machineModel,
+      rarity: "rare", subject: "COAL",
+    },
+    {
+      icon: "📜", title: "ISA Scholar", desc: "Complete ISA & Addressing (Part 3)",
+      earned: coalTopicStats.isaAddressing >= 100,
+      progress: coalTopicStats.isaAddressing,
+      rarity: "rare", subject: "COAL",
+    },
+    {
+      icon: "🚀", title: "Pipeline Pro", desc: "Reach 80%+ in Pipelining (Part 7)",
+      earned: coalTopicStats.perfPipeline >= 80,
+      progress: coalTopicStats.perfPipeline,
+      rarity: "epic", subject: "COAL",
+    },
+    {
+      icon: "🎓", title: "COAL Graduate", desc: "Complete all 7 COAL parts",
+      earned: Object.values(coalTopicStats).every((v) => v >= 100),
+      progress: Math.round(Object.values(coalTopicStats).reduce((s,v)=>s+v,0) / 7),
+      rarity: "legendary", subject: "COAL",
     },
   ];
 
@@ -713,6 +747,29 @@ export default function ProfilePage() {
   const radarData = buildRadarData(topicStats);
   const weekComp = getWeekComparison(calendarDots);
   const mostActiveDay = getMostActiveDay(calendarDots);
+
+  // COAL chart data
+  const coalRadarData = [
+    { subject: "Foundations",  A: coalTopicStats.foundations   },
+    { subject: "Machine",      A: coalTopicStats.machineModel  },
+    { subject: "ISA",          A: coalTopicStats.isaAddressing },
+    { subject: "Assembly",     A: coalTopicStats.assembly      },
+    { subject: "x86",          A: coalTopicStats.x86Arch       },
+    { subject: "I/O",          A: coalTopicStats.ioInterrupts  },
+    { subject: "Pipeline",     A: coalTopicStats.perfPipeline  },
+  ];
+  const coalPieData = [
+    { name: "Foundations",  value: coalTopicStats.foundations   },
+    { name: "Machine Model",value: coalTopicStats.machineModel  },
+    { name: "ISA",          value: coalTopicStats.isaAddressing },
+    { name: "Assembly",     value: coalTopicStats.assembly      },
+    { name: "x86 / IA-32",  value: coalTopicStats.x86Arch       },
+    { name: "I/O",          value: coalTopicStats.ioInterrupts  },
+    { name: "Pipelining",   value: coalTopicStats.perfPipeline  },
+  ].filter((d) => d.value > 0);
+
+  const activeRadarData = activeSubject === "COAL" ? coalRadarData : radarData;
+  const activePieData   = activeSubject === "COAL" ? coalPieData   : pieData;
 
   const handleChartMouseMove = useCallback((state) => {
     if (
@@ -817,7 +874,7 @@ export default function ProfilePage() {
                 </span>
                 <span className="pd-dot">·</span>
                 <span className="pd-role-chip pd-role-chip--green">
-                  {badges.filter((b) => b.earned).length} badges
+                  {badges.filter((b) => b.earned).length} badges earned
                 </span>
               </div>
             </div>
@@ -852,6 +909,79 @@ export default function ProfilePage() {
         {/* ══════════════ OVERVIEW TAB ══════════════ */}
         {activeTab === "overview" && (
           <div className="pd-section">
+
+            {/* ── Subject Toggle ── */}
+            <div className="pd-subject-toggle-wrap">
+              <div className="pd-subject-toggle">
+                <button
+                  type="button"
+                  className={`pd-subject-pill${activeSubject === "DLD" ? " pd-subject-pill--active pd-subject-pill--dld" : ""}`}
+                  onClick={() => setActiveSubject("DLD")}
+                >
+                  ⚡ DLD
+                </button>
+                <button
+                  type="button"
+                  className={`pd-subject-pill${activeSubject === "COAL" ? " pd-subject-pill--active pd-subject-pill--coal" : ""}`}
+                  onClick={() => setActiveSubject("COAL")}
+                >
+                  🖥️ COAL
+                </button>
+              </div>
+              <span className="pd-subject-toggle-label">
+                {activeSubject === "DLD" ? "Digital Logic Design" : "Computer Organization & Assembly Language"}
+              </span>
+            </div>
+
+            {/* ── Course Summary Cards ── */}
+            <div className="pd-course-cards">
+              <div className={`pd-course-card pd-course-card--dld${activeSubject === "DLD" ? " pd-course-card--active" : ""}`}
+                   onClick={() => setActiveSubject("DLD")} role="button" tabIndex={0}
+                   onKeyDown={(e) => e.key === "Enter" && setActiveSubject("DLD")}>
+                <div className="pd-course-card-top">
+                  <span className="pd-course-card-icon">⚡</span>
+                  <div>
+                    <div className="pd-course-card-name">Digital Logic Design</div>
+                    <div className="pd-course-card-sub">DLD · Core Course</div>
+                  </div>
+                  <span className="pd-course-card-pct" style={{ color: COLORS.blue }}>
+                    {dldTopicsTotal ? Math.round((dldTopicsCompleted / dldTopicsTotal) * 100) : 0}%
+                  </span>
+                </div>
+                <div className="pd-course-card-progress-track">
+                  <div className="pd-course-card-progress-fill"
+                       style={{ width: `${dldTopicsTotal ? Math.round((dldTopicsCompleted / dldTopicsTotal) * 100) : 0}%`, background: COLORS.blue }} />
+                </div>
+                <div className="pd-course-card-footer">
+                  <span>{dldTopicsCompleted}/{dldTopicsTotal} topics completed</span>
+                  <Link to="/boolean/overview" className="pd-course-card-resume" style={{ color: COLORS.blue }}>Resume →</Link>
+                </div>
+              </div>
+
+              <div className={`pd-course-card pd-course-card--coal${activeSubject === "COAL" ? " pd-course-card--active" : ""}`}
+                   onClick={() => setActiveSubject("COAL")} role="button" tabIndex={0}
+                   onKeyDown={(e) => e.key === "Enter" && setActiveSubject("COAL")}>
+                <div className="pd-course-card-top">
+                  <span className="pd-course-card-icon">🖥️</span>
+                  <div>
+                    <div className="pd-course-card-name">Computer Organization & Assembly</div>
+                    <div className="pd-course-card-sub">COAL · Systems Course</div>
+                  </div>
+                  <span className="pd-course-card-pct" style={{ color: COLORS.purple }}>
+                    {coalPartsTotal ? Math.round((coalPartsCompleted / coalPartsTotal) * 100) : 0}%
+                  </span>
+                </div>
+                <div className="pd-course-card-progress-track">
+                  <div className="pd-course-card-progress-fill"
+                       style={{ width: `${coalPartsTotal ? Math.round((coalPartsCompleted / coalPartsTotal) * 100) : 0}%`, background: COLORS.purple }} />
+                </div>
+                <div className="pd-course-card-footer">
+                  <span>{coalPartsCompleted}/{coalPartsTotal} parts completed</span>
+                  <Link to="/resources/coal/theory" className="pd-course-card-resume" style={{ color: COLORS.purple }}>Resume →</Link>
+                </div>
+              </div>
+            </div>
+
             {/* ── Stat cards ── */}
             {loadingProgress ? (
               <div className="pd-stats-grid">
@@ -893,10 +1023,10 @@ export default function ProfilePage() {
                 <StatCard
                   icon="📚"
                   label="Topics Completed"
-                  value={completedTopics}
+                  value={activeCompletedTopics}
                   sub={
-                    summary.totalTopics
-                      ? `of ${summary.totalTopics} topics`
+                    activeTotalTopics
+                      ? `of ${activeTotalTopics} ${activeSubject === "COAL" ? "parts" : "topics"}`
                       : "modules finished"
                   }
                   accent={COLORS.purple}
@@ -904,12 +1034,8 @@ export default function ProfilePage() {
                 <StatCard
                   icon="🎯"
                   label="Completion Rate"
-                  value={`${summary.completionRate || 0}%`}
-                  sub={
-                    summary.totalProblems
-                      ? `${solvedCount} of ${summary.totalProblems} problems`
-                      : "problems solved"
-                  }
+                  value={`${activeCompletionRate}%`}
+                  sub={`${activeSubject} progress`}
                   accent={COLORS.pink}
                 />
                 {/* Row 2 */}
@@ -960,56 +1086,99 @@ export default function ProfilePage() {
             {/* Learning Tracks */}
             <div className="pd-card pd-card--transparent">
               <h2 className="pd-card-title">Learning Tracks</h2>
-              <p className="pd-card-sub">Pick up where you left off</p>
+              <p className="pd-card-sub">Pick up where you left off · {activeSubject === "COAL" ? "Computer Organization & Assembly" : "Digital Logic Design"}</p>
               <div className="pd-tracks-grid">
-                <TrackCard
-                  trackType="SYNCED TRACK"
-                  title="Boolean Algebra"
-                  progress={topicStats.booleanAlgebra || 0}
-                  lessonsCount={Math.round(
-                    ((topicStats.booleanAlgebra || 0) / 100) * 12,
-                  )}
-                  totalLessons={12}
-                  xp={Math.round(
-                    ((topicStats.booleanAlgebra || 0) / 100) * 500,
-                  )}
-                  totalXp={500}
-                  streak={streakCurrent}
-                  saved={2}
-                  nextLesson="Logic Gates Overview"
-                  accent={COLORS.blue}
-                  link="/boolean/overview"
-                />
-                <TrackCard
-                  trackType="SYNCED TRACK"
-                  title="K-Map Simplification"
-                  progress={topicStats.kmap || 0}
-                  lessonsCount={Math.round(((topicStats.kmap || 0) / 100) * 8)}
-                  totalLessons={8}
-                  xp={Math.round(((topicStats.kmap || 0) / 100) * 350)}
-                  totalXp={350}
-                  streak={streakCurrent}
-                  saved={0}
-                  nextLesson="Grouping Rules"
-                  accent={COLORS.purple}
-                  link="/kmapgenerator"
-                />
-                <TrackCard
-                  trackType="SYNCED TRACK"
-                  title="Sequential Circuits"
-                  progress={topicStats.sequential || 0}
-                  lessonsCount={Math.round(
-                    ((topicStats.sequential || 0) / 100) * 15,
-                  )}
-                  totalLessons={15}
-                  xp={Math.round(((topicStats.sequential || 0) / 100) * 800)}
-                  totalXp={800}
-                  streak={streakCurrent}
-                  saved={5}
-                  nextLesson="Latches vs Flip-Flops"
-                  accent={COLORS.green}
-                  link="/sequential/intro"
-                />
+                {activeSubject === "DLD" ? (
+                  <>
+                    <TrackCard
+                      trackType="DLD TRACK"
+                      title="Boolean Algebra"
+                      progress={topicStats.booleanAlgebra || 0}
+                      lessonsCount={Math.round(((topicStats.booleanAlgebra || 0) / 100) * 12)}
+                      totalLessons={12}
+                      xp={Math.round(((topicStats.booleanAlgebra || 0) / 100) * 500)}
+                      totalXp={500}
+                      streak={streakCurrent}
+                      saved={2}
+                      nextLesson="Logic Gates Overview"
+                      accent={COLORS.blue}
+                      link="/boolean/overview"
+                    />
+                    <TrackCard
+                      trackType="DLD TRACK"
+                      title="K-Map Simplification"
+                      progress={topicStats.kmap || 0}
+                      lessonsCount={Math.round(((topicStats.kmap || 0) / 100) * 8)}
+                      totalLessons={8}
+                      xp={Math.round(((topicStats.kmap || 0) / 100) * 350)}
+                      totalXp={350}
+                      streak={streakCurrent}
+                      saved={0}
+                      nextLesson="Grouping Rules"
+                      accent={COLORS.purple}
+                      link="/kmapgenerator"
+                    />
+                    <TrackCard
+                      trackType="DLD TRACK"
+                      title="Sequential Circuits"
+                      progress={topicStats.sequential || 0}
+                      lessonsCount={Math.round(((topicStats.sequential || 0) / 100) * 15)}
+                      totalLessons={15}
+                      xp={Math.round(((topicStats.sequential || 0) / 100) * 800)}
+                      totalXp={800}
+                      streak={streakCurrent}
+                      saved={5}
+                      nextLesson="Latches vs Flip-Flops"
+                      accent={COLORS.green}
+                      link="/sequential/intro"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <TrackCard
+                      trackType="COAL TRACK"
+                      title="Foundations & Machine Model"
+                      progress={Math.round((coalTopicStats.foundations + coalTopicStats.machineModel) / 2)}
+                      lessonsCount={Math.round((Math.round((coalTopicStats.foundations + coalTopicStats.machineModel) / 2) / 100) * 6)}
+                      totalLessons={6}
+                      xp={Math.round((Math.round((coalTopicStats.foundations + coalTopicStats.machineModel) / 2) / 100) * 450)}
+                      totalXp={450}
+                      streak={streakCurrent}
+                      saved={0}
+                      nextLesson="CPU Components & Register Model"
+                      accent={COLORS.purple}
+                      link="/resources/coal/theory"
+                    />
+                    <TrackCard
+                      trackType="COAL TRACK"
+                      title="ISA & Assembly Programming"
+                      progress={Math.round((coalTopicStats.isaAddressing + coalTopicStats.assembly) / 2)}
+                      lessonsCount={Math.round((Math.round((coalTopicStats.isaAddressing + coalTopicStats.assembly) / 2) / 100) * 8)}
+                      totalLessons={8}
+                      xp={Math.round((Math.round((coalTopicStats.isaAddressing + coalTopicStats.assembly) / 2) / 100) * 650)}
+                      totalXp={650}
+                      streak={streakCurrent}
+                      saved={0}
+                      nextLesson="Addressing Modes"
+                      accent={COLORS.cyan}
+                      link="/coal/instruction-set-architecture"
+                    />
+                    <TrackCard
+                      trackType="COAL TRACK"
+                      title="x86 Architecture & Performance"
+                      progress={Math.round((coalTopicStats.x86Arch + coalTopicStats.ioInterrupts + coalTopicStats.perfPipeline) / 3)}
+                      lessonsCount={Math.round((Math.round((coalTopicStats.x86Arch + coalTopicStats.ioInterrupts + coalTopicStats.perfPipeline) / 3) / 100) * 8)}
+                      totalLessons={8}
+                      xp={Math.round((Math.round((coalTopicStats.x86Arch + coalTopicStats.ioInterrupts + coalTopicStats.perfPipeline) / 3) / 100) * 700)}
+                      totalXp={700}
+                      streak={streakCurrent}
+                      saved={0}
+                      nextLesson="Intel IA-32 Architecture"
+                      accent={COLORS.amber}
+                      link="/coal/ia32-architecture"
+                    />
+                  </>
+                )}
               </div>
             </div>
 
@@ -1054,13 +1223,18 @@ export default function ProfilePage() {
 
                     {/* Strongest Area */}
                     {(() => {
-                      const best = Object.entries(topicStats).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
+                      const best = bestArea;
+                      const label = activeSubject === "COAL"
+                        ? { foundations:"Foundations", machineModel:"Machine Model", isaAddressing:"ISA & Addressing",
+                            assembly:"Assembly Prog.", x86Arch:"x86 / IA-32", ioInterrupts:"I/O & Interrupts", perfPipeline:"Pipelining" }
+                        : { booleanAlgebra:"Boolean Algebra", kmap:"K-Map", sequential:"Sequential",
+                            numberSystems:"Number Systems", arithmetic:"Arithmetic" };
                       return (
                         <div className="pd-perf-metric">
                           <div className="pd-perf-metric-head">
                             <span className="pd-perf-metric-label">Strongest Area</span>
                             <span className="pd-perf-metric-val pd-perf-metric-val--purple">
-                              {best ? best[0].replace(/([A-Z])/g," $1").trim() : "—"}{best ? ` · ${best[1]}%` : ""}
+                              {best ? `${label[best[0]] || best[0]} · ${best[1]}%` : "—"}
                             </span>
                           </div>
                           <div className="pd-perf-bar-track">
@@ -1072,13 +1246,18 @@ export default function ProfilePage() {
 
                     {/* Needs Attention */}
                     {(() => {
-                      const weak = Object.entries(topicStats).filter(([,v]) => v < 100).sort((a,b) => a[1]-b[1])[0];
+                      const weak = weakArea;
+                      const label = activeSubject === "COAL"
+                        ? { foundations:"Foundations", machineModel:"Machine Model", isaAddressing:"ISA & Addressing",
+                            assembly:"Assembly Prog.", x86Arch:"x86 / IA-32", ioInterrupts:"I/O & Interrupts", perfPipeline:"Pipelining" }
+                        : { booleanAlgebra:"Boolean Algebra", kmap:"K-Map", sequential:"Sequential",
+                            numberSystems:"Number Systems", arithmetic:"Arithmetic" };
                       return (
                         <div className="pd-perf-metric">
                           <div className="pd-perf-metric-head">
                             <span className="pd-perf-metric-label">Needs Attention</span>
                             <span className="pd-perf-metric-val pd-perf-metric-val--amber">
-                              {weak ? `${weak[0].replace(/([A-Z])/g," $1").trim()} · ${weak[1]}%` : "All strong 🎉"}
+                              {weak ? `${label[weak[0]] || weak[0]} · ${weak[1]}%` : "All strong 🎉"}
                             </span>
                           </div>
                           <div className="pd-perf-bar-track">
@@ -1180,6 +1359,20 @@ export default function ProfilePage() {
         {/* ══════════════ ANALYTICS TAB ══════════════ */}
         {activeTab === "analytics" && (
           <div className="pd-section">
+            {/* Subject toggle for analytics */}
+            <div className="pd-subject-toggle-wrap">
+              <div className="pd-subject-toggle">
+                <button type="button"
+                  className={`pd-subject-pill${activeSubject === "DLD" ? " pd-subject-pill--active pd-subject-pill--dld" : ""}`}
+                  onClick={() => setActiveSubject("DLD")}>⚡ DLD</button>
+                <button type="button"
+                  className={`pd-subject-pill${activeSubject === "COAL" ? " pd-subject-pill--active pd-subject-pill--coal" : ""}`}
+                  onClick={() => setActiveSubject("COAL")}>🖥️ COAL</button>
+              </div>
+              <span className="pd-subject-toggle-label">
+                Showing {activeSubject === "COAL" ? "COAL" : "DLD"} analytics
+              </span>
+            </div>
             {/* Weekly trend line chart */}
             <div className="pd-card">
               <h2 className="pd-card-title">Weekly Learning Trends</h2>
@@ -1303,11 +1496,11 @@ export default function ProfilePage() {
               <div className="pd-card">
                 <h2 className="pd-card-title">Skill Radar</h2>
                 <p className="pd-card-sub">
-                  Completion % across all topic areas
+                  Completion % across {activeSubject === "COAL" ? "COAL parts" : "DLD topic areas"}
                 </p>
                 <ResponsiveContainer width="100%" height={220}>
                   <RadarChart
-                    data={radarData}
+                    data={activeRadarData}
                     margin={{ top: 8, right: 24, left: 24, bottom: 8 }}
                     onMouseMove={handleChartMouseMove}
                     onMouseLeave={handleChartMouseLeave}
@@ -1325,8 +1518,8 @@ export default function ProfilePage() {
                     <Radar
                       name="Completion %"
                       dataKey="A"
-                      stroke={COLORS.blue}
-                      fill={COLORS.blue}
+                      stroke={activeSubject === "COAL" ? COLORS.purple : COLORS.blue}
+                      fill={activeSubject === "COAL" ? COLORS.purple : COLORS.blue}
                       fillOpacity={0.25}
                       strokeWidth={2}
                     />
@@ -1347,10 +1540,10 @@ export default function ProfilePage() {
               <div className="pd-card">
                 <h2 className="pd-card-title">Topic Completion Ratio</h2>
                 <p className="pd-card-sub">
-                  Proportion of completion per subject area
+                  {activeSubject === "COAL" ? "COAL part completion breakdown" : "DLD topic completion breakdown"}
                 </p>
-                {pieData.length === 0 ? (
-                  <p className="pd-empty">Start topics to see the breakdown.</p>
+                {activePieData.length === 0 ? (
+                  <p className="pd-empty">Start {activeSubject} topics to see the breakdown.</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
                     <PieChart
@@ -1358,13 +1551,13 @@ export default function ProfilePage() {
                       onMouseLeave={handleChartMouseLeave}
                     >
                       <Pie
-                        data={pieData}
+                        data={activePieData}
                         cx="50%"
                         cy="50%"
                         outerRadius={90}
                         dataKey="value"
                       >
-                        {pieData.map((_, i) => (
+                        {activePieData.map((_, i) => (
                           <Cell
                             key={i}
                             fill={PIE_COLORS[i % PIE_COLORS.length]}
@@ -1441,38 +1634,47 @@ export default function ProfilePage() {
         {/* ══════════════ SKILLS TAB ══════════════ */}
         {activeTab === "skills" && (
           <div className="pd-section">
-            {/* Topic accuracy bar chart — shown first */}
+            {/* Topic accuracy bar chart — subject-aware */}
             <div className="pd-card">
               <h2 className="pd-card-title">Topic-wise Accuracy</h2>
               <p className="pd-card-sub">
-                Completion percentage per subject area
+                Completion percentage per {activeSubject === "COAL" ? "COAL part" : "DLD subject area"}
               </p>
+              {/* Subject toggle */}
+              <div className="pd-subject-toggle-wrap" style={{ marginBottom: "1rem" }}>
+                <div className="pd-subject-toggle">
+                  <button type="button"
+                    className={`pd-subject-pill${activeSubject === "DLD" ? " pd-subject-pill--active pd-subject-pill--dld" : ""}`}
+                    onClick={() => setActiveSubject("DLD")}>⚡ DLD</button>
+                  <button type="button"
+                    className={`pd-subject-pill${activeSubject === "COAL" ? " pd-subject-pill--active pd-subject-pill--coal" : ""}`}
+                    onClick={() => setActiveSubject("COAL")}>🖥️ COAL</button>
+                </div>
+              </div>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart
-                  data={[
+                  data={activeSubject === "COAL" ? [
+                    { topic: "Foundations",  pct: coalTopicStats.foundations   },
+                    { topic: "Machine",      pct: coalTopicStats.machineModel  },
+                    { topic: "ISA",          pct: coalTopicStats.isaAddressing },
+                    { topic: "Assembly",     pct: coalTopicStats.assembly      },
+                    { topic: "x86",          pct: coalTopicStats.x86Arch       },
+                    { topic: "I/O",          pct: coalTopicStats.ioInterrupts  },
+                    { topic: "Pipeline",     pct: coalTopicStats.perfPipeline  },
+                  ] : [
                     { topic: "Boolean", pct: topicStats.booleanAlgebra },
-                    { topic: "K-Map", pct: topicStats.kmap },
-                    { topic: "Sequential", pct: topicStats.sequential },
-                    { topic: "Numbers", pct: topicStats.numberSystems },
-                    { topic: "Arithmetic", pct: topicStats.arithmetic },
+                    { topic: "K-Map",   pct: topicStats.kmap           },
+                    { topic: "Sequential", pct: topicStats.sequential  },
+                    { topic: "Numbers", pct: topicStats.numberSystems  },
+                    { topic: "Arithmetic", pct: topicStats.arithmetic  },
                   ]}
                   margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
                   onMouseMove={handleChartMouseMove}
                   onMouseLeave={handleChartMouseLeave}
                 >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="rgba(148,163,184,0.15)"
-                  />
-                  <XAxis
-                    dataKey="topic"
-                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fontSize: 12, fill: "var(--secondary-text)" }}
-                    unit="%"
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
+                  <XAxis dataKey="topic" tick={{ fontSize: 12, fill: "var(--secondary-text)" }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: "var(--secondary-text)" }} unit="%" />
                   <Tooltip
                     content={<ChartTooltip />}
                     position={chartTooltipPosition || undefined}
@@ -1482,7 +1684,10 @@ export default function ProfilePage() {
                     offset={14}
                   />
                   <Bar dataKey="pct" name="Completion %" radius={[6, 6, 0, 0]}>
-                    {PIE_COLORS.map((c, i) => (
+                    {(activeSubject === "COAL"
+                      ? [COLORS.purple, COLORS.cyan, COLORS.blue, COLORS.amber, COLORS.indigo, COLORS.pink, COLORS.green]
+                      : PIE_COLORS
+                    ).map((c, i) => (
                       <Cell key={i} fill={c} />
                     ))}
                   </Bar>
@@ -1494,35 +1699,32 @@ export default function ProfilePage() {
             <div className="pd-two-col">
               <div className="pd-card">
                 <h2 className="pd-card-title">Skill Progress Tracker</h2>
-                <p className="pd-card-sub">
-                  Topic completion across all learning areas
-                </p>
+                <p className="pd-card-sub">Topic completion across all learning areas</p>
+
+                {/* DLD skills */}
+                <div className="pd-skills-subject-header pd-skills-subject-header--dld">
+                  <span>⚡</span> Digital Logic Design
+                </div>
                 <div className="pd-skills-list">
-                  <SkillBar
-                    label="Boolean Algebra"
-                    pct={topicStats.booleanAlgebra}
-                    color={COLORS.blue}
-                  />
-                  <SkillBar
-                    label="K-Map Simplification"
-                    pct={topicStats.kmap}
-                    color={COLORS.purple}
-                  />
-                  <SkillBar
-                    label="Sequential Circuits"
-                    pct={topicStats.sequential}
-                    color={COLORS.green}
-                  />
-                  <SkillBar
-                    label="Number Systems"
-                    pct={topicStats.numberSystems}
-                    color={COLORS.amber}
-                  />
-                  <SkillBar
-                    label="Arithmetic Functions"
-                    pct={topicStats.arithmetic}
-                    color={COLORS.pink}
-                  />
+                  <SkillBar label="Boolean Algebra"    pct={topicStats.booleanAlgebra} color={COLORS.blue}   />
+                  <SkillBar label="K-Map Simplification" pct={topicStats.kmap}         color={COLORS.purple} />
+                  <SkillBar label="Sequential Circuits" pct={topicStats.sequential}    color={COLORS.green}  />
+                  <SkillBar label="Number Systems"      pct={topicStats.numberSystems} color={COLORS.amber}  />
+                  <SkillBar label="Arithmetic Functions" pct={topicStats.arithmetic}   color={COLORS.pink}   />
+                </div>
+
+                {/* COAL skills */}
+                <div className="pd-skills-subject-header pd-skills-subject-header--coal">
+                  <span>🖥️</span> Computer Organization & Assembly
+                </div>
+                <div className="pd-skills-list">
+                  <SkillBar label="Foundations"         pct={coalTopicStats.foundations}   color={COLORS.purple} />
+                  <SkillBar label="Machine Model"       pct={coalTopicStats.machineModel}  color={COLORS.cyan}   />
+                  <SkillBar label="ISA & Addressing"    pct={coalTopicStats.isaAddressing} color={COLORS.blue}   />
+                  <SkillBar label="Assembly Programming" pct={coalTopicStats.assembly}     color={COLORS.amber}  />
+                  <SkillBar label="x86 / IA-32"         pct={coalTopicStats.x86Arch}       color={COLORS.indigo} />
+                  <SkillBar label="I/O & Interrupts"    pct={coalTopicStats.ioInterrupts}  color={COLORS.pink}   />
+                  <SkillBar label="Pipelining"          pct={coalTopicStats.perfPipeline}  color={COLORS.green}  />
                 </div>
               </div>
 
@@ -1778,6 +1980,49 @@ export default function ProfilePage() {
               unlocked: activeDays >= 20,
               progress: Math.min(activeDays, 20), total: 20,
             },
+            // ── COAL Milestones ─────────────────────────────────────
+            {
+              id: "coal_first",   icon: "🖥️", label: "COAL Explorer",
+              desc: "Open your first COAL topic",
+              xp: 20, category: "COAL",
+              unlocked: Object.values(coalTopicStats).some((v) => v > 0),
+              progress: Object.values(coalTopicStats).some((v) => v > 0) ? 1 : 0, total: 1,
+            },
+            {
+              id: "coal_cpu",     icon: "⚙️", label: "CPU Explorer",
+              desc: "Complete Machine Model (Part 2)",
+              xp: 150, category: "COAL",
+              unlocked: coalTopicStats.machineModel >= 100,
+              progress: coalTopicStats.machineModel, total: 100, isPercent: true,
+            },
+            {
+              id: "coal_isa",     icon: "📜", label: "ISA Scholar",
+              desc: "Complete ISA & Addressing (Part 3)",
+              xp: 180, category: "COAL",
+              unlocked: coalTopicStats.isaAddressing >= 100,
+              progress: coalTopicStats.isaAddressing, total: 100, isPercent: true,
+            },
+            {
+              id: "coal_asm",     icon: "🖥️", label: "Assembly Coder",
+              desc: "Complete Assembly Programming (Part 4)",
+              xp: 250, category: "COAL",
+              unlocked: coalTopicStats.assembly >= 100,
+              progress: coalTopicStats.assembly, total: 100, isPercent: true,
+            },
+            {
+              id: "coal_pipeline",icon: "🚀", label: "Pipeline Pro",
+              desc: "Reach 80%+ in Pipelining (Part 7)",
+              xp: 300, category: "COAL",
+              unlocked: coalTopicStats.perfPipeline >= 80,
+              progress: Math.min(coalTopicStats.perfPipeline, 80), total: 80, isPercent: false,
+            },
+            {
+              id: "coal_graduate",icon: "🎓", label: "COAL Graduate",
+              desc: "Complete all 7 COAL parts",
+              xp: 700, category: "COAL",
+              unlocked: Object.values(coalTopicStats).every((v) => v >= 100),
+              progress: Object.values(coalTopicStats).filter((v) => v >= 100).length, total: 7,
+            },
           ];
 
           const earned       = MILESTONES.filter((m) => m.unlocked);
@@ -1790,7 +2035,7 @@ export default function ProfilePage() {
           const CAT_COLORS = {
             Problems: COLORS.blue, Topics: COLORS.purple,
             Streaks: COLORS.amber, Accuracy: COLORS.green,
-            Consistency: COLORS.cyan,
+            Consistency: COLORS.cyan, COAL: "#8b5cf6",
           };
 
           return (
