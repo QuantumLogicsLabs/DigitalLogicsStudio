@@ -130,6 +130,23 @@ const PremiumLearningShell = ({
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [expandedFolders, setExpandedFolders] = useState(() => {
+    const initial = {};
+    const navPagesList = sidebarPages?.length ? sidebarPages : pages;
+    navPagesList.forEach(page => {
+      if (page.modules?.some(mod => `/coal/${mod.slug}` === location.pathname)) {
+        initial[page.partId] = true;
+      }
+    });
+    return initial;
+  });
+
+  const toggleFolder = (partId, e) => {
+    setExpandedFolders(prev => ({
+      ...prev,
+      [partId]: !prev[partId]
+    }));
+  };
 
   const currentPath = location.pathname;
   const navPages = sidebarPages?.length ? sidebarPages : pages;
@@ -379,32 +396,64 @@ const PremiumLearningShell = ({
                       (!page.path.includes("#") ||
                         location.hash === page.path.slice(page.path.indexOf("#")));
                 }
+
+                const isExpanded = expandedFolders[page.partId];
                 return (
-                  <NavLink
-                    key={page.path}
-                    to={page.path}
-                    className={() =>
-                      `afhdl-nav-item${active ? " is-active" : ""}${done ? " is-visited" : ""}`
-                    }
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <span className="afhdl-nav-index">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="afhdl-nav-copy">
-                      <span className="afhdl-nav-label">{page.label}</span>
-                      <span className="afhdl-nav-description">
-                        {page.description}
+                  <div key={page.path} className="afhdl-sidebar-folder">
+                    {/* The Main Folder Button */}
+                    <NavLink
+                      to={page.path}
+                      className={() =>
+                        `afhdl-nav-item${active ? " is-active" : ""}${done ? " is-visited" : ""}`
+                      }
+                      onClick={(e) => {
+                        toggleFolder(page.partId, e);
+                        if (!page.modules || page.modules.length === 0) setSidebarOpen(false); 
+                      }}
+                    >
+                      <span className="afhdl-nav-index">
+                        {String(index + 1).padStart(2, "0")}
                       </span>
-                    </span>
-                    <span className="afhdl-nav-status">
-                      {done ? (
-                        <span className="afhdl-nav-check" title="Completed">
-                          ✓
+                      <span className="afhdl-nav-copy">
+                        <span className="afhdl-nav-label">{page.label}</span>
+                        <span className="afhdl-nav-description">
+                          {page.description}
                         </span>
-                      ) : null}
-                    </span>
-                  </NavLink>
+                      </span>
+                      
+                      {/* Dropdown Arrow Icon */}
+                      {page.modules && page.modules.length > 0 && (
+                        <span className="afhdl-nav-chevron" style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                          ›
+                        </span>
+                      )}
+                    </NavLink>
+
+                    {/* The Subtopics Dropdown */}
+                    {isExpanded && page.modules && (
+                      <div className="afhdl-sidebar-subnav">
+                        {page.modules.map(module => {
+                          const subtopicPath = `/coal/${module.slug}`;
+                          const isSubActive = currentPath === subtopicPath;
+                          const isSubDone = completedSubtopics.includes(module.slug);
+
+                          return (
+                            <NavLink
+                              key={module.slug}
+                              to={subtopicPath}
+                              className={`afhdl-subnav-item ${isSubActive ? "is-active" : ""} ${isSubDone ? "is-visited" : ""}`}
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              <span className="afhdl-subnav-indicator">
+                                {isSubDone ? "✓" : null}
+                              </span>
+                              <span className="afhdl-subnav-title">{module.title}</span>
+                            </NavLink>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>

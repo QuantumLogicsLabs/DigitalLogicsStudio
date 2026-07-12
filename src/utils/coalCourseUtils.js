@@ -88,6 +88,7 @@ function buildCoalPartSidebarPages() {
     description: part.title,
     partId: part.id,
     partNumber: part.part,
+    modules: part.modules,
   }));
 }
 
