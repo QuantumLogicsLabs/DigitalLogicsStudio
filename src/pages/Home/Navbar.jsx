@@ -76,6 +76,7 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
   const profileMenuRef = useRef(null);
   const displayName = user?.name?.trim() || "User";
   const displayEmail = user?.email?.trim() || "No email linked";
+  const firstName = displayName.split(/\s+/)[0];
   const onCoalTrack = isCoalRoute(location.pathname);
   const navLinks = onCoalTrack ? COAL_NAV_LINKS : DLD_NAV_LINKS;
   const brandTagline = onCoalTrack
@@ -257,7 +258,7 @@ export function Navbar({ toggleTheme, theme, onHomeClick, onToggleNavbar, navbar
                     aria-label="Open profile menu"
                   >
                     <span className="home-profile-avatar">{userInitials}</span>
-                    <span className="home-profile-name">{displayName}</span>
+                    <span className="home-profile-name">{firstName}</span>
                     <span className="home-profile-chevron" aria-hidden="true">
                       <svg
                         width="14"
