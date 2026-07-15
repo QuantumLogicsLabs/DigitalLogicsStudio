@@ -215,13 +215,28 @@
   font-weight: 400;
 }
 
-/* ── Stats row ── */
-.hero-stats-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
+.hero-stats-marquee {
   width: min(100%, 560px);
-  margin: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.hero-stats-track {
+  display: flex;
+  gap: 0.65rem;
+  width: max-content;
+  animation: heroStatsMarquee 22s linear infinite;
+  will-change: transform;
+}
+
+.hero-stats-marquee:hover .hero-stats-track {
+  animation-play-state: paused;
+}
+
+@keyframes heroStatsMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 .hero-stat-card {
