@@ -131,21 +131,21 @@ const PremiumLearningShell = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState(() => {
-    const saved = sessionStorage.getItem('sidebar-expanded-folders');
-    return saved ? JSON.parse(saved) : {};
+    const initial = {};
+    const navPagesList = sidebarPages?.length ? sidebarPages : pages;
+    navPagesList.forEach(page => {
+      if (page.modules?.some(mod => `/coal/${mod.slug}` === location.pathname)) {
+        initial[page.partId] = true;
+      }
+    });
+    return initial;
   });
 
   const toggleFolder = (partId, e) => {
-    e.preventDefault(); 
-    
-    setExpandedFolders(prev => {
-      const newState = {
-        ...prev,
-        [partId]: !prev[partId]
-      };
-      sessionStorage.setItem('sidebar-expanded-folders', JSON.stringify(newState));
-      return newState;
-    });
+    setExpandedFolders(prev => ({
+      ...prev,
+      [partId]: !prev[partId]
+    }));
   };
 
   const currentPath = location.pathname;
