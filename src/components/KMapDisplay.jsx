@@ -1,4 +1,3 @@
-
 export const KMapDisplay = ({
     grid,
     groups,

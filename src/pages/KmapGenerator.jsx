@@ -13,6 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import {
     CirclePlus, 
     X, 
+    Plug,
 } from 'lucide-react';
 
 const KMapGenerator = () => {
@@ -69,6 +70,29 @@ const KMapGenerator = () => {
         setShowGroupingGuide(false);
     };
 
+    const getIntermediateTerms = (expr, type, inputVars) => {
+        if (!expr || expr === '1' || expr === '0') return [];
+        
+        const cleanExpr = expr.includes('=') ? expr.split('=')[1].trim() : expr;
+        
+        let terms = [];
+        if (type === 'SOP') {
+            // Split by '+' for SOP
+            terms = cleanExpr.split('+').map(t => t.trim()).filter(Boolean);
+        } else {
+            // Extract groupings for POS
+            const matches = cleanExpr.match(/\([^)]+\)/g);
+            if (matches) {
+                terms = matches.map(m => m.replace(/[()]/g, '').trim());
+            }
+        }
+        terms = terms.filter(term => !inputVars.includes(term));
+
+        return terms;
+    };
+
+    const intermediateTerms = getIntermediateTerms(expression, optimizationType, variables);
+
     return (
         <div className={`kmap-page theme-${theme}`}>
         <div className="grid-background" />
@@ -101,10 +125,7 @@ const KMapGenerator = () => {
                         setShowSolution(true);
                         }}
                         onExample={handleExample}
-                        onReset={handleReset}
-                        showGroupingGuide={showGroupingGuide}
-                        expression={expression}
-                        onExperiment={() => setShowCircuitModal(true)}  
+                        onReset={handleReset} 
                     />
                 </div>
             </aside>
@@ -126,9 +147,13 @@ const KMapGenerator = () => {
                     </div>
                 )}
 
-                {/* Results stack — unchanged components, new container */}
                 {showSolution && (
                 <div className="kmap-results-stack">
+                    
+                    <SimplifiedExpression
+                    expression={expression}
+                    />
+
                     <KMapDisplay
                     grid={grid}
                     groups={groups}
@@ -139,12 +164,29 @@ const KMapGenerator = () => {
                     showGroupingGuide={showGroupingGuide}
                     optimizationType={optimizationType}
                     />
-
-                    <SimplifiedExpression
+                    
+                    <TruthTableDisplay
+                    numVariables={numVariables}
+                    variables={variables}
+                    inputValue={inputValue}
+                    dontCares={dontCares}
+                    optimizationType={optimizationType}
+                    intermediateTerms={intermediateTerms}
                     expression={expression}
-                    showGroupingGuide={showGroupingGuide}
-                    onToggleGuide={() => setShowGroupingGuide(!showGroupingGuide)}
                     />
+
+                    {/* Divider */}
+                    <div className="kmap-section-divider">
+                        <span></span>
+                    </div>
+
+                    <button
+                        className="kmap-btn kmap-btn-outline kmap-btn-full"
+                        onClick={() => setShowGroupingGuide(!showGroupingGuide)}
+                        style={{ marginTop: 'var(--spacing-lg)' }}
+                    >
+                        {showGroupingGuide ? 'Hide' : 'Show'} Grouping Guide
+                    </button>
 
                     {showGroupingGuide && (
                     <GroupingGuide
@@ -158,13 +200,13 @@ const KMapGenerator = () => {
                     />
                     )}
 
-                    <TruthTableDisplay
-                    numVariables={numVariables}
-                    variables={variables}
-                    inputValue={inputValue}
-                    dontCares={dontCares}
-                    optimizationType={optimizationType}
-                    />
+                    <button
+                        className="kmap-btn kmap-btn-circuit"
+                        onClick={() => setShowCircuitModal(true)}
+                        title="Open the interactive circuit editor"
+                    >
+                        <Plug className="h-4 w-4 mr-2" /> Experiment with Circuit
+                    </button>
 
                     <RelatedSeoLinks />
                 </div>

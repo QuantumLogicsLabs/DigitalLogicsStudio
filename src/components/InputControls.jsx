@@ -3,7 +3,6 @@ import {
     Cpu, 
     FileCode, 
     RotateCcw, 
-    Plug,
 } from 'lucide-react';
 
 export const InputControls = ({
@@ -20,9 +19,6 @@ export const InputControls = ({
     onGenerate,
     onExample,
     onReset,
-    expression,
-    onExperiment,
-    showGroupingGuide
 }) => {
     const handleVariableNameChange = (index, value) => {
         const newVars = [...variables];
@@ -49,6 +45,20 @@ export const InputControls = ({
                         <option value="2">2 Variables</option>
                         <option value="3">3 Variables</option>
                         <option value="4">4 Variables</option>
+                    </select>
+                </div>
+
+                <div className="kmap-control-group">
+                    <label className="kmap-label" title="Select SOP (Sum of Products) or POS (Product of Sums)">
+                        Optimization
+                    </label>
+                    <select
+                        className="kmap-input"
+                        value={optimizationType}
+                        onChange={(e) => onOptimizationTypeChange(e.target.value)}
+                    >
+                        <option value="SOP">Sum of Products (SOP)</option>
+                        <option value="POS">Product of Sums (POS)</option>
                     </select>
                 </div>
 
@@ -97,20 +107,6 @@ export const InputControls = ({
                     />
                 </div>
 
-                <div className="kmap-control-group">
-                    <label className="kmap-label" title="Select SOP (Sum of Products) or POS (Product of Sums)">
-                        Optimization
-                    </label>
-                    <select
-                        className="kmap-input"
-                        value={optimizationType}
-                        onChange={(e) => onOptimizationTypeChange(e.target.value)}
-                    >
-                        <option value="SOP">Sum of Products (SOP)</option>
-                        <option value="POS">Product of Sums (POS)</option>
-                    </select>
-                </div>
-
                 {/* Core Action Button Row */}
                 <div className="kmap-btn-row">
                     <button
@@ -119,6 +115,7 @@ export const InputControls = ({
                     title="Solve the KMap"
                     >
                     <Cpu className="h-5 w-5" /> 
+                    GENERATE
                     </button>
                     <button
                     className="kmap-btn kmap-btn-secondary"
@@ -126,6 +123,7 @@ export const InputControls = ({
                     title="Load a prefilled example"
                     >
                     <FileCode className="h-5 w-5" /> 
+                    EXAMPLE
                     </button>
                     <button
                     className="kmap-btn kmap-btn-outline"
@@ -133,24 +131,9 @@ export const InputControls = ({
                     title="Clear all inputs"
                     >
                     <RotateCcw className="h-5 w-5" /> 
+                    RESET
                     </button>
                 </div>
-
-                {/* Divider */}
-                <div className="kmap-section-divider">
-                    <span>Experiment</span>
-                </div>
-
-                {/* Circuit experiment button – visible only when a solution exists */}
-                {expression && (
-                    <button
-                        className="kmap-btn kmap-btn-circuit"
-                        onClick={onExperiment}
-                        title="Open the interactive circuit editor"
-                    >
-                        <Plug className="h-4 w-4 mr-2" /> Experiment with Circuit
-                    </button>
-                )}
             </div>
         </div>
     );

@@ -214,7 +214,17 @@ export const GroupingGuide = ({ groups, variables, numVariables, grid, getColumn
             </div>
 
             <div className="kmap-info-box" style={{ marginTop: 'var(--spacing-lg)' }}>
-                {/* ... Rules list remains unchanged ... */}
+                <p className="kmap-info-title">K-Map Grouping Rules:</p>
+                <ul className="kmap-info-list">
+                    <li className="kmap-info-item">Group sizes must be powers of 2: 1, 2, 4, 8, or 16 cells</li>
+                    <li className="kmap-info-item">Groups must be rectangular (can be squares or rectangles)</li>
+                    <li className="kmap-info-item">Groups must be rectangular (can be squares or rectangles)</li>
+                    <li className="kmap-info-item">Groups can wrap around edges (top-bottom, left-right)</li>
+                    <li className="kmap-info-item">Make groups as large as possible to eliminate more variables</li>
+                    <li className="kmap-info-item">Variables that change within a group are eliminated</li>
+                    <li className="kmap-info-item">A cell can belong to multiple groups</li>
+                    <li className="kmap-info-item">All {optimizationType === 'SOP' ? '1s' : '0s'} must be covered by at least one group</li>
+                </ul>
             </div>
         </div>
     );

@@ -5200,6 +5200,101 @@ select:focus-visible {
   50%      { opacity: 0.8; transform: scale(1.1); }
 }
 
+/* ================================================= */
+/* =========== K-MAP PAGE (Scoped Overrides) ======== */
+/* These overrides apply only when the page root has the `.kmap-page` class */
+/* They adjust typography, spacing and button sizing for improved readability */
+/* ================================================= */
+.kmap-page {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.kmap-page .kmap-card {
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.kmap-page .kmap-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.2px;
+}
+
+.kmap-page .kmap-empty-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.kmap-page {
+  font-size: 1.05rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.kmap-page .kmap-controls-grid .kmap-label,
+.kmap-page .kmap-helper-text {
+  font-size: 0.95rem;
+}
+
+.kmap-page .kmap-input,
+.kmap-page .kmap-var-input {
+  font-size: 0.95rem;
+  padding: 0.5rem 0.6rem;
+}
+
+.kmap-page .kmap-btn {
+  font-size: 0.95rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+}
+
+.kmap-page .kmap-btn.kmap-btn-primary {
+  min-width: 120px;
+}
+
+.kmap-page .kmap-btn.kmap-btn-outline.kmap-btn-full {
+  width: 100%;
+}
+
+.kmap-page .kmap-wrapper,
+.kmap-page .kmap-table {
+  font-size: 0.95rem;
+}
+
+.kmap-page .kmap-cell-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.kmap-page .kmap-row-header,
+.kmap-page .kmap-header-cell {
+  font-size: 0.9rem;
+  padding: 8px 10px;
+}
+
+.kmap-page .kmap-groups-legend-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Responsive tweaks scoped to KMap page */
+@media (max-width: 768px) {
+  .kmap-page { font-size: 15px; }
+  .kmap-page .kmap-section-title { font-size: 1.05rem; }
+  .kmap-page .kmap-card { padding: 14px; }
+  .kmap-page .kmap-btn { padding: 0.5rem 0.75rem; font-size: 0.9rem; }
+  .kmap-page .kmap-grid-container { overflow-x: auto; }
+}
+
+/* Small utility: slightly increase contrast for empty-state hint on KMap page */
+.kmap-page .kmap-empty-hint { color: var(--text-secondary); font-size: 0.98rem; }
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -6012,44 +6107,116 @@ select:focus-visible {
   font-size: 1.05rem;
 }
 
-/* Light mode overrides for truth table */
+/* ═══════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES FOR TRUTH TABLE & MODAL
+   ═══════════════════════════════════════════════════════════ */
+
+/* Modal Container Light Mode */
+.theme-light .tt-modal-inner,
+[data-theme="light"] .tt-modal-inner {
+  background: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+.theme-light .tt-modal-header h2,
+[data-theme="light"] .tt-modal-header h2 {
+  color: #0f172a !important;
+}
+.theme-light .tt-modal-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Expand Button Styling */
+.tt-expand-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.tt-expand-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+.theme-light .tt-expand-btn:hover,
+[data-theme="light"] .tt-expand-btn:hover {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #2563eb !important;
+}
+
+/* Modal Inner Layout Helpers */
+.tt-modal-inner {
+  display: flex;
+  flex-direction: column;
+}
+.tt-modal-header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.tt-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f8fafc;
+}
+.tt-modal-body {
+  flex: 1;
+  padding: 24px;
+}
+
+/* Table Light Mode Overrides */
+.theme-light .kmap-truth-table,
 [data-theme="light"] .kmap-truth-table {
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
 }
+.theme-light .kmap-truth-table thead tr,
 [data-theme="light"] .kmap-truth-table thead tr {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.09) 0%, rgba(2, 132, 199, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(2, 132, 199, 0.04) 100%) !important;
 }
+.theme-light .kmap-truth-table th,
 [data-theme="light"] .kmap-truth-table th {
-  color: #2563eb;
-  border-bottom-color: rgba(37, 99, 235, 0.28);
+  color: #2563eb !important;
+  border-bottom-color: rgba(37, 99, 235, 0.2) !important;
 }
+.theme-light .kmap-truth-table tbody tr,
 [data-theme="light"] .kmap-truth-table tbody tr {
+  background: #ffffff !important;
+}
+.theme-light .kmap-truth-table tbody tr:nth-child(even),
+[data-theme="light"] .kmap-truth-table tbody tr:nth-child(even) {
   background: #f8fafc !important;
 }
-[data-theme="light"] .kmap-truth-table tbody tr:nth-child(even) {
-  background: #f1f5f9 !important;
-}
+.theme-light .kmap-truth-table tbody tr:hover,
 [data-theme="light"] .kmap-truth-table tbody tr:hover {
-  background: rgba(37, 99, 235, 0.05) !important;
+  background: rgba(37, 99, 235, 0.06) !important;
 }
+.theme-light .kmap-truth-table td,
 [data-theme="light"] .kmap-truth-table td {
-  color: #0f172a !important;
-  border-bottom-color: rgba(148, 163, 184, 0.18);
+  color: #334155 !important;
+  border-bottom-color: rgba(148, 163, 184, 0.2) !important;
 }
+.theme-light .kmap-truth-table .input-term-cell,
 [data-theme="light"] .kmap-truth-table .input-term-cell {
-  color: #475569 !important;
+  color: #64748b !important;
 }
+.theme-light .kmap-truth-table .output-1,
 [data-theme="light"] .kmap-truth-table .output-1 {
   color: #059669 !important;
 }
+.theme-light .kmap-truth-table .output-0,
 [data-theme="light"] .kmap-truth-table .output-0 {
   color: #94a3b8 !important;
 }
+.theme-light .kmap-truth-table .output-x,
+.theme-light .kmap-truth-table .output-dontcare,
 [data-theme="light"] .kmap-truth-table .output-x,
 [data-theme="light"] .kmap-truth-table .output-dontcare {
   color: #d97706 !important;
 }
-
 /* ═══════════════════════════════════════════════════════════
    GROUPING GUIDE
    ═══════════════════════════════════════════════════════════ */
