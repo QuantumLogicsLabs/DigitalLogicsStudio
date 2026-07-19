@@ -8,36 +8,6 @@ import "../../pages/ArithmeticFunctionsAndHDLs/AFHDLLayout.css";
 import "./PremiumLearningShell.css";
 import RelatedSeoLinks from "../seo/RelatedSeoLinks";
 
-function useScrollSpy(sectionIds) {
-  const [activeId, setActiveId] = useState('');
-
-  useEffect(() => {
-    if (!sectionIds || sectionIds.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: '-20% 0px -80% 0px' 
-      }
-    );
-
-    sectionIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, [sectionIds]);
-
-  return activeId;
-}
-
 function SunIcon() {
   return (
     <svg
@@ -250,14 +220,6 @@ const PremiumLearningShell = ({
     return pageSubtopicId ? completedSubtopics.includes(pageSubtopicId) : false;
   };
 
-  const sectionIdsToTrack = useMemo(() => {
-    return navPages
-      .map(page => page.path.includes("#") ? page.path.split("#")[1] : null)
-      .filter(Boolean);
-  }, [navPages]);
-
-  const activeScrolledId = useScrollSpy(sectionIdsToTrack);
-
   return (
     <div
       className={`afhdl-layout premium-topic-shell ${rootClassName} ${
@@ -368,17 +330,11 @@ const PremiumLearningShell = ({
             <nav className="afhdl-sidebar-nav">
               {navPages.map((page, index) => {
                 const done = pageDone(index, page);
-                let active = false;
-      
-                if (activeScrolledId && page.path.includes(`#${activeScrolledId}`)) {
-                  active = true;
-                } else if (!activeScrolledId) {
-                  active = isSidebarItemActive
-                    ? isSidebarItemActive(page, location)
-                    : page.path.split("#")[0] === currentPath &&
-                      (!page.path.includes("#") ||
-                        location.hash === page.path.slice(page.path.indexOf("#")));
-                }
+                const active = isSidebarItemActive
+                  ? isSidebarItemActive(page, location)
+                  : page.path.split("#")[0] === currentPath &&
+                    (!page.path.includes("#") ||
+                      location.hash === page.path.slice(page.path.indexOf("#")));
                 return (
                   <NavLink
                     key={page.path}
