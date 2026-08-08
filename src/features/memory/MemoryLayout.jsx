@@ -1,20 +1,14 @@
 import React from "react";
-import PremiumLearningShell from "../../shared/components/topics/PremiumLearningShell";
+import TopicLayout from "../../shared/components/topics/TopicLayout";
 import "./MemorySystem.css";
-import { memoryPages } from "./memoryConfig";
-
-const PATH_TO_SUBTOPIC_ID = Object.fromEntries(
-  memoryPages.map((page) => [page.path, page.path.replace("/memory/", "")]),
-);
-
-const MEMORY_TOPIC = {
-  id: "memory-systems",
-  title: "MEMORY SYSTEMS",
-  links: Object.values(PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
-};
+import {
+  memoryPages,
+  MEMORY_PATH_TO_SUBTOPIC_ID,
+  MEMORY_TOPIC,
+} from "./memoryConfig";
 
 const MemoryLayout = ({ title, kicker, description, children }) => (
-  <PremiumLearningShell
+  <TopicLayout
     title={title}
     subtitle={description}
     pages={memoryPages}
@@ -26,11 +20,11 @@ const MemoryLayout = ({ title, kicker, description, children }) => (
     rootClassName="mem-layout"
     tracking={{
       topic: MEMORY_TOPIC,
-      pathToSubtopicId: PATH_TO_SUBTOPIC_ID,
+      pathToSubtopicId: MEMORY_PATH_TO_SUBTOPIC_ID,
     }}
   >
     {children}
-  </PremiumLearningShell>
+  </TopicLayout>
 );
 
 export default MemoryLayout;

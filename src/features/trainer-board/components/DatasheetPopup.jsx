@@ -1,8 +1,9 @@
+import { memo } from "react";
 import { ICS } from "../utils/icCatalog";
-import { pinoutSummary } from "../utils/pinoutSummary";
+import { pinoutSummary } from "../utils/simulationEngine";
 
-// ── Datasheet Popup — built entirely from existing pinoutSummary() data ──
-export function DatasheetPopup({ icKey, x, y, onClose }) {
+// ── Datasheet Popup — built entirely from pinoutSummary() data ────
+function DatasheetPopup({ icKey, x, y, onClose }) {
   const ic = ICS[icKey];
   if (!ic) return null;
   const pinLines = pinoutSummary(icKey).split("  ").filter(Boolean);
@@ -84,3 +85,5 @@ export function DatasheetPopup({ icKey, x, y, onClose }) {
     </div>
   );
 }
+
+export default memo(DatasheetPopup);

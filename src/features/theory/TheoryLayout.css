@@ -1,0 +1,72 @@
+/* ── Theory topic-page shell ──────────────────────────────────────
+   Shared chrome for every DLD/COAL topic page — the same
+   PremiumLearningShell every other DLD topic page (boolean-algebra,
+   memory, etc.) uses, including its built-in desktop sidebar. Each
+   track gets its own accent via a rootClassName modifier
+   (.theory-layout--dld / .theory-layout--coal); everything else is
+   identical. */
+
+.theory-layout.premium-topic-shell {
+  --afhdl-accent: #5b8cff;
+  --afhdl-accent-soft: rgba(91, 140, 255, 0.14);
+  --afhdl-border-strong: rgba(129, 140, 248, 0.32);
+}
+
+.theory-layout--coal.premium-topic-shell {
+  --afhdl-accent: #8b5cf6;
+  --afhdl-accent-soft: rgba(139, 92, 246, 0.14);
+  --afhdl-border-strong: rgba(167, 139, 250, 0.32);
+}
+
+[data-theme="dark"] .theory-layout--coal.premium-topic-shell {
+  --afhdl-bg:
+    radial-gradient(circle at top left, rgba(139, 92, 246, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 12%, rgba(91, 140, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #050810 0%, #0a0f1e 45%, #0c1224 100%);
+}
+
+[data-theme="light"] .theory-layout--coal.premium-topic-shell {
+  --afhdl-accent: #7c3aed;
+  --afhdl-accent-soft: rgba(124, 58, 237, 0.1);
+}
+
+.theory-layout .afhdl-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.theory-layout .afhdl-body {
+  padding-top: var(--afhdl-topbar-height, 56px);
+}
+
+.theory-layout--coal .afhdl-bg-1 {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 64%);
+}
+
+.theory-layout--coal .afhdl-category-pill {
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.theory-layout--coal .afhdl-pill-dot {
+  background: #a78bfa;
+}
+
+/* Universal green completion accent — overrides the shared shell's
+   default theming wherever a "done" state is shown. */
+.theory-layout .core-topic-pill.is-done,
+.theory-layout .core-topic-check.is-complete,
+.theory-layout .afhdl-nav-item.is-visited .afhdl-nav-check,
+.theory-layout .afhdl-mark-read-btn.is-read {
+  color: #10b981;
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.theory-layout .afhdl-mark-read-btn.is-read svg,
+.theory-layout .core-topic-check.is-complete svg {
+  stroke: #10b981;
+}
+

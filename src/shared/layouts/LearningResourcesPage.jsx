@@ -8,14 +8,14 @@ import {
   Layers3,
   Sparkles,
 } from "lucide-react";
-import { Navbar } from "../../shared/components/Navbar";
-import Footer from "../../shared/components/Footer";
-import { useTheme } from "../../shared/context/ThemeContext";
-import usePointerGlow from "../../shared/hooks/usePointerGlow";
-import CoreTopicsSection from "../../shared/components/topics/CoreTopicsSection";
-import coreTopics from "../../shared/data/coreTopics";
-import "../home/Home.css";
-import "./LearningResourcesPage.css";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { useTheme } from "../context/ThemeContext";
+import usePointerGlow from "../hooks/usePointerGlow";
+import CoreTopicsSection from "../components/topics/CoreTopicsSection";
+import coreTopics from "../data/coreTopics";
+import "../../features/home/Home.css";
+import "../styles/LearningResourcesPage.css";
 
 const trackConfig = {
   dld: {

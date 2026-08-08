@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
-import { useAuth } from "../../auth/context/AuthContext";
+import { useAuth } from "../../../auth/context/AuthContext";
 
 const STATS = [
   { value: "12+", label: "Interactive Tools" },

@@ -110,6 +110,12 @@ const COAL_PATH_TO_SUBTOPIC_ID = Object.fromEntries(
   ]),
 );
 
+const COAL_TOPIC = {
+  id: "coal-theory",
+  title: "COAL THEORY",
+  links: Object.values(COAL_PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
+};
+
 const COAL_THEORY_OVERVIEW_PATH = "/resources/coal/theory";
 
 function getCoalPartForPath(pathname) {
@@ -165,6 +171,7 @@ function isCoalPartSidebarDone(page, completedSubtopics) {
 export {
   COAL_MODULE_ICONS,
   COAL_PATH_TO_SUBTOPIC_ID,
+  COAL_TOPIC,
   COAL_THEORY_OVERVIEW_PATH,
   buildCoalPages,
   buildCoalPartSidebarPages,

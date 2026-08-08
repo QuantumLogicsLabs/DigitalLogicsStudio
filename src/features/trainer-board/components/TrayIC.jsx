@@ -1,8 +1,9 @@
+import { memo } from "react";
 import { ICS } from "../utils/icCatalog";
-import { pinoutSummary } from "../utils/pinoutSummary";
+import { pinoutSummary } from "../utils/simulationEngine";
 
 // ── IC Tray item ──────────────────────────────────────────────────
-export function TrayIC({ icKey, onMouseDown, onContextMenu }) {
+function TrayIC({ icKey, onMouseDown, onContextMenu }) {
   const ic = ICS[icKey];
   return (
     <div
@@ -94,3 +95,5 @@ export function TrayIC({ icKey, onMouseDown, onContextMenu }) {
     </div>
   );
 }
+
+export default memo(TrayIC);

@@ -1,5 +1,5 @@
 import React from "react";
-import BALayout from "./components/BALayout";
+import BALayout from "./BALayout";
 
 const InfoCards = () => (
   <div className="comparison-grid">

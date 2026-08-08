@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BALayout from "./components/BALayout";
+import BALayout from "./BALayout";
 
 const countSignificantDigits = (value) => {
   if (!value || /^\s*$/.test(value))

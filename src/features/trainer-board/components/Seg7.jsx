@@ -1,5 +1,6 @@
+import { memo } from "react";
 // ── Seven Segment Display ─────────────────────────────────────────
-export function Seg7({ val, h = 48 }) {
+function Seg7({ val, h = 48 }) {
   const w = h * 0.6,
     t = h * 0.09,
     g = h * 0.032;
@@ -64,3 +65,5 @@ export function Seg7({ val, h = 48 }) {
     </svg>
   );
 }
+
+export default memo(Seg7);

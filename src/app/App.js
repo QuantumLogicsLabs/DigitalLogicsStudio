@@ -67,17 +67,15 @@ const RegSyncBinaryCounters = lazy(
 );
 const ProblemSolver = lazy(() => import("../features/book/Ch1"));
 const Ch2ProblemSolver = lazy(() => import("../features/book/Ch2"));
-const LearningResourcesPage = lazy(
-  () => import("../features/learning-resources/LearningResourcesPage"),
-);
-const CoalHomePage = lazy(() => import("../features/coal/CoalHomePage"));
-const CoalTheoryPage = lazy(() => import("../features/coal/CoalTheoryPage"));
+const DldHomeRoute = lazy(() => import("../features/theory/DldHomeRoute"));
+const CoalHomeRoute = lazy(() => import("../features/coal/CoalHomeRoute"));
 const CoalPracticalPage = lazy(() => import("../features/coal/CoalPracticalPage"));
-const CoalTopicPage = lazy(() => import("../features/coal/CoalTopicPage"));
+const CoalTopicPageRoute = lazy(() => import("../features/coal/CoalTopicPageRoute"));
+const DldMemoryTopicPage = lazy(() => import("../features/theory/DldMemoryTopicRoute"));
 const ParityBitCalculator = lazy(() => import("../features/arithmetic-hdl/ParityBitCalculator"));
 const KMapGenerator = lazy(() => import("../features/kmap/KmapGenerator"));
 const GateExplanation = lazy(() => import("../features/logic-gates/GateExplanation"));
-const TimeDiagrams = lazy(() => import("../features/sequential-circuits/TimeDiagrams"));
+const TimeDiagrams = lazy(() => import("../features/TimeDiagrams/TimeDiagrams"));
 const BooleanAlgebraOverview = lazy(
   () => import("../features/boolean-algebra/BooleanAlgebraOverview"),
 );
@@ -181,19 +179,6 @@ const SeqStateDiagram = lazy(
 const SeqStateReduction = lazy(
   () => import("../features/sequential-circuits/SeqStateReduction"),
 );
-const MemoryBasics = lazy(() => import("../features/memory/MemoryBasics"));
-const ReadOnlyMemories = lazy(() => import("../features/memory/ReadOnlyMemories"));
-const ProgrammableLogicArray = lazy(
-  () => import("../features/memory/ProgrammableLogicArray"),
-);
-const RandomAccessMemory = lazy(
-  () => import("../features/memory/RandomAccessMemory"),
-);
-const StaticDynamicRAM = lazy(() => import("../features/memory/StaticDynamicRAM"));
-const ArrayOfRAMICs = lazy(() => import("../features/memory/ArrayOfRAMICs"));
-const MemoryConstructionRAM = lazy(
-  () => import("../features/memory/MemoryConstructionRAM"),
-);
 const DLDTrainerBoard = lazy(() => import("../features/trainer-board/TrainerBoard"));
 const LoginPage = lazy(() => import("../auth/pages/LoginPage"));
 const SignupPage = lazy(() => import("../auth/pages/SignupPage"));
@@ -248,16 +233,19 @@ const AppContent = () => {
             element={<Navigate to="/problems?course=coal" replace />}
           />
 
-          <Route path="/resources/coal/theory" element={<CoalTheoryPage />} />
+          <Route
+            path="/resources/coal/theory"
+            element={<Navigate to="/resources/coal" replace />}
+          />
           <Route
             path="/resources/coal/practical"
             element={<CoalPracticalPage />}
           />
-          <Route path="/resources/coal" element={<CoalHomePage />} />
-          <Route path="/coal/:slug" element={<CoalTopicPage />} />
+          <Route path="/resources/coal" element={<CoalHomeRoute />} />
+          <Route path="/coal/:slug" element={<CoalTopicPageRoute />} />
           <Route
             path="/resources/:track?"
-            element={<LearningResourcesPage />}
+            element={<DldHomeRoute />}
           />
           <Route path="/boolforge" element={<Boolforge />} />
 
@@ -453,29 +441,15 @@ const AppContent = () => {
             element={<RegSyncBinaryCounters />}
           />
 
-          {/* ── Memory Systems ────────────────────────────────── */}
-          <Route path="/memory/basics" element={<MemoryBasics />} />
-          <Route
-            path="/memory/read-only-memories"
-            element={<ReadOnlyMemories />}
-          />
-          <Route
-            path="/memory/programmable-logic-array"
-            element={<ProgrammableLogicArray />}
-          />
-          <Route
-            path="/memory/random-access-memory"
-            element={<RandomAccessMemory />}
-          />
-          <Route
-            path="/memory/static-dynamic-ram"
-            element={<StaticDynamicRAM />}
-          />
-          <Route path="/memory/array-of-ram-ics" element={<ArrayOfRAMICs />} />
-          <Route
-            path="/memory/memory-construction-ram"
-            element={<MemoryConstructionRAM />}
-          />
+          {/* ── Memory Systems ── now fully data-driven (see
+              features/theory/data/dldTopicContent.js) ─────────── */}
+          <Route path="/memory/basics" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/read-only-memories" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/programmable-logic-array" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/random-access-memory" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/static-dynamic-ram" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/array-of-ram-ics" element={<DldMemoryTopicPage />} />
+          <Route path="/memory/memory-construction-ram" element={<DldMemoryTopicPage />} />
 
           {/* ── COAL Practical Labs ───────────────────────────── */}
           <Route

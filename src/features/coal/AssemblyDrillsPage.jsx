@@ -14,14 +14,14 @@ import {
   CheckCircle,
   Code
 } from "lucide-react";
-import { Navbar } from "../../shared/components/Navbar";
+import Navbar from "../../shared/components/Navbar";
 import Footer from "../../shared/components/Footer";
 import { useTheme } from "../../shared/context/ThemeContext";
 import usePointerGlow from "../../shared/hooks/usePointerGlow";
 import { coalCourseMeta } from "../../shared/data/coalCourseOutline";
 import "./AssemblyDrillsPage.css";
 import "../home/Home.css";
-import "../learning-resources/LearningResourcesPage.css";
+import "../../shared/styles/LearningResourcesPage.css";
 
 const COAL_ACCENT = coalCourseMeta.accent;
 

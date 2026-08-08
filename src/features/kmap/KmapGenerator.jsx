@@ -9,7 +9,7 @@ import { useKMapLogic } from '../../shared/hooks/useKMapLogic';
 import Boolforge from '../boolforge/Boolforge';
 import RelatedSeoLinks from '../../shared/seo/RelatedSeoLinks';
 import { trackToolInteraction } from '../../shared/utils/analytics';
-import { Navbar } from '../../shared/components/Navbar';
+import Navbar from '../../shared/components/Navbar';
 import { useTheme } from '../../shared/context/ThemeContext';
 import {
     CirclePlus, 

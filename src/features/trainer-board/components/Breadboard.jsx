@@ -1,10 +1,12 @@
-import { ICS, IC_LOGIC } from "../utils/icCatalog";
+import { memo } from "react";
+import { ICS } from "../utils/icCatalog";
+import { IC_LOGIC } from "../utils/simulationEngine";
 import { COLS, ROWS_A, ROWS_B, HOLE_PX, GAP_AFTER, colXForBB } from "../utils/breadboardLayout";
 
 // ── Breadboard SVG ────────────────────────────────────────────────
-// FIX: bbRef is attached to the SVG container div directly here.
-// Wire coordinates are stored as SVG-local coords (not page coords).
-export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouseDown, onICContextMenu, mode, onICDelete, poweredIds }) {
+// bbRef (attached by the parent) is the coordinate origin for all wires —
+// wire coordinates are stored as SVG-local coords (not page coords).
+function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouseDown, onICContextMenu, mode, onICDelete, poweredIds }) {
   const W = 36 + COLS * (HOLE_PX + 2) + 5 * 6 + HOLE_PX + 16;
   const ROW_H = 14;
   const IC_BODY_H = 24;
@@ -27,7 +29,7 @@ export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouse
 
   const wiredSet = new Set(wires.flatMap((w) => [w.from, w.to]));
 
-  // FIX: Holes now have a visible background square to mimic real breadboard holes,
+  // Holes have a visible background square to mimic real breadboard holes,
   // plus a larger hit area (transparent rect) for easy clicking.
   const Hole = ({ id, cx, cy, type }) => {
     const isStart = wireStart && wireStart.id === id;
@@ -338,13 +340,13 @@ export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouse
         const ic = ICS[p.ic];
         if (!ic || p.col === undefined) return null;
         const cols = Math.ceil(ic.pins / 2);
-        // NEW: icW ab actual hole-grid span se match karta hai (GAP_AFTER ke
-        // extra gaps included) — pehle fixed cols*13+8 tha jo IC-width group
-        // boundaries cross karte hi drift kar jata tha.
+        // icW matches the actual hole-grid span (GAP_AFTER extra gaps
+        // included) — a fixed cols*13+8 would drift once an IC crosses a
+        // group boundary.
         const icW = colX(p.col + cols - 1) - colX(p.col) + 16;
         const icH = IC_BODY_H;
-        // NEW: column-index i (0-based, left to right) ka pixel offset —
-        // ye har pin ko uske real breadboard hole ke exactly upar center karta hai.
+        // column-index i (0-based, left to right) pixel offset — centers
+        // every pin exactly over its real breadboard hole.
         const pinX = (i) => colX(p.col + i) - p.x - 1.5; // 1.5 = half of 3px pin width
         return (
           <g
@@ -352,11 +354,11 @@ export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouse
             transform={`translate(${p.x},${p.y})`}
             style={{ cursor: "grab" }}
             onMouseDown={(e) => {
-              if (e.button !== 0) return; // right/middle click ko ignore karo — sirf left-click drag start kare
+              if (e.button !== 0) return; // ignore right/middle click — only left-click starts drag
 
               e.stopPropagation();
               if (mode === "delete") {
-                onICDelete?.(p.id); // NEW: delete mode mein click = IC hata do
+                onICDelete?.(p.id); // delete mode: click = remove IC
                 return;
               }
               onICMouseDown(p.id, p.ic, e.clientX, e.clientY);
@@ -410,7 +412,7 @@ export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouse
               stroke="#444"
               strokeWidth={0.5}
             />
-            {/* NEW: unpowered warning — VCC/GND rail se wired nahi hai */}
+            {/* Unpowered warning — VCC/GND pin isn't wired to a rail */}
             {poweredIds && !poweredIds.has(p.id) && (
               <g>
                 <circle cx={icW - 5} cy={5} r={4} fill="#ff2222" stroke="#500" strokeWidth={0.6} />
@@ -447,3 +449,5 @@ export function Breadboard({ wireStart, wires, placedICs, onHoleClick, onICMouse
     </svg>
   );
 }
+
+export default memo(Breadboard);

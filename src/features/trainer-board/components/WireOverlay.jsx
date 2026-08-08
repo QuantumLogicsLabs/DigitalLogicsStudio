@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 
-// ── Wire overlay — FIX: uses SVG-local coords, rendered inside same SVG container ──
-// We render wires as an absolute SVG overlay positioned exactly over the breadboard SVG
-export function WireOverlay({ wires, preview, width, height, onWireClick }) {
+// ── Wire overlay ──────────────────────────────────────────────────
+// Uses SVG-local coords, rendered as an absolute overlay positioned
+// exactly over the breadboard SVG.
+function WireOverlay({ wires, preview, width, height, onWireClick }) {
   const [hoveredWireId, setHoveredWireId] = useState(null);
   return (
     <svg
@@ -71,3 +72,5 @@ export function WireOverlay({ wires, preview, width, height, onWireClick }) {
     </svg>
   );
 }
+
+export default memo(WireOverlay);

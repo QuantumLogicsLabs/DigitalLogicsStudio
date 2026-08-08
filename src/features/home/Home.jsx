@@ -1,13 +1,14 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, BookOpen, Clock3, Search, Sparkles } from "lucide-react";
-import { Navbar } from "../../shared/components/Navbar";
-import HeroSection from "./HeroSection";
+import Navbar from "../../shared/components/Navbar";
 import Footer from "../../shared/components/Footer";
-import FeaturedToolsSection from "./FeaturedToolsSection";
+import { FeaturedToolsSection, HeroSection } from "./components";
 import homeData from "./HomeData";
 import { useTheme } from "../../shared/context/ThemeContext";
 import coreTopics from "../../shared/data/coreTopics";
+import { PREVIEW_MAPPINGS } from "../../shared/data/previewContent";
+import SEARCH_PREVIEW_MAP from "../../shared/data/searchComponentMap";
 import { buildSearchIndex, searchIndexedItems } from "../../shared/utils/search";
 import "./Home.css";
 
@@ -87,6 +88,28 @@ const Home = () => {
       return haystack.includes(query);
     });
   }, [deferredSearchTerm]);
+
+  // Determine if search should show an inline preview (component-backed) or fallback to data previews
+  const activeComponentPreview = React.useMemo(() => {
+    const query = deferredSearchTerm.trim().toLowerCase();
+    if (!query) return null;
+
+    return SEARCH_PREVIEW_MAP.find((item) =>
+      item.keywords.some((kw) => query.includes(kw)),
+    ) || null;
+  }, [deferredSearchTerm]);
+
+  const activePreviewKey = React.useMemo(() => {
+    const query = deferredSearchTerm.trim().toLowerCase();
+    if (!query) return null;
+
+    if (query.includes("boolean identities") || query === "identities") {
+      return "/boolean/identities";
+    }
+    return null;
+  }, [deferredSearchTerm]);
+
+  const activePreview = activePreviewKey ? PREVIEW_MAPPINGS[activePreviewKey] : null;
 
   const coalResources = [
     {
@@ -195,6 +218,35 @@ const Home = () => {
         />
 
         <div className="home-sections" ref={resultsRef}>
+          {/* Render Component-backed Embedded Preview if matched */}
+          {activeComponentPreview ? (
+            <section className="home-section search-embedded-preview">
+              <div className="preview-header">
+                <span className="preview-badge">Quick Content</span>
+                <h2>{activeComponentPreview.title}</h2>
+                <Link to={activeComponentPreview.route} className="preview-full-link" style={{ marginLeft: 'auto' }}>
+                  Open full page →
+                </Link>
+              </div>
+
+              <div className="preview-frame-body">
+                <React.Suspense fallback={<div className="preview-loading">Loading page preview...</div>}>
+                  <activeComponentPreview.Component />
+                </React.Suspense>
+              </div>
+            </section>
+          ) : activePreview ? (
+            /* Fallback: data-only preview (compact) */
+            <section className="home-section inline-preview-section">
+              <div className="preview-header">
+                <span className="preview-badge">Quick Preview</span>
+                <h2>{activePreview.title}</h2>
+              </div>
+              <div className="preview-content-body">
+                {activePreview.component}
+              </div>
+            </section>
+          ) : null}
           {hasResults ? (
             <>
               <FeaturedToolsSection data={featuredTools} />

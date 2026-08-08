@@ -5,7 +5,7 @@ import ControlPanel from '../../shared/components/ControlPanel';
 import ControlGroup from '../../shared/components/ControlGroup';
 import CircuitModal from '../../shared/components/CircuitModal';
 import { parseSOP, generateTruthTable } from '../../shared/utils/boolMath';
-import { Navbar } from '../../shared/components/Navbar';
+import Navbar from '../../shared/components/Navbar';
 import Footer from '../../shared/components/Footer';
 import { useTheme } from '../../shared/context/ThemeContext';
 

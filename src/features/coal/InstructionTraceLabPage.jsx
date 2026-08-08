@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { Navbar } from "../../shared/components/Navbar";
+import Navbar from "../../shared/components/Navbar";
 import Footer from "../../shared/components/Footer";
 import { useTheme } from "../../shared/context/ThemeContext";
 import usePointerGlow from "../../shared/hooks/usePointerGlow";
 import { coalCourseMeta } from "../../shared/data/coalCourseOutline";
 import CPUExplorer from "./CPUExplorer";
 import "../home/Home.css";
-import "../learning-resources/LearningResourcesPage.css";
+import "../../shared/styles/LearningResourcesPage.css";
 
 const COAL_ACCENT = coalCourseMeta.accent;
 

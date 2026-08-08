@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import ToolLayout from '../../shared/components/ToolLayout';
 import ExplanationBlock from '../../shared/components/ExplanationBlock';
 import CircuitModal from '../../shared/components/CircuitModal';
-import { Navbar } from '../../shared/components/Navbar';
+import Navbar from '../../shared/components/Navbar';
 import Footer from '../../shared/components/Footer';
 import { useTheme } from '../../shared/context/ThemeContext';
 

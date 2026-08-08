@@ -56,3 +56,13 @@ export const memoryPages = [
     color: "#fbbf24",
   },
 ];
+
+export const MEMORY_PATH_TO_SUBTOPIC_ID = Object.fromEntries(
+  memoryPages.map((page) => [page.path, page.path.replace("/memory/", "")]),
+);
+
+export const MEMORY_TOPIC = {
+  id: "memory-systems",
+  title: "MEMORY SYSTEMS",
+  links: Object.values(MEMORY_PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
+};

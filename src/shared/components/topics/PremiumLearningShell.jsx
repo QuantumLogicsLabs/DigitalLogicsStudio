@@ -225,7 +225,10 @@ const PremiumLearningShell = ({
       className={`afhdl-layout premium-topic-shell ${rootClassName} ${
         isScrolled ? "is-scrolled" : ""
       }`.trim()}
-      style={{ background: "var(--afhdl-bg)", color: "var(--afhdl-text)" }}
+      style={{
+        background: "var(--afhdl-bg, transparent)",
+        color: "var(--afhdl-text, inherit)",
+      }}
     >
       <div className="afhdl-bg afhdl-bg-1" />
       <div className="afhdl-bg afhdl-bg-2" />

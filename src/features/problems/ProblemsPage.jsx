@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../../shared/context/ThemeContext";
 import { useAuth } from "../../auth/context/AuthContext";
-import { Navbar } from "../../shared/components/Navbar";
+import Navbar from "../../shared/components/Navbar";
 import useLearningProgress from "../../shared/hooks/useLearningProgress";
 import coreTopics from "../../shared/data/coreTopics";
 import allProblemsCatalog, {

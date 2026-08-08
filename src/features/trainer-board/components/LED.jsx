@@ -1,6 +1,8 @@
+import { memo } from "react";
+import { LEDCOL } from "../utils/constants";
+
 // ── LED dot ───────────────────────────────────────────────────────
-const LEDCOL = { R: "#ff1100", G: "#00ee44", Y: "#ffcc00", B: "#0099ff" };
-export function LED({ on, c = "G", size = 10 }) {
+function LED({ on, c = "G", size = 10 }) {
   const col = LEDCOL[c] || LEDCOL.G;
   return (
     <div
@@ -18,3 +20,5 @@ export function LED({ on, c = "G", size = 10 }) {
     />
   );
 }
+
+export default memo(LED);

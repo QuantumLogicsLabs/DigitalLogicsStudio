@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BALayout from "./components/BALayout";
+import BALayout from "./BALayout";
 import ControlPanel from "../../shared/components/ControlPanel";
 import ControlGroup from "../../shared/components/ControlGroup";
 import CircuitModal from "../../shared/components/CircuitModal";

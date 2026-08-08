@@ -10,30 +10,27 @@
    DESIGN TOKENS  (scoped to .ns-layout so they don't leak)
 ───────────────────────────────────────────────────────────── */
 .ns-layout {
-  /* Surface ramp */
-  --ns-bg: #07090f;
-  --ns-surface-0: #0d111a; /* deepest cards */
-  --ns-surface-1: #121824; /* standard card */
-  --ns-surface-2: #182333; /* raised / hover */
-  --ns-surface-glass: rgba(14, 20, 31, 0.76);
-  --ns-surface-blur: rgba(9, 13, 21, 0.9);
-  --ns-page-bg:
-    linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, transparent 32%),
-    linear-gradient(225deg, rgba(167, 139, 250, 0.1) 0%, transparent 34%),
-    linear-gradient(180deg, #07090f 0%, #0b111b 46%, #07090f 100%);
+  /* Surface ramp — matches reg-layout (the site's color standard) */
+  --ns-bg: #08111f;
+  --ns-surface-0: #0b1323; /* deepest cards */
+  --ns-surface-1: #10192d; /* standard card */
+  --ns-surface-2: #13203a; /* raised / hover */
+  --ns-surface-glass: rgba(11, 19, 36, 0.78);
+  --ns-surface-blur: rgba(11, 19, 36, 0.9);
+  --ns-page-bg: #08111f;
 
-  /* Teal accent scale */
-  --ns-teal-400: #2dd4bf;
-  --ns-teal-500: #14b8a6;
-  --ns-teal-600: #0d9488;
-  --ns-teal-glow: rgba(20, 184, 166, 0.22);
-  --ns-teal-soft: rgba(45, 212, 191, 0.1);
-  --ns-teal-border: rgba(45, 212, 191, 0.2);
-  --ns-teal-border-hi: rgba(20, 184, 166, 0.38);
+  /* Accent scale (was teal — now reg's blue) */
+  --ns-teal-400: #7fb0ff;
+  --ns-teal-500: #5b8cff;
+  --ns-teal-600: #436fe8;
+  --ns-teal-glow: rgba(91, 140, 255, 0.22);
+  --ns-teal-soft: rgba(91, 140, 255, 0.1);
+  --ns-teal-border: rgba(91, 140, 255, 0.18);
+  --ns-teal-border-hi: rgba(91, 140, 255, 0.3);
 
   /* Cyan accent (secondary) */
-  --ns-cyan: #22d3ee;
-  --ns-cyan-soft: rgba(34, 211, 238, 0.1);
+  --ns-cyan: #93c5fd;
+  --ns-cyan-soft: rgba(147, 197, 253, 0.1);
   --ns-amber: #fbbf24;
   --ns-amber-soft: rgba(251, 191, 36, 0.12);
   --ns-violet: #a78bfa;
@@ -42,15 +39,15 @@
   --ns-rose-soft: rgba(251, 113, 133, 0.12);
 
   /* Text scale */
-  --ns-text-hi: #e8faf8;
-  --ns-text-base: #d7e2ea;
-  --ns-text-muted: #93a8b7;
-  --ns-text-faint: #607586;
+  --ns-text-hi: #e5edf8;
+  --ns-text-base: #c8d5e6;
+  --ns-text-muted: #88a0bf;
+  --ns-text-faint: #6f86a4;
 
   /* Borders */
-  --ns-border: rgba(148, 163, 184, 0.14);
-  --ns-border-hi: rgba(45, 212, 191, 0.3);
-  --ns-border-sep: rgba(148, 163, 184, 0.1);
+  --ns-border: rgba(148, 163, 184, 0.18);
+  --ns-border-hi: rgba(91, 140, 255, 0.28);
+  --ns-border-sep: rgba(148, 163, 184, 0.12);
 
   /* Danger */
   --ns-danger: #f87171;
@@ -60,8 +57,8 @@
   --ns-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
   --ns-shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
   --ns-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
-  --ns-shadow-teal: 0 0 24px rgba(20, 184, 166, 0.18);
-  --ns-shadow-teal-hi: 0 0 32px rgba(20, 184, 166, 0.28);
+  --ns-shadow-teal: 0 0 24px rgba(91, 140, 255, 0.16);
+  --ns-shadow-teal-hi: 0 0 32px rgba(91, 140, 255, 0.24);
 
   /* Motion */
   --ns-ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -92,27 +89,25 @@
 
 /* Light theme */
 [data-theme="light"] .ns-layout {
-  --ns-bg: #f0fdfb;
+  /* Matches reg-layout (the site's color standard) */
+  --ns-bg: #f8fafc;
   --ns-surface-0: #ffffff;
-  --ns-surface-1: #f7fefd;
-  --ns-surface-2: #e8faf7;
-  --ns-surface-glass: rgba(255, 255, 255, 0.8);
-  --ns-surface-blur: rgba(248, 255, 253, 0.92);
-  --ns-page-bg:
-    linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, transparent 34%),
-    linear-gradient(225deg, rgba(124, 58, 237, 0.07) 0%, transparent 32%),
-    linear-gradient(180deg, #f8fffd 0%, #edfdfa 100%);
+  --ns-surface-1: #f1f5f9;
+  --ns-surface-2: #e2e8f0;
+  --ns-surface-glass: rgba(255, 255, 255, 0.82);
+  --ns-surface-blur: rgba(248, 250, 255, 0.92);
+  --ns-page-bg: #f8fafc;
 
-  --ns-teal-400: #0d9488;
-  --ns-teal-500: #0f766e;
-  --ns-teal-600: #115e59;
-  --ns-teal-glow: rgba(13, 148, 136, 0.14);
-  --ns-teal-soft: rgba(13, 148, 136, 0.08);
-  --ns-teal-border: rgba(13, 148, 136, 0.2);
-  --ns-teal-border-hi: rgba(13, 148, 136, 0.36);
+  --ns-teal-400: #b45309;
+  --ns-teal-500: #b45309;
+  --ns-teal-600: #92400e;
+  --ns-teal-glow: rgba(180, 83, 9, 0.16);
+  --ns-teal-soft: rgba(180, 83, 9, 0.08);
+  --ns-teal-border: rgba(180, 83, 9, 0.2);
+  --ns-teal-border-hi: rgba(180, 83, 9, 0.32);
 
-  --ns-cyan: #0891b2;
-  --ns-cyan-soft: rgba(8, 145, 178, 0.08);
+  --ns-cyan: #2563eb;
+  --ns-cyan-soft: rgba(37, 99, 235, 0.1);
   --ns-amber: #b45309;
   --ns-amber-soft: rgba(180, 83, 9, 0.08);
   --ns-violet: #7c3aed;
@@ -120,20 +115,20 @@
   --ns-rose: #be123c;
   --ns-rose-soft: rgba(190, 18, 60, 0.08);
 
-  --ns-text-hi: #042f2e;
-  --ns-text-base: #134e4a;
-  --ns-text-muted: #2d7d74;
-  --ns-text-faint: #5eada6;
+  --ns-text-hi: #0f172a;
+  --ns-text-base: #334155;
+  --ns-text-muted: #64748b;
+  --ns-text-faint: #94a3b8;
 
-  --ns-border: rgba(13, 148, 136, 0.16);
-  --ns-border-hi: rgba(13, 148, 136, 0.3);
-  --ns-border-sep: rgba(13, 148, 136, 0.1);
+  --ns-border: rgba(148, 163, 184, 0.24);
+  --ns-border-hi: rgba(37, 99, 235, 0.28);
+  --ns-border-sep: rgba(148, 163, 184, 0.16);
 
-  --ns-shadow-sm: 0 2px 8px rgba(0, 80, 70, 0.08);
-  --ns-shadow-md: 0 6px 24px rgba(0, 80, 70, 0.12);
-  --ns-shadow-lg: 0 16px 48px rgba(0, 80, 70, 0.15);
-  --ns-shadow-teal: 0 0 24px rgba(13, 148, 136, 0.12);
-  --ns-shadow-teal-hi: 0 0 32px rgba(13, 148, 136, 0.2);
+  --ns-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --ns-shadow-md: 0 6px 24px rgba(15, 23, 42, 0.08);
+  --ns-shadow-lg: 0 16px 48px rgba(15, 23, 42, 0.1);
+  --ns-shadow-teal: 0 0 24px rgba(180, 83, 9, 0.14);
+  --ns-shadow-teal-hi: 0 0 32px rgba(180, 83, 9, 0.2);
 }
 
 .ns-layout * {
@@ -3008,3 +3003,4 @@
     margin: 0 0.08rem;
   }
 }
+

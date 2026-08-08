@@ -1,10 +1,11 @@
 import React from "react";
-import PremiumLearningShell from "../../shared/components/topics/PremiumLearningShell";
+import TopicLayout from "../../shared/components/topics/TopicLayout";
 import CoalSidebar from "./CoalSidebar";
 import {
   buildCoalPartSidebarPages,
   buildCoalTopicPages,
   COAL_PATH_TO_SUBTOPIC_ID,
+  COAL_TOPIC,
   COAL_THEORY_OVERVIEW_PATH,
   isCoalPartSidebarActive,
   isCoalPartSidebarDone,
@@ -14,11 +15,6 @@ import "./CoalLayout.css";
 const coalTopicPages = buildCoalTopicPages();
 const coalPartSidebarPages = buildCoalPartSidebarPages();
 
-const COAL_TOPIC = {
-  id: "coal-theory",
-  title: "COAL THEORY",
-  links: Object.values(COAL_PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
-};
 
 function CoalLayout({
   children,
@@ -34,7 +30,7 @@ function CoalLayout({
           CoalLayout.css. Mobile keeps the original hamburger drawer. */}
       <CoalSidebar />
 
-      <PremiumLearningShell
+      <TopicLayout
         title={title}
         subtitle={subtitle}
         intro={intro}
@@ -58,7 +54,7 @@ function CoalLayout({
         }}
       >
         {children}
-      </PremiumLearningShell>
+      </TopicLayout>
     </>
   );
 }

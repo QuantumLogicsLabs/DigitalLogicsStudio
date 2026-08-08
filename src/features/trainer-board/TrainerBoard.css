@@ -1,0 +1,139 @@
+/* ════════════════════════════════════════════════════════════════
+   Trainer Board — IT-300 Digital Logic Training System
+   Static/structural styles. Anything that depends on live board state
+   (LED colors, wire colors, IC body colors, hover states driven by
+   props, etc.) stays inline in its component since it's computed at
+   render time — only the fixed chrome lives here.
+   ════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+.clk-blink { animation: blink .5s infinite; }
+.short-blink { animation: blink .3s infinite; }
+
+/* ── Page shell ── */
+.trainer-page-container {
+  font-family: monospace;
+  background: radial-gradient(ellipse at 40% 40%, #3a3a3a, #141414);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18px;
+  user-select: none;
+}
+
+/* ── Outer chassis (the grey plastic case) ── */
+.trainer-outer-chassis {
+  position: relative;
+  border-radius: 18px 18px 8px 8px;
+  background: linear-gradient(160deg, #e8e8e8, #c0c0c0 40%, #a8a8a8 70%, #909090);
+  padding: 16px 16px 0;
+  box-shadow:
+    0 50px 90px rgba(0, 0, 0, .9),
+    0 10px 20px rgba(0, 0, 0, .5),
+    inset 0 3px 6px rgba(255, 255, 255, .5);
+  max-width: 1280px;
+  width: 100%;
+}
+
+.trainer-side-wall {
+  position: absolute;
+  top: 16px;
+  bottom: 0;
+  right: -15px;
+  width: 15px;
+  background: linear-gradient(90deg, #aaa, #666);
+  border-radius: 0 8px 8px 0;
+}
+
+.trainer-bottom-bar {
+  position: absolute;
+  bottom: -24px;
+  left: 8px;
+  right: 8px;
+  height: 24px;
+  background: linear-gradient(180deg, #888, #505050);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .8);
+}
+
+/* ── PCB ── */
+.trainer-pcb {
+  border-radius: 8px;
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+  background: #0e2412;
+  background-image:
+    radial-gradient(ellipse 55% 35% at 20% 20%, #1b5430, transparent),
+    radial-gradient(ellipse 55% 35% at 80% 80%, #17422a, transparent);
+}
+
+.trainer-pcb-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(210, 165, 60, .04) 20px),
+    repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(210, 165, 60, .04) 20px);
+}
+
+/* ── Main 3-column layout ── */
+.trainer-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px;
+  gap: 8px;
+}
+
+.breadboard-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  padding-bottom: 8px;
+}
+
+.breadboard-scroll-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.breadboard-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.breadboard-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, rgba(147, 197, 253, 0.62), rgba(37, 99, 235, 0.34));
+  border-radius: 4px;
+}
+
+.breadboard-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, rgba(191, 219, 254, 0.78), rgba(59, 130, 246, 0.52));
+}
+
+/* ── Responsive ── */
+@media (max-width: 992px) {
+  .trainer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trainer-page-container {
+    padding: 8px !important;
+  }
+
+  .trainer-outer-chassis {
+    padding: 12px 12px 0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .trainer-side-wall {
+    display: none !important;
+  }
+}

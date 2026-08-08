@@ -1,4 +1,4 @@
-import apiClient from "./apiClient";
+import apiClient from "../../shared/services/apiClient";
 
 // Mirrors the pattern used by authService/progressService: thin wrapper
 // around apiClient, one function per endpoint, returns response.data.

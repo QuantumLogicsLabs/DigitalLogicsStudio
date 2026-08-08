@@ -1,13 +1,28 @@
-/* Dark-only premium shell overrides — light mode uses each layout's native tokens */
-[data-theme="dark"] .premium-topic-shell {
-  --afhdl-bg:
-    radial-gradient(circle at top left, rgba(91, 140, 255, 0.16), transparent 28%),
-    radial-gradient(circle at 85% 12%, rgba(129, 140, 248, 0.12), transparent 26%),
-    linear-gradient(180deg, #050b16 0%, #0a1120 45%, #0c1528 100%);
-}
+/* ══════════════════════════════════════════════════════════════════════
+   PremiumLearningShell.css
+   Shared chrome for every topic/chapter page (memory, number-systems,
+   boolean-algebra, sequential-circuits, registers-transfers,
+   arithmetic-hdl, combinational-circuits, logic-gates, etc).
+
+   COLOR STANDARD
+   ───────────────
+   The Registers & Transfers page (`reg-layout`, RegStyles.css) is the
+   site's reference palette. Rather than overriding colors here, each
+   feature's own CSS file (MemorySystem.css, NSLayout.css, SeqLayout.css,
+   BALayout.css, AFHDLLayout.css) now declares that same palette natively,
+   under its own token names, in both themes. That keeps this file purely
+   structural and gives every topic page a single, local source of truth
+   for its colors instead of a separate override layer fighting CSS
+   specificity/load-order with the feature file.
+
+   To change the site-wide standard later: edit RegStyles.css's `:root`
+   and `[data-theme="light"]` blocks, then copy the same hex values into
+   the equivalent blocks in the other five files listed above.
+   ══════════════════════════════════════════════════════════════════════ */
 
 .premium-topic-shell .afhdl-main {
   width: min(940px, 100%);
+  transition: background 0.18s ease;
 }
 
 .premium-topic-content {
@@ -38,114 +53,7 @@
   background: var(--afhdl-surface-strong);
 }
 
-.premium-topic-shell.ba-layout,
-.premium-topic-shell.ns-layout,
-.premium-topic-shell.seq-layout,
-.premium-topic-shell.reg-layout,
-.premium-topic-shell.mem-layout {
+.premium-topic-shell {
   background: var(--afhdl-bg);
   color: var(--afhdl-text);
-}
-
-.premium-topic-shell.ba-layout {
-  --ba-bg: var(--afhdl-bg);
-  --ba-surface: var(--afhdl-surface);
-  --ba-surface-strong: var(--afhdl-surface-strong);
-  --ba-surface-soft: var(--afhdl-surface-soft);
-  --ba-interactive-bg: var(--afhdl-interactive-bg);
-  --ba-table-header-bg: var(--afhdl-table-header-bg);
-  --ba-table-row-bg: var(--afhdl-table-row-bg);
-  --ba-border: var(--afhdl-border);
-  --ba-border-strong: var(--afhdl-border-strong);
-  --ba-text: var(--afhdl-text);
-  --ba-muted: var(--afhdl-muted);
-  --ba-muted-strong: var(--afhdl-muted-strong);
-  --ba-accent: var(--afhdl-accent);
-  --ba-accent-soft: var(--afhdl-accent-soft);
-  --ba-shadow: var(--afhdl-shadow);
-}
-
-[data-theme="dark"] .premium-topic-shell.ns-layout {
-  --ns-bg: #08111f;
-  --ns-surface-0: #0b1323;
-  --ns-surface-1: #0f172a;
-  --ns-surface-2: #13203a;
-  --ns-surface-glass: rgba(11, 19, 36, 0.78);
-  --ns-surface-blur: rgba(11, 19, 36, 0.9);
-  --ns-teal-400: #7fb0ff;
-  --ns-teal-500: #5b8cff;
-  --ns-teal-600: #436fe8;
-  --ns-teal-glow: rgba(91, 140, 255, 0.22);
-  --ns-teal-soft: rgba(91, 140, 255, 0.1);
-  --ns-teal-border: rgba(91, 140, 255, 0.18);
-  --ns-teal-border-hi: rgba(91, 140, 255, 0.3);
-  --ns-cyan: #93c5fd;
-  --ns-cyan-soft: rgba(147, 197, 253, 0.1);
-  --ns-text-hi: #e5edf8;
-  --ns-text-base: #c8d5e6;
-  --ns-text-muted: #9fb0c8;
-  --ns-text-faint: #6f86a4;
-  --ns-border: rgba(148, 163, 184, 0.18);
-  --ns-border-hi: rgba(99, 102, 241, 0.28);
-  --ns-border-sep: rgba(148, 163, 184, 0.12);
-  --ns-shadow-teal: 0 0 24px rgba(91, 140, 255, 0.16);
-  --ns-shadow-teal-hi: 0 0 32px rgba(91, 140, 255, 0.24);
-}
-
-[data-theme="dark"] .premium-topic-shell.seq-layout {
-  --bg: #08111f;
-  --muted: #9fb0c8;
-  --text: #e5edf8;
-  --accent: #5b8cff;
-  --accent-2: #818cf8;
-  --card-bg: rgba(11, 19, 36, 0.78);
-  --border-color: rgba(148, 163, 184, 0.14);
-  --glass: rgba(11, 19, 36, 0.62);
-}
-
-[data-theme="dark"] .premium-topic-shell.reg-layout {
-  --amber: #5b8cff;
-  --amber-dim: #436fe8;
-  --amber-glow: rgba(91, 140, 255, 0.14);
-  --amber-border: rgba(91, 140, 255, 0.24);
-  --blue: #93c5fd;
-  --blue-glow: rgba(147, 197, 253, 0.12);
-  --emerald: #34d399;
-  --emerald-glow: rgba(52, 211, 153, 0.1);
-  --bg-base: #08111f;
-  --bg-surface: #0b1323;
-  --bg-elevated: #10192d;
-  --bg-card: #13203a;
-  --text-primary: #e5edf8;
-  --text-secondary: #c8d5e6;
-  --text-muted: #88a0bf;
-  --text-code: #93c5fd;
-  --shadow-glow:
-    0 0 40px rgba(91, 140, 255, 0.12), 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .premium-topic-shell.mem-layout {
-  --mem-bg: #08111f;
-  --mem-surface: #0b1323;
-  --mem-card: #10192d;
-  --mem-card-hover: #13203a;
-  --mem-border: #22304a;
-  --mem-border-glow: #345df2;
-  --mem-text: #e5edf8;
-  --mem-muted: #8fa4bf;
-  --mem-subtle: #334155;
-  --mem-accent: #5b8cff;
-  --mem-accent2: #818cf8;
-  --mem-accent3: #34d399;
-  --mem-accent4: #93c5fd;
-  --mem-glow-cyan: rgba(91, 140, 255, 0.14);
-  --mem-glow-indigo: rgba(129, 140, 248, 0.12);
-  --mem-glow-green: rgba(52, 211, 153, 0.1);
-}
-
-[data-theme="light"] .premium-topic-shell {
-  --afhdl-bg:
-    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 34%),
-    radial-gradient(circle at 85% 8%, rgba(139, 92, 246, 0.1), transparent 30%),
-    linear-gradient(180deg, #eef4ff 0%, #dfe9ff 52%, #eef4ff 100%);
 }

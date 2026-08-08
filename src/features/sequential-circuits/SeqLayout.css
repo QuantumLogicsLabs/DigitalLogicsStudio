@@ -1,25 +1,28 @@
-/* Mobile-first SeqLayout styles with theme variables */
-:root {
-  --bg: #ffffff;
-  --muted: #6b7280;
+/* Mobile-first SeqLayout styles with theme variables.
+   Scoped to .seq-layout (not :root) so these tokens can't leak into or
+   collide with unrelated components — matches reg-layout, the site's
+   color standard, in both themes. */
+.seq-layout {
+  --bg: #f8fafc;
+  --muted: #64748b;
   --text: #0f172a;
-  --accent: #4f46e5;
-  --accent-2: #818cf8;
-  --card-bg: rgba(15, 23, 42, 0.06);
-  --border-color: rgba(15, 23, 42, 0.06);
-  --glass: rgba(255, 255, 255, 0.6);
+  --accent: #b45309;
+  --accent-2: #2563eb;
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --glass: rgba(255, 255, 255, 0.65);
   --sidebar-width: clamp(220px, 28vw, 320px);
 }
 
-:root[data-theme="dark"] {
-  --bg: #050b18;
-  --muted: #94a3b8;
-  --text: #e2e8f0;
-  --accent: #4f46e5;
-  --accent-2: #818cf8;
-  --card-bg: rgba(8, 15, 30, 0.75);
-  --border-color: rgba(148, 163, 184, 0.08);
-  --glass: rgba(5, 11, 24, 0.6);
+[data-theme="dark"] .seq-layout {
+  --bg: #08111f;
+  --muted: #88a0bf;
+  --text: #e5edf8;
+  --accent: #5b8cff;
+  --accent-2: #93c5fd;
+  --card-bg: rgba(11, 19, 36, 0.78);
+  --border-color: rgba(148, 163, 184, 0.14);
+  --glass: rgba(11, 19, 36, 0.62);
 }
 
 html,
@@ -2797,3 +2800,4 @@ body,
   border-radius: 6px;
   letter-spacing: 0.03em;
 }
+

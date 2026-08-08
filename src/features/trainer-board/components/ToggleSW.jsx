@@ -1,5 +1,6 @@
+import { memo } from "react";
 // ── Toggle Switch ─────────────────────────────────────────────────
-export function ToggleSW({ label, val, onToggle }) {
+function ToggleSW({ label, val, onToggle }) {
   return (
     <div
       onClick={onToggle}
@@ -53,3 +54,5 @@ export function ToggleSW({ label, val, onToggle }) {
     </div>
   );
 }
+
+export default memo(ToggleSW);

@@ -1165,5 +1165,3 @@ export function CoalDiagram({ type }) {
   if (!Component) return null;
   return <Component />;
 }
-
-

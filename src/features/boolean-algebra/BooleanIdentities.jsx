@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BALayout from "./components/BALayout";
+import BALayout from "./BALayout";
 import CircuitModal from "../../shared/components/CircuitModal";
 
 const identities = [

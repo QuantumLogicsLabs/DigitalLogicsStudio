@@ -461,6 +461,165 @@
   padding: 0;
 }
 
+/* Inline preview compact card */
+.inline-preview-section {
+  background: var(--card-bg, #0f172a);
+  border: 1px solid var(--accent-color, #3b82f6);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.inline-preview-section .preview-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.preview-badge {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-color, #3b82f6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.preview-content-body .preview-card {
+  color: var(--text-color);
+}
+
+/* Embedded component preview (bounded frame) */
+.search-embedded-preview {
+  background: var(--card-bg, #0f172a);
+  border: 1px solid var(--accent-color, #3b82f6);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 28px rgba(2,6,23,0.12);
+}
+
+.search-embedded-preview .preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.preview-full-link {
+  color: var(--accent-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.preview-frame-body {
+  max-height: 420px; /* constrain preview height */
+  overflow-y: auto;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.preview-loading {
+  color: var(--secondary-text);
+  padding: 1rem 0;
+}
+
+/* Scoped overrides to prevent embedded pages from showing full layout chrome */
+.search-embedded-preview .afhdl-layout,
+.search-embedded-preview .theory-layout,
+.search-embedded-preview .topic-shell,
+.search-embedded-preview .premium-topic-shell {
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* hide global background decorations and topbars/overlays */
+.search-embedded-preview .afhdl-bg,
+.search-embedded-preview .afhdl-topbar,
+.search-embedded-preview .afhdl-overlay,
+.search-embedded-preview .afhdl-sidebar,
+.search-embedded-preview .afhdl-footer-nav,
+.search-embedded-preview .afhdl-sidebar-inner,
+.search-embedded-preview .afhdl-sidebar-nav {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Generic fallbacks for other patterns */
+.search-embedded-preview aside[class*="sidebar"],
+.search-embedded-preview header[class*="topbar"],
+.search-embedded-preview nav[class*="sidebar"],
+.search-embedded-preview .sidebar,
+.search-embedded-preview .page-sidebar {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Remove reserved left gutter (desktop permanent sidebar) so content can expand */
+.search-embedded-preview .afhdl-body {
+  padding-left: 0 !important;
+}
+
+/* Make the main content take the full width inside the preview frame */
+.search-embedded-preview .afhdl-main,
+.search-embedded-preview main,
+.search-embedded-preview .topic-content,
+.search-embedded-preview .page-main {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 1rem 1.25rem !important; /* keep internal spacing */
+}
+
+/* Tame hero/breadcrumb spacing inside the preview */
+.search-embedded-preview .afhdl-breadcrumb,
+.search-embedded-preview .afhdl-hero,
+.search-embedded-preview .afhdl-hero-title,
+.search-embedded-preview .afhdl-hero-subtitle {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure links/buttons inside preview are visually contained */
+.search-embedded-preview .afhdl-main a,
+.search-embedded-preview .afhdl-main button {
+  color: inherit;
+}
+
+/* Prevent preview components from using fixed or sticky positions that overlap home */
+.search-embedded-preview .afhdl-topbar,
+.search-embedded-preview .afhdl-header,
+.search-embedded-preview .afhdl-fixed,
+.search-embedded-preview .afhdl-sticky,
+.search-embedded-preview [style*="position: fixed"],
+.search-embedded-preview [style*="position: sticky"] {
+  position: static !important;
+}
+
+/* Small visual tidy up */
+.search-embedded-preview .afhdl-content,
+.search-embedded-preview .afhdl-article,
+.search-embedded-preview .content {
+  padding: 0 !important;
+}
+
+/* If the embedded page still uses an inner constrained container, center it visually */
+.search-embedded-preview .afhdl-main .container,
+.search-embedded-preview .afhdl-main .content-inner,
+.search-embedded-preview .afhdl-main .topic-wrapper {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
 .home-section-header {
   margin-bottom: 2rem;
   max-width: 72rem;

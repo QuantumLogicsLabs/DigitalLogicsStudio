@@ -3,23 +3,24 @@
    Mobile-first • Dark/Light theme • Mirrors AFHDLLayout quality
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── CSS custom properties (dark default) ──────────────────── */
+/* ── CSS custom properties (matches reg-layout, the site's color
+   standard, in both themes) ──────────────────────────────────── */
 .ba-layout {
-  --ba-bg: linear-gradient(180deg, #0a0818 0%, #100c24 55%, #120e28 100%);
-  --ba-surface: rgba(16, 12, 36, 0.8);
-  --ba-surface-strong: rgba(20, 15, 45, 0.92);
-  --ba-surface-soft: rgba(20, 15, 45, 0.58);
-  --ba-interactive-bg: rgba(20, 15, 45, 0.55);
-  --ba-table-header-bg: rgba(139, 92, 246, 0.2);
-  --ba-table-row-bg: rgba(20, 15, 45, 0.5);
-  --ba-border: rgba(167, 139, 250, 0.18);
-  --ba-border-strong: rgba(139, 92, 246, 0.32);
-  --ba-text: #ede9fe;
-  --ba-muted: #b8a8d8;
-  --ba-muted-strong: #d4c8f0;
-  --ba-accent: #a78bfa;
-  --ba-accent-soft: rgba(167, 139, 250, 0.12);
-  --ba-shadow: 0 18px 40px rgba(5, 2, 20, 0.38);
+  --ba-bg: #08111f;
+  --ba-surface: rgba(11, 19, 36, 0.8);
+  --ba-surface-strong: rgba(16, 25, 45, 0.92);
+  --ba-surface-soft: rgba(16, 25, 45, 0.58);
+  --ba-interactive-bg: rgba(16, 25, 45, 0.55);
+  --ba-table-header-bg: rgba(91, 140, 255, 0.2);
+  --ba-table-row-bg: rgba(16, 25, 45, 0.5);
+  --ba-border: rgba(148, 163, 184, 0.18);
+  --ba-border-strong: rgba(91, 140, 255, 0.28);
+  --ba-text: #e5edf8;
+  --ba-muted: #88a0bf;
+  --ba-muted-strong: #c8d5e6;
+  --ba-accent: #5b8cff;
+  --ba-accent-soft: rgba(91, 140, 255, 0.12);
+  --ba-shadow: 0 18px 40px rgba(2, 6, 23, 0.35);
   --ba-sidebar-width: clamp(240px, 28vw, 300px);
   --ba-topbar-height: 56px;
 
@@ -33,27 +34,21 @@
 
 /* ── Light theme overrides ─────────────────────────────────── */
 [data-theme="light"] .ba-layout {
-  --ba-bg:
-    radial-gradient(
-      circle at top left,
-      rgba(167, 139, 250, 0.08),
-      transparent 34%
-    ),
-    linear-gradient(180deg, #faf8ff 0%, #f3effb 52%, #f8f5ff 100%);
+  --ba-bg: #f8fafc;
   --ba-surface: rgba(255, 255, 255, 0.85);
-  --ba-surface-strong: rgba(255, 255, 255, 0.96);
-  --ba-surface-soft: rgba(245, 240, 255, 0.82);
-  --ba-interactive-bg: rgba(245, 240, 255, 0.9);
-  --ba-table-header-bg: rgba(139, 92, 246, 0.1);
-  --ba-table-row-bg: rgba(250, 248, 255, 0.9);
-  --ba-border: rgba(167, 139, 250, 0.28);
-  --ba-border-strong: rgba(109, 40, 217, 0.22);
-  --ba-text: #1e0a3c;
-  --ba-muted: #6b4fa0;
-  --ba-muted-strong: #4a2d80;
-  --ba-accent: #7c3aed;
-  --ba-accent-soft: rgba(124, 58, 237, 0.08);
-  --ba-shadow: 0 18px 40px rgba(167, 139, 250, 0.15);
+  --ba-surface-strong: rgba(248, 250, 255, 0.95);
+  --ba-surface-soft: rgba(241, 245, 249, 0.88);
+  --ba-interactive-bg: rgba(226, 232, 240, 0.75);
+  --ba-table-header-bg: rgba(180, 83, 9, 0.12);
+  --ba-table-row-bg: rgba(248, 250, 255, 0.92);
+  --ba-border: rgba(180, 83, 9, 0.18);
+  --ba-border-strong: rgba(180, 83, 9, 0.28);
+  --ba-text: #0f172a;
+  --ba-muted: #64748b;
+  --ba-muted-strong: #334155;
+  --ba-accent: #b45309;
+  --ba-accent-soft: rgba(180, 83, 9, 0.1);
+  --ba-shadow: 0 12px 36px rgba(15, 23, 42, 0.1);
 }
 
 .ba-layout * {
@@ -1285,3 +1280,4 @@
     transition: none;
   }
 }
+

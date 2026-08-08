@@ -1,0 +1,558 @@
+/* ── Overlays & Modals ─────────────────────────────────────────────────── */
+.circuit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.circuit-modal-assignment-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circuit-modal-assignment-card {
+  background: var(--bg-medium, #141b2d);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 12px;
+  padding: 1.25rem;
+  min-width: 320px;
+  max-width: 480px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.circuit-modal-assignment-title {
+  margin: 0 0 1rem;
+  color: var(--text-color, #e8f0ff);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.circuit-modal-assignment-desc {
+  font-size: 0.78rem;
+  color: var(--secondary-text, #8899aa);
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.circuit-modal-assignment-section {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.circuit-modal-assignment-section.inputs {
+  color: var(--accent-secondary, #00d4ff);
+}
+
+.circuit-modal-assignment-section.outputs {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-assign-panel {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color, #2a3550);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.circuit-modal-assign-panel.no-border {
+  border-bottom: none;
+}
+
+.circuit-modal-assign-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.circuit-modal-assign-label {
+  width: 48px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--accent-secondary, #00d4ff);
+  flex-shrink: 0;
+}
+
+.circuit-modal-assign-label.output {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-assign-select {
+  flex: 1;
+  background: var(--bg-light, #1e2842);
+  border: 1px solid var(--border-color, #2a3550);
+  color: var(--text-color, #e8f0ff);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.circuit-modal-assign-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.circuit-modal-btn-reset {
+  background: none;
+  border: 1px solid var(--border-color, #2a3550);
+  color: var(--secondary-text, #8899aa);
+  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.circuit-modal-btn-done {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ── Bars & Headers ─────────────────────────────────────────────────────── */
+.circuit-modal-topbar {
+  background: var(--bg-medium, #141b2d);
+  border-bottom: 1px solid var(--border-color, #2a3550);
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.circuit-modal-title {
+  font-weight: 800;
+  color: var(--text-color, #e8f0ff);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.circuit-modal-iobar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.circuit-modal-need-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--secondary-text, #8899aa);
+}
+
+.circuit-modal-pill {
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.circuit-modal-pill-inputs {
+  background: rgba(0, 255, 136, 0.094);
+  border: 1px solid rgba(0, 255, 136, 0.333);
+  color: #00ff88;
+}
+
+.circuit-modal-pill-outputs {
+  background: rgba(0, 212, 255, 0.094);
+  border: 1px solid rgba(0, 212, 255, 0.333);
+  color: #00d4ff;
+}
+
+.circuit-modal-gate-match-status {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.circuit-modal-gate-match-status.valid {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-gate-match-status.invalid {
+  color: var(--accent-danger, #ff3366);
+}
+
+.circuit-modal-map-btn {
+  background: none;
+  border: 1px solid var(--border-color, #2a3550);
+  color: var(--secondary-text, #8899aa);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.circuit-modal-map-btn.assigned {
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid var(--accent-secondary, #00d4ff);
+  color: var(--accent-secondary, #00d4ff);
+  font-weight: 700;
+}
+
+.circuit-modal-submit-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.circuit-modal-submit-btn:disabled {
+  background: rgba(99, 102, 241, 0.2);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.circuit-modal-close-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-color, #2a3550);
+  color: var(--secondary-text, #8899aa);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.circuit-modal-descbar {
+  background: var(--bg-medium, #141b2d);
+  border-bottom: 1px solid var(--border-color, #2a3550);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: var(--secondary-text, #8899aa);
+  min-height: 42px;
+  overflow: hidden;
+}
+
+.circuit-modal-descbar-indicator {
+  width: 5px;
+  min-width: 3px;
+  align-self: stretch;
+  background: linear-gradient(180deg, #00d4ff, #8b5cf6);
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.circuit-modal-descbar-text {
+  color: var(--text-color, #e8f0ff);
+  line-height: 2.5;
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.circuit-modal-equations-wrap {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.circuit-modal-equation-code {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 6px;
+  padding: 0.2rem 0.65rem;
+  font-size: 1rem;
+  color: #c4b5fd;
+  font-family: monospace;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* ── Progress Card ──────────────────────────────────────────────────────── */
+.circuit-modal-status-card {
+  border-radius: 10px;
+  padding: 0.45rem 0.8rem;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  border: 1px solid var(--border-color, #2a3550);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.circuit-modal-status-card.complete {
+  border: 1px solid rgba(0, 255, 136, 0.35);
+  background: rgba(0, 255, 136, 0.08);
+}
+
+.circuit-modal-status-card.warning {
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.circuit-modal-status-card.error {
+  border: 1px solid rgba(255, 51, 102, 0.35);
+  background: rgba(255, 51, 102, 0.08);
+}
+
+.circuit-modal-status-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary-text, #8899aa);
+}
+
+.circuit-modal-status-label {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--text-color, #e8f0ff);
+}
+
+.circuit-modal-status-card.complete .circuit-modal-status-label {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-status-card.warning .circuit-modal-status-label {
+  color: #fbbf24;
+}
+
+.circuit-modal-status-card.error .circuit-modal-status-label {
+  color: var(--accent-danger, #ff3366);
+}
+
+.circuit-modal-status-subtext {
+  font-size: 0.72rem;
+  color: var(--secondary-text, #8899aa);
+  line-height: 1.4;
+}
+
+/* ── Body & Canvas ──────────────────────────────────────────────────────── */
+.circuit-modal-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.circuit-modal-canvas {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Result Panel & Table ───────────────────────────────────────────────── */
+.circuit-modal-result-panel {
+  width: 420px;
+  min-width: 320px;
+  background: var(--bg-medium, #141b2d);
+  border-left: 1px solid var(--border-color, #2a3550);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.circuit-modal-result-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color, #2a3550);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.circuit-modal-result-header.pass {
+  background: rgba(0, 255, 136, 0.06);
+}
+
+.circuit-modal-result-header.fail {
+  background: rgba(255, 51, 102, 0.06);
+}
+
+.circuit-modal-result-title {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.circuit-modal-result-title.pass {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-result-title.fail {
+  color: var(--accent-danger, #ff3366);
+}
+
+.circuit-modal-result-pass-sub {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-result-close-btn {
+  background: none;
+  border: none;
+  color: var(--secondary-text, #8899aa);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.4rem;
+  line-height: 1;
+}
+
+.circuit-modal-result-close-btn.pass {
+  margin-left: 0.6rem;
+}
+
+.circuit-modal-result-close-btn.fail {
+  margin-left: auto;
+}
+
+.circuit-modal-error-box {
+  margin: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 51, 102, 0.08);
+  border: 1px solid rgba(255, 51, 102, 0.3);
+  border-radius: 8px;
+  color: var(--accent-danger, #ff3366);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.circuit-modal-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.circuit-modal-fail-banner {
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 51, 102, 0.08);
+  border: 1px solid rgba(255, 51, 102, 0.2);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--accent-danger, #ff3366);
+}
+
+.circuit-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.circuit-modal-th {
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent-secondary, #00d4ff);
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border-color, #2a3550);
+  font-weight: 700;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.circuit-modal-th.expected {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-th.got {
+  color: #a5b4fc;
+}
+
+.circuit-modal-tr.fail {
+  background: rgba(255, 51, 102, 0.04);
+}
+
+.circuit-modal-td {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border-color, #2a3550);
+  text-align: center;
+  color: var(--text-color, #e8f0ff);
+  font-weight: 400;
+}
+
+.circuit-modal-td.output {
+  font-weight: 700;
+}
+
+.circuit-modal-td.output.match {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-td.output.mismatch {
+  color: var(--accent-danger, #ff3366);
+  background: rgba(255, 51, 102, 0.06);
+}
+
+.circuit-modal-td.status.pass {
+  color: var(--accent-primary, #00ff88);
+}
+
+.circuit-modal-td.status.fail {
+  color: var(--accent-danger, #ff3366);
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────── */
+.circuit-modal-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--bg-light, #1e2842);
+  border: 1px solid var(--border-color, #2a3550);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.circuit-modal-page-btn {
+  background: none;
+  border: none;
+  color: var(--accent-secondary, #00d4ff);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.circuit-modal-page-btn:disabled {
+  color: var(--secondary-text, #8899aa);
+  cursor: default;
+}
+
+.circuit-modal-page-info {
+  color: var(--text-color, #e8f0ff);
+}

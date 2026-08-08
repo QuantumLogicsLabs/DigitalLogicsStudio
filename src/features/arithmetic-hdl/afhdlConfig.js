@@ -60,3 +60,22 @@ export const afhdlPages = [
     description: "Connect the arithmetic building blocks to real digital systems.",
   },
 ];
+
+export const AFHDL_PATH_TO_SUBTOPIC_ID = {
+  "/arithmetic/binary-adders": "binary-adders",
+  "/arithmetic/binary-subtractor": "binary-subtractor",
+  "/arithmetic/binary-add-subtractor": "adder-subtractor",
+  "/arithmetic/binary-multipliers": "binary-multipliers",
+  "/arithmetic/code-conversion": "code-conversion",
+  "/arithmetic/magnitude-comparator": "magnitude-comparator",
+  "/arithmetic/parity-generators": "parity-generators",
+  "/arithmetic/complements": "complements",
+  "/arithmetic/signed-unsigned": "signed-unsigned",
+  "/arithmetic/design-applications": "design-applications",
+};
+
+export const AFHDL_TOPIC = {
+  id: "arithmetic-functions-and-hdls",
+  title: "ARITHMETIC FUNCTIONS AND HDLS",
+  links: Object.values(AFHDL_PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
+};

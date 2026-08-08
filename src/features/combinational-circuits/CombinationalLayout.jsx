@@ -1,41 +1,11 @@
 import React from "react";
-import PremiumLearningShell from "../../shared/components/topics/PremiumLearningShell";
+import TopicLayout from "../../shared/components/topics/TopicLayout";
+import {
+  combinationalPages,
+  COMBINATIONAL_TOPIC,
+  COMBINATIONAL_PATH_TO_SUBTOPIC_ID,
+} from "./combinationalConfig";
 
-const combinationalPages = [
-  {
-    path: "/encoder",
-    label: "Encoder",
-    description: "Compress active input lines into compact binary output codes.",
-  },
-  {
-    path: "/decoder",
-    label: "Decoder",
-    description: "Expand binary inputs into one-hot outputs and minterm logic.",
-  },
-  {
-    path: "/mux",
-    label: "Multiplexer",
-    description: "Route one of many inputs onto a single controlled output line.",
-  },
-  {
-    path: "/demux",
-    label: "Demultiplexer",
-    description: "Distribute one input signal across a selected output channel.",
-  },
-];
-
-const PATH_TO_SUBTOPIC_ID = {
-  "/encoder": "encoder",
-  "/decoder": "decoder",
-  "/mux": "mux",
-  "/demux": "demux",
-};
-
-const COMBINATIONAL_TOPIC = {
-  id: "combinational-circuits",
-  title: "COMBINATIONAL CIRCUITS",
-  links: Object.values(PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
-};
 
 const CombinationalLayout = ({
   title,
@@ -44,7 +14,7 @@ const CombinationalLayout = ({
   highlights = [],
   children,
 }) => (
-  <PremiumLearningShell
+  <TopicLayout
     title={title}
     subtitle={subtitle}
     intro={intro}
@@ -57,11 +27,11 @@ const CombinationalLayout = ({
     progressVerb="complete"
     tracking={{
       topic: COMBINATIONAL_TOPIC,
-      pathToSubtopicId: PATH_TO_SUBTOPIC_ID,
+      pathToSubtopicId: COMBINATIONAL_PATH_TO_SUBTOPIC_ID,
     }}
   >
     {children}
-  </PremiumLearningShell>
+  </TopicLayout>
 );
 
 export default CombinationalLayout;

@@ -1,25 +1,25 @@
 /* ── CSS VARIABLES ───────────────────────────────────────────── */
 :root {
-  --mem-bg: #07090f;
-  --mem-surface: #0d1117;
-  --mem-card: #111827;
-  --mem-card-hover: #161e2e;
-  --mem-border: #1e2d45;
-  --mem-border-glow: #2a4070;
+  --mem-bg: #08111f;
+  --mem-surface: #0b1323;
+  --mem-card: #10192d;
+  --mem-card-hover: #13203a;
+  --mem-border: #22304a;
+  --mem-border-glow: #345df2;
 
-  --mem-text: #e2e8f0;
-  --mem-muted: #64748b;
+  --mem-text: #e5edf8;
+  --mem-muted: #88a0bf;
   --mem-subtle: #334155;
 
-  --mem-accent: #38bdf8;
-  --mem-accent2: #818cf8;
+  --mem-accent: #5b8cff;
+  --mem-accent2: #93c5fd;
   --mem-accent3: #34d399;
-  --mem-accent4: #fb923c;
+  --mem-accent4: #93c5fd;
   --mem-danger: #f87171;
 
-  --mem-glow-cyan: rgba(56, 189, 248, 0.15);
-  --mem-glow-indigo: rgba(129, 140, 248, 0.15);
-  --mem-glow-green: rgba(52, 211, 153, 0.15);
+  --mem-glow-cyan: rgba(91, 140, 255, 0.14);
+  --mem-glow-indigo: rgba(129, 140, 248, 0.12);
+  --mem-glow-green: rgba(52, 211, 153, 0.1);
 
   --mem-font-display: "Syne", sans-serif;
   --mem-font-body: "DM Sans", sans-serif;
@@ -33,20 +33,25 @@
 }
 
 [data-theme="light"] {
-  --mem-bg: #f0f4f8;
+  --mem-bg: #f8fafc;
   --mem-surface: #ffffff;
-  --mem-card: #ffffff;
-  --mem-card-hover: #f8fafc;
+  --mem-card: #f1f5f9;
+  --mem-card-hover: #e2e8f0;
   --mem-border: #cbd5e1;
-  --mem-border-glow: #93c5fd;
+  --mem-border-glow: #b45309;
 
   --mem-text: #0f172a;
   --mem-muted: #64748b;
   --mem-subtle: #e2e8f0;
 
-  --mem-glow-cyan: rgba(56, 189, 248, 0.08);
-  --mem-glow-indigo: rgba(99, 102, 241, 0.08);
-  --mem-glow-green: rgba(16, 185, 129, 0.08);
+  --mem-accent: #b45309;
+  --mem-accent2: #2563eb;
+  --mem-accent3: #059669;
+  --mem-accent4: #2563eb;
+
+  --mem-glow-cyan: rgba(180, 83, 9, 0.1);
+  --mem-glow-indigo: rgba(37, 99, 235, 0.08);
+  --mem-glow-green: rgba(5, 150, 105, 0.08);
 }
 
 /* ── RESET & BASE ────────────────────────────────────────────── */
@@ -1266,3 +1271,4 @@
     max-width: 100%;
   }
 }
+

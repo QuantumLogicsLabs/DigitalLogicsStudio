@@ -64,3 +64,22 @@ export const baPages = [
     description: "Count significant figures, MSD, and LSD for any number.",
   },
 ];
+
+export const BA_PATH_TO_SUBTOPIC_ID = {
+  "/boolean/overview": "overview",
+  "/boolean/identities": "identities",
+  "/boolean/laws": "laws",
+  "/boolean/duality": "duality",
+  "/boolean/consensus": "consensus",
+  "/boolean/complement": "complement",
+  "/boolean/minterms": "minterms",
+  "/boolean/maxterms": "maxterms",
+  "/boolean/minterms-maxterms": "relation",
+  "/boolean/significant-digits": "significant-digits",
+};
+
+export const BA_TOPIC = {
+  id: "boolean-algebra",
+  title: "BOOLEAN ALGEBRA",
+  links: Object.values(BA_PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
+};

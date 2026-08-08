@@ -28,23 +28,19 @@ export function getBBDimensions() {
   return { W, H };
 }
 
-//helper function to get ics on pins
-
 // A real DIP chip can ONLY sit straddling the center gap — that's the
-// entire point of the socket. So placement is now a single-axis (column)
+// entire point of the socket. So placement is a single-axis (column)
 // snap, not a free x/y drop: Y is always locked to the gap, and the
 // returned `col` is the *real* breadboard column its pin-1 side lands on
 // (used by the simulation engine to resolve which holes each pin touches).
 export function snapICPosition(dropX, dropY, pinCount, placedICs = [], excludeId = null) {
   const ROW_H = 14;
-  // const IC_BODY_H = 24;
   const IC_PIN_H = 7;
   const TOP_RAIL_Y = 6;
 
   const BODY_Y = TOP_RAIL_Y + 36;
   const TOP_ROWS_H = 5 * ROW_H;
   const CENTER_Y = BODY_Y + TOP_ROWS_H + 2;
-  // const icH = IC_BODY_H;
   const lockedY = CENTER_Y - IC_PIN_H;
 
   const cols = Math.ceil(pinCount / 2);

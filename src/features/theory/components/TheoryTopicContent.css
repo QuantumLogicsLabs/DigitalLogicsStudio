@@ -1,0 +1,450 @@
+/* ════════════════════════════════════════════════════════════════
+   Theory Topic Content — shared visual language for every theory
+   topic body, DLD and COAL alike.
+
+   Themed through CSS custom properties already set per-category by
+   PremiumLearningShell.css (via each layout's rootClassName, e.g.
+   .mem-layout / .seq-layout / .coal-layout). Falls back to a sensible
+   default blue when a category hasn't defined these yet, so nothing
+   looks broken — it just won't be perfectly re-themed until that
+   category's rootClassName also defines --accent/--text/--muted.
+   ════════════════════════════════════════════════════════════════ */
+
+.theory-topic-content {
+  /* NOTE: previously fell back to var(--accent)/var(--text)/etc — those
+     generic names are only ever defined by SeqLayout.css, never by
+     .theory-layout/.coal-layout (which are built on the afhdl/premium-
+     topic-shell base). So this always silently used the hardcoded dark
+     fallback values below, even in light theme — that's why body text
+     stayed near-white on a light background. Pointing at --afhdl-*
+     (which AFHDLLayout.css properly themes for both light and dark)
+     fixes it; the hex fallbacks now only matter if that's ever missing. */
+  --t-accent: var(--afhdl-accent, #5b8cff);
+  --t-accent-2: var(--afhdl-accent, #5b8cff);
+  --t-text: var(--afhdl-text, #e5edf8);
+  --t-muted: var(--afhdl-muted, #9fb0c8);
+  --t-border: var(--afhdl-border, rgba(148, 163, 184, 0.16));
+  --t-card-bg: var(--afhdl-surface-soft, rgba(255, 255, 255, 0.03));
+  color: var(--t-text);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.theory-topic-content__intro {
+  font-size: 1.08rem;
+  color: var(--t-text);
+  opacity: 0.92;
+  margin: 0 0 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--t-border);
+}
+
+.theory-section {
+  margin-bottom: 2.25rem;
+}
+.theory-section:last-of-type {
+  margin-bottom: 1.5rem;
+}
+.theory-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--t-text);
+  margin: 0 0 0.9rem;
+}
+.theory-section__kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t-accent);
+  margin: 0 0 0.35rem;
+}
+.theory-section p {
+  margin: 0 0 1rem;
+  color: var(--t-text);
+  opacity: 0.88;
+}
+.theory-section__subhead {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--t-text);
+  margin: 1.25rem 0 0.6rem;
+}
+
+/* ── Bulleted / numbered lists ── */
+.theory-bullets {
+  margin: 0 0 1rem;
+  padding-left: 1.3rem;
+}
+.theory-bullets__item {
+  margin-bottom: 0.4rem;
+  color: var(--t-text);
+  opacity: 0.88;
+}
+
+.theory-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+}
+.theory-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-border);
+  border-radius: 8px;
+}
+.theory-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--t-accent);
+}
+.theory-step-text {
+  color: var(--t-text);
+  opacity: 0.9;
+  padding-top: 1px;
+}
+
+/* ── Info-card grid ── */
+.theory-card-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+.theory-info-card {
+  padding: 0.85rem 0.9rem;
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-border);
+  border-radius: 10px;
+}
+.theory-info-card-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.35rem;
+}
+.theory-info-card-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--t-text);
+}
+.theory-info-card-text {
+  font-size: 0.82rem;
+  color: var(--t-muted);
+  line-height: 1.5;
+}
+
+.theory-card {
+  padding: 0.9rem 1rem;
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-border);
+  border-radius: 10px;
+  margin-bottom: 0.9rem;
+}
+.theory-card-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--t-accent);
+  margin-bottom: 0.6rem;
+}
+
+/* ── Code block ── */
+.theory-code-block {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--t-border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  overflow-x: auto;
+  margin: 0 0 1.25rem;
+  white-space: pre-wrap;
+}
+.theory-code-block code {
+  color: var(--t-text);
+}
+
+/* ── Chip / pinout diagram ── */
+.theory-chip {
+  display: inline-block;
+  min-width: 150px;
+  padding: 0.6rem 0.8rem;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--t-border);
+  border-radius: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.76rem;
+  margin: 0 0.6rem 0.6rem 0;
+}
+.theory-chip-label {
+  font-weight: 700;
+  color: var(--t-accent);
+  margin-bottom: 0.4rem;
+}
+.theory-chip-pin {
+  color: var(--t-muted);
+  line-height: 1.5;
+}
+.theory-chip-pin-data {
+  color: var(--t-accent-2);
+  line-height: 1.5;
+}
+
+/* ── Table ── */
+.theory-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 1.25rem;
+}
+.theory-table-caption {
+  font-size: 0.8rem;
+  color: var(--t-muted);
+  margin-bottom: 0.5rem;
+}
+.theory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.theory-table th,
+.theory-table td {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--t-border);
+}
+.theory-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--t-muted);
+  font-weight: 700;
+}
+.theory-table td {
+  color: var(--t-text);
+  opacity: 0.9;
+}
+
+/* ── Callout / worked-example aside ── */
+.theory-callout {
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--t-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--t-accent) 30%, transparent);
+  border-left: 3px solid var(--t-accent);
+  border-radius: 8px;
+  margin: 0 0 1.25rem;
+}
+.theory-callout__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  color: var(--t-accent);
+  font-size: 0.86rem;
+}
+.theory-callout p {
+  margin: 0;
+  color: var(--t-text);
+  opacity: 0.92;
+  font-size: 0.9rem;
+}
+
+.theory-divider {
+  height: 1px;
+  background: var(--t-border);
+  margin: 1.75rem 0;
+}
+
+/* ── Key takeaways ── */
+.theory-takeaways {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--t-border);
+}
+.theory-takeaways h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+.theory-takeaways ul {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+.theory-takeaways li {
+  margin-bottom: 0.4rem;
+  color: var(--t-text);
+  opacity: 0.88;
+}
+
+/* ── Related practical-tool link ── */
+.theory-related-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--t-border);
+  color: var(--t-accent);
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.theory-related-tool:hover {
+  background: color-mix(in srgb, var(--t-accent) 12%, transparent);
+  border-color: var(--t-accent);
+}
+
+/* ── "Coming soon" fallback for unmigrated / not-yet-written topics ── */
+.theory-coming-soon {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--t-muted);
+  border: 1px dashed var(--t-border);
+  border-radius: 12px;
+}
+.theory-coming-soon strong {
+  display: block;
+  color: var(--t-text);
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Quiz ── */
+.theory-quiz {
+  margin-top: 1rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--t-card-bg);
+  border: 1px solid var(--t-border);
+  border-radius: 12px;
+}
+.theory-quiz-start-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--t-text);
+  margin-bottom: 0.3rem;
+}
+.theory-quiz-start-sub {
+  font-size: 0.82rem;
+  color: var(--t-muted);
+  margin-bottom: 0.9rem;
+}
+.theory-quiz-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--t-muted);
+  margin-bottom: 0.5rem;
+}
+.theory-quiz-progress-bar {
+  height: 4px;
+  background: var(--t-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.theory-quiz-progress-fill {
+  height: 100%;
+  background: var(--t-accent);
+  transition: width 0.2s ease;
+}
+.theory-quiz-question {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--t-text);
+  margin-bottom: 0.85rem;
+}
+.theory-quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.theory-quiz-option {
+  text-align: left;
+  padding: 0.6rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--t-border);
+  border-radius: 8px;
+  color: var(--t-text);
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.theory-quiz-option:hover:not(:disabled) {
+  border-color: var(--t-accent);
+}
+.theory-quiz-option.correct {
+  border-color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+}
+.theory-quiz-option.wrong {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+}
+.theory-quiz-explain {
+  margin-top: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.theory-quiz-explain.correct-explain {
+  background: rgba(52, 211, 153, 0.1);
+  color: #a7f3d0;
+}
+.theory-quiz-explain.wrong-explain {
+  background: rgba(248, 113, 113, 0.1);
+  color: #fecaca;
+}
+.theory-quiz-done-emoji {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+.theory-quiz-done-score {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--t-text);
+}
+.theory-quiz-done-label {
+  text-align: center;
+  color: var(--t-muted);
+  font-size: 0.86rem;
+  margin-top: 0.3rem;
+}
+.theory-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.theory-btn-full {
+  width: 100%;
+}
+.theory-btn-primary {
+  background: var(--t-accent);
+  color: #08111f;
+}
+.theory-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--t-border);
+  color: var(--t-text);
+}
+.theory-btn-group {
+  display: flex;
+  gap: 0.6rem;
+}
+

@@ -1,0 +1,32 @@
+/* ── Theory topic page ─────────────────────────────────────────── */
+
+.theory-topic-shell-content {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.theory-topic-hero {
+  margin-bottom: 0.5rem;
+}
+
+.theory-topic-hero--embedded {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+.theory-topic-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--afhdl-muted, #88a0bf);
+}
+
+.theory-topic-hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+

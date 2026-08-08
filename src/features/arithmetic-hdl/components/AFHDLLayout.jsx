@@ -1,28 +1,9 @@
 import React from "react";
-import PremiumLearningShell from "../../../shared/components/topics/PremiumLearningShell";
-import { afhdlPages } from "../afhdlConfig";
-
-const PATH_TO_SUBTOPIC_ID = {
-  "/arithmetic/binary-adders": "binary-adders",
-  "/arithmetic/binary-subtractor": "binary-subtractor",
-  "/arithmetic/binary-add-subtractor": "adder-subtractor",
-  "/arithmetic/binary-multipliers": "binary-multipliers",
-  "/arithmetic/code-conversion": "code-conversion",
-  "/arithmetic/magnitude-comparator": "magnitude-comparator",
-  "/arithmetic/parity-generators": "parity-generators",
-  "/arithmetic/complements": "complements",
-  "/arithmetic/signed-unsigned": "signed-unsigned",
-  "/arithmetic/design-applications": "design-applications",
-};
-
-const AFHDL_TOPIC = {
-  id: "arithmetic-functions-and-hdls",
-  title: "ARITHMETIC FUNCTIONS AND HDLs",
-  links: Object.values(PATH_TO_SUBTOPIC_ID).map((id) => ({ id })),
-};
+import TopicLayout from "../../../shared/components/topics/TopicLayout";
+import { afhdlPages, AFHDL_TOPIC, AFHDL_PATH_TO_SUBTOPIC_ID } from "../afhdlConfig";
 
 const AFHDLLayout = ({ title, subtitle, intro, highlights = [], children }) => (
-  <PremiumLearningShell
+  <TopicLayout
     title={title}
     subtitle={subtitle}
     intro={intro}
@@ -35,11 +16,11 @@ const AFHDLLayout = ({ title, subtitle, intro, highlights = [], children }) => (
     progressVerb="complete"
     tracking={{
       topic: AFHDL_TOPIC,
-      pathToSubtopicId: PATH_TO_SUBTOPIC_ID,
+      pathToSubtopicId: AFHDL_PATH_TO_SUBTOPIC_ID,
     }}
   >
     {children}
-  </PremiumLearningShell>
+  </TopicLayout>
 );
 
 export default AFHDLLayout;
