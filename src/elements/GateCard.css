@@ -1,0 +1,37 @@
+.cf-gate-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--cf-radius-sm);
+  border: 1px solid var(--cf-border-soft);
+  border-left: 2px solid var(--accent, var(--cf-brand-2));
+  background: var(--cf-panel-alt);
+  color: var(--cf-text-dim);
+  cursor: grab;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.cf-gate-card:hover {
+  background: var(--cf-panel);
+  color: var(--cf-text);
+  transform: translateX(2px);
+}
+
+.cf-gate-card:active {
+  cursor: grabbing;
+}
+
+.cf-gate-card__icon {
+  display: flex;
+  color: var(--accent, var(--cf-brand-2));
+  flex-shrink: 0;
+}
+
+.cf-gate-card__label {
+  font-family: var(--cf-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}

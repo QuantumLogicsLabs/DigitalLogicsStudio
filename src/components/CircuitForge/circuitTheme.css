@@ -1,0 +1,45 @@
+/*
+  Circuit Forge — design tokens
+  A CAD-tool aesthetic grounded in real circuit-board language:
+  dark PCB base, a signal-green "trace" accent for active/live states,
+  and a copper accent for hover/interaction — plus the existing
+  Boolforge brand indigo for identity continuity.
+
+  Import this once, at the top of CircuitForge.jsx.
+*/
+
+:root {
+  /* Surfaces */
+  --cf-bg: #080b13;
+  --cf-panel: #0d1220;
+  --cf-panel-alt: #10172a;
+  --cf-toolbar: #0b0f1a;
+  --cf-border: #1c2540;
+  --cf-border-soft: #161e34;
+
+  /* Text */
+  --cf-text: #e8edf7;
+  --cf-text-dim: #8993ad;
+  --cf-text-faint: #4d5776;
+
+  /* Brand + circuit accents */
+  --cf-brand: #7c6cff;
+  --cf-brand-2: #4f8cff;
+  --cf-trace: #35e2a3;
+  --cf-trace-dim: rgba(53, 226, 163, 0.14);
+  --cf-copper: #ff9d4d;
+  --cf-copper-dim: rgba(255, 157, 77, 0.14);
+  --cf-danger: #ff5c72;
+
+  /* Type */
+  --cf-font-display: "Space Grotesk", "Inter", sans-serif;
+  --cf-font-body: "Inter", system-ui, sans-serif;
+  --cf-font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+
+  /* Layout */
+  --cf-toolbar-h: 56px;
+  --cf-sidebar-w: 268px;
+  --cf-radius-sm: 6px;
+  --cf-radius-md: 10px;
+  --cf-radius-lg: 14px;
+}

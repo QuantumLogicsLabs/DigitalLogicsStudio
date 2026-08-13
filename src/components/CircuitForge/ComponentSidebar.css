@@ -1,0 +1,71 @@
+.cf-sidebar {
+  width: var(--cf-sidebar-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--cf-panel);
+  border-right: 1px solid var(--cf-border);
+  height: 100%;
+}
+
+.cf-sidebar__search {
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--cf-border-soft);
+}
+
+.cf-sidebar__scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 24px;
+}
+
+.cf-sidebar__section {
+  margin-bottom: 6px;
+}
+
+.cf-sidebar__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--cf-text-dim);
+}
+
+.cf-sidebar__section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent, var(--cf-brand-2));
+  box-shadow: 0 0 6px var(--accent, var(--cf-brand-2));
+  flex-shrink: 0;
+}
+
+.cf-sidebar__section-label {
+  flex: 1;
+  text-align: left;
+  font-family: var(--cf-font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--cf-text-dim);
+}
+
+.cf-sidebar__chevron {
+  color: var(--cf-text-faint);
+  transition: transform 0.15s ease;
+}
+.cf-sidebar__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.cf-sidebar__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 10px;
+}

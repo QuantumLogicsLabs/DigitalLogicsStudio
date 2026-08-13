@@ -10,6 +10,10 @@ import { useTheme } from "../context/ThemeContext";
 import { getCircuitHint } from "../services/circuitMindService";
 import { generateAiCircuit } from "../services/aiService";
 import "./../assets/css/Boolforge.css";
+import Toolbar from "../components/CircuitForge/Toolbar";
+import ComponentSidebar from "../components/CircuitForge/ComponentSidebar";
+import AssistantDrawer from "../components/CircuitForge/AssistantDrawer";
+import "../components/CircuitForge/circuitTheme.css";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const MAX_GATE_INPUTS = 8;
@@ -708,6 +712,7 @@ const Boolforge = ({
   };
 
   // ── Wire hit‑test & delete (right‑click on canvas) ────────────────────────
+ // ── Wire hit‑test & delete (right‑click on canvas) ────────────────────────
   const handleCanvasContextMenu = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -727,36 +732,20 @@ const Boolforge = ({
       const toX = toGate.x;
       const toY = getInputY(toGate, wire.toIndex);
 
+      const HIT_RADIUS = 8;
       const dx = toX - fromX,
         dy = toY - fromY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const controlDistance = Math.min(Math.abs(dx) / 2, distance / 3);
-      const cp1x = fromX + controlDistance,
-        cp1y = fromY;
-      const cp2x = toX - controlDistance,
-        cp2y = toY;
-
-      const SAMPLES = 60,
-        HIT_RADIUS = 8;
-      for (let i = 0; i <= SAMPLES; i++) {
-        const t = i / SAMPLES,
-          mt = 1 - t;
-        const bx =
-          mt ** 3 * fromX +
-          3 * mt ** 2 * t * cp1x +
-          3 * mt * t ** 2 * cp2x +
-          t ** 3 * toX;
-        const by =
-          mt ** 3 * fromY +
-          3 * mt ** 2 * t * cp1y +
-          3 * mt * t ** 2 * cp2y +
-          t ** 3 * toY;
-        if (Math.sqrt((bx - x) ** 2 + (by - y) ** 2) < HIT_RADIUS) {
-          e.preventDefault();
-          setWires((prev) => prev.filter((w) => w.id !== wire.id));
-          saveToHistory();
-          return;
-        }
+      const lenSq = dx * dx + dy * dy;
+      let t = lenSq === 0 ? 0 : ((x - fromX) * dx + (y - fromY) * dy) / lenSq;
+      t = Math.max(0, Math.min(1, t));
+      const px = fromX + t * dx,
+        py = fromY + t * dy;
+      const dist = Math.sqrt((px - x) ** 2 + (py - y) ** 2);
+      if (dist < HIT_RADIUS) {
+        e.preventDefault();
+        setWires((prev) => prev.filter((w) => w.id !== wire.id));
+        saveToHistory();
+        return;
       }
     }
     e.preventDefault();
@@ -1503,53 +1492,47 @@ const Boolforge = ({
   }, [gates, wires, onCircuitChange]);
 
   // Draw wires whenever relevant state changes
-  const drawWires = useCallback(() => {
+const drawWires = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(panOffset.x, panOffset.y);
-    ctx.scale(zoom, zoom);
+
+    // Convert a world-space point straight to screen pixels using the
+    // CURRENT zoom/panOffset state — same math the .gates-container CSS
+    // transform uses. No ctx.translate/scale, so there's nothing to fall
+    // out of sync after a resize or rapid zoom change.
+    const toScreen = (wx, wy) => ({
+      x: panOffset.x + wx * zoom,
+      y: panOffset.y + wy * zoom,
+    });
 
     wires.forEach((wire) => {
       const fromGate = gateMap.get(wire.fromId);
       const toGate = gateMap.get(wire.toId);
       if (!fromGate || !toGate) return;
 
-      const fromX = fromGate.x + 120;
-      const fromY = IC_TYPES.has(fromGate.type)
+      const fromWorldX = fromGate.x + 120;
+      const fromWorldY = IC_TYPES.has(fromGate.type)
         ? getOutputY(fromGate, wire.fromOutputIndex ?? 0)
         : fromGate.y + 50;
-      const toX = toGate.x;
-      const toY = getInputY(toGate, wire.toIndex);
+      const toWorldX = toGate.x;
+      const toWorldY = getInputY(toGate, wire.toIndex);
+
+      const from = toScreen(fromWorldX, fromWorldY);
+      const to = toScreen(toWorldX, toWorldY);
 
       const outIdx = wire.fromOutputIndex ?? 0;
       const isActive = evaluateGate(fromGate, outIdx);
       ctx.strokeStyle = isActive ? "#00ff88" : "#334155";
-      ctx.lineWidth = 3 / zoom;
-      ctx.shadowBlur = isActive ? 12 / zoom : 0;
-      ctx.shadowColor = isActive ? "#00ff88" : "transparent";
-
-      ctx.beginPath();
-      ctx.moveTo(fromX, fromY);
-      const dx = toX - fromX,
-        dy = toY - fromY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const controlDistance = Math.min(Math.abs(dx) / 2, distance / 3);
-      ctx.bezierCurveTo(
-        fromX + controlDistance,
-        fromY,
-        toX - controlDistance,
-        toY,
-        toX,
-        toY,
-      );
+      ctx.lineWidth = Math.max(1.5, 3 * zoom);
+     ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
       ctx.stroke();
       ctx.shadowBlur = 0;
     });
-    ctx.restore();
   }, [wires, gateMap, evaluateGate, zoom, panOffset]);
 
   useEffect(() => {

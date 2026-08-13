@@ -1,0 +1,49 @@
+.cf-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--cf-radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cf-text-dim);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.cf-icon-btn:hover:not(:disabled) {
+  background: var(--cf-panel-alt);
+  color: var(--cf-text);
+  border-color: var(--cf-border);
+}
+
+.cf-icon-btn:focus-visible {
+  outline: 2px solid var(--cf-brand-2);
+  outline-offset: 2px;
+}
+
+.cf-icon-btn.is-active {
+  color: var(--cf-trace);
+  background: var(--cf-trace-dim);
+  border-color: rgba(53, 226, 163, 0.3);
+}
+
+.cf-icon-btn--solid {
+  background: linear-gradient(135deg, var(--cf-brand), var(--cf-brand-2));
+  color: #fff;
+}
+.cf-icon-btn--solid:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.cf-icon-btn--danger:hover:not(:disabled) {
+  background: rgba(255, 92, 114, 0.12);
+  color: var(--cf-danger);
+  border-color: rgba(255, 92, 114, 0.3);
+}
+
+.cf-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

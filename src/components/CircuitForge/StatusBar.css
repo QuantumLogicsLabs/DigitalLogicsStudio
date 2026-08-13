@@ -1,0 +1,27 @@
+.cf-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 0 12px;
+  background: var(--cf-toolbar);
+  border-top: 1px solid var(--cf-border);
+  font-family: var(--cf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--cf-text-faint);
+}
+
+.cf-status__sep {
+  width: 1px;
+  height: 11px;
+  background: var(--cf-border);
+}
+
+.cf-status__spacer {
+  flex: 1;
+}
+
+.cf-status__brand {
+  color: var(--cf-text-dim);
+}

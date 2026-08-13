@@ -1,0 +1,124 @@
+.cf-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 5, 10, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 40;
+}
+.cf-drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cf-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  background: var(--cf-panel);
+  border-left: 1px solid var(--cf-border);
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  box-shadow: -20px 0 40px rgba(0, 0, 0, 0.35);
+}
+.cf-drawer.is-open {
+  transform: translateX(0);
+}
+
+.cf-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cf-drawer__title {
+  font-family: var(--cf-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-text);
+}
+
+.cf-drawer__close {
+  background: transparent;
+  border: none;
+  color: var(--cf-text-dim);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--cf-radius-sm);
+}
+.cf-drawer__close:hover {
+  background: var(--cf-panel-alt);
+  color: var(--cf-text);
+}
+
+.cf-drawer__hint {
+  font-family: var(--cf-font-body);
+  font-size: 12.5px;
+  color: var(--cf-text-faint);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.cf-drawer__textarea {
+  width: 100%;
+  resize: none;
+  border-radius: var(--cf-radius-md);
+  border: 1px solid var(--cf-border);
+  background: var(--cf-panel-alt);
+  color: var(--cf-text);
+  font-family: var(--cf-font-body);
+  font-size: 13px;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+.cf-drawer__textarea:focus {
+  outline: none;
+  border-color: var(--cf-brand-2);
+}
+
+.cf-drawer__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cf-drawer__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  border-radius: var(--cf-radius-sm);
+  border: none;
+  font-family: var(--cf-font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.cf-drawer__btn:hover {
+  filter: brightness(1.1);
+}
+
+.cf-drawer__btn--hint {
+  background: var(--cf-copper-dim);
+  color: var(--cf-copper);
+  border: 1px solid rgba(255, 157, 77, 0.3);
+}
+
+.cf-drawer__btn--generate {
+  background: linear-gradient(135deg, var(--cf-brand), var(--cf-brand-2));
+  color: #fff;
+}
