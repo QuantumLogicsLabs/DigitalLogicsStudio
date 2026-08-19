@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { gateSymbols, IC_META, IC_TYPES } from "../../shared/data/gates";
-import { TruthTableGenerator } from "./components/TruthTable";
-import { SaveAndLoad } from "./components/SaveAndLoad";
+import { IC_META, IC_TYPES } from "../../shared/data/gates";
 import { parseExpressionToCircuit } from "../../shared/utils/expressionParser";
 import RelatedSeoLinks from "../../shared/seo/RelatedSeoLinks";
 import Navbar from "../../shared/components/navbar";
@@ -9,69 +7,20 @@ import Footer from "../../shared/components/Footer";
 import { useTheme } from "../../shared/context/ThemeContext";
 import { getCircuitHint } from "../../shared/services/circuitMindService";
 import { generateAiCircuit } from "../../shared/services/aiService";
+import {
+  MAX_GATE_INPUTS,
+  MIN_GATE_INPUTS,
+  MULTI_INPUT_GATES,
+  GRID_SIZE,
+  SNAP_TO_GRID,
+} from "./constants";
+import { defaultInputCount, getICHeight, getInputY, getOutputY } from "./geometry";
+import { computeGateOutput } from "./gateLogic";
+import Sidebar from "./Sidebar";
+import CanvasArea from "./CanvasArea";
+import ControlPanel from "./ControlPanel";
+import RenameModal from "./RenameModal";
 import "./Boolforge.css";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-const MAX_GATE_INPUTS = 8;
-const MIN_GATE_INPUTS = 2;
-const MULTI_INPUT_GATES = new Set(["AND", "OR", "NAND", "NOR", "XOR", "XNOR"]);
-const SINGLE_INPUT_GATES = new Set(["NOT", "BUFFER", "OUTPUT"]);
-const GRID_SIZE = 20;
-const SNAP_TO_GRID = true;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function defaultInputCount(type) {
-  if (type === "INPUT") return 0;
-  if (SINGLE_INPUT_GATES.has(type)) return 1;
-  if (IC_TYPES.has(type)) return IC_META[type].inputs;
-  return 2;
-}
-
-const IC_HEIGHTS = {
-  MUX2: 100,
-  MUX4: 120,
-  MUX8: 160,
-  DEMUX2: 100,
-  DEMUX4: 120,
-  DEMUX8: 160,
-  ENC4: 100,
-  ENC8: 140,
-  DEC4: 100,
-  DEC8: 140,
-  HALF_ADDER: 80,
-  FULL_ADDER: 100,
-  ADD4: 160,
-  CLADD4: 160,
-  HALF_SUBTRACTOR: 80,
-  FULL_SUBTRACTOR: 100,
-};
-
-function getICHeight(type) {
-  return IC_HEIGHTS[type] ?? 100;
-}
-
-function getInputY(gate, inputIndex) {
-  if (IC_TYPES.has(gate.type)) {
-    const n = IC_META[gate.type].inputs;
-    const h = getICHeight(gate.type);
-    if (n === 1) return gate.y + h / 2;
-    return gate.y + (10 / 100) * h + (inputIndex / (n - 1)) * (0.8 * h);
-  }
-  const n = gate.inputs;
-  if (n === 1) return gate.y + 50;
-  if (n === 2) return gate.y + (inputIndex === 0 ? 35 : 65);
-  const gateTop = gate.y + 15;
-  const gateBottom = gate.y + 85;
-  return gateTop + (inputIndex / (n - 1)) * (gateBottom - gateTop);
-}
-
-function getOutputY(gate, outputIndex) {
-  if (!IC_TYPES.has(gate.type)) return gate.y + 50;
-  const n = IC_META[gate.type].outputs;
-  const h = getICHeight(gate.type);
-  if (n === 1) return gate.y + h / 2;
-  return gate.y + (10 / 100) * h + (outputIndex / (n - 1)) * (0.8 * h);
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const Boolforge = ({
@@ -162,173 +111,6 @@ const Boolforge = ({
     (index) => portNames?.outputs?.[index] ?? `S${index}`,
     [portNames],
   );
-
-  // ── Gate logic ─────────────────────────────────────────────────────────────
-  const computeGateOutput = (gate, inputs, outputIndex = 0) => {
-    const ci = inputs.filter((v) => v !== undefined);
-    switch (gate.type) {
-      case "INPUT":
-        return gate.inputValues[0] || false;
-      case "AND": {
-        const n = gate.inputs || 2;
-        let allHigh = true;
-        for (let i = 0; i < n; i++)
-          if (!(inputs[i] ?? false)) {
-            allHigh = false;
-            break;
-          }
-        return allHigh;
-      }
-      case "OR":
-        return ci.some(Boolean);
-      case "NOT":
-        return inputs[0] !== undefined ? !inputs[0] : false;
-      case "NAND": {
-        const n = gate.inputs || 2;
-        let allHigh = true;
-        for (let i = 0; i < n; i++)
-          if (!(inputs[i] ?? false)) {
-            allHigh = false;
-            break;
-          }
-        return !allHigh;
-      }
-      case "NOR":
-        return !ci.some(Boolean);
-      case "XOR":
-        return ci.length >= 2 && ci.reduce((acc, v) => acc !== v, false);
-      case "XNOR":
-        return ci.length >= 2 && !ci.reduce((acc, v) => acc !== v, false);
-      case "BUFFER":
-      case "OUTPUT":
-        return inputs[0] ?? false;
-      case "MUX2": {
-        const s = inputs[2] ?? false;
-        return s ? (inputs[1] ?? false) : (inputs[0] ?? false);
-      }
-      case "MUX4": {
-        const s0 = inputs[4] ?? false,
-          s1 = inputs[5] ?? false;
-        const sel = (s1 ? 2 : 0) + (s0 ? 1 : 0);
-        return inputs[sel] ?? false;
-      }
-      case "MUX8": {
-        const s0 = inputs[8] ?? false,
-          s1 = inputs[9] ?? false,
-          s2 = inputs[10] ?? false;
-        const sel = (s2 ? 4 : 0) + (s1 ? 2 : 0) + (s0 ? 1 : 0);
-        return inputs[sel] ?? false;
-      }
-      case "DEMUX2": {
-        const d = inputs[0] ?? false,
-          s = inputs[1] ?? false;
-        if (outputIndex === 0) return !s && d;
-        if (outputIndex === 1) return s && d;
-        return false;
-      }
-      case "DEMUX4": {
-        const d = inputs[0] ?? false,
-          s0 = inputs[1] ?? false,
-          s1 = inputs[2] ?? false;
-        const sel = (s1 ? 2 : 0) + (s0 ? 1 : 0);
-        return sel === outputIndex && d;
-      }
-      case "DEMUX8": {
-        const d = inputs[0] ?? false,
-          s0 = inputs[1] ?? false,
-          s1 = inputs[2] ?? false,
-          s2 = inputs[3] ?? false;
-        const sel = (s2 ? 4 : 0) + (s1 ? 2 : 0) + (s0 ? 1 : 0);
-        return sel === outputIndex && d;
-      }
-      case "ENC4": {
-        let code = 0;
-        for (let i = 3; i >= 0; i--) {
-          if (inputs[i]) {
-            code = i;
-            break;
-          }
-        }
-        return outputIndex === 0 ? Boolean(code & 2) : Boolean(code & 1);
-      }
-      case "ENC8": {
-        let code = 0;
-        for (let i = 7; i >= 0; i--) {
-          if (inputs[i]) {
-            code = i;
-            break;
-          }
-        }
-        return outputIndex === 0
-          ? Boolean(code & 4)
-          : outputIndex === 1
-            ? Boolean(code & 2)
-            : Boolean(code & 1);
-      }
-      case "DEC4": {
-        const sel = ((inputs[1] ?? false) ? 2 : 0) + ((inputs[0] ?? false) ? 1 : 0);
-        return sel === outputIndex;
-      }
-      case "DEC8": {
-        const sel =
-          ((inputs[2] ?? false) ? 4 : 0) +
-          ((inputs[1] ?? false) ? 2 : 0) +
-          ((inputs[0] ?? false) ? 1 : 0);
-        return sel === outputIndex;
-      }
-      case "HALF_ADDER": {
-        const a = inputs[0] ?? false,
-          b = inputs[1] ?? false;
-        return outputIndex === 0 ? a !== b : a && b;
-      }
-      case "FULL_ADDER": {
-        const a = inputs[0] ?? false,
-          b = inputs[1] ?? false,
-          cin = inputs[2] ?? false;
-        const sum = (a !== b) !== cin;
-        const cout = (a && b) || (cin && a !== b);
-        return outputIndex === 0 ? sum : cout;
-      }
-      case "ADD4": {
-        const a = [inputs[0], inputs[1], inputs[2], inputs[3]].map((v) => v ?? false);
-        const b = [inputs[4], inputs[5], inputs[6], inputs[7]].map((v) => v ?? false);
-        let carry = inputs[8] ?? false;
-        const sums = [];
-        for (let i = 0; i < 4; i++) {
-          const xor_ab = a[i] !== b[i];
-          sums[i] = xor_ab !== carry;
-          carry = (a[i] && b[i]) || (carry && xor_ab);
-        }
-        return outputIndex === 4 ? carry : sums[outputIndex];
-      }
-      case "CLADD4": {
-        const a = [inputs[0], inputs[1], inputs[2], inputs[3]].map((v) => v ?? false);
-        const b = [inputs[4], inputs[5], inputs[6], inputs[7]].map((v) => v ?? false);
-        const cin = inputs[8] ?? false;
-        const g = a.map((ai, i) => ai && b[i]);
-        const p = a.map((ai, i) => ai !== b[i]);
-        const c = [cin];
-        for (let i = 0; i < 4; i++) c[i + 1] = g[i] || (p[i] && c[i]);
-        const sums = p.map((pi, i) => pi !== c[i]);
-        return outputIndex === 4 ? c[4] : sums[outputIndex];
-      }
-      case "HALF_SUBTRACTOR": {
-        const a = inputs[0] ?? false,
-          b = inputs[1] ?? false;
-        return outputIndex === 0 ? a !== b : !a && b;
-      }
-      case "FULL_SUBTRACTOR": {
-        const a = inputs[0] ?? false,
-          b = inputs[1] ?? false,
-          bin = inputs[2] ?? false;
-        const diff = (a !== b) !== bin;
-        const bout = (!a && b) || (!a && bin) || (b && bin);
-        return outputIndex === 0 ? diff : bout;
-      }
-      default:
-        return false;
-    }
-  };
 
   // ── Simulation ─────────────────────────────────────────────────────────────
   const gateValues = React.useMemo(() => {
@@ -1719,619 +1501,93 @@ const Boolforge = ({
         handleMouseUp();
       }}
     >
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h2>Circuit Forge</h2>
-        <button
-          onClick={() => setSelectionToolActive((v) => !v)}
-          className={`toggle-selection-btn${selectionToolActive ? " active" : ""}`}
-        >
-          <span className="icon">{selectionToolActive ? "✦" : "⬚"}</span>
-          {selectionToolActive ? "Selection ON" : "Selection OFF"}
-        </button>
+      <Sidebar
+        selectionToolActive={selectionToolActive}
+        setSelectionToolActive={setSelectionToolActive}
+        simplifiedExpression={simplifiedExpression}
+        addGate={addGate}
+      />
 
-        {simplifiedExpression && (
-          <div className="simplified-expression-display">
-            <h3>📐 K-Map Simplified Expression</h3>
-            <div className="expression-content">{simplifiedExpression}</div>
-            <p className="expression-hint">Circuit auto-generated below! ✨</p>
-          </div>
-        )}
+      <CanvasArea
+        containerRef={containerRef}
+        canvasRef={canvasRef}
+        handleCanvasContextMenu={handleCanvasContextMenu}
+        handleCanvasMouseDown={handleCanvasMouseDown}
+        isPanning={isPanning}
+        spacePressed={spacePressed}
+        selectionToolActive={selectionToolActive}
+        setSelectionToolActive={setSelectionToolActive}
+        panOffset={panOffset}
+        setIsPanning={setIsPanning}
+        setPanStart={setPanStart}
+        isSelecting={isSelecting}
+        selectionStart={selectionStart}
+        selectionEnd={selectionEnd}
+        zoom={zoom}
+        setZoom={setZoom}
+        setPanOffset={setPanOffset}
+        gates={gates}
+        connectingFrom={connectingFrom}
+        selectedGateIds={selectedGateIds}
+        evaluateGate={evaluateGate}
+        startDrag={startDrag}
+        startRename={startRename}
+        deleteGate={deleteGate}
+        removeInputSlot={removeInputSlot}
+        addInputSlot={addInputSlot}
+        startConnection={startConnection}
+        completeConnection={completeConnection}
+        fitToView={fitToView}
+      />
 
-        {/* Palettes */}
-        <div className="palette-section">
-          <div className="palette-section-title">Logic Gates</div>
-          <div className="gate-palette">
-            {[
-              "INPUT",
-              "OUTPUT",
-              "AND",
-              "OR",
-              "NOT",
-              "NAND",
-              "NOR",
-              "XOR",
-              "XNOR",
-              "BUFFER",
-            ].map((type) => (
-              <button key={type} className="gate-btn" onClick={() => addGate(type)}>
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Multiplexers</div>
-          <div className="gate-palette">
-            {[
-              { type: "MUX2", label: "MUX 2:1" },
-              { type: "MUX4", label: "MUX 4:1" },
-              { type: "MUX8", label: "MUX 8:1" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Demultiplexers</div>
-          <div className="gate-palette">
-            {[
-              { type: "DEMUX2", label: "DEMUX 1:2" },
-              { type: "DEMUX4", label: "DEMUX 1:4" },
-              { type: "DEMUX8", label: "DEMUX 1:8" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Encoders</div>
-          <div className="gate-palette">
-            {[
-              { type: "ENC4", label: "ENC 4:2" },
-              { type: "ENC8", label: "ENC 8:3" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Decoders</div>
-          <div className="gate-palette">
-            {[
-              { type: "DEC4", label: "DEC 2:4" },
-              { type: "DEC8", label: "DEC 3:8" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Adders</div>
-          <div className="gate-palette">
-            {[
-              { type: "HALF_ADDER", label: "Half Adder" },
-              { type: "FULL_ADDER", label: "Full Adder" },
-              { type: "ADD4", label: "4 bit Adder" },
-              { type: "CLADD4", label: "Carry LA 4" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="palette-section">
-          <div className="palette-section-title">Subtractors</div>
-          <div className="gate-palette">
-            {[
-              { type: "HALF_SUBTRACTOR", label: "Half Subtractor" },
-              { type: "FULL_SUBTRACTOR", label: "Full Subtractor" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                className="gate-btn gate-btn--ic"
-                onClick={() => addGate(type)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+      <ControlPanel
+        embedded={embedded}
+        aiPrompt={aiPrompt}
+        setAiPrompt={setAiPrompt}
+        handleRequestHint={handleRequestHint}
+        hintLoading={hintLoading}
+        handleGenerateCircuit={handleGenerateCircuit}
+        isGenLoading={isGenLoading}
+        hint={hint}
+        hintError={hintError}
+        setHint={setHint}
+        setHintError={setHintError}
+        inputGates={inputGates}
+        outputGates={outputGates}
+        toggleInput={toggleInput}
+        evaluateGate={evaluateGate}
+        truthTable={truthTable}
+        undo={undo}
+        redo={redo}
+        historyIndex={historyIndex}
+        history={history}
+        gates={gates}
+        wires={wires}
+        gateIdCounter={gateIdCounter}
+        wireIdCounter={wireIdCounter}
+        inputCounter={inputCounter}
+        outputCounter={outputCounter}
+        setGates={setGates}
+        setWires={setWires}
+        setGateIdCounter={setGateIdCounter}
+        setWireIdCounter={setWireIdCounter}
+        setInputCounter={setInputCounter}
+        setOutputCounter={setOutputCounter}
+        saveToHistory={saveToHistory}
+        clearCircuit={clearCircuit}
+        zoom={zoom}
+        setZoom={setZoom}
+        setPanOffset={setPanOffset}
+        fitToView={fitToView}
+      />
 
-        <div className="instructions">
-          <p>
-            <strong>Controls:</strong>
-          </p>
-          <p>• Click buttons to add components</p>
-          <p>• Drag gates to move them (Group Drag supported!)</p>
-          <p>
-            • <strong>Drag empty space</strong> to pan the canvas (default)
-          </p>
-          <p>
-            • Enable <strong>⬚ Selection Tool</strong> to box-select components
-          </p>
-          <p>
-            • Hold <strong>Space</strong> or drag with <strong>Middle Button</strong> to
-            pan anytime
-          </p>
-          <p>• Ctrl + Click to add/remove individual gates</p>
-          <p>• Click output dot → input dot to wire</p>
-          <p>• Right-click wire to delete it</p>
-          <p>• Right-click gate to delete (deletes selection)</p>
-          <p>• Double-click gate to rename it</p>
-          <p>• Scroll to zoom in/out</p>
-          <p>
-            • Click <strong>+</strong> / <strong>−</strong> to resize inputs
-          </p>
-          <p>
-            <strong>Shortcuts:</strong>
-          </p>
-          <p>• Ctrl + Z: Undo &nbsp; Ctrl + Shift + Z: Redo</p>
-          <p>• Ctrl + A: Select All &nbsp; Ctrl + D: Duplicate</p>
-          <p>• Ctrl + C: Copy &nbsp; Ctrl + V: Paste</p>
-          <p>• Delete / Backspace: Remove selected</p>
-          <p>• Esc: Cancel wire / Clear selection</p>
-        </div>
-      </div>
-
-      {/* Canvas */}
-      <div className="canvas-container" ref={containerRef}>
-        <canvas
-          ref={canvasRef}
-          onContextMenu={handleCanvasContextMenu}
-          onMouseDown={handleCanvasMouseDown}
-          onTouchStart={(e) => {
-            if (e.touches.length === 1) {
-              const t = e.touches[0];
-              setIsPanning(true);
-              setPanStart({ x: t.clientX - panOffset.x, y: t.clientY - panOffset.y });
-            }
-          }}
-          style={{
-            cursor: isPanning
-              ? "grabbing"
-              : spacePressed
-                ? "grab"
-                : selectionToolActive
-                  ? "crosshair"
-                  : "grab",
-          }}
-        />
-
-        <div
-          className="gates-container"
-          style={{
-            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
-          }}
-        >
-          {isSelecting && (
-            <div
-              className="selection-rectangle"
-              style={{
-                position: "absolute",
-                left: Math.min(selectionStart.x, selectionEnd.x),
-                top: Math.min(selectionStart.y, selectionEnd.y),
-                width: Math.abs(selectionStart.x - selectionEnd.x),
-                height: Math.abs(selectionStart.y - selectionEnd.y),
-                border: "1.5px dashed var(--accent-secondary, #00d4ff)",
-                background: "rgba(0, 212, 255, 0.12)",
-                pointerEvents: "none",
-                zIndex: 1000,
-                borderRadius: "3px",
-                boxShadow: "0 0 8px rgba(0, 212, 255, 0.2)",
-              }}
-            />
-          )}
-
-          {gates.map((gate) => {
-            const canExpand = MULTI_INPUT_GATES.has(gate.type);
-            const canAddInput = canExpand && gate.inputs < MAX_GATE_INPUTS;
-            const canRemoveInput = canExpand && gate.inputs > MIN_GATE_INPUTS;
-            const isIC = IC_TYPES.has(gate.type);
-            const icMeta = isIC ? IC_META[gate.type] : null;
-            const icH = isIC ? getICHeight(gate.type) : 100;
-            const cfGateId = connectingFrom?.gate?.id ?? connectingFrom?.id;
-
-            return (
-              <div
-                key={gate.id}
-                data-gate-id={gate.id}
-                className={`gate ${gate.type === "OUTPUT" ? "output-gate" : ""} ${isIC ? "gate--ic" : ""} ${selectedGateIds.includes(gate.id) ? "selected" : ""} ${gate.type === "OUTPUT" && evaluateGate(gate) ? "active" : ""}`}
-                style={{ left: gate.x, top: gate.y, height: isIC ? icH : undefined }}
-                onMouseDown={(e) => startDrag(e, gate)}
-                onTouchStart={(e) => {
-                  if (e.touches.length === 1) {
-                    e.stopPropagation();
-                    startDrag(e.touches[0], gate);
-                  }
-                }}
-                onDoubleClick={(e) => startRename(e, gate)}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  deleteGate(gate);
-                }}
-              >
-                <div className="gate-content">
-                  {gateSymbols[gate.type]}
-                  {!isIC && <div className="gate-label">{gate.label || gate.type}</div>}
-                </div>
-
-                {canExpand && (
-                  <div className="gate-input-controls">
-                    <button
-                      className="gate-input-btn"
-                      title={
-                        canRemoveInput
-                          ? `Remove input (${gate.inputs - 1} inputs)`
-                          : `Minimum ${MIN_GATE_INPUTS} inputs`
-                      }
-                      disabled={!canRemoveInput}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => removeInputSlot(e, gate)}
-                    >
-                      −
-                    </button>
-                    <span className="gate-input-count">{gate.inputs}</span>
-                    <button
-                      className="gate-input-btn"
-                      title={
-                        canAddInput
-                          ? `Add input (${gate.inputs + 1} inputs)`
-                          : `Maximum ${MAX_GATE_INPUTS} inputs`
-                      }
-                      disabled={!canAddInput}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => addInputSlot(e, gate)}
-                    >
-                      +
-                    </button>
-                  </div>
-                )}
-
-                {/* IC outputs */}
-                {isIC &&
-                  Array.from({ length: icMeta.outputs }).map((_, outIdx) => {
-                    const n = icMeta.outputs,
-                      topPct = n === 1 ? 50 : 10 + (outIdx / (n - 1)) * 80;
-                    const isConnecting =
-                      cfGateId === gate.id && connectingFrom?.outputIndex === outIdx;
-                    return (
-                      <div
-                        key={`out-${outIdx}`}
-                        className={`connection-point output-point ic-output-point ${isConnecting ? "active" : ""} ${evaluateGate(gate, outIdx) ? "ic-output-point--high" : ""}`}
-                        style={{ top: `${topPct}%` }}
-                        title={icMeta.outputLabels[outIdx]}
-                        onClick={() => startConnection(gate, outIdx)}
-                      >
-                        <span className="ic-pin-label">
-                          {icMeta.outputLabels[outIdx]}
-                        </span>
-                      </div>
-                    );
-                  })}
-
-                {/* Standard output */}
-                {!isIC && gate.hasOutput && (
-                  <div
-                    className={`connection-point output-point ${cfGateId === gate.id ? "active" : ""}`}
-                    onClick={() => startConnection(gate, 0)}
-                  />
-                )}
-
-                {/* IC inputs */}
-                {isIC &&
-                  Array.from({ length: icMeta.inputs }).map((_, idx) => {
-                    const n = icMeta.inputs,
-                      topPct = n === 1 ? 50 : 10 + (idx / (n - 1)) * 80;
-                    return (
-                      <div
-                        key={`in-${idx}`}
-                        className={`connection-point input-point ic-input-point ${connectingFrom ? "active" : ""}`}
-                        style={{ top: `${topPct}%` }}
-                        title={icMeta.inputLabels[idx]}
-                        onClick={() => completeConnection(gate, idx)}
-                      >
-                        <span className="ic-pin-label ic-pin-label--left">
-                          {icMeta.inputLabels[idx]}
-                        </span>
-                      </div>
-                    );
-                  })}
-
-                {/* Standard inputs */}
-                {!isIC &&
-                  gate.inputs >= 2 &&
-                  Array.from({ length: gate.inputs }).map((_, idx) => {
-                    const n = gate.inputs,
-                      topPct =
-                        n === 2 ? (idx === 0 ? 35 : 65) : 15 + (idx / (n - 1)) * 70;
-                    return (
-                      <div
-                        key={idx}
-                        className={`connection-point input-point ${connectingFrom ? "active" : ""}`}
-                        style={{ top: `${topPct}%` }}
-                        onClick={() => completeConnection(gate, idx)}
-                      />
-                    );
-                  })}
-                {!isIC && gate.inputs === 1 && (
-                  <div
-                    className={`connection-point input-point ${connectingFrom ? "active" : ""}`}
-                    style={{ top: "50%" }}
-                    onClick={() => completeConnection(gate, 0)}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="canvas-overlay-controls">
-          <button
-            className={`canvas-overlay-btn${selectionToolActive ? " canvas-overlay-btn--active" : ""}`}
-            onClick={() => setSelectionToolActive((v) => !v)}
-            style={
-              selectionToolActive
-                ? {
-                    background: "var(--accent-primary, #7c3aed)",
-                    color: "#fff",
-                    borderColor: "var(--accent-primary, #7c3aed)",
-                  }
-                : {}
-            }
-          >
-            ⬚
-          </button>
-          <button className="canvas-overlay-btn" onClick={fitToView}>
-            ⊡
-          </button>
-          <button
-            className="canvas-overlay-btn"
-            onClick={() => setZoom((z) => Math.min(3, z * 1.2))}
-          >
-            +
-          </button>
-          <button
-            className="canvas-overlay-btn"
-            onClick={() => setZoom((z) => Math.max(0.3, z * 0.8))}
-          >
-            −
-          </button>
-        </div>
-      </div>
-
-      {/* Right panel */}
-      <div className="truth-table-panel">
-        <h2>Circuit Control</h2>
-
-        {!embedded && (
-          <div className="ai-assistant-section">
-            <h3 className="ai-title">🤖 CircuitMind Assistant</h3>
-            <textarea
-              className="ai-textarea"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="Describe the circuit (e.g. 'half adder', 'A AND B OR C')…"
-              rows={2}
-            />
-            <div className="controls">
-              <button
-                className="btn hint-btn"
-                onClick={handleRequestHint}
-                disabled={hintLoading}
-                style={{ cursor: hintLoading ? "wait" : "pointer" }}
-              >
-                {hintLoading ? "💡 Thinking…" : "💡 Get Hint"}
-              </button>
-              <button
-                className="btn generate-btn"
-                onClick={handleGenerateCircuit}
-                disabled={isGenLoading}
-                style={{ cursor: isGenLoading ? "wait" : "pointer" }}
-              >
-                {isGenLoading ? "⚡ Generating…" : "⚡ AI Generate"}
-              </button>
-            </div>
-            {(hint || hintError) && (
-              <div className={`ai-response ${hintError ? "error" : ""}`}>
-                {hintError || hint}
-                <button
-                  className="dismiss-hint"
-                  onClick={() => {
-                    setHint(null);
-                    setHintError("");
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {inputGates.length > 0 && (
-          <div className="input-controls">
-            <h3
-              style={{
-                fontSize: "12px",
-                color: "var(--accent-primary)",
-                marginBottom: "10px",
-              }}
-            >
-              Input Toggles
-            </h3>
-            {inputGates.map((gate) => (
-              <div key={gate.id} className="input-toggle">
-                <label>{gate.label}</label>
-                <div
-                  className={`toggle-btn ${gate.inputValues[0] ? "on" : ""}`}
-                  onClick={() => toggleInput(gate)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {outputGates.length > 0 && (
-          <div className="output-display">
-            <h3>Output Values</h3>
-            {outputGates.map((gate) => (
-              <div key={gate.id} className="output-item">
-                <label>{gate.label}</label>
-                <div className={`output-value ${evaluateGate(gate) ? "high" : "low"}`}>
-                  {evaluateGate(gate) ? "1" : "0"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <TruthTableGenerator truthTable={truthTable} />
-
-        <div className="controls">
-          <button className="btn" onClick={undo} disabled={historyIndex <= 0}>
-            ↶ Undo
-          </button>
-          <button
-            className="btn"
-            onClick={redo}
-            disabled={historyIndex >= history.length - 1}
-          >
-            ↷ Redo
-          </button>
-          <SaveAndLoad
-            data={{
-              gates,
-              wires,
-              gateIdCounter,
-              wireIdCounter,
-              inputCounter,
-              outputCounter,
-            }}
-            setGates={setGates}
-            setWires={setWires}
-            setGateIdCounter={setGateIdCounter}
-            setWireIdCounter={setWireIdCounter}
-            setInputCounter={setInputCounter}
-            setOutputCounter={setOutputCounter}
-            saveToHistory={saveToHistory}
-          />
-          <button className="btn danger" onClick={clearCircuit}>
-            🗑️ Clear All
-          </button>
-        </div>
-
-        <div className="zoom-controls">
-          <button
-            className="btn zoom-btn"
-            onClick={() => setZoom(Math.min(3, zoom * 1.2))}
-            title="Zoom In"
-          >
-            🔍+
-          </button>
-          <span className="zoom-level">{Math.round(zoom * 100)}%</span>
-          <button
-            className="btn zoom-btn"
-            onClick={() => setZoom(Math.max(0.1, zoom * 0.8))}
-            title="Zoom Out"
-          >
-            🔍−
-          </button>
-          <button
-            className="btn zoom-btn"
-            onClick={() => {
-              setZoom(1);
-              setPanOffset({ x: 0, y: 0 });
-            }}
-            title="Reset Zoom"
-          >
-            ⟲
-          </button>
-          <button
-            className="btn zoom-btn"
-            onClick={fitToView}
-            title="Fit all gates into view"
-            style={{ flex: 1 }}
-          >
-            ⊡ Fit
-          </button>
-        </div>
-
-        <div className="stats">
-          <div>
-            <span>Gates:</span> <strong>{gates.length}</strong>
-          </div>
-          <div>
-            <span>Wires:</span> <strong>{wires.length}</strong>
-          </div>
-          <div>
-            <span>Inputs:</span> <strong>{inputGates.length}</strong>
-          </div>
-          <div>
-            <span>Outputs:</span> <strong>{outputGates.length}</strong>
-          </div>
-        </div>
-      </div>
-
-      {/* Rename Modal */}
-      {renamingGate && (
-        <div className="modal-overlay" onClick={cancelRename}>
-          <div className="rename-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3 className="rename-title">✏️ Rename Gate</h3>
-            <p className="rename-text">
-              Enter a custom label for this{" "}
-              <strong className="gate-type">{renamingGate.type}</strong> gate.
-            </p>
-            <input
-              autoFocus
-              className="rename-input"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitRename();
-                if (e.key === "Escape") cancelRename();
-              }}
-            />
-            <div className="rename-actions">
-              <button className="btn cancel-btn" onClick={cancelRename}>
-                Cancel
-              </button>
-              <button className="btn rename-btn" onClick={commitRename}>
-                Rename
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RenameModal
+        renamingGate={renamingGate}
+        renameValue={renameValue}
+        setRenameValue={setRenameValue}
+        cancelRename={cancelRename}
+        commitRename={commitRename}
+      />
 
       <RelatedSeoLinks />
     </div>
