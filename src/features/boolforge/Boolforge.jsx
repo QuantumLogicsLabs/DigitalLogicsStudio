@@ -11,8 +11,8 @@ import { getCircuitHint } from "../../shared/services/circuitMindService";
 import { generateAiCircuit } from "../../shared/services/aiService";
 import "./Boolforge.css";
 
-// 🚀 BARREL IMPORTS FROM NEW FOLDERS
-import { Sidebar, RenameModal } from "./components";
+// 🚀 BARREL IMPORTS
+import { Sidebar, RenameModal, SheetTabs } from "./components";
 import { useKeyboardShortcuts } from "./hooks";
 import {
   MAX_GATE_INPUTS,
@@ -26,7 +26,6 @@ import {
   getCurvePoints,
   getWirePoints,
   wirePathD,
-  hitWireAt,
   defaultInputCount,
   computeGateOutput
 } from "./utils";
@@ -42,7 +41,13 @@ const Boolforge = ({
 }) => {
   const { theme, toggle: toggleTheme } = useTheme();
 
-  // ── UI & Canvas state ──────────────────────────────────────────────────────
+  // ── Sheet Management State ─────────────────────────────────────────────────
+  const [sheets, setSheets] = useState([{ id: 1, name: "Sheet 1" }]);
+  const [activeSheetId, setActiveSheetId] = useState(1);
+  const sheetIdCounter = useRef(2);
+  const sheetsDataRef = useRef({}); // Stores inactive sheets data
+
+  // ── UI & Canvas state (Active Workspace) ───────────────────────────────────
   const [navbarVisible, setNavbarVisible] = useState(true);
   const [footerVisible, setFooterVisible] = useState(true);
   const [zoom, setZoom] = useState(1);
@@ -56,12 +61,11 @@ const Boolforge = ({
   const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
   const [selectionStartIds, setSelectionStartIds] = useState([]);
 
-  // ── Gate & Wire state ──────────────────────────────────────────────────────
+  // ── Gate & Wire state (Active Workspace) ───────────────────────────────────
   const [gates, setGates] = useState([]);
   const [wires, setWires] = useState([]);
   const [selectedGate, setSelectedGate] = useState(null);
   const [selectedGateIds, setSelectedGateIds] = useState([]);
-  const [selectedWireIds, setSelectedWireIds] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState(null);
   const [connectCursor, setConnectCursor] = useState(null);
@@ -81,7 +85,7 @@ const Boolforge = ({
   const [hintError, setHintError] = useState("");
   const [isGenLoading, setIsGenLoading] = useState(false);
 
-  // ── History ────────────────────────────────────────────────────────────────
+  // ── History (Active Workspace) ─────────────────────────────────────────────
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -95,6 +99,81 @@ const Boolforge = ({
   const touchStateRef = useRef({ type: null, id: null, startX: 0, startY: 0 });
   const hasAutoBuilt = useRef(false);
   const lastSyncKeyRef = useRef(null);
+
+  // ── Sheet Switching Logic ──────────────────────────────────────────────────
+  const saveCurrentToRef = useCallback(() => {
+    sheetsDataRef.current[activeSheetId] = {
+      gates, wires, gateIdCounter, wireIdCounter,
+      inputCounter, outputCounter, history, historyIndex,
+      panOffset, zoom
+    };
+  }, [activeSheetId, gates, wires, gateIdCounter, wireIdCounter, inputCounter, outputCounter, history, historyIndex, panOffset, zoom]);
+
+  const switchSheet = useCallback((newId) => {
+    if (newId === activeSheetId) return;
+    saveCurrentToRef(); 
+
+    const d = sheetsDataRef.current[newId] || {
+      gates: [], wires: [], gateIdCounter: 0, wireIdCounter: 0,
+      inputCounter: 0, outputCounter: 0, history: [], historyIndex: -1,
+      panOffset: { x: 0, y: 0 }, zoom: 1
+    };
+
+    setGates(d.gates);
+    setWires(d.wires);
+    setGateIdCounter(d.gateIdCounter);
+    setWireIdCounter(d.wireIdCounter);
+    setInputCounter(d.inputCounter);
+    setOutputCounter(d.outputCounter);
+    setHistory(d.history);
+    setHistoryIndex(d.historyIndex);
+    setPanOffset(d.panOffset);
+    setZoom(d.zoom);
+    
+    setSelectedGateIds([]);
+    setConnectingFrom(null);
+    setConnectCursor(null);
+    setActiveSheetId(newId);
+  }, [activeSheetId, saveCurrentToRef]);
+
+  const addSheet = useCallback(() => {
+    const newId = sheetIdCounter.current++;
+    const newName = `Sheet ${sheets.length + 1}`;
+    setSheets((prev) => [...prev, { id: newId, name: newName }]);
+
+    sheetsDataRef.current[newId] = {
+      gates: [], wires: [], gateIdCounter: 0, wireIdCounter: 0,
+      inputCounter: 0, outputCounter: 0, history: [], historyIndex: -1,
+      panOffset: { x: 0, y: 0 }, zoom: 1
+    };
+    switchSheet(newId);
+  }, [sheets.length, switchSheet]);
+
+  const renameSheet = useCallback((id, currentName) => {
+    const newName = window.prompt("Enter new sheet name:", currentName);
+    if (newName && newName.trim()) {
+      setSheets((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, name: newName.trim() } : s))
+      );
+    }
+  }, []);
+  const deleteSheet = useCallback((id) => {
+    if (sheets.length <= 1) return; // Failsafe: Cannot delete the last sheet
+
+    if (!window.confirm("Are you sure you want to delete this sheet? All its circuits will be lost.")) return;
+
+    const newSheets = sheets.filter(s => s.id !== id);
+    setSheets(newSheets);
+    
+    // Clear data from memory
+    delete sheetsDataRef.current[id];
+
+    // If the user deleted the tab they were currently looking at, switch to the last available tab
+    if (activeSheetId === id) {
+      const fallbackSheet = newSheets[newSheets.length - 1];
+      switchSheet(fallbackSheet.id);
+    }
+  }, [sheets, activeSheetId, switchSheet]);
 
   // ── Derived ────────────────────────────────────────────────────────────────
   const gateMap = React.useMemo(() => {
@@ -389,7 +468,6 @@ const Boolforge = ({
   const startDrag = (e, gate) => {
     if (e.button !== 0) return;
     e.stopPropagation();
-    setSelectedWireIds([]);
     setIsPanning(false);
 
     const isCtrl = e.ctrlKey || e.metaKey;
@@ -540,15 +618,11 @@ const Boolforge = ({
 
   const deleteWire = (wireId) => {
     setWires((prev) => prev.filter((w) => w.id !== wireId));
-    setSelectedWireIds((prev) => prev.filter((id) => id !== wireId));
     saveToHistory();
   };
 
   const handleCanvasContextMenu = (e) => {
     e.preventDefault();
-    const { x, y } = clientToWorld(e.clientX, e.clientY);
-    const hit = hitWireAt(x, y, wires, gateMap);
-    if (hit) deleteWire(hit.id);
   };
 
   const stopPortEvent = (e) => {
@@ -565,16 +639,6 @@ const Boolforge = ({
         return;
       }
       const { x: startX, y: startY } = clientToWorld(e.clientX, e.clientY);
-      if (e.button === 0) {
-        const hit = hitWireAt(startX, startY, wires, gateMap);
-        if (hit) {
-          setSelectedWireIds([hit.id]);
-          setSelectedGateIds([]);
-          setSelectedGate(null);
-          return;
-        }
-        setSelectedWireIds([]);
-      }
       const isCtrl = e.ctrlKey || e.metaKey;
       const isMiddleClick = e.button === 1;
 
@@ -1206,21 +1270,8 @@ const Boolforge = ({
 
   // 🚀 HOOK USAGE FOR KEYBOARD SHORTCUTS
   useKeyboardShortcuts({
-    undo,
-    redo,
-    gates,
-    selectedGateIds,
-    setSelectedGateIds,
-    selectedWireIds,
-    setSelectedWireIds,
-    deleteGate,
-    setWires,
-    saveToHistory,
-    copySelectedGates,
-    pasteGates,
-    duplicateSelectedGates,
-    setConnectingFrom,
-    setConnectCursor,
+    undo, redo, gates, selectedGateIds, setSelectedGateIds, deleteGate,
+    copySelectedGates, pasteGates, duplicateSelectedGates, setConnectingFrom, setConnectCursor
   });
 
   useEffect(() => {
@@ -1282,7 +1333,7 @@ const Boolforge = ({
       />
 
       {/* Canvas */}
-      <div className={`canvas-container${connectingFrom ? " is-wiring" : ""}`} ref={containerRef}>
+      <div className={`canvas-container${connectingFrom ? " is-wiring" : ""}`} ref={containerRef} style={{ position: 'relative' }}>
         <canvas
           ref={canvasRef}
           onContextMenu={handleCanvasContextMenu}
@@ -1306,27 +1357,8 @@ const Boolforge = ({
               const pts = getWirePoints(fromGate, toGate, wire.fromOutputIndex, wire.toIndex);
               const isActive = evaluateGate(fromGate, wire.fromOutputIndex ?? 0);
               return (
-                <g
-                  key={wire.id}
-                  className={`${isActive ? "wire-on" : "wire-off"}${selectedWireIds.includes(wire.id) ? " wire-selected" : ""}`}
-                >
-                  <path
-                    className="wire-hit"
-                    d={wirePathD(pts)}
-                    fill="none"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setSelectedWireIds([wire.id]);
-                      setSelectedGateIds([]);
-                      setSelectedGate(null);
-                    }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      deleteWire(wire.id);
-                    }}
-                  />
+                <g key={wire.id} className={isActive ? "wire-on" : "wire-off"}>
+                  <path className="wire-hit" d={wirePathD(pts)} fill="none" onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); deleteWire(wire.id); }} />
                   {isActive && <path className="wire-glow" d={wirePathD(pts)} fill="none" />}
                   <path className="wire-path" d={wirePathD(pts)} fill="none" />
                 </g>
@@ -1427,6 +1459,17 @@ const Boolforge = ({
           <button className="canvas-overlay-btn" onClick={() => setZoom((z) => Math.min(3, z * 1.2))}>+</button>
           <button className="canvas-overlay-btn" onClick={() => setZoom((z) => Math.max(0.3, z * 0.8))}>−</button>
         </div>
+
+        {/* 🚀 SHEET TABS INJECTED HERE */}
+        <SheetTabs 
+          sheets={sheets} 
+          activeSheetId={activeSheetId} 
+          onSwitchSheet={switchSheet} 
+          onAddSheet={addSheet} 
+          onRenameSheet={renameSheet} 
+          onDeleteSheet={deleteSheet} 
+        />
+        
       </div>
 
       {/* Right panel */}
