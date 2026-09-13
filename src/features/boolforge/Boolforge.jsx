@@ -75,7 +75,11 @@ const Boolforge = ({
     mergeInputGates, deleteWire,
     copySelectedGates, pasteGates, duplicateSelectedGates,
     clearCircuit,
-     customIcMeta,
+    customIcMeta,
+    // --- ADDED COMMENT STATE & CRUD ---
+    comments, setComments,
+    selectedCommentIds, setSelectedCommentIds,
+    handleAddComment, updateComment, deleteComment,
   } = circuit;
 
   // SIMULATION (gate evaluation + truth table)
@@ -87,6 +91,8 @@ const Boolforge = ({
     setGates,
     wires,
     setWires,
+    comments,             // <-- ADDED
+    setComments,          // <-- ADDED
     gateMap,
     wireIdCounter,
     setWireIdCounter,
@@ -99,6 +105,8 @@ const Boolforge = ({
     setSelectedGate,
     selectedWireIds,
     setSelectedWireIds,
+    selectedCommentIds,   // <-- ADDED
+    setSelectedCommentIds,// <-- ADDED
     mergeInputGates,
     deleteWire,
     containerRef,
@@ -115,7 +123,7 @@ const Boolforge = ({
     connectingFrom, setConnectingFrom,
     connectCursor, setConnectCursor,
     clientToWorld,
-    startDrag, onDrag, stopDrag,
+    startDrag, startDragComment, onDrag, stopDrag, // <-- ADDED startDragComment
     handleOutputPortClick,
     handleCanvasContextMenu,
     handleCanvasMouseDown, handleMouseMove, handleMouseUp,
@@ -364,6 +372,7 @@ const handleDeleteComponent = async (id, name) => {
         showGridOverlay={showGridOverlay}
         setShowGridOverlay={setShowGridOverlay}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        handleAddComment={handleAddComment} // <-- ADDED
       />
       {/* WORKSPACE — sidebar + canvas, below the ribbon */}
       <div className="circuit-workspace">
@@ -461,6 +470,13 @@ const handleDeleteComponent = async (id, name) => {
           setHintError={setHintError}
           showGridOverlay={showGridOverlay}
           customIcMeta={customIcMeta}
+          // --- ADDED COMMENT PROPS ---
+          comments={comments}
+          selectedCommentIds={selectedCommentIds}
+          setSelectedCommentIds={setSelectedCommentIds}
+          updateComment={updateComment}
+          deleteComment={deleteComment}
+          startDragComment={startDragComment}
         />
       </div>
 

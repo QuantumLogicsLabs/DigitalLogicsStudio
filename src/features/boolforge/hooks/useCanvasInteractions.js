@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { GATE_WIDTH, getICHeight, getOutputY, hitWireAt } from "../utils";
 import { IC_TYPES } from "../../../shared/data/gates";
 
-// Owns all canvas-level interaction: pan/zoom, box selection, gate
+// Owns all canvas-level interaction: pan/zoom, box selection, gate & comment
 // dragging (mouse + touch), and wire creation/completion. Talks to the
 // circuit state via the setters/helpers passed in.
 export function useCanvasInteractions({
@@ -10,6 +10,8 @@ export function useCanvasInteractions({
   setGates,
   wires,
   setWires,
+  comments = [],
+  setComments,
   gateMap,
   wireIdCounter,
   setWireIdCounter,
@@ -21,6 +23,8 @@ export function useCanvasInteractions({
   setSelectedGate,
   selectedWireIds,
   setSelectedWireIds,
+  selectedCommentIds = [],
+  setSelectedCommentIds,
   mergeInputGates,
   deleteWire,
   containerRef,
@@ -48,6 +52,7 @@ export function useCanvasInteractions({
   const hasMovedRef = useRef(false);
   const wasCtrlClickRef = useRef(false);
   const touchStateRef = useRef({ type: null, id: null, startX: 0, startY: 0 });
+  const dragTypeRef = useRef(null); // Tracks if we are dragging a 'gate' or 'comment'
 
   const clientToWorld = useCallback(
     (clientX, clientY) => {
@@ -67,6 +72,7 @@ export function useCanvasInteractions({
       if (e.button !== 0) return;
       e.stopPropagation();
       setSelectedWireIds([]);
+      if (setSelectedCommentIds) setSelectedCommentIds([]);
       setIsPanning(false);
 
       const isCtrl = e.ctrlKey || e.metaKey;
@@ -82,6 +88,7 @@ export function useCanvasInteractions({
       setSelectedGate(gate);
       wasCtrlClickRef.current = isCtrl;
       hasMovedRef.current = false;
+      dragTypeRef.current = "gate";
 
       const startPositions = {};
       gates.forEach((g) => {
@@ -95,12 +102,50 @@ export function useCanvasInteractions({
       setDragStartMouse({ x: mouseX, y: mouseY });
       setDragging(true);
     },
-    [gates, selectedGateIds, containerRef, panOffset, zoom, setSelectedWireIds, setSelectedGateIds, setSelectedGate]
+    [gates, selectedGateIds, containerRef, panOffset, zoom, setSelectedWireIds, setSelectedGateIds, setSelectedGate, setSelectedCommentIds]
+  );
+
+  const startDragComment = useCallback(
+    (e, comment) => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      setSelectedWireIds([]);
+      setSelectedGateIds([]);
+      setSelectedGate(null);
+      setIsPanning(false);
+
+      const isCtrl = e.ctrlKey || e.metaKey;
+      let nextSelection = [...selectedCommentIds];
+      if (isCtrl) {
+        if (selectedCommentIds.includes(comment.id))
+          nextSelection = nextSelection.filter((id) => id !== comment.id);
+        else nextSelection.push(comment.id);
+      } else {
+        if (!selectedCommentIds.includes(comment.id)) nextSelection = [comment.id];
+      }
+      if (setSelectedCommentIds) setSelectedCommentIds(nextSelection);
+      wasCtrlClickRef.current = isCtrl;
+      hasMovedRef.current = false;
+      dragTypeRef.current = "comment";
+
+      const startPositions = {};
+      comments.forEach((c) => {
+        if (nextSelection.includes(c.id)) startPositions[c.id] = { x: c.x, y: c.y };
+      });
+      setDragStartPositions(startPositions);
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const mouseX = (e.clientX - rect.left - panOffset.x) / zoom;
+      const mouseY = (e.clientY - rect.top - panOffset.y) / zoom;
+      setDragStartMouse({ x: mouseX, y: mouseY });
+      setDragging(true);
+    },
+    [comments, selectedCommentIds, containerRef, panOffset, zoom, setSelectedWireIds, setSelectedGateIds, setSelectedGate, setSelectedCommentIds]
   );
 
   const onDrag = useCallback(
     (e) => {
-      if (!dragging || selectedGateIds.length === 0 || isPanning) return;
+      if (!dragging || isPanning) return;
       const rect = containerRef.current.getBoundingClientRect();
       const mouseX = (e.clientX - rect.left - panOffset.x) / zoom;
       const mouseY = (e.clientY - rect.top - panOffset.y) / zoom;
@@ -109,31 +154,52 @@ export function useCanvasInteractions({
 
       if (Math.abs(dx) > 2 || Math.abs(dy) > 2) hasMovedRef.current = true;
 
-      setGates((prev) =>
-        prev.map((g) => {
-          if (selectedGateIds.includes(g.id)) {
-            const startPos = dragStartPositions[g.id];
-            if (startPos) {
-              return {
-                ...g,
-                x: snapToGrid(startPos.x + dx),
-                y: snapToGrid(startPos.y + dy),
-              };
+      if (dragTypeRef.current === "gate" && selectedGateIds.length > 0) {
+        setGates((prev) =>
+          prev.map((g) => {
+            if (selectedGateIds.includes(g.id)) {
+              const startPos = dragStartPositions[g.id];
+              if (startPos) {
+                return {
+                  ...g,
+                  x: snapToGrid(startPos.x + dx),
+                  y: snapToGrid(startPos.y + dy),
+                };
+              }
             }
-          }
-          return g;
-        })
-      );
+            return g;
+          })
+        );
+      } else if (dragTypeRef.current === "comment" && selectedCommentIds.length > 0) {
+        setComments?.((prev) =>
+          prev.map((c) => {
+            if (selectedCommentIds.includes(c.id)) {
+              const startPos = dragStartPositions[c.id];
+              if (startPos) {
+                return {
+                  ...c,
+                  x: snapToGrid(startPos.x + dx),
+                  y: snapToGrid(startPos.y + dy),
+                };
+              }
+            }
+            return c;
+          })
+        );
+      }
     },
-    [dragging, selectedGateIds, isPanning, containerRef, panOffset, zoom, dragStartMouse, dragStartPositions, snapToGrid, setGates]
+    [dragging, isPanning, dragTypeRef, selectedGateIds, selectedCommentIds, containerRef, panOffset, zoom, dragStartMouse, dragStartPositions, snapToGrid, setGates, setComments]
   );
 
   const stopDrag = useCallback(() => {
     if (dragging) {
       setDragging(false);
-      if (!hasMovedRef.current && selectedGate && !wasCtrlClickRef.current) {
-        setSelectedGateIds([selectedGate.id]);
+      if (!hasMovedRef.current && !wasCtrlClickRef.current) {
+        if (dragTypeRef.current === "gate" && selectedGate) {
+          setSelectedGateIds([selectedGate.id]);
+        }
       }
+      dragTypeRef.current = null;
       saveToHistory();
     }
   }, [dragging, selectedGate, saveToHistory, setSelectedGateIds]);
@@ -240,6 +306,7 @@ export function useCanvasInteractions({
           if (hit) {
             setSelectedWireIds([hit.id]);
             setSelectedGateIds([]);
+            if (setSelectedCommentIds) setSelectedCommentIds([]);
             setSelectedGate(null);
             return;
           }
@@ -255,6 +322,9 @@ export function useCanvasInteractions({
           if (!selectionToolActive && !e.shiftKey) {
             setIsPanning(true);
             setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+            setSelectedGateIds([]);
+            if (setSelectedCommentIds) setSelectedCommentIds([]);
+            setSelectedGate(null);
           } else {
             setIsSelecting(true);
             setSelectionStart({ x: startX, y: startY });
@@ -262,6 +332,7 @@ export function useCanvasInteractions({
             setSelectionStartIds(isCtrl ? selectedGateIds : []);
             if (!isCtrl) {
               setSelectedGateIds([]);
+              if (setSelectedCommentIds) setSelectedCommentIds([]);
               setSelectedGate(null);
             }
           }
@@ -281,6 +352,7 @@ export function useCanvasInteractions({
       setSelectedWireIds, 
       setSelectedGateIds, 
       setSelectedGate, 
+      setSelectedCommentIds,
       snapEnabled,
       customIcMeta
     ]
@@ -362,6 +434,7 @@ export function useCanvasInteractions({
           setDragStartMouse({ x: mouseX, y: mouseY });
 
           touchStateRef.current = { type: "drag", id: gateId, startX: touch.clientX, startY: touch.clientY };
+          dragTypeRef.current = "gate";
           setDragging(true);
           return;
         }
@@ -384,7 +457,7 @@ export function useCanvasInteractions({
       if (state.type === "pan") {
         e.preventDefault();
         setPanOffset({ x: touch.clientX - panStart.x, y: touch.clientY - panStart.y });
-      } else if (state.type === "drag") {
+      } else if (state.type === "drag" && dragTypeRef.current === "gate") {
         e.preventDefault();
         const rect = containerRef.current.getBoundingClientRect();
         const mouseX = (touch.clientX - rect.left - panOffset.x) / zoom;
@@ -414,6 +487,7 @@ export function useCanvasInteractions({
   const handleTouchEnd = useCallback(() => {
     if (touchStateRef.current.type === "drag" && dragging) {
       setDragging(false);
+      dragTypeRef.current = null;
       saveToHistory();
     }
     if (touchStateRef.current.type === "pan") setIsPanning(false);
@@ -499,7 +573,7 @@ export function useCanvasInteractions({
     connectingFrom, setConnectingFrom,
     connectCursor, setConnectCursor,
     clientToWorld,
-    startDrag, onDrag, stopDrag,
+    startDrag, startDragComment, onDrag, stopDrag,
     startConnection, endWiring, completeConnection, handleOutputPortClick,
     handleCanvasContextMenu, stopPortEvent,
     handleCanvasMouseDown, handleMouseMove, handleMouseUp,

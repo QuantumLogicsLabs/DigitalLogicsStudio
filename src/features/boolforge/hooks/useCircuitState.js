@@ -32,6 +32,8 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
   const [selectedGate, setSelectedGate] = useState(null);
   const [selectedGateIds, setSelectedGateIds] = useState([]);
   const [selectedWireIds, setSelectedWireIds] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [selectedCommentIds, setSelectedCommentIds] = useState([]);
 
   const [renamingGate, setRenamingGate] = useState(null);
   const [renameValue, setRenameValue] = useState("");
@@ -64,6 +66,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
     const state = {
       gates: JSON.parse(JSON.stringify(gates)),
       wires: JSON.parse(JSON.stringify(wires)),
+      comments: JSON.parse(JSON.stringify(comments)), // <-- Add this
       gateIdCounter,
       wireIdCounter,
       inputCounter,
@@ -75,7 +78,9 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
       return newHistory.slice(-50);
     });
     setHistoryIndex((prev) => Math.min(prev + 1, 49));
-  }, [gates, wires, gateIdCounter, wireIdCounter, inputCounter, outputCounter, historyIndex]);
+  }, [gates, wires, comments, gateIdCounter, wireIdCounter, inputCounter, outputCounter, historyIndex]);
+
+
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
@@ -83,6 +88,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
       const state = history[newIndex];
       setGates(JSON.parse(JSON.stringify(state.gates)));
       setWires(JSON.parse(JSON.stringify(state.wires)));
+      setComments(JSON.parse(JSON.stringify(state.comments || []))); // <-- Add this
       setGateIdCounter(state.gateIdCounter);
       setWireIdCounter(state.wireIdCounter);
       setInputCounter(state.inputCounter || 0);
@@ -97,6 +103,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
       const state = history[newIndex];
       setGates(JSON.parse(JSON.stringify(state.gates)));
       setWires(JSON.parse(JSON.stringify(state.wires)));
+      setComments(JSON.parse(JSON.stringify(state.comments || [])));
       setGateIdCounter(state.gateIdCounter);
       setWireIdCounter(state.wireIdCounter);
       setInputCounter(state.inputCounter || 0);
@@ -184,6 +191,34 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
     },
     [gates, gateIdCounter, inputCounter, outputCounter, containerRef, generateInputLabel, generateOutputLabel, saveToHistory]
   );
+  // ── Comment CRUD ────────────────────────────────────────────────────────
+  const handleAddComment = useCallback(() => {
+    const newComment = {
+      id: `comment-${Date.now()}`,
+      x: 100, 
+      y: 100,
+      text: "New Note...",
+      isEditing: true
+    };
+    setComments((prev) => [...prev, newComment]);
+    saveToHistory();
+  }, [saveToHistory]);
+
+  const updateComment = useCallback((id, updates) => {
+    setComments((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+    );
+    // Only save to history when they finish editing (isEditing becomes false)
+    if (updates.isEditing === false) {
+      saveToHistory();
+    }
+  }, [saveToHistory]);
+
+  const deleteComment = useCallback((id) => {
+    setComments((prev) => prev.filter((c) => c.id !== id));
+    setSelectedCommentIds((prev) => prev.filter((cid) => cid !== id));
+    saveToHistory();
+  }, [saveToHistory]);
 
   const addInputSlot = useCallback(
     (e, gate) => {
@@ -393,6 +428,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
     // state
     gates, setGates,
     wires, setWires,
+    comments, setComments, // <-- ADD THIS
     gateIdCounter, setGateIdCounter,
     wireIdCounter, setWireIdCounter,
     inputCounter, setInputCounter,
@@ -400,6 +436,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
     selectedGate, setSelectedGate,
     selectedGateIds, setSelectedGateIds,
     selectedWireIds, setSelectedWireIds,
+    selectedCommentIds, setSelectedCommentIds, // <-- ADD THIS
     renamingGate, renameValue, setRenameValue,
     history, setHistory, historyIndex, setHistoryIndex,
     // derived
@@ -411,6 +448,7 @@ export function useCircuitState({ portNames = null, containerRef, snapEnabled = 
     snapToGrid,
     // CRUD
     deleteGate, addGate, addInputSlot, removeInputSlot,
+    handleAddComment, updateComment, deleteComment, // <-- ADD THIS
     startRename, commitRename, cancelRename,
     toggleInput,
     mergeInputGates, deleteWire,

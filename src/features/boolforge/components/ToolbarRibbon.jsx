@@ -91,6 +91,9 @@ export const ToolbarRibbon = ({
   customComponents = [],
   addGate,
   onDeleteComponent,
+  
+  // comments
+  handleAddComment,
 
   // mobile sidebar drawer toggle (hamburger button, only visible <=900px)
   onToggleSidebar,
@@ -120,15 +123,10 @@ export const ToolbarRibbon = ({
     };
   }, [openMenu]);
 
-  // ToastContext (see useAI.js / useSheets.js) exposes warning/error/success —
-  // "warning" is the closest neutral tone for a stub-feature notice.
   const notReady = (feature) => {
     toast.warning(`${feature} is on the roadmap — not wired up yet.`);
   };
 
-  // Auto-Arrange: real feature, reuses the same layout engine already used
-  // for AI-generated circuits (utils/layoutGeneratedCircuit) to re-flow the
-  // current gates into left-to-right columns based on the wire graph.
   const handleAutoArrange = () => {
     if (!gates.length) {
       toast.warning?.("Nothing to arrange yet — add some gates first.");
@@ -319,7 +317,7 @@ export const ToolbarRibbon = ({
         </button>
       )}
 
-      {/* ── Tools: visible but not-yet-wired feature previews ───────── */}
+      {/* ── Tools ───────── */}
             <RibbonMenu label="Tools" icon={Zap} isOpen={openMenu === "tools"} onToggle={() => toggleMenu("tools")} badge="1">
                <RibbonMenuSection title="Custom Library">
           <RibbonMenuItem
@@ -364,13 +362,15 @@ export const ToolbarRibbon = ({
           )}
         </RibbonMenuSection>
         <RibbonMenuDivider />
-        <RibbonMenuSection title="Coming soon">
+        <RibbonMenuSection title="Annotations">
           <RibbonMenuItem
             icon={MessageSquare}
-            label="Comments"
+            label="Add Comment"
             description="Leave notes on the circuit"
-            trailing={<SoonBadge />}
-            onClick={() => notReady("Comments")}
+            onClick={() => {
+              if (handleAddComment) handleAddComment();
+              closeMenu();
+            }}
           />
         </RibbonMenuSection>
       </RibbonMenu>

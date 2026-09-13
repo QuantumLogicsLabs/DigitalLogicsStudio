@@ -6,14 +6,7 @@ import {
 import { RibbonMenuItem } from "./RibbonMenu";
 import apiClient from "../../../shared/services/apiClient";
 
-// ─── State + logic, owned by ToolbarRibbon (never unmounts) ──────────────
-// Projects now save to the server (per-user, /api/boolforge-projects)
-// instead of localStorage, so a saved project follows the user across
-// browsers/devices — same pattern as Custom Components. Export/Import JSON
-// stay pure local file operations, independent of the server: Import loads
-// a file into the current in-memory project, and the user explicitly hits
-// Save Project if they want that persisted to their account.
-export function useSaveAndLoad({ sheets, loadSheets }) {
+export function useSaveAndLoad({ sheets, loadSheets, comments = [] }) {
   const [showSave, setShowSave] = useState(false);
   const [showLoad, setShowLoad] = useState(false);
   const [projectName, setProjectName] = useState("");
@@ -53,7 +46,8 @@ export function useSaveAndLoad({ sheets, loadSheets }) {
 
     setSaving(true);
     try {
-      await apiClient.post("/boolforge-projects", { name: trimmed, sheets });
+      // Pass comments alongside sheets to ensure they are saved in database
+      await apiClient.post("/boolforge-projects", { name: trimmed, sheets, comments });
       setShowSave(false);
       setProjectName("");
     } catch (err) {
@@ -86,9 +80,9 @@ export function useSaveAndLoad({ sheets, loadSheets }) {
     }
   };
 
-  // ── Export / Import: local file operations, unrelated to the server ──
   const exportJSON = () => {
-    const exportData = { sheets, exportedAt: new Date().toISOString() };
+    // Include comments in the JSON export
+    const exportData = { sheets, comments, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -100,6 +94,10 @@ export function useSaveAndLoad({ sheets, loadSheets }) {
 
   const loadSnapshot = (snap) => {
     if (Array.isArray(snap.sheets) && snap.sheets.length > 0) {
+      // If the loaded snapshot has root-level comments, merge them into the first sheet
+      if (snap.comments && snap.comments.length > 0 && snap.sheets[0].circuit) {
+        snap.sheets[0].circuit.comments = snap.comments;
+      }
       loadSheets(snap.sheets);
     } else if (Array.isArray(snap.gates)) {
       loadSheets([{
@@ -163,7 +161,6 @@ export function useSaveAndLoad({ sheets, loadSheets }) {
   };
 }
 
-// ─── Trigger buttons — safe to unmount when the File dropdown closes ─────
 export function SaveLoadMenuItems({ api, onExportPNG, closeMenu }) {
   const handleOpenSave = () => { closeMenu?.(); api.openSave(); };
   const handleOpenLoad = () => { closeMenu?.(); api.openLoad(); };
@@ -179,8 +176,6 @@ export function SaveLoadMenuItems({ api, onExportPNG, closeMenu }) {
   );
 }
 
-// ─── The actual dialogs — must be rendered OUTSIDE the dropdown's
-// isOpen-gated tree, so they survive the dropdown closing ─────────────────
 export function SaveLoadDialogs({ api }) {
   if (!api.showSave && !api.showLoad) return null;
 
