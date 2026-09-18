@@ -2108,97 +2108,493 @@ body:has(.boolforge-page) {
   background: rgba(37, 99, 235, 0.08);
 }
 /* ══════════════════════════════════════════════════════════════════════════
-   COMMENTS — sticky-note pins on canvas/components
+   COMMENTS — professional note markers on canvas/components
    ══════════════════════════════════════════════════════════════════════════ */
 
-.canvas-container--comment-mode {
-  outline: 2px dashed var(--accent-secondary, #00d4ff);
-  outline-offset: -2px;
+/* ── Floating hint shown only while comment-mode is armed ─────────────── */
+
+.comment-mode-hint {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  background: rgba(10, 14, 26, 0.92);
+  border: 1px solid var(--accent-secondary, #00d4ff);
+  border-radius: 999px;
+
+  color: var(--accent-secondary, #00d4ff);
+
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  white-space: nowrap;
+
+  z-index: 30;
+  pointer-events: none;
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
-.comment-pin {
-  cursor: pointer;
+[data-theme="light"] .comment-mode-hint {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent-secondary, #2563eb);
+  color: var(--accent-secondary, #2563eb);
 }
 
-.comment-pin-icon {
-  width: 26px;
-  height: 26px;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMENT PIN MARKER
+   Small circular draggable marker
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.comment-pin-marker {
+  width: 20px;
+  height: 20px;
+
   border-radius: 50%;
+  border: none;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  background: rgba(251, 191, 36, 0.15);
-  border: 1.5px solid #fbbf24;
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.35);
+
+  padding: 0;
+
+  /* Drag support */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+
+  background: var(--accent-secondary, #00d4ff);
+  color: #04121c;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(0, 212, 255, 0.18);
+
   transform: translate(-50%, -50%);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
-.comment-pin-icon:hover {
-  transform: translate(-50%, -50%) scale(1.12);
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.55);
+
+/* Hover state */
+
+.comment-pin-marker:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 4px rgba(0, 212, 255, 0.28);
 }
 
-.comment-pin--component .comment-pin-icon {
-  background: rgba(0, 212, 255, 0.15);
-  border-color: var(--accent-secondary, #00d4ff);
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.35);
+
+/* While dragging */
+
+.comment-pin-marker:active {
+  cursor: grabbing;
+
+  transform: translate(-50%, -50%) scale(1.08);
 }
+
+
+/* ── Component-attached comment marker ───────────────────────────────── */
+
+.comment-pin--component .comment-pin-marker {
+  background: var(--accent-primary, #00ff88);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(0, 255, 136, 0.18);
+}
+
+.comment-pin--component .comment-pin-marker:hover {
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 4px rgba(0, 255, 136, 0.28);
+}
+
+
+/* ── Canvas-attached comment marker ──────────────────────────────────── */
+
+.comment-pin--canvas .comment-pin-marker {
+  cursor: grab;
+}
+
+.comment-pin--canvas .comment-pin-marker:active {
+  cursor: grabbing;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMENT POPUP
+   ══════════════════════════════════════════════════════════════════════════ */
 
 .comment-popup {
   position: absolute;
-  top: 6px;
-  left: 20px;
-  width: 200px;
-  background: var(--bg-medium, #142d29);
-  border: 1px solid var(--border-color, #1b2131);
+
+  top: 4px;
+  left: 16px;
+
+  width: 216px;
+
+  background: var(--bg-medium, #141b2d);
+
+  border: 1px solid var(--border-color, #2a3550);
   border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+  padding: 0;
+
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+
   z-index: 600;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+
+  overflow: hidden;
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════════
+   POPUP HEADER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.comment-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 8px 10px;
+
+  border-bottom: 1px solid var(--border-color, #2a3550);
+
+  background: rgba(255, 255, 255, 0.02);
+
+  /*
+   * Prevent selecting the header while interacting with
+   * the comment popup.
+   */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.comment-popup-header-label {
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  color: var(--secondary-text, #8899aa);
+}
+
+.comment-popup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   POPUP ICON BUTTONS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.comment-icon-btn {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 6px;
+
+  color: var(--secondary-text, #8899aa);
+
+  cursor: pointer;
+
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.comment-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: var(--accent-secondary, #00d4ff);
+}
+
+.comment-icon-btn--danger:hover {
+  background: rgba(255, 51, 102, 0.12);
+
+  color: var(--accent-danger, #ff3366);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMENT TEXT
+   ══════════════════════════════════════════════════════════════════════════ */
+
 .comment-popup-text {
+  padding: 10px;
+
   font-size: 12.5px;
-  line-height: 1.5;
+  line-height: 1.55;
+
   color: var(--text-primary, #e8f0ff);
+
   white-space: pre-wrap;
   word-break: break-word;
+
   max-height: 140px;
+
   overflow-y: auto;
 }
 
-.comment-popup-text em {
+.comment-popup-placeholder {
   color: var(--secondary-text, #8899aa);
+
   font-style: italic;
 }
 
+.comment-popup-timestamp {
+  padding: 0 10px 10px;
+
+  font-size: 10.5px;
+
+  color: var(--secondary-text, #8899aa);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMENT TEXTAREA
+   ══════════════════════════════════════════════════════════════════════════ */
+
 .comment-textarea {
   width: 100%;
+
   box-sizing: border-box;
+
   resize: vertical;
-  min-height: 60px;
+
+  min-height: 64px;
+
   background: var(--bg-light, #1e2842);
-  border: 1px solid var(--accent-secondary, #00d4ff);
-  border-radius: 6px;
+
+  border: none;
+  border-top: 1px solid transparent;
+
   color: var(--text-color, #e8f0ff);
-  padding: 6px 8px;
-  font-size: 12px;
+
+  padding: 10px;
+
+  font-size: 12.5px;
   font-family: inherit;
+
   outline: none;
 }
 
-.comment-popup-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
+.comment-textarea:focus {
+  background: rgba(0, 212, 255, 0.04);
 }
 
-.btn-small {
-  padding: 4px 8px;
-  font-size: 11px;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   POPUP FOOTER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.comment-popup-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 6px;
+
+  padding: 8px 10px;
+
+  border-top: 1px solid var(--border-color, #2a3550);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMENT ACTION BUTTONS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.comment-action-btn {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 5px 10px;
+
+  border-radius: 6px;
+
+  font-size: 11.5px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  border: 1px solid transparent;
+
+  font-family: inherit;
+
+  transition: all 0.12s ease;
+}
+
+
+/* Ghost button */
+
+.comment-action-btn--ghost {
+  background: transparent;
+
+  border-color: var(--border-color, #2a3550);
+
+  color: var(--secondary-text, #8899aa);
+}
+
+.comment-action-btn--ghost:hover {
+  color: var(--text-primary, #e8f0ff);
+
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Primary button */
+
+.comment-action-btn--primary {
+  background: var(--accent-secondary, #00d4ff);
+
+  color: #04121c;
+}
+
+.comment-action-btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-theme="light"] .comment-popup {
+  background: #ffffff;
+
+  border-color: rgba(37, 99, 235, 0.15);
+
+  box-shadow: 0 16px 40px rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .comment-popup-header {
+  background: rgba(37, 99, 235, 0.03);
+
+  border-bottom-color: rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .comment-popup-header-label,
+[data-theme="light"] .comment-popup-timestamp,
+[data-theme="light"] .comment-popup-placeholder {
+  color: var(--text-secondary, #64748b);
+}
+
+[data-theme="light"] .comment-icon-btn {
+  color: var(--text-secondary, #64748b);
+}
+
+[data-theme="light"] .comment-icon-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+
+  color: var(--accent-secondary, #2563eb);
+}
+
+[data-theme="light"] .comment-icon-btn--danger:hover {
+  background: rgba(220, 38, 38, 0.1);
+
+  color: #dc2626;
+}
+
+[data-theme="light"] .comment-popup-text {
+  color: var(--text-primary, #1e293b);
+}
+
+[data-theme="light"] .comment-textarea {
+  background: #f8fafc;
+
+  color: var(--text-primary, #1e293b);
+}
+
+[data-theme="light"] .comment-textarea:focus {
+  background: rgba(37, 99, 235, 0.03);
+}
+
+[data-theme="light"] .comment-popup-footer {
+  border-top-color: rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="light"] .comment-action-btn--ghost {
+  border-color: rgba(37, 99, 235, 0.2);
+
+  color: var(--text-secondary, #64748b);
+}
+
+[data-theme="light"] .comment-action-btn--ghost:hover {
+  color: var(--text-primary, #1e293b);
+
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="light"] .comment-action-btn--primary {
+  background: var(--accent-secondary, #2563eb);
+
+  color: #ffffff;
+}
+
+
+/* ── Light theme comment markers ─────────────────────────────────────── */
+
+[data-theme="light"] .comment-pin-marker {
+  background: var(--accent-secondary, #2563eb);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 2px 8px rgba(37, 99, 235, 0.25),
+    0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+[data-theme="light"] .comment-pin-marker:hover {
+  box-shadow:
+    0 2px 10px rgba(37, 99, 235, 0.3),
+    0 0 0 4px rgba(37, 99, 235, 0.22);
+}
+
+
+/* ── Light theme component comment marker ───────────────────────────── */
+
+[data-theme="light"] .comment-pin--component .comment-pin-marker {
+  background: #059669;
+
+  box-shadow:
+    0 2px 8px rgba(5, 150, 105, 0.25),
+    0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+[data-theme="light"] .comment-pin--component .comment-pin-marker:hover {
+  box-shadow:
+    0 2px 10px rgba(5, 150, 105, 0.3),
+    0 0 0 4px rgba(5, 150, 105, 0.22);
 }
