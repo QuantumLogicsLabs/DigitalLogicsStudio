@@ -15,25 +15,43 @@ export function getICHeight(type) {
 export function getGateHeight(gate, customIcMeta = {}) {
   if (gate.type?.startsWith("CUSTOM_") && customIcMeta[gate.type]) {
     const meta = customIcMeta[gate.type];
-    return Math.max(100, Math.max(meta.inputs, meta.outputs) * 22 + 20);
+    // Changed multiplier from 22 to 20 to ensure total height stays on grid
+    return Math.max(100, Math.max(meta.inputs, meta.outputs) * 20 + 20);
   }
   return IC_TYPES.has(gate.type) ? getICHeight(gate.type) : GATE_HEIGHT;
 }
 
 export function getInputY(gate, inputIndex, customIcMeta = {}) {
   const h = getGateHeight(gate, customIcMeta);
+  let n = gate.inputs;
+
+  // IC Grid Aligned Port Positioning
   if (gate.type?.startsWith("CUSTOM_") && customIcMeta[gate.type]) {
-    const n = customIcMeta[gate.type].inputs;
+    n = customIcMeta[gate.type].inputs;
     if (n === 1) return gate.y + h / 2;
-    return gate.y + 0.1 * h + (inputIndex / (n - 1)) * (0.8 * h);
+    const span = (n - 1) * 20;
+    const startY = (h - span) / 2;
+    return gate.y + startY + inputIndex * 20;
   }
   if (IC_TYPES.has(gate.type)) {
-    const n = IC_META[gate.type].inputs;
+    n = IC_META[gate.type].inputs;
     if (n === 1) return gate.y + h / 2;
-    return gate.y + 0.1 * h + (inputIndex / (n - 1)) * (0.8 * h);
+    const span = (n - 1) * 20;
+    const startY = (h - span) / 2;
+    return gate.y + startY + inputIndex * 20;
   }
-  const n = gate.inputs;
+  
+  // Standard Gate Grid Aligned Port Positioning (Assuming h = 100)
   if (n === 1) return gate.y + h / 2;
+  
+  if (h === 100) {
+    if (n === 2) return gate.y + (inputIndex === 0 ? 30 : 70);
+    if (n === 3) return gate.y + (inputIndex === 0 ? 20 : inputIndex === 1 ? 50 : 80);
+    if (n === 4) return gate.y + 20 + inputIndex * 20;
+    if (n === 5) return gate.y + 10 + inputIndex * 20;
+  }
+
+  // Fallback
   if (n === 2) return gate.y + (inputIndex === 0 ? 0.35 : 0.65) * h;
   return gate.y + 0.15 * h + (inputIndex / (n - 1)) * 0.7 * h;
 }
@@ -41,15 +59,25 @@ export function getInputY(gate, inputIndex, customIcMeta = {}) {
 
 export function getOutputY(gate, outputIndex, customIcMeta = {}) {
   const h = getGateHeight(gate, customIcMeta);
+  
+  // IC Grid Aligned Port Positioning
   if (gate.type?.startsWith("CUSTOM_") && customIcMeta[gate.type]) {
     const n = customIcMeta[gate.type].outputs;
     if (n === 1) return gate.y + h / 2;
-    return gate.y + 0.1 * h + (outputIndex / (n - 1)) * (0.8 * h);
+    const span = (n - 1) * 20;
+    const startY = (h - span) / 2;
+    return gate.y + startY + outputIndex * 20;
   }
-  if (!IC_TYPES.has(gate.type)) return gate.y + h / 2;
-  const n = IC_META[gate.type].outputs;
-  if (n === 1) return gate.y + h / 2;
-  return gate.y + 0.1 * h + (outputIndex / (n - 1)) * (0.8 * h);
+  
+  if (IC_TYPES.has(gate.type)) {
+    const n = IC_META[gate.type].outputs;
+    if (n === 1) return gate.y + h / 2;
+    const span = (n - 1) * 20;
+    const startY = (h - span) / 2;
+    return gate.y + startY + outputIndex * 20;
+  }
+  
+  return gate.y + h / 2;
 }
 
 export function getCurvePoints(fromX, fromY, toX, toY) {
