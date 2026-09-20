@@ -9,6 +9,7 @@ import {
 import {
   gateSymbols,
   IC_TYPES,
+  IC_META,
 } from "../../../shared/data/gates";
 import { SheetTabs } from "./SheetTabs";
 import {
@@ -790,9 +791,14 @@ export const CircuitCanvas = ({
           const canExpand = MULTI_INPUT_GATES.has(gate.type);
           const canAddInput = canExpand && gate.inputs < MAX_GATE_INPUTS;
           const canRemoveInput = canExpand && gate.inputs > MIN_GATE_INPUTS;
+          
           const isCustom = gate.type.startsWith("CUSTOM_");
           const isIC = IC_TYPES.has(gate.type) || isCustom;
-          const icMeta = isIC ? customIcMeta[gate.type] : null;
+          
+          // FIX: Standard ICs now correctly pull their metadata from IC_META
+          const icMeta = isIC 
+            ? (isCustom ? customIcMeta[gate.type] : IC_META[gate.type]) 
+            : null;
 
           const icH = isIC
             ? isCustom && icMeta
