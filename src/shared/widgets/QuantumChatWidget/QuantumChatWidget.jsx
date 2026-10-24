@@ -14,7 +14,6 @@ import {
   LogOut,
   MoreHorizontal,
   Send,
-  SquarePen,
 } from "lucide-react";
 import { useQuantumChatAuth } from "../../quantumchat/context/QuantumChatAuthContext";
 import {
@@ -847,7 +846,7 @@ function QuantumChatWidgetInner() {
   const [isOpen, setIsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
-  const [composeTick, setComposeTick] = useState(0);
+  const [composeTick] = useState(0);
   const [unreadTotal, setUnreadTotal] = useState(0);
 
   const chatUrl = resolveQuantumChatUrl();
@@ -984,20 +983,6 @@ function QuantumChatWidgetInner() {
               </div>
             )}
           </div>
-
-          <button
-            type="button"
-            className="quantum-chat-dock__icon-btn"
-            aria-label="Compose new message"
-            title="Compose"
-            onClick={(event) => {
-              event.stopPropagation();
-              if (!isOpen) setIsOpen(true);
-              if (user && hasLocalKeyring) setComposeTick((n) => n + 1);
-            }}
-          >
-            <SquarePen size={17} strokeWidth={2.1} />
-          </button>
 
           <button
             type="button"
