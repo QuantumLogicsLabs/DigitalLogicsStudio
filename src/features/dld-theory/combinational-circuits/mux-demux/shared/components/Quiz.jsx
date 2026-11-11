@@ -4,15 +4,25 @@
  * Props:
  *   questions    : { q, opts, ans, exp, hint }[]
  *   feedbackText : { perfect, good, review }
+ *
+ * Submitting with at least the pass mark ticks the topic as complete in the
+ * learning path (via the shell's useLessonCompletion).
  */
 import React, { useState } from "react";
 import { COLORS } from "../theme.js";
+import { useLessonCompletion } from "../../../../../../shared/components/topics/lessonCompletion";
+import { getQuizPassMark } from "../../../combinationalConfig";
+
+const countCorrect = (questions, answers) =>
+  questions.reduce((s, q, i) => s + (answers[i] === q.ans ? 1 : 0), 0);
 
 const Quiz = ({ questions, feedbackText }) => {
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const { isComplete, markComplete } = useLessonCompletion();
+  const passMark = getQuizPassMark(questions.length);
   const q = questions[current];
 
   const choose = (qi, oi) => {
@@ -20,7 +30,10 @@ const Quiz = ({ questions, feedbackText }) => {
     setAnswers((prev) => ({ ...prev, [qi]: oi }));
   };
 
-  const submit = () => setSubmitted(true);
+  const submit = () => {
+    setSubmitted(true);
+    if (countCorrect(questions, answers) >= passMark) markComplete();
+  };
   const restart = () => {
     setAnswers({});
     setCurrent(0);
@@ -38,9 +51,8 @@ const Quiz = ({ questions, feedbackText }) => {
     setShowHint(false);
   };
 
-  const score = submitted
-    ? questions.reduce((s, q, i) => s + (answers[i] === q.ans ? 1 : 0), 0)
-    : null;
+  const score = submitted ? countCorrect(questions, answers) : null;
+  const passed = score !== null && score >= passMark;
 
   const feedbackMsg =
     score === null ? null
@@ -57,6 +69,11 @@ const Quiz = ({ questions, feedbackText }) => {
             Score: {score} / {questions.length}
           </div>
           <p style={{ color: COLORS.textSecondary, fontSize: "0.85rem", marginTop: "6px", lineHeight: "1.6" }}>{feedbackMsg}</p>
+          <p style={{ color: passed ? COLORS.high : COLORS.warn, fontSize: "0.85rem", fontWeight: "700", margin: "8px 0 0" }}>
+            {passed
+              ? "✅ Passed! This topic is now ticked as complete."
+              : `You need ${passMark}/${questions.length} to complete this topic. Review the lesson and try again.`}
+          </p>
         </div>
 
         <div style={{ display: "grid", gap: "10px" }}>
@@ -109,6 +126,22 @@ const Quiz = ({ questions, feedbackText }) => {
 
   return (
     <div>
+      <div
+        style={{
+          marginBottom: "14px",
+          padding: "9px 13px",
+          borderRadius: "8px",
+          fontSize: "0.8rem",
+          background: isComplete ? "rgba(0,255,136,0.07)" : "rgba(99,102,241,0.08)",
+          border: `1px solid ${isComplete ? "rgba(0,255,136,0.3)" : "rgba(99,102,241,0.25)"}`,
+          color: isComplete ? COLORS.high : COLORS.textSecondary,
+        }}
+      >
+        {isComplete
+          ? "✓ Topic completed. Keep practicing as much as you like — your completion is saved."
+          : `🎯 Score at least ${passMark}/${questions.length} to complete this topic.`}
+      </div>
+
       <div
         style={{
           display: "flex",
