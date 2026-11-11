@@ -13,6 +13,7 @@
 import React, { useState, useMemo } from "react";
 import { COLORS, bitIndicatorStyle } from "../../shared/theme.js";
 import TruthTable from "../../shared/components/TruthTable.jsx";
+import Tex from "../../../../../../shared/components/Tex";
 import { useToast } from "../../../../../../shared/context/ToastContext";
 
 // ─── Sub: single input toggle button ──────────────────────────────────────────
@@ -79,10 +80,10 @@ const EquationRow = ({ eq, isExpanded, onToggle }) => {
         }}
         onClick={onToggle}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <code style={{ color: eq.color, fontFamily: "monospace", fontSize: "0.95rem", fontWeight: "800" }}>
-            {eq.eq}
-          </code>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+          <span style={{ color: eq.color, fontSize: "0.95rem" }}>
+            <Tex>{eq.tex}</Tex>
+          </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <button
@@ -102,7 +103,7 @@ const EquationRow = ({ eq, isExpanded, onToggle }) => {
               fontWeight: "700",
             }}
           >
-            📋 COPY
+            COPY
           </button>
           <span style={{ color: COLORS.textMuted, fontSize: "0.8rem" }}>
             {isExpanded ? "▲" : "▼"}
@@ -124,7 +125,7 @@ const EquationRow = ({ eq, isExpanded, onToggle }) => {
               boxShadow: `inset 0 0 10px ${eq.color}10`,
             }}
           >
-            <span style={{ color: eq.color, fontSize: "0.8rem", fontWeight: "800" }}>🎯 MEMORY TRICK: </span>
+            <span style={{ color: eq.color, fontSize: "0.8rem", fontWeight: "800" }}>MEMORY TRICK:</span>
             <span style={{ color: COLORS.textPrimary, fontSize: "0.85rem", opacity: 0.9 }}>{eq.trick}</span>
           </div>
         </div>
@@ -231,7 +232,7 @@ const EncoderSimulator = ({ config, inputVals, setInputVals }) => {
       {/* ── Boolean equations (full width) ── */}
       <div style={{ gridColumn: "1 / -1" }}>
         <h4 style={{ color: COLORS.indigoLight, marginBottom: "14px", fontSize: "0.9rem" }}>
-          📐 Boolean Equations — Click to Expand
+          Boolean Equations — Click to Expand
         </h4>
         {config.booleanEqs.map((eq, i) => (
           <EquationRow
