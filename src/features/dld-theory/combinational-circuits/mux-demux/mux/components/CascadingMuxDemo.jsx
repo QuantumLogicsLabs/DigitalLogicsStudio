@@ -15,22 +15,24 @@ const CascadingMuxDemo = () => {
   const [s0, setS0] = useState(0);
 
   const groupLabel = s2 === 0 ? "Lower MUX (D0–D3)" : "Upper MUX (D4–D7)";
+  const groupRange = s2 === 0 ? "D0–D3" : "D4–D7";
   const innerIdx   = (s1 << 1) | s0;
   const finalInput = s2 * 4 + innerIdx;
 
   return (
     <div style={{ background: COLORS.darkBg, borderRadius: "14px", padding: "22px", border: "1px solid rgba(251,191,36,0.25)" }}>
       <h4 style={{ color: COLORS.warn, marginBottom: "8px", fontSize: "0.95rem" }}>
-        🔗 Cascading — Building an 8-to-1 MUX from 4-to-1 MUXes
+        🔗 Building an 8-to-1 MUX from Two 4-to-1 MUXes
       </h4>
       <p style={{ color: COLORS.textSecondary, fontSize: "0.83rem", lineHeight: "1.6", marginBottom: "18px" }}>
-        Two 4-to-1 MUXes feed a final 2-to-1 MUX. The extra select bit S2 chooses which group; S1,S0 choose within the group.
+        Think of the 8 inputs as two groups of 4. <strong style={{ color: COLORS.textPrimary }}>S2</strong> picks
+        the group. Then <strong style={{ color: COLORS.textPrimary }}>S1 and S0</strong> pick one input inside that group.
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "18px", alignItems: "start" }}>
         {/* Left: S2 group select */}
         <div style={{ textAlign: "center" }}>
-          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>S2 — Group select</div>
+          <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>Step 1 — S2 picks the group</div>
           {[0, 1].map((v) => (
             <button
               key={v}
@@ -51,7 +53,7 @@ const CascadingMuxDemo = () => {
         {/* Right: S1,S0 inner + result */}
         <div>
           <div style={{ color: COLORS.textSecondary, fontSize: "0.75rem", marginBottom: "8px" }}>
-            S1,S0 — Select within {groupLabel}
+            Step 2 — S1, S0 pick one input from {groupRange}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "14px" }}>
             {["S1", "S0"].map((label, li) => {
@@ -82,15 +84,20 @@ const CascadingMuxDemo = () => {
               D{finalInput} passes to output Y
             </div>
             <div style={{ color: COLORS.textSecondary, fontSize: "0.8rem", marginTop: "6px" }}>
-              Full select: S2S1S0 = {s2}{s1}{s0}₂ = {finalInput}₁₀
+              Shortcut: read S2 S1 S0 as one binary number → {s2}{s1}{s0} = {finalInput}, so D{finalInput}.
             </div>
           </div>
 
           <div style={{ marginTop: "12px", padding: "12px 14px", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: "9px" }}>
             <p style={{ color: COLORS.textSecondary, fontSize: "0.82rem", margin: 0, lineHeight: "1.6" }}>
-              💡 <strong style={{ color: COLORS.textPrimary }}>How it works:</strong>{" "}
-              S2={s2} enables the <strong style={{ color: COLORS.warn }}>{groupLabel}</strong>.
-              Within that MUX, S1S0={s1}{s0} (={innerIdx}₁₀) selects D{innerIdx} of that group → final D{finalInput}.
+              💡 <strong style={{ color: COLORS.textPrimary }}>In plain words:</strong>{" "}
+              S2 = {s2}, so we use the <strong style={{ color: COLORS.warn }}>{groupLabel}</strong>.
+              S1 S0 = {s1}{s0} in binary, which is {innerIdx}. So we take input number {innerIdx} of
+              that group (counting 0, 1, 2, 3) → <strong style={{ color: COLORS.high }}>D{finalInput}</strong>.
+            </p>
+            <p style={{ color: COLORS.textMuted, fontSize: "0.78rem", margin: "8px 0 0", lineHeight: "1.6" }}>
+              Inside the real circuit, both 4-to-1 MUXes use S1 S0 at the same time. The final 2-to-1 MUX
+              then uses S2 to decide which of their two outputs reaches Y.
             </p>
           </div>
         </div>

@@ -8,7 +8,8 @@
  *   description — one-line summary
  *   analogy     — real-world comparison for students
  *   encode()    — pure function (vals[]) → { [outName]: 0|1, active: number }
- *   booleanEqs  — array of { out, eq, color, explanation, trick }
+ *   booleanEqs  — array of { out, eq, tex, color, explanation, trick }
+ *                 (eq is the plain-text form for copying, tex is what gets typeset)
  *   truthHeaders— column headers for the truth table
  *   truthRows   — string[][] data rows
  */
@@ -30,9 +31,9 @@ export const ENCODER_TYPES = {
       return { A1: 0, A0: 0, V: 0, active: -1 };
     },
     booleanEqs: [
-      { out: "A1", eq: "A1 = I2 + I3", color: "#f97316", explanation: "A1 is the MSB. It equals 1 for inputs 2 and 3, because both 2 (10₂) and 3 (11₂) have their bit-1 = 1. The rule: just OR the inputs whose binary index has that bit set.", trick: "Binary indices 2=10, 3=11 → both have bit-1 ON → A1 = I2 OR I3" },
-      { out: "A0", eq: "A0 = I3 + I1·I2'", color: "#a78bfa", explanation: "A0 is the LSB. Inputs 1 (01₂) and 3 (11₂) have bit-0=1. But I3 has higher priority than I1, so we use I3 directly. For I1, we must ensure I2 is NOT active (priority masking): I1·I2'.", trick: "For priority: I3 always wins. I1 only fires when I2 is quiet (I2')." },
-      { out: "V", eq: "V = I0 + I1 + I2 + I3", color: "#34d399", explanation: "Valid flag V = 1 whenever ANY input is HIGH. V = 0 means all inputs are LOW — nothing to encode.", trick: "V is simply OR of ALL inputs. If anything is happening, V says so." },
+      { out: "A1", eq: "A1 = I2 + I3", tex: "A_{1} = I_{2} + I_{3}", color: "#f97316", explanation: "A1 is the MSB. It equals 1 for inputs 2 and 3, because both 2 (10₂) and 3 (11₂) have their bit-1 = 1. The rule: just OR the inputs whose binary index has that bit set.", trick: "Binary indices 2=10, 3=11 → both have bit-1 ON → A1 = I2 OR I3" },
+      { out: "A0", eq: "A0 = I3 + I1·I2'", tex: "A_{0} = I_{3} + I_{1} \\cdot I_{2}'", color: "#a78bfa", explanation: "A0 is the LSB. Inputs 1 (01₂) and 3 (11₂) have bit-0=1. But I3 has higher priority than I1, so we use I3 directly. For I1, we must ensure I2 is NOT active (priority masking): I1·I2'.", trick: "For priority: I3 always wins. I1 only fires when I2 is quiet (I2')." },
+      { out: "V", eq: "V = I0 + I1 + I2 + I3", tex: "V = I_{0} + I_{1} + I_{2} + I_{3}", color: "#34d399", explanation: "Valid flag V = 1 whenever ANY input is HIGH. V = 0 means all inputs are LOW — nothing to encode.", trick: "V is simply OR of ALL inputs. If anything is happening, V says so." },
     ],
     truthHeaders: ["Active", "A1", "A0", "V"],
     truthRows: [
@@ -60,10 +61,10 @@ export const ENCODER_TYPES = {
       return { A2: 0, A1: 0, A0: 0, V: 0, active: -1 };
     },
     booleanEqs: [
-      { out: "A2", eq: "A2 = I4 + I5 + I6 + I7", color: "#f97316", explanation: "A2 is bit-2. Indices 4–7 all have bit-2=1. OR those four inputs.", trick: "Indices 4–7 all ≥ 4, so they all have bit-2 ON. Think: top half of 0–7." },
-      { out: "A1", eq: "A1 = I2 + I3 + I6 + I7", color: "#a78bfa", explanation: "A1 is bit-1. Indices with bit-1=1: 2,3,6,7. OR those four.", trick: "Pattern: pairs of 2 ON, 2 OFF, repeating. 0,1 OFF → 2,3 ON → 4,5 OFF → 6,7 ON." },
-      { out: "A0", eq: "A0 = I1 + I3 + I5 + I7", color: "#34d399", explanation: "A0 is bit-0 = 1 for all ODD indices. OR all odd-indexed inputs.", trick: "All ODD numbers have LSB=1. So A0 = OR of all odd-index inputs. Simple!" },
-      { out: "V", eq: "V = I0+I1+I2+I3+I4+I5+I6+I7", color: "#60a5fa", explanation: "Valid: any input active → V=1. Big OR of all 8 inputs.", trick: "V is always just the OR of everything. No exceptions." },
+      { out: "A2", eq: "A2 = I4 + I5 + I6 + I7", tex: "A_{2} = I_{4} + I_{5} + I_{6} + I_{7}", color: "#f97316", explanation: "A2 is bit-2. Indices 4–7 all have bit-2=1. OR those four inputs.", trick: "Indices 4–7 all ≥ 4, so they all have bit-2 ON. Think: top half of 0–7." },
+      { out: "A1", eq: "A1 = I2 + I3 + I6 + I7", tex: "A_{1} = I_{2} + I_{3} + I_{6} + I_{7}", color: "#a78bfa", explanation: "A1 is bit-1. Indices with bit-1=1: 2,3,6,7. OR those four.", trick: "Pattern: pairs of 2 ON, 2 OFF, repeating. 0,1 OFF → 2,3 ON → 4,5 OFF → 6,7 ON." },
+      { out: "A0", eq: "A0 = I1 + I3 + I5 + I7", tex: "A_{0} = I_{1} + I_{3} + I_{5} + I_{7}", color: "#34d399", explanation: "A0 is bit-0 = 1 for all ODD indices. OR all odd-indexed inputs.", trick: "All ODD numbers have LSB=1. So A0 = OR of all odd-index inputs. Simple!" },
+      { out: "V", eq: "V = I0+I1+I2+I3+I4+I5+I6+I7", tex: "V = I_{0} + I_{1} + I_{2} + I_{3} + I_{4} + I_{5} + I_{6} + I_{7}", color: "#60a5fa", explanation: "Valid: any input active → V=1. Big OR of all 8 inputs.", trick: "V is always just the OR of everything. No exceptions." },
     ],
     truthHeaders: ["Active Input", "A2", "A1", "A0", "V"],
     truthRows: [
@@ -88,10 +89,10 @@ export const ENCODER_TYPES = {
       return { "A(8)": 0, "B(4)": 0, "C(2)": 0, "D(1)": 0, active: -1 };
     },
     booleanEqs: [
-      { out: "A — 8s place", eq: "A = D8 + D9", color: "#f97316", explanation: "A is the 8s bit. Only digits 8 and 9 have this bit set.", trick: "Only the TWO largest decimal digits need the 8s bit." },
-      { out: "B — 4s place", eq: "B = D4 + D5 + D6 + D7", color: "#a78bfa", explanation: "B is the 4s bit. Digits 4–7 all have this bit set.", trick: "Middle four: 4,5,6,7 all have 4s bit ON. Think: the second quarter." },
-      { out: "C — 2s place", eq: "C = D2 + D3 + D6 + D7", color: "#34d399", explanation: "C is the 2s bit. Digits 2,3,6,7 have it set.", trick: "Alternating pairs: 2,3 ON → 4,5 OFF → 6,7 ON. Same pattern as binary bit-1!" },
-      { out: "D — 1s place", eq: "D = D1 + D3 + D5 + D7 + D9", color: "#60a5fa", explanation: "D is the 1s bit. All ODD digits have this bit set.", trick: "All ODD numbers end in 1 in binary. OR all 5 odd digit keys." },
+      { out: "A — 8s place", eq: "A = D8 + D9", tex: "A = D_{8} + D_{9}", color: "#f97316", explanation: "A is the 8s bit. Only digits 8 and 9 have this bit set.", trick: "Only the TWO largest decimal digits need the 8s bit." },
+      { out: "B — 4s place", eq: "B = D4 + D5 + D6 + D7", tex: "B = D_{4} + D_{5} + D_{6} + D_{7}", color: "#a78bfa", explanation: "B is the 4s bit. Digits 4–7 all have this bit set.", trick: "Middle four: 4,5,6,7 all have 4s bit ON. Think: the second quarter." },
+      { out: "C — 2s place", eq: "C = D2 + D3 + D6 + D7", tex: "C = D_{2} + D_{3} + D_{6} + D_{7}", color: "#34d399", explanation: "C is the 2s bit. Digits 2,3,6,7 have it set.", trick: "Alternating pairs: 2,3 ON → 4,5 OFF → 6,7 ON. Same pattern as binary bit-1!" },
+      { out: "D — 1s place", eq: "D = D1 + D3 + D5 + D7 + D9", tex: "D = D_{1} + D_{3} + D_{5} + D_{7} + D_{9}", color: "#60a5fa", explanation: "D is the 1s bit. All ODD digits have this bit set.", trick: "All ODD numbers end in 1 in binary. OR all 5 odd digit keys." },
     ],
     truthHeaders: ["Key Pressed", "A(8)", "B(4)", "C(2)", "D(1)"],
     truthRows: [
@@ -121,8 +122,8 @@ export const ENCODER_TYPES = {
       return { A3: 0, A2: 0, A1: 0, A0: 0, V: 0, active: -1 };
     },
     booleanEqs: [
-      { out: "A3", eq: "A3 = I8+I9+I10+I11+I12+I13+I14+I15", color: "#f97316", explanation: "Bit-3 is 1 for all inputs 8–15.", trick: "Top half of the 16 inputs." },
-      { out: "V", eq: "V = OR(I0...I15)", color: "#60a5fa", explanation: "Valid whenever any of the 16 inputs are High.", trick: "OR of every single input line." },
+      { out: "A3", eq: "A3 = I8+I9+I10+I11+I12+I13+I14+I15", tex: "A_{3} = I_{8} + I_{9} + I_{10} + I_{11} + I_{12} + I_{13} + I_{14} + I_{15}", color: "#f97316", explanation: "Bit-3 is 1 for all inputs 8–15.", trick: "Top half of the 16 inputs." },
+      { out: "V", eq: "V = OR(I0...I15)", tex: "V = I_{0} + I_{1} + \\cdots + I_{15}", color: "#60a5fa", explanation: "Valid whenever any of the 16 inputs are High.", trick: "OR of every single input line." },
     ],
     truthHeaders: ["Active Input", "A3", "A2", "A1", "A0", "V"],
     truthRows: [

@@ -87,8 +87,9 @@ const MuxPage = () => {
       {/* Cascading demo */}
       <Section title="Cascading MUXes" icon="🔗" accentColor={COLORS.warn}>
         <p style={{ color: COLORS.textSecondary, fontSize: "0.88rem", lineHeight: "1.65", marginBottom: "18px" }}>
-          Two 4-to-1 MUXes can be chained through a 2-to-1 MUX to create an 8-to-1 MUX,
-          adding one extra select bit per level of cascading.
+          Need a MUX with more inputs? Join smaller ones together. Two 4-to-1 MUXes plus one
+          2-to-1 MUX work together as a single 8-to-1 MUX. Each time you double the number of
+          inputs, you need just one more select line.
         </p>
         <CascadingMuxDemo />
       </Section>
