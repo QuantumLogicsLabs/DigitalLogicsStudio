@@ -30,6 +30,8 @@ const Boolforge = ({
   embedded = false,
   initialGates = null,
   initialWires = null,
+  // Zoom/pan to show the whole circuit whenever initialGates is loaded.
+  fitOnLoad = false,
 }) => {
   const { theme, toggle: toggleTheme } = useTheme();
 
@@ -49,6 +51,7 @@ const Boolforge = ({
   const containerRef = useRef(null);
   const hasAutoBuilt = useRef(false);
   const lastSyncKeyRef = useRef(null);
+  const pendingFitRef = useRef(false);
 
   // ── Custom components ────────────────────────────────────────────────────
   const {
@@ -433,15 +436,41 @@ const Boolforge = ({
 
       setGateIdCounter(maxGateId);
       setWireIdCounter(maxWireId);
+
+      // Continue port naming after the loaded ports, so a newly added
+      // input/output doesn't reuse the label of one already on the canvas.
+      setInputCounter(
+        initialGates.filter((g) => g.type === "INPUT").length
+      );
+      setOutputCounter(
+        initialGates.filter((g) => g.type === "OUTPUT").length
+      );
+
+      if (fitOnLoad) pendingFitRef.current = true;
     }
   }, [
     initialGates,
     initialWires,
+    fitOnLoad,
     setGates,
     setWires,
     setGateIdCounter,
     setWireIdCounter,
+    setInputCounter,
+    setOutputCounter,
   ]);
+
+  // Runs after the loaded gates have rendered, so fitToView measures them.
+  // The flag is cleared inside the frame: if gates change again first, the
+  // cleanup cancels this frame and the next run schedules a fresh one.
+  useEffect(() => {
+    if (!pendingFitRef.current || gates.length === 0) return undefined;
+    const frame = requestAnimationFrame(() => {
+      pendingFitRef.current = false;
+      fitToView();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [gates, fitToView]);
 
   // ── Notify parent when circuit changes ───────────────────────────────────
   useEffect(() => {
