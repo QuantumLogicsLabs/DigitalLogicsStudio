@@ -13,12 +13,36 @@
  *   - hint : string    (shown on demand before answering)
  *
  * Features: hint toggle, streak tracking, progress bar, score summary.
+ *
+ * Finishing with at least the pass mark ticks the topic as complete in the
+ * learning path (via the shell's useLessonCompletion).
  */
 import React, { useState } from "react";
 import { COLORS } from "../theme.js";
+import { useLessonCompletion } from "../../../../../../shared/components/topics/lessonCompletion";
+import { getQuizPassMark } from "../../../combinationalConfig";
+
+// ─── Sub-component: pass requirement / completed note above the quiz ──────────
+const PassBanner = ({ isComplete, passMark, total }) => (
+  <div
+    style={{
+      marginBottom: "14px",
+      padding: "9px 13px",
+      borderRadius: "8px",
+      fontSize: "0.8rem",
+      background: isComplete ? "rgba(0,255,136,0.07)" : "rgba(99,102,241,0.08)",
+      border: `1px solid ${isComplete ? "rgba(0,255,136,0.3)" : "rgba(99,102,241,0.25)"}`,
+      color: isComplete ? COLORS.high : COLORS.textSecondary,
+    }}
+  >
+    {isComplete
+      ? "✓ Topic completed. Keep practicing as much as you like — your completion is saved."
+      : `🎯 Score at least ${passMark}/${total} to complete this topic.`}
+  </div>
+);
 
 // ─── Sub-component: score summary shown after finishing all questions ───────────
-const QuizResults = ({ score, total, bestStreak, onRestart, feedbackText }) => (
+const QuizResults = ({ score, total, passMark, bestStreak, onRestart, feedbackText }) => (
   <div style={{ textAlign: "center", padding: "40px 20px" }}>
     <div style={{ fontSize: "3.5rem", marginBottom: "12px" }}>
       {score >= total - 1 ? "🏆" : score >= Math.floor(total / 2) ? "🎯" : "📚"}
@@ -33,8 +57,20 @@ const QuizResults = ({ score, total, bestStreak, onRestart, feedbackText }) => (
     <p style={{ color: COLORS.textSecondary, marginBottom: "4px" }}>
       Best Streak: <strong style={{ color: "#f97316" }}>🔥 {bestStreak}</strong>
     </p>
-    <p style={{ color: COLORS.textSecondary, marginBottom: "24px", fontSize: "0.9rem" }}>
+    <p style={{ color: COLORS.textSecondary, marginBottom: "12px", fontSize: "0.9rem" }}>
       {feedbackText}
+    </p>
+    <p
+      style={{
+        color: score >= passMark ? COLORS.high : COLORS.warn,
+        marginBottom: "24px",
+        fontSize: "0.88rem",
+        fontWeight: "600",
+      }}
+    >
+      {score >= passMark
+        ? "✅ Passed! This topic is now ticked as complete."
+        : `You need ${passMark}/${total} to complete this topic. Review the lesson and try again.`}
     </p>
     <button
       onClick={onRestart}
@@ -84,6 +120,8 @@ const Quiz = ({ questions, feedbackText }) => {
   const [showHint, setShowHint] = useState(false);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
+  const { isComplete, markComplete } = useLessonCompletion();
+  const passMark = getQuizPassMark(questions.length);
 
   const q = questions[qi];
 
@@ -104,6 +142,8 @@ const Quiz = ({ questions, feedbackText }) => {
   const next = () => {
     if (qi + 1 >= questions.length) {
       setDone(true);
+      // `score` already includes the last answer (choose() ran a render ago).
+      if (score >= passMark) markComplete();
       return;
     }
     setQi(qi + 1);
@@ -126,6 +166,7 @@ const Quiz = ({ questions, feedbackText }) => {
       <QuizResults
         score={score}
         total={questions.length}
+        passMark={passMark}
         bestStreak={bestStreak}
         onRestart={restart}
         feedbackText={feedbackText(score, questions.length)}
@@ -135,6 +176,8 @@ const Quiz = ({ questions, feedbackText }) => {
   // ── Active question screen ──
   return (
     <div>
+      <PassBanner isComplete={isComplete} passMark={passMark} total={questions.length} />
+
       {/* Progress + streak row */}
       <div
         style={{
