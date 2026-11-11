@@ -13,8 +13,11 @@ import { COLORS } from "../shared/theme.js";
 import Section from "../shared/components/Section.jsx";
 import Quiz from "../shared/components/Quiz.jsx";
 import TipsPanel from "../shared/components/TipsPanel.jsx";
+import ExperimentButton from "../shared/components/ExperimentButton.jsx";
+import CircuitModal from "../../../../../shared/components/CircuitModal";
 
 import { MUX_TYPES, MUX_QUIZ, MUX_QUIZ_FEEDBACK, MUX_TIPS } from "./muxData.js";
+import { MUX_CIRCUITS, CASCADED_MUX_CIRCUIT } from "./muxCircuits.js";
 import MuxTypeSelector from "./components/MuxTypeSelector.jsx";
 import MuxSimulator from "./components/MuxSimulator.jsx";
 import CascadingMuxDemo from "./components/CascadingMuxDemo.jsx";
@@ -24,6 +27,9 @@ const MuxPage = () => {
   const [selectedType, setSelectedType] = useState("4to1");
   const [dataVals, setDataVals] = useState(Array(8).fill(0));
   const [selVals, setSelVals]   = useState(Array(3).fill(0));
+  // Ready-built circuit shown in the circuit editor, or null when it's closed.
+  // Re-opening always starts from the ready-built circuit again.
+  const [experiment, setExperiment] = useState(null);
 
   const config = MUX_TYPES[selectedType];
 
@@ -49,8 +55,15 @@ const MuxPage = () => {
     >
       <div style={{ maxWidth: "900px", margin: "0 auto", fontFamily: "inherit" }}>
 
-      {/* Type selector */}
-      <MuxTypeSelector selectedType={selectedType} types={MUX_TYPES} onChange={(k) => { setSelectedType(k); setDataVals(Array(8).fill(0)); setSelVals(Array(3).fill(0)); }} />
+      {/* Type selector + open the selected MUX, ready-built, in the circuit editor */}
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "0 10px" }}>
+        <MuxTypeSelector selectedType={selectedType} types={MUX_TYPES} onChange={(k) => { setSelectedType(k); setDataVals(Array(8).fill(0)); setSelVals(Array(3).fill(0)); }} />
+        <ExperimentButton
+          onClick={() => setExperiment(MUX_CIRCUITS[selectedType])}
+          title={`Open a ready-built ${config.label} in the circuit editor`}
+          style={{ marginBottom: "22px" }}
+        />
+      </div>
 
       {/* Concept & analogy */}
       <Section title={`${config.label} — Concept`} icon="💡" accentColor={COLORS.indigo}>
@@ -92,6 +105,14 @@ const MuxPage = () => {
           inputs, you need just one more select line.
         </p>
         <CascadingMuxDemo />
+        <div style={{ marginTop: "16px" }}>
+          <ExperimentButton
+            onClick={() => setExperiment(CASCADED_MUX_CIRCUIT)}
+            title="Open the cascaded 8-to-1 MUX, ready-built, in the circuit editor"
+          >
+            Experiment with the Cascaded Circuit
+          </ExperimentButton>
+        </div>
       </Section>
 
       {/* Quiz */}
@@ -100,6 +121,12 @@ const MuxPage = () => {
       </Section>
 
       <TipsPanel tips={MUX_TIPS} />
+
+      <CircuitModal
+        open={experiment !== null}
+        onClose={() => setExperiment(null)}
+        circuit={experiment}
+      />
     </div>
     </CombinationalLayout>
   );

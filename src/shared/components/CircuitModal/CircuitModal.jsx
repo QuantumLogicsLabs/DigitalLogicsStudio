@@ -127,29 +127,46 @@ function AssignmentPanel({
 }
 
 // ─── Main CircuitModal ────────────────────────────────────────────────────────
+// Three ways to open it:
+//   problem                 — graded task, validated against a truth table
+//   expression + variables  — experiment; gates auto-built from the expression
+//   circuit                 — experiment with a ready-built circuit:
+//                             { title, description?, inputs, outputs, gates, wires }
+//                             Pass a stable object (e.g. a module constant): the
+//                             canvas reloads it whenever the object changes.
 const CircuitModal = ({
   open,
   onClose,
   problem: problemProp,
   expression,
   variables,
+  circuit = null,
   onSolved,
 }) => {
   const isExperimentMode = useMemo(
-    () => !problemProp && Boolean(expression && variables),
-    [problemProp, expression, variables],
+    () => !problemProp && (Boolean(circuit) || Boolean(expression && variables)),
+    [problemProp, circuit, expression, variables],
   );
 
   const problem = useMemo(() => {
     if (problemProp) return problemProp;
     if (!isExperimentMode) return null;
+    if (circuit) {
+      return {
+        id: null,
+        title: circuit.title,
+        description: circuit.description,
+        inputs: circuit.inputs,
+        outputs: circuit.outputs,
+      };
+    }
     return {
       id: null,
       title: expression,
       inputs: variables,
       outputs: ["F"],
     };
-  }, [problemProp, isExperimentMode, expression, variables]);
+  }, [problemProp, isExperimentMode, circuit, expression, variables]);
 
   const boolforgeExpression = useMemo(() => {
     if (!isExperimentMode || !expression) return null;
@@ -162,8 +179,19 @@ const CircuitModal = ({
   );
   const emptyVariables = useMemo(() => [], []);
 
-  const [gates, setGates] = useState([]);
-  const [wires, setWires] = useState([]);
+  const [gates, setGates] = useState(() => circuit?.gates ?? []);
+  const [wires, setWires] = useState(() => circuit?.wires ?? []);
+
+  // Load a new ready-built circuit as soon as the prop changes. Done during
+  // render (not in an effect) so the canvas never flashes the previous one.
+  const [loadedCircuit, setLoadedCircuit] = useState(circuit);
+  if (circuit !== loadedCircuit) {
+    setLoadedCircuit(circuit);
+    if (circuit) {
+      setGates(circuit.gates);
+      setWires(circuit.wires);
+    }
+  }
   const [result, setResult] = useState(null);
   const [showAssign, setShowAssign] = useState(false);
   const [completionError, setCompletionError] = useState("");
@@ -414,11 +442,12 @@ const CircuitModal = ({
       </div>
 
       {/* ── Problem description bar ── */}
-      {!isExperimentMode && problem?.description && (
+      {problem?.description && (
         <div className="circuit-modal-descbar">
           <span className="circuit-modal-descbar-indicator" />
           <span className="circuit-modal-descbar-text">
-            <b>PROBLEM :</b> {problem.description}
+            <b>{isExperimentMode ? "TRY IT :" : "PROBLEM :"}</b>{" "}
+            {problem.description}
           </span>
 
           {problem?.equations?.length > 0 && (
@@ -443,7 +472,8 @@ const CircuitModal = ({
             onCircuitChange={handleCircuitChange}
             portNames={boolforgePortNames}
             simplifiedExpression={isExperimentMode ? boolforgeExpression : null}
-            variables={isExperimentMode ? variables : emptyVariables}
+            variables={isExperimentMode && !circuit ? variables : emptyVariables}
+            fitOnLoad={Boolean(circuit)}
           />
         </div>
 
