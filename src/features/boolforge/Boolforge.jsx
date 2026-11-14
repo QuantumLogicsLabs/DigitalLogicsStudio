@@ -10,6 +10,7 @@ import {
   CircuitCanvas,
   ToolbarRibbon,
   CreateComponentDialog,
+  CommentsSidebar,
 } from "./components";
 import { useToast } from "../../shared/context/ToastContext";
 
@@ -20,6 +21,7 @@ import {
   useSimulation,
   useAI,
   useCustomComponents,
+  useBoardComments,
 } from "./hooks";
 
 const Boolforge = ({
@@ -42,9 +44,9 @@ const Boolforge = ({
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [showGridOverlay, setShowGridOverlay] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   // ── Comments ────────────────────────────────────────────────────────────
-  const [commentMode, setCommentMode] = useState(false);
 
   // ── Refs shared across hooks ─────────────────────────────────────────────
   const canvasRef = useRef(null);
@@ -67,6 +69,10 @@ const Boolforge = ({
     customComponents,
     snapEnabled,
   });
+
+  const boardPath = typeof window === "undefined" ? "/boolforge" : window.location.pathname;
+  const boardKey = `boolforge:${boardPath}:${circuit.activeSheet?.name || "Sheet 1"}`;
+  const boardComments = useBoardComments(boardKey, true);
 
   const {
     sheets,
@@ -139,9 +145,7 @@ const Boolforge = ({
 
     // Comments
     comments,
-    addComment,
     updateComment,
-    deleteComment,
   } = circuit;
 
   // ── Simulation ───────────────────────────────────────────────────────────
@@ -695,11 +699,9 @@ const Boolforge = ({
             (v) => !v
           )
         }
-        comments={comments}
-        commentMode={commentMode}
-        setCommentMode={
-          setCommentMode
-        }
+        comments={boardComments.comments}
+        commentsOpen={commentsOpen}
+        onToggleComments={() => setCommentsOpen((value) => !value)}
       />
 
       <div className="circuit-workspace">
@@ -915,22 +917,8 @@ const Boolforge = ({
           }
 
           // ── Comments ───────────────────────────────────────────────────
-          comments={comments}
-          commentMode={
-            commentMode
-          }
-          setCommentMode={
-            setCommentMode
-          }
-          onAddComment={
-            addComment
-          }
-          onUpdateComment={
-            updateComment
-          }
-          onDeleteComment={
-            deleteComment
-          }
+          comments={[]}
+          commentMode={false}
 
           /*
            * Comment movement:
@@ -995,6 +983,18 @@ const Boolforge = ({
               );
             }
           }}
+        />
+
+        <CommentsSidebar
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+          comments={boardComments.comments}
+          loading={boardComments.loading}
+          submitting={boardComments.submitting}
+          error={boardComments.error}
+          onAddComment={boardComments.addComment}
+          onUpdateComment={boardComments.updateComment}
+          onDeleteComment={boardComments.deleteComment}
         />
       </div>
 

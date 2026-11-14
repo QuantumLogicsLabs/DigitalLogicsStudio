@@ -5,3 +5,4 @@ export * from './useCanvasInteractions';
 export * from './useSimulation';
 export * from './useAI';
 export * from "./useCustomComponents";
+export * from "./useBoardComments";

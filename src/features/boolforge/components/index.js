@@ -8,3 +8,4 @@ export { ZoomWidget } from './ZoomWidget';
 export { FloatingPanel } from './FloatingPanel';
 export { SimulatePanel } from './SimulatePanel';
 export { AIPanel } from './AIPanel';
+export { CommentsSidebar } from './CommentsSidebar';
