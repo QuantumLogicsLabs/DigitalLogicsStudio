@@ -99,6 +99,8 @@ export const ToolbarRibbon = ({
   comments = [],
   commentMode = false,
   setCommentMode,
+  commentsOpen = false,
+  onToggleComments,
 }) => {
   const toast = useToast();
   const [openMenu, setOpenMenu] = useState(null);
@@ -190,10 +192,10 @@ export const ToolbarRibbon = ({
 
   // Comments: toggle comment-placement mode on the canvas, and close the
   // menu so the user immediately sees the canvas to click on.
-  const handleToggleCommentMode = () => {
-  setCommentMode?.((v) => !v);
+  const handleToggleComments = () => {
+  onToggleComments?.();
   closeMenu();
-  if (!commentMode) {
+  if (false) {
     toast.success?.("Comment mode on — click the canvas or a component once to add a note.");
   }
 };
@@ -337,9 +339,9 @@ export const ToolbarRibbon = ({
       {/* ── Comments: quick-access toggle, mirrors the Tools → Comments
           item below so the feature is reachable in one click too ────── */}
       <button
-        className={`ribbon-button${commentMode ? " ribbon-button--active" : ""}`}
-        onClick={handleToggleCommentMode}
-        title={commentMode ? "Exit comment mode" : "Add notes to the canvas or components"}
+        className={`ribbon-button${commentsOpen ? " ribbon-button--active" : ""}`}
+        onClick={handleToggleComments}
+        title={commentsOpen ? "Close comments" : "Open comments"}
       >
         <MessageSquare size={15} strokeWidth={2} className="ribbon-btn-icon" />
         <span>Comments{comments.length > 0 ? ` (${comments.length})` : ""}</span>
@@ -395,11 +397,11 @@ export const ToolbarRibbon = ({
         <RibbonMenuSection title="Notes">
           <RibbonMenuItem
             icon={MessageSquare}
-            label={commentMode ? "Comments (active)" : "Comments"}
-            description={commentMode ? "Click canvas or a component to place a note" : "Leave notes on the circuit"}
-            active={commentMode}
-            trailing={commentMode ? <Check size={14} /> : null}
-            onClick={handleToggleCommentMode}
+            label={commentsOpen ? "Comments (open)" : "Comments"}
+            description="Open the discussion for this board"
+            active={commentsOpen}
+            trailing={commentsOpen ? <Check size={14} /> : null}
+            onClick={handleToggleComments}
           />
         </RibbonMenuSection>
       </RibbonMenu>
@@ -429,7 +431,7 @@ export const ToolbarRibbon = ({
             <li>Double-click a gate to rename it</li>
             <li>Scroll to zoom in or out</li>
             <li>Use + / − on a gate to resize its inputs</li>
-            <li>Toggle Comments, then click the canvas or a component to add a note</li>
+            <li>Open Comments to read or post discussion for this board</li>
           </ul>
         </RibbonMenuSection>
         <RibbonMenuDivider />
